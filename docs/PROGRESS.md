@@ -6,7 +6,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 3 (foundations): built, verified and on GitHub. **The first deploy waits on the owner making the repo public and connecting it in Vercel** (see the Phase 3 entry). |
+| **Current phase** | Phase 3 (foundations): **done and live on the staging link, waiting for the owner's approval**. On approval, `staging` is merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
@@ -42,7 +42,10 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - **CI:** GitHub Actions runs lint, types, 18 tests, the leak check and the build on every push and pull request. Deploys come from Vercel's own GitHub connection; its build runs the leak and credential check first, so a leak never deploys.
 - `npm run verify` passes locally. First commit pushed to `main` and `staging`.
 - First tried deploying from GitHub Actions with a Vercel token, which works with a private repo. The owner then chose to make the repo public and connect Vercel directly, so the deploy job was removed and the leak check now also blocks credentials (API keys, tokens, private keys) and runs before every build. The `VERCEL_TOKEN` secret and token are no longer used and should be deleted.
-- **Waiting on the owner:** make the repo public; connect it in the Vercel project (Settings → Git); delete the unused `VERCEL_TOKEN` secret and Vercel token (steps in the chat). Then I deploy `staging` and check the link.
+- The owner made the repo public and connected it in Vercel. Vercel's first build on connecting came out as a production deployment of the `staging` commit; later pushes behave correctly (`staging` builds a preview, `main` is the production branch), and production was redeployed from `main`. Vercel's build log confirms the leak check runs first, then TypeScript; functions run in `lhr1`.
+- Checked live: home, `/styleguide`, 404, manifest, icons, OG image and `/api/health` respond; every response carries `X-Robots-Tag: noindex, nofollow`; robots.txt disallows everything; CSP, HSTS and frame headers are present; the hero photo is preloaded through Cloudinary.
+- **GitHub Actions has never run** (the workflow is registered but has zero runs), probably an Actions setting on the organisation or repo. Not blocking: Vercel's build runs the leak check and TypeScript. Lint and tests run locally (`npm run verify`) until it's fixed.
+- **Waiting on the owner:** approve Phase 3 from the phone checklist; enable GitHub Actions; say whether I create the Supabase projects (free) or production goes on Pro.
 
 ### 3 October 2026 — Phase 2: design revision 2 (red velvet and gold)
 - Owner feedback on revision 1: good, but keep the **original logo** (only change its colour), use **red velvet and golden gradients**, **no green or pink**. Everything else unchanged.
