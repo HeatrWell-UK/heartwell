@@ -1,6 +1,6 @@
 # Heartwell — Project Plan
 
-Version 1.1 · 4 October 2026 · Status: **approved by the owner on 3 October 2026**. Updated 4 October 2026: the site is hosted on Vercel while it's being built and moves to Hostinger before ads and real orders (owner's decision, section 8); the preview is open to anyone with the link, with no password (owner's decision).
+Version 1.1 · 4 October 2026 · Status: **approved by the owner on 3 October 2026**. Updated 4 October 2026: the site is hosted on Vercel while it's being built and moves to Hostinger before ads and real orders (owner's decision, section 8); the preview is open to anyone with the link, with no password; the GitHub repository is public until launch and Vercel deploys straight from it (owner's decisions).
 
 Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Mainland households. It runs the same business as its sister shop, UK Sofa Shop: the same products, prices, back office, delivery partner and order flow. It gets a completely new customer-facing design, its own name, contact details and accounts. It launches with the sister shop's 64 sofas and is built so dining sets, coffee tables, wardrobes and beds can be added routinely later.
 
@@ -419,9 +419,10 @@ my work (feature branch) ──► staging branch ──► Vercel preview (auto
                               main branch ──► Vercel production (auto-deploy) = the approved build
 ```
 
-- Private repository `HeatrWell-UK/heartwell`.
-- Every push runs GitHub Actions: type check, lint, tests, build and the **sister-leak scan**. The pre-commit hook runs the scan locally too.
-- **Deploys are gated by the checks.** After the checks pass on a push to `staging` or `main`, the same GitHub Actions run builds with the Vercel CLI and deploys to the Vercel project `heartwell` (team "Heartwell", Node 24, functions in London `lhr1`). A failed check means no deployment. This needs one repository secret, `VERCEL_TOKEN`, and avoids connecting Vercel to GitHub, which the free plan may refuse for an organisation's private repo. Environment variables live in the Vercel project; `.env.example` lists the names, and secrets are never committed.
+- Repository `HeatrWell-UK/heartwell`, **public until launch** (owner's decision, 4 October 2026), made private again in Phase 19. Public means anyone can read the code and the docs, so: no secrets in files (the leak check also blocks credential formats), no customer data in the repo, and GitHub's secret scanning and push protection stay on.
+- **Vercel is connected to the repository** (Vercel's GitHub app on HeatrWell-UK). Every push deploys: `staging` to the preview link, `main` to the approved build, any other branch to its own preview. Project `heartwell` (team "Heartwell"), Node 24, functions in London (`lhr1`).
+- The build runs the **leak and credential check first** (`prebuild`), so a leak fails the build and never deploys. TypeScript errors fail it too. Every push also runs GitHub Actions (lint, type check, tests, leak check, build); a red run means the deployment from that push needs fixing. The pre-commit hook runs the leak check locally as well.
+- Environment variables live in the Vercel project; `.env.example` lists the names, and secrets are never committed.
 - **Why Vercel for now:** nothing to set up, a fresh preview after every push, and both Hostinger slots stay free. Vercel's free Hobby plan is for non-commercial use only, so it hosts the build, never the live shop.
 - **Kept portable:** the code reads its own `APP_ENV`, never Vercel's variables; scheduled jobs run from Supabase pg_cron, not Vercel Cron; origins come from forwarded headers (`externalOrigin`). Moving host means copying environment variables, not changing code.
 
@@ -754,7 +755,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 19 — Go-live
 
 - **Goal:** Heartwell is live.
-- **Does:** production settings; DNS steps (exact, by account); heartwellsofa.co.uk redirect with email untouched (verified before and after); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); final smoke test; `SITE_INDEXABLE=true` on the live domain; launch checklist and rollback plan.
+- **Does:** production settings; DNS steps (exact, by account); heartwellsofa.co.uk redirect with email untouched (verified before and after); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
 - **Prepare:** item 22.
 - **Prompt:**
   ```
@@ -801,6 +802,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 | Hostinger Business resources under an ad spike | Cached pages, Cloudinary images, small JavaScript; monitor; upgrade path to Cloud Startup with no code changes. |
 | Only two app slots | Staging and production use both. A third project on this account would need an upgrade. |
 | Vercel Hobby is for non-commercial use | Used only while we build, with staging settings and `noindex`; the move to Hostinger (Phase 18B) comes before ads or real orders. |
+| Public repository until launch | Anyone can read the code and docs (including that Heartwell and the sister shop are related), and anything pushed stays in forks and caches even after the repo goes private. The leak and credential check runs before every commit, in CI and before every build; customer data never enters the repo; secrets live only in the host's environment variables. Made private in Phase 19. |
 | In-app browser quirks | Phone-first testing in both apps every phase; no pop-ups, sign-ins or downloads. |
 | Email from heartwellsofa.co.uk while the site is heartwellfurniture.co.uk | SPF, DKIM and DMARC checked on heartwellsofa.co.uk; one setting to move email to the main domain later (recommended once it's set up). |
 | AI photos misrepresenting a product | Mandatory human approval; the furniture itself must be unchanged. |

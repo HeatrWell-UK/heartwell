@@ -6,7 +6,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 3 (foundations): built, verified and on GitHub. **The first deploy waits on the owner adding the `VERCEL_TOKEN` secret** (see the Phase 3 entry). |
+| **Current phase** | Phase 3 (foundations): built, verified and on GitHub. **The first deploy waits on the owner making the repo public and connecting it in Vercel** (see the Phase 3 entry). |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
@@ -27,8 +27,8 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - The Supabase account connected via MCP had no projects as of 3 Oct 2026.
 - Logo concept: `reference/Logo-Concept.jpeg` (brown/cream heart-shaped sofa, "Heartwell / SOFA").
 - Sister repo cloned read-only at `../sister-uksofashop-readonly` (from a zip of master on 3 Oct 2026; no git history).
-- GitHub: organisation **HeatrWell-UK**, private repo **heartwell** (`main` = approved, `staging` = preview). Local commits are authored as "Heartwell <heartwellsofa@gmail.com>". The push sign-in is held by Git Credential Manager on the owner's PC.
-- Vercel: team **Heartwell** (slug `heartwell`, `team_ROWTCazIeGNQ0zVEY4xIvRLg`, Hobby, login heartwellsofa@gmail.com), project **heartwell** (`prj_kXuZGVcI3xbw2inPEgTKNE6XUpq5`, Next.js, Node 24, functions in `lhr1`, preview toolbar off, Vercel Authentication off). Vercel isn't connected to GitHub; GitHub Actions deploys with the CLI using the `VERCEL_TOKEN` repository secret.
+- GitHub: organisation **HeatrWell-UK**, repo **heartwell**, **public until launch** (owner's decision; made private in Phase 19). `main` = approved, `staging` = preview. Local commits are authored as "Heartwell <heartwellsofa@gmail.com>". The push sign-in is held by Git Credential Manager on the owner's PC.
+- Vercel: team **Heartwell** (slug `heartwell`, `team_ROWTCazIeGNQ0zVEY4xIvRLg`, Hobby, login heartwellsofa@gmail.com), project **heartwell** (`prj_kXuZGVcI3xbw2inPEgTKNE6XUpq5`, Next.js, Node 24, functions in `lhr1`, preview toolbar off, Vercel Authentication off). Vercel deploys straight from the GitHub repo (owner's decision); the build runs the leak check first (`prebuild`).
 - Vercel environment variables: `NEXT_PUBLIC_APP_ENV=staging` on all environments during the build; `NEXT_PUBLIC_SUPPORT_EMAIL`; `NEXT_PUBLIC_SITE_URL` = heartwellfurniture.vercel.app (production), heartwell-staging.vercel.app (preview), localhost (development). No `SITE_INDEXABLE` anywhere.
 - Leak check: banned values live in `reference/leak-terms.txt` (local only). After changing it or the catalogue, run `npm run leaks:fingerprints` and commit `scripts/sister-fingerprints.json`, which holds hashes only.
 
@@ -39,10 +39,10 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - **Built:** Next.js 16.3 / React 19.3 / TypeScript 6 strict / Tailwind 4.3 project; design tokens and fonts (Besley, Figtree) from `DESIGN.md`; brand assets script (logo WebP, favicon, icons, OG image); Cloudinary loader that never re-runs generative transforms; security headers, CSP and noindex; config single sources (`env`, `site`, `brand`, `contact`, `promises`, `navigation`); UI kit (Button, Field inputs, Badge, Price, Accordion); announcement bar, header, swipe menu drawer (works in in-app browsers, focus and inert handled), footer; home page (heart-frame hero with an AI room photo, promise tiles, how ordering works); 404, error pages, robots (disallow all until go-live), manifest, `/api/health`, `/styleguide`.
 - Contact details not supplied yet (phone, WhatsApp, address, company details) are `null` and hidden everywhere, never shown as placeholders.
 - **Leak check:** fingerprint-based (hashes of the sister's name, domain, emails, phone, address, socials, account IDs and product description passages), so the repo holds no sister values at all. Runs as the pre-commit hook (`--staged`) and in CI (`--all`). Verified that it catches spaced phone numbers, IDs inside code and copied description text.
-- **CI:** GitHub Actions runs the leak check, lint, types, 16 tests and the build on every push, then deploys `staging` and `main` to Vercel only if all of that passed.
+- **CI:** GitHub Actions runs lint, types, 18 tests, the leak check and the build on every push and pull request. Deploys come from Vercel's own GitHub connection; its build runs the leak and credential check first, so a leak never deploys.
 - `npm run verify` passes locally. First commit pushed to `main` and `staging`.
-- Vercel can't link the repo until the Vercel login is connected to GitHub, and Hobby may refuse an organisation's private repo. CI deploys with a token instead, which also means nothing unchecked can be deployed.
-- **Waiting on the owner:** create a Vercel token and add it as the `VERCEL_TOKEN` secret on the GitHub repo (steps in the chat). Then the next push deploys the staging link.
+- First tried deploying from GitHub Actions with a Vercel token, which works with a private repo. The owner then chose to make the repo public and connect Vercel directly, so the deploy job was removed and the leak check now also blocks credentials (API keys, tokens, private keys) and runs before every build. The `VERCEL_TOKEN` secret and token are no longer used and should be deleted.
+- **Waiting on the owner:** make the repo public; connect it in the Vercel project (Settings → Git); delete the unused `VERCEL_TOKEN` secret and Vercel token (steps in the chat). Then I deploy `staging` and check the link.
 
 ### 3 October 2026 — Phase 2: design revision 2 (red velvet and gold)
 - Owner feedback on revision 1: good, but keep the **original logo** (only change its colour), use **red velvet and golden gradients**, **no green or pink**. Everything else unchanged.

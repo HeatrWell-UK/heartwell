@@ -13,7 +13,8 @@ Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Main
 - Read-only reference at `../sister-uksofashop-readonly` (branch master). Never push to it, open issues/PRs, or change it.
 - `reference/` (sister schema + catalogue) is local only and git-ignored. Import scripts read it; only cleaned Heartwell data reaches the database.
 - **Never carry over:** its reviews, orders, customers, leads, subscribers, videos or any customer data; its name, domain, phone/WhatsApp numbers, emails, address, socials; its account IDs, keys or tokens (Meta, GA4, GTM, Google Ads, Merchant Center, Supabase, Cloudinary, Trustpilot); its product descriptions.
-- `npm run check:leaks` (pre-commit hook + CI) must pass before every commit.
+- `npm run check:leaks` (pre-commit hook, CI and `prebuild`) must pass before every commit. It also blocks credential formats.
+- The Heartwell repo (HeatrWell-UK/heartwell) is **public until launch**: never commit secrets, customer data or anything from `reference/`. Keys go in the host's environment variables only.
 
 ## Business rules (do not change without the owner)
 - Cash or bank transfer on delivery. An order counts only once the customer confirms it (POST button on `/confirm-order/[id]`).
@@ -31,7 +32,7 @@ Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Main
 
 ## Code and platform
 - Next.js 16 (App Router), React 19, TypeScript strict, Tailwind v4, Supabase, Cloudinary (custom loader), Nodemailer via Hostinger SMTP.
-- Hosting: Vercel (team "Heartwell", Hobby, lhr1) while we build, with `NEXT_PUBLIC_APP_ENV=staging` on every Vercel environment; Hostinger Node.js apps from Phase 18B, before ads or real orders. Keep the code portable: no Vercel crons, no `VERCEL_*` variables in logic, no Vercel-only features; scheduled jobs run from Supabase pg_cron; behind the proxy, build origins from forwarded headers (`externalOrigin`).
+- Hosting: Vercel (team "Heartwell", Hobby, lhr1, deploying straight from GitHub) while we build, with `NEXT_PUBLIC_APP_ENV=staging` on every Vercel environment; Hostinger Node.js apps from Phase 18B, before ads or real orders. Keep the code portable: no Vercel crons, no `VERCEL_*` variables in logic, no Vercel-only features; scheduled jobs run from Supabase pg_cron; behind the proxy, build origins from forwarded headers (`externalOrigin`).
 - Schema changes only as files in `supabase/migrations/`, applied to staging and production.
 - Customer-facing UI follows `docs/DESIGN.md` and must not resemble the sister shop (no warm cream, no amber accent, no Fraunces or Geist, no heavy motion). CSS-only motion. Phone-first; built for the Facebook and Instagram in-app browsers.
 - The admin keeps the sister shop's admin design, with Heartwell branding.

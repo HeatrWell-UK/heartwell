@@ -12,11 +12,27 @@
 // "example sofa co" and "examplesofaco" all match the same entry, and a phone
 // number matches however it is spaced. Descriptions are matched as runs of words
 // (shingles), so a copied passage is caught even inside new text.
+//
+// The repository is public until launch, so the same pass also looks for
+// credentials by their published formats. Keys belong in the host's
+// environment variables, never in a file. (Publishable keys, which are meant to
+// be public, aren't flagged.)
 
 import { createHash } from 'node:crypto'
 
 const SALT = 'heartwell-leak-v1:'
 export const SHINGLE_SIZE = 12
+
+const SECRET_PATTERNS = [
+  ['private key', /-----BEGIN [A-Z ]*PRIVATE KEY-----/],
+  ['Supabase secret key', /\bsb_secret_[A-Za-z0-9_-]{10,}/],
+  ['JSON web token (e.g. a Supabase service key)', /\beyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/],
+  ['Meta access token', /\bEAA[A-Za-z0-9]{30,}/],
+  ['Google API key', /\bAIza[0-9A-Za-z_-]{35}/],
+  ['Cloudinary URL with API secret', /cloudinary:\/\/\d+:[A-Za-z0-9_-]+@/],
+  ['Anthropic API key', /\bsk-ant-[A-Za-z0-9_-]{20,}/],
+  ['GitHub token', /\b(?:ghp|gho|ghs|ghu|github_pat)_[A-Za-z0-9_]{20,}/],
+]
 
 /** Lower-case words and numbers, everything else dropped. */
 export function tokens(text) {
@@ -97,6 +113,9 @@ export function scanLines(lines, matcher, { allow = [] } = {}) {
 
   const allWords = []
   for (const { n, text } of lines) {
+    for (const [label, pattern] of SECRET_PATTERNS) {
+      if (pattern.test(text)) add(n, 'secret', label)
+    }
     const words = tokens(text)
     for (let i = 0; i < words.length; i++) {
       allWords.push({ word: words[i], line: n })

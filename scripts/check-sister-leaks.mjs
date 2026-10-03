@@ -1,10 +1,13 @@
-// Fails if anything from the sister shop is about to enter the repository.
+// Fails if anything from the sister shop, or any credential, is about to enter
+// the repository (which is public until launch).
 //
 //   node scripts/check-sister-leaks.mjs --staged   lines added in the commit (pre-commit hook)
-//   node scripts/check-sister-leaks.mjs --all      every tracked and new file (CI, npm run verify)
+//   node scripts/check-sister-leaks.mjs --all      every tracked and new file (CI, npm run build)
 //
-// See scripts/lib/leak-scan.mjs for how matching works without storing any
-// sister values.
+// It also runs before every build (the "prebuild" script), so a host building
+// straight from GitHub refuses to deploy anything that fails it. See
+// scripts/lib/leak-scan.mjs for how matching works without storing any sister
+// values.
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
@@ -24,7 +27,7 @@ const SKIP = [
   /\.(png|jpe?g|webp|avif|gif|ico|woff2?|ttf|otf|pdf|zip|mp4|webm)$/i,
   /(^|\/)package-lock\.json$/,
   /^scripts\/sister-fingerprints\.json$/,
-  /^(node_modules|\.next|out|build|coverage)\//,
+  /^(node_modules|\.next|\.vercel|out|build|coverage)\//,
 ]
 
 // The planning docs and session rules talk about the sister shop by name; they
@@ -43,9 +46,12 @@ function isGitRepo() {
   }
 }
 
+// Without git (a host's build machine), read the source tree. Env files and
+// build output there belong to the host, not to anything being committed.
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
-    if (['.git', 'node_modules', '.next', 'reference'].includes(name)) continue
+    if (['.git', 'node_modules', '.next', '.vercel', 'reference'].includes(name)) continue
+    if (/^\.env/.test(name) && name !== '.env.example') continue
     const full = join(dir, name)
     if (statSync(full).isDirectory()) walk(full, out)
     else out.push(relative(ROOT, full).replaceAll('\\', '/'))
@@ -110,13 +116,16 @@ function main() {
       if (text.includes('\0')) continue
       findings = scanText(text, matcher, options)
     }
-    for (const f of findings) problems.push(`${path}:${f.line}  sister ${f.category}: "${f.text}"`)
+    for (const f of findings) {
+      const what = f.category === 'secret' ? 'possible secret' : `sister ${f.category}`
+      problems.push(`${path}:${f.line}  ${what}: "${f.text}"`)
+    }
   }
 
   if (problems.length) {
-    console.error(`check:leaks found ${problems.length} problem(s). Nothing from the sister shop may be committed:\n`)
+    console.error(`check:leaks found ${problems.length} problem(s). Nothing from the sister shop, and no credentials, may be committed:\n`)
     for (const p of problems) console.error(`  ${p}`)
-    console.error('\nRemove or rewrite these, then try again.')
+    console.error("\nRemove or rewrite these (keys belong in the host's environment variables), then try again.")
     process.exit(1)
   }
   console.log(`check:leaks: clean (${entries.length} file${entries.length === 1 ? '' : 's'} checked, ${mode}).`)

@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/check-sister-leaks.mjs --all",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -16,7 +17,7 @@
     "check:leaks": "node scripts/check-sister-leaks.mjs",
     "leaks:fingerprints": "node scripts/build-sister-fingerprints.mjs",
     "brand:assets": "node scripts/build-brand-assets.mjs",
-    "verify": "npm run check:leaks -- --all && npm run lint && npm run typecheck && npm run test && npm run build",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build",
     "prepare": "node scripts/install-hooks.mjs"
   },
   "dependencies": {

@@ -26,3 +26,6 @@ Thumbs.db
 /design/preview-photos/
 
 /design/static/
+
+# Vercel CLI
+.vercel/

@@ -54,6 +54,21 @@ describe('leak scanner', () => {
     expect(findings).toEqual([{ line: 42, category: 'contact', text: '07700 900123' }])
   })
 
+  it('finds credentials by their format', () => {
+    // Assembled at runtime so this file doesn't trip the check itself.
+    const fake = 'x'.repeat(40)
+    expect(categories(`SUPABASE_SECRET_KEY=${'sb_' + 'secret_'}${fake}`)).toEqual(['secret'])
+    expect(categories(`key: '${'AI' + 'za'}${'A'.repeat(35)}'`)).toEqual(['secret'])
+    expect(categories(`${'-----BEGIN '}PRIVATE KEY-----`)).toEqual(['secret'])
+    expect(categories(`${'ey' + 'J'}${fake}.${'ey' + 'J'}${fake}.${fake}`)).toEqual(['secret'])
+    expect(categories(`token=${'EA' + 'A'}${'B'.repeat(40)}`)).toEqual(['secret'])
+  })
+
+  it('leaves publishable keys and variable names alone', () => {
+    expect(categories(`NEXT_PUBLIC_SUPABASE_KEY=${'sb_' + 'publishable_'}${'x'.repeat(30)}`)).toEqual([])
+    expect(categories('SUPABASE_SECRET_KEY=')).toEqual([])
+  })
+
   it('refuses terms too short to match safely', () => {
     expect(() => buildFingerprints({ terms: [{ category: 'brand', term: 'abc' }], descriptions: [] })).toThrow()
   })
