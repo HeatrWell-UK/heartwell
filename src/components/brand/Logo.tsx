@@ -21,8 +21,22 @@ export function LogoLockup({ reversed = false, height = 31, className }: { rever
   )
 }
 
-/** The full stacked logo with "SOFA": footer on the home page, brand moments. */
-export function LogoStacked({ reversed = false, width = 190, className }: { reversed?: boolean; width?: number; className?: string }) {
+/**
+ * The full stacked logo with "SOFA": footer on the home page, brand moments.
+ * Lazy by default because it usually sits below the fold, which also stops the
+ * page preloading it ahead of the hero photo.
+ */
+export function LogoStacked({
+  reversed = false,
+  width = 190,
+  eager = false,
+  className,
+}: {
+  reversed?: boolean
+  width?: number
+  eager?: boolean
+  className?: string
+}) {
   const height = Math.round((width * 790) / 1150)
   return (
     <img
@@ -30,6 +44,8 @@ export function LogoStacked({ reversed = false, width = 190, className }: { reve
       alt="Heartwell Sofa"
       width={width}
       height={height}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
       className={cn('block', className)}
     />
   )
