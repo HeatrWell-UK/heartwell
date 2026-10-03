@@ -1,0 +1,4 @@
+#!/bin/sh
+# Blocks any commit that would add something from the sister shop.
+# Installed automatically by `npm install` (scripts/install-hooks.mjs).
+exec node scripts/check-sister-leaks.mjs --staged

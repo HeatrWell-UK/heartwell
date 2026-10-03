@@ -1,0 +1,28 @@
+# Sister-shop reference material: local only, never committed
+/reference/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and builds
+node_modules/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Local working files
+/assets/source/
+/.qa/
+.DS_Store
+Thumbs.db
+*.log
+
+# Design preview photos (also stored in Cloudinary)
+/design/preview-photos/
+
+/design/static/

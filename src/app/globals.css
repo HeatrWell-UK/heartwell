@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/*
+ * Heartwell design tokens: "Red Velvet and Gold" (docs/DESIGN.md).
+ * The font variables come from next/font on <html>; `inline` makes utilities
+ * reference them where they are used, so they always resolve.
+ */
+@theme inline {
+  --color-velvet: #8E1B2E;
+  --color-velvet-dark: #7E1627;
+  --color-velvet-bright: #A3243A;
+  --color-wine: #4A0D17;
+  --color-wine-deep: #3A0A12;
+  --color-gold: #B58A2F;
+  --color-gold-dark: #94701F;
+  --color-gold-pale: #E9CC7B;
+  --color-gold-light: #F2DC9C;
+  --color-gold-tint: #F4E7C6;
+  --color-gold-cream-tint: #FBF4E6;
+  --color-stone: #F5F1EF;
+  --color-ink: #22171A;
+  --color-slate: #5E4F52;
+  --color-body-dark: #3E2F32;
+  --color-line: #E5DADB;
+  --color-line-soft: #EFE7E7;
+  --color-field: #CDBFC1;
+  --color-on-wine: #EBDADD;
+  --color-on-wine-link: #F2E4E6;
+  --color-on-wine-muted: #DCC6CA;
+  --color-error: #B42318;
+  --color-whatsapp: #25D366;
+
+  --font-display: var(--font-besley), Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-figtree), 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --radius-field: 12px;
+  --radius-card: 20px;
+  --radius-panel: 24px;
+
+  --shadow-overlay: 0 -8px 24px rgba(34, 23, 26, 0.12);
+  --shadow-focus: 0 0 0 3px #ffffff, 0 0 0 5px #8E1B2E;
+
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Gradients used as backgrounds. Gold is never placed behind small text. */
+@utility bg-velvet-sheen {
+  background-image: linear-gradient(180deg, #A3243A 0%, #7E1627 100%);
+}
+@utility bg-gold-sheen {
+  background-image: linear-gradient(135deg, #94701F 0%, #E9CC7B 35%, #B58A2F 60%, #F2DC9C 85%, #9E7626 100%);
+}
+@utility text-gold-sheen {
+  background-image: linear-gradient(135deg, #94701F 0%, #E9CC7B 35%, #B58A2F 60%, #F2DC9C 85%, #9E7626 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #E9CC7B;
+}
+/* A thin gold rule, e.g. under the announcement bar. */
+@utility border-gold-rule {
+  border-bottom: 2px solid #B58A2F;
+  border-image: linear-gradient(90deg, #94701F, #F2DC9C 50%, #94701F) 1;
+}
+/* Fabric samples are cut with pinking shears. Used only for fabric swatches. */
+@utility pinked {
+  clip-path: polygon(0% 0%,8.33% 5%,16.67% 0%,25% 5%,33.33% 0%,41.67% 5%,50% 0%,58.33% 5%,66.67% 0%,75% 5%,83.33% 0%,91.67% 5%,100% 0%,95% 8.33%,100% 16.67%,95% 25%,100% 33.33%,95% 41.67%,100% 50%,95% 58.33%,100% 66.67%,95% 75%,100% 83.33%,95% 91.67%,100% 100%,91.67% 95%,83.33% 100%,75% 95%,66.67% 100%,58.33% 95%,50% 100%,41.67% 95%,33.33% 100%,25% 95%,16.67% 100%,8.33% 95%,0% 100%,5% 91.67%,0% 83.33%,5% 75%,0% 66.67%,5% 58.33%,0% 50%,5% 41.67%,0% 33.33%,5% 25%,0% 16.67%,5% 8.33%);
+}
+/* Horizontal rails that scroll without showing a scrollbar. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    background: #ffffff;
+    color: var(--color-ink);
+  }
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  a { color: var(--color-velvet); text-underline-offset: 3px; }
+  a:hover { color: var(--color-wine); }
+
+  /* One visible focus ring everywhere: white gap, then velvet. */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+    border-radius: 6px;
+  }
+
+  /* Inputs at 17px so iPhones never zoom into a field. */
+  input, select, textarea { font-size: 17px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* The basket sheet and drawers slide in when the customer asks for them. */
+@keyframes hw-sheet-up {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}

@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Heartwell product page, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,600;0,700;1,600&amp;family=Figtree:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#8E1B2E}a:hover{color:#4A0D17}
+.pinked{clip-path:polygon(0% 0%,8.33% 5%,16.67% 0%,25% 5%,33.33% 0%,41.67% 5%,50% 0%,58.33% 5%,66.67% 0%,75% 5%,83.33% 0%,91.67% 5%,100% 0%,95% 8.33%,100% 16.67%,95% 25%,100% 33.33%,95% 41.67%,100% 50%,95% 58.33%,100% 66.67%,95% 75%,100% 83.33%,95% 91.67%,100% 100%,91.67% 95%,83.33% 100%,75% 95%,66.67% 100%,58.33% 95%,50% 100%,41.67% 95%,33.33% 100%,25% 95%,16.67% 100%,8.33% 95%,0% 100%,5% 91.67%,0% 83.33%,5% 75%,0% 66.67%,5% 58.33%,0% 50%,5% 41.67%,0% 33.33%,5% 25%,0% 16.67%,5% 8.33%)}
+.hscroll::-webkit-scrollbar{display:none}
+.sheet{animation:hw-up 260ms cubic-bezier(.2,.8,.2,1)}
+@keyframes hw-up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.sheet{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 3760px; box-sizing: border-box; background: #FFFFFF; color: #22171A; font-family: Figtree, 'Segoe UI', system-ui, sans-serif; font-size: 16px; line-height: 1.5; overflow: hidden; display: flex; flex-direction: column;">
+
+  <div style="background: #4A0D17; color: #FFFFFF; font-size: 13px; font-weight: 500; text-align: center; padding: 10px 16px 8px; border-bottom: 2px solid #B58A2F; border-image: linear-gradient(90deg,#94701F,#F2DC9C 50%,#94701F) 1;">Free UK Mainland delivery. Pay nothing until it arrives.</div>
+
+  <header style="height: 60px; box-sizing: border-box; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EFE7E7;">
+    <button type="button" aria-label="Open menu" style="width: 44px; height: 44px; border: 0; background: transparent; color: #22171A; display: flex; align-items: center; justify-content: center; padding: 0;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <a href="Home.dc.html" style="display: flex; align-items: center; gap: 8px; text-decoration: none;" aria-label="Heartwell home">
+      <img src="/_blob/24ba8ed14e952000205ea0124178e2c2" alt="" style="width: 44px; height: 31px; display: block;">
+      <img src="/_blob/12018461235151766f2270a648128ff6" alt="Heartwell" style="width: 128px; height: 24px; display: block;">
+    </a>
+    <div style="display: flex; align-items: center;">
+      <button type="button" aria-label="Search" style="width: 44px; height: 44px; border: 0; background: transparent; color: #22171A; display: flex; align-items: center; justify-content: center; padding: 0;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+      </button>
+      <button type="button" aria-label="Basket" onClick="{{openBasket}}" style="position: relative; width: 44px; height: 44px; border: 0; background: transparent; color: #22171A; display: flex; align-items: center; justify-content: center; padding: 0;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10h17l-1.6 8.2a2 2 0 0 1-2 1.6H7.1a2 2 0 0 1-2-1.6L3.5 10z"/><path d="M8 10l3-5.5M16 10l-3-5.5"/><path d="M9 13.5v3M15 13.5v3M12 13.5v3"/></svg>
+        <sc-if value="{{inBasket}}" hint-placeholder-val="{{false}}">
+          <span style="position: absolute; top: 6px; right: 5px; min-width: 18px; height: 18px; border-radius: 999px; background: #8E1B2E; color: #FFFFFF; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;">1</span>
+        </sc-if>
+      </button>
+    </div>
+  </header>
+
+  <nav aria-label="Breadcrumb" style="padding: 10px 16px; font-size: 14px; color: #5E4F52; display: flex; gap: 6px; align-items: center;">
+    <a href="#" style="color: #5E4F52;">Sofas</a>
+    <span aria-hidden="true">/</span>
+    <a href="#" style="color: #5E4F52;">Corner sofas</a>
+  </nav>
+
+  <section aria-label="Photos" style="position: relative;">
+    <div style="width: 390px; height: 390px; background: #F5F1EF; overflow: hidden;">
+      <img src="{{current.img}}" alt="{{current.alt}}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+    </div>
+    <button type="button" aria-label="Save this sofa" style="position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border-radius: 999px; border: 0; background: rgba(255,255,255,.94); color: #8E1B2E; display: flex; align-items: center; justify-content: center; padding: 0;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+    </button>
+    <span style="position: absolute; left: 12px; bottom: 12px; background: rgba(58,10,19,.84); color: #FFFFFF; font-size: 13px; font-weight: 600; padding: 5px 11px; border-radius: 999px;">{{current.name}} plush velvet</span>
+    <div style="display: flex; justify-content: center; gap: 6px; padding: 12px 0 0;">
+      <span style="width: 20px; height: 6px; border-radius: 999px; background: #8E1B2E;"></span>
+      <span style="width: 6px; height: 6px; border-radius: 999px; background: #DCCFD0;"></span>
+      <span style="width: 6px; height: 6px; border-radius: 999px; background: #DCCFD0;"></span>
+    </div>
+  </section>
+
+  <section style="padding: 16px 16px 0; display: flex; flex-direction: column; gap: 10px;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <span style="font-size: 13px; font-weight: 600; color: #8E1B2E; background: #F4E7C6; padding: 4px 10px; border-radius: 999px;">Made to order</span>
+      <span style="font-size: 13px; font-weight: 600; color: #8E1B2E; background: #F4E7C6; padding: 4px 10px; border-radius: 999px;">Made in the UK</span>
+    </div>
+    <h1 style="margin: 0; font-family: Besley, Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.12; letter-spacing: -0.012em; text-wrap: balance;">Lily High Back {{size.label}}</h1>
+    <div style="display: flex; align-items: baseline; gap: 12px;">
+      <span style="font-family: Besley, Georgia, serif; font-weight: 700; font-size: 32px; line-height: 1; color: #22171A;">{{size.price}}</span>
+      <span style="font-size: 15px; font-weight: 600; color: #8E1B2E;">Free delivery</span>
+    </div>
+    <span style="font-size: 15px; color: #5E4F52;">Pay nothing today. Pay the driver when it arrives.</span>
+  </section>
+
+  <section style="padding: 22px 16px 0; display: flex; flex-direction: column; gap: 12px;">
+    <div style="font-size: 15px;"><span style="font-weight: 600;">Colour:</span> <span style="color: #5E4F52;">{{current.name}} plush velvet</span></div>
+    <div role="radiogroup" aria-label="Colour" style="display: flex; gap: 12px;">
+      <sc-for list="{{colours}}" as="c" hint-placeholder-count="4">
+        <button type="button" role="radio" aria-checked="{{c.checked}}" aria-label="{{c.name}}" onClick="{{c.pick}}" style="width: 48px; height: 48px; border-radius: 999px; padding: 4px; box-sizing: border-box; background: transparent; border: {{c.ring}}; display: flex; align-items: center; justify-content: center;">
+          <span style="width: 100%; height: 100%; border-radius: 999px; background: {{c.hex}}; box-shadow: inset 0 0 0 1px rgba(34,23,26,.2);"></span>
+        </button>
+      </sc-for>
+    </div>
+    <button type="button" style="align-self: flex-start; display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 14px 6px 8px; border-radius: 999px; border: 1px solid #E5DADB; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 600; color: #8E1B2E;">
+      <span style="display: flex;">
+        <span class="pinked" style="width: 26px; height: 26px; background: #0F4A3F;"></span>
+        <span class="pinked" style="width: 26px; height: 26px; background: #D8B7BF; margin-left: -8px;"></span>
+        <span class="pinked" style="width: 26px; height: 26px; background: #A8701F; margin-left: -8px;"></span>
+      </span>
+      Or choose from 70 fabrics
+    </button>
+  </section>
+
+  <section style="padding: 22px 16px 0; display: flex; flex-direction: column; gap: 12px;">
+    <span style="font-size: 15px; font-weight: 600;">Size</span>
+    <div role="radiogroup" aria-label="Size" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;">
+      <sc-for list="{{sizes}}" as="s" hint-placeholder-count="4">
+        <button type="button" role="radio" aria-checked="{{s.checked}}" onClick="{{s.pick}}" style="min-height: 60px; border-radius: 16px; border: {{s.border}}; background: {{s.bg}}; padding: 8px 12px; text-align: left; font: inherit; display: flex; flex-direction: column; justify-content: center; gap: 1px; color: #22171A;">
+          <span style="font-size: 15px; font-weight: 600; line-height: 1.25;">{{s.label}}</span>
+          <span style="font-size: 14px; color: #5E4F52; line-height: 1.25;">{{s.price}}</span>
+        </button>
+      </sc-for>
+    </div>
+    <span style="font-size: 15px; font-weight: 600; padding-top: 6px;">Back</span>
+    <div role="radiogroup" aria-label="Back style" style="display: flex; padding: 4px; border-radius: 999px; background: #F5F1EF; gap: 4px;">
+      <sc-for list="{{backs}}" as="b" hint-placeholder-count="2">
+        <button type="button" role="radio" aria-checked="{{b.checked}}" onClick="{{b.pick}}" style="flex: 1 1 0; min-height: 44px; border-radius: 999px; border: 0; background: {{b.bg}}; color: {{b.fg}}; font: inherit; font-size: 15px; font-weight: 600;">{{b.label}}</button>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 12px;">
+    <button type="button" onClick="{{addToBasket}}" style="height: 56px; border-radius: 999px; border: 0; background: linear-gradient(180deg,#A3243A 0%,#7E1627 100%); color: #FFFFFF; font: inherit; font-weight: 600; font-size: 17px;">Add to basket</button>
+    <a href="#" style="height: 56px; box-sizing: border-box; border-radius: 999px; border: 1.5px solid #8E1B2E; color: #8E1B2E; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none;">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#25D366" d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5z"/><path fill="#FFFFFF" d="M9.1 7.6c-.2-.5-.4-.5-.6-.5h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.9 4.5 4 2.2.9 2.7.7 3.2.7s1.6-.7 1.8-1.3c.2-.6.2-1.2.2-1.3l-.4-.3-1.9-.9c-.3-.1-.5-.1-.6.1l-.9 1.1c-.2.2-.3.2-.6.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.9-2.1z"/></svg>
+      Ask about this sofa on WhatsApp
+    </a>
+  </section>
+
+  <section style="margin: 24px 16px 0; padding: 18px 16px; border-radius: 20px; background: #F5F1EF; display: flex; flex-direction: column; gap: 12px;">
+    <label for="pc" style="font-size: 16px; font-weight: 600;">Check delivery to your postcode</label>
+    <div style="display: flex; gap: 8px;">
+      <input id="pc" type="text" inputmode="text" autocomplete="postal-code" value="LS6 2AB" style="flex: 1 1 auto; min-width: 0; height: 52px; box-sizing: border-box; border-radius: 12px; border: 1.5px solid #CDBFC1; background: #FFFFFF; padding: 0 14px; font: inherit; font-size: 17px; color: #22171A; text-transform: uppercase;">
+      <button type="button" onClick="{{checkPostcode}}" style="flex: 0 0 auto; height: 52px; padding: 0 20px; border-radius: 12px; border: 0; background: linear-gradient(180deg,#A3243A 0%,#7E1627 100%); color: #FFFFFF; font: inherit; font-weight: 600; font-size: 16px;">Check</button>
+    </div>
+    <sc-if value="{{checked}}" hint-placeholder-val="{{true}}">
+      <div role="status" style="display: flex; gap: 10px; align-items: flex-start; background: #FFFFFF; border-radius: 12px; padding: 12px;">
+        <span style="flex: 0 0 auto; width: 24px; height: 24px; border-radius: 999px; background: #8E1B2E; color: #FFFFFF; display: flex; align-items: center; justify-content: center; margin-top: 1px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </span>
+        <span style="font-size: 15px; line-height: 1.45;"><strong style="font-weight: 600;">Free delivery to LS6.</strong> Usually arrives between Tuesday 6 and Thursday 8 October.</span>
+      </div>
+    </sc-if>
+    <span style="font-size: 14px; line-height: 1.45; color: #5E4F52;">Upstairs delivery, assembly and taking your old sofa away can be added at checkout.</span>
+  </section>
+
+  <section style="padding: 22px 16px 0; display: flex; flex-direction: column;">
+    <div style="display: flex; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid #EFE7E7;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8E1B2E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 auto;"><rect x="3" y="6.5" width="18" height="11" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6.5 9.5v5M17.5 9.5v5"/></svg>
+      <span style="font-size: 15px;"><strong style="font-weight: 600;">Pay on delivery.</strong> Cash or bank transfer, once it is in your room.</span>
+    </div>
+    <div style="display: flex; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid #EFE7E7;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8E1B2E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="flex: 0 0 auto;"><path d="M12 3.5l7 2.8v5.2c0 4.3-3 7.6-7 9-4-1.4-7-4.7-7-9V6.3l7-2.8z"/><path d="M9 12l2 2 4-4"/></svg>
+      <span style="font-size: 15px;"><strong style="font-weight: 600;">1-year guarantee</strong> on the frame and springs.</span>
+    </div>
+    <div style="display: flex; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 1px solid #EFE7E7;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8E1B2E" stroke-width="1.75" stroke-linecap="round" style="flex: 0 0 auto;"><circle cx="6" cy="6.5" r="2.5"/><circle cx="6" cy="17.5" r="2.5"/><path d="M8.2 8l11.3 9M8.2 16l11.3-9"/></svg>
+      <span style="font-size: 15px;"><strong style="font-weight: 600;">Made to order for you,</strong> so the 14-day change-of-mind return doesn't apply. Faults are always covered.</span>
+    </div>
+  </section>
+
+  <section style="padding: 32px 16px 0; display: flex; flex-direction: column; gap: 14px;">
+    <h2 style="margin: 0; font-family: Besley, Georgia, serif; font-weight: 700; font-size: 24px; line-height: 1.2;">Measurements</h2>
+    <div style="border-radius: 20px; border: 1px solid #E5DADB; background: #FFFFFF; padding: 16px;">
+      <svg width="100%" viewBox="0 0 326 210" role="img" aria-label="Top view of the corner sofa: 240 centimetres along each side, 90 centimetres deep">
+        <path d="M60 30h230v70H130v90H60z" fill="#F5F1EF" stroke="#8E1B2E" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M60 52h230M82 52v138" stroke="#8E1B2E" stroke-width="1.2" stroke-dasharray="4 4"/>
+        <path d="M60 14h230" stroke="#B58A2F" stroke-width="1.5"/><path d="M60 9v10M290 9v10" stroke="#B58A2F" stroke-width="1.5"/>
+        <text x="175" y="10" text-anchor="middle" font-family="Figtree, sans-serif" font-size="13" font-weight="600" fill="#22171A">240 cm</text>
+        <path d="M40 30v160" stroke="#B58A2F" stroke-width="1.5"/><path d="M35 30h10M35 190h10" stroke="#B58A2F" stroke-width="1.5"/>
+        <text x="30" y="114" text-anchor="middle" font-family="Figtree, sans-serif" font-size="13" font-weight="600" fill="#22171A" transform="rotate(-90 30 114)">240 cm</text>
+        <path d="M306 30v70" stroke="#B58A2F" stroke-width="1.5"/><path d="M301 30h10M301 100h10" stroke="#B58A2F" stroke-width="1.5"/>
+        <text x="318" y="70" text-anchor="middle" font-family="Figtree, sans-serif" font-size="13" font-weight="600" fill="#22171A" transform="rotate(-90 318 70)">90 cm</text>
+      </svg>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding-top: 12px; border-top: 1px solid #EFE7E7; margin-top: 8px;">
+        <div style="display: flex; flex-direction: column;"><span style="font-size: 13px; color: #5E4F52;">Width</span><span style="font-size: 16px; font-weight: 600;">240 × 240 cm</span></div>
+        <div style="display: flex; flex-direction: column;"><span style="font-size: 13px; color: #5E4F52;">Depth</span><span style="font-size: 16px; font-weight: 600;">90 cm</span></div>
+        <div style="display: flex; flex-direction: column;"><span style="font-size: 13px; color: #5E4F52;">Height</span><span style="font-size: 16px; font-weight: 600;">95 cm</span></div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 20px; background: #F5F1EF;">
+      <label for="door" style="font-size: 16px; font-weight: 600;">Will it fit through your door?</label>
+      <span style="font-size: 14px; color: #5E4F52;">Measure the narrowest door or hallway on the way in.</span>
+      <div style="display: flex; gap: 8px;">
+        <div style="flex: 1 1 auto; position: relative;">
+          <input id="door" type="number" inputmode="numeric" placeholder="Width" style="width: 100%; height: 52px; box-sizing: border-box; border-radius: 12px; border: 1.5px solid #CDBFC1; background: #FFFFFF; padding: 0 44px 0 14px; font: inherit; font-size: 17px;">
+          <span style="position: absolute; right: 14px; top: 14px; font-size: 16px; color: #5E4F52;">cm</span>
+        </div>
+        <button type="button" style="height: 52px; padding: 0 18px; border-radius: 12px; border: 1.5px solid #8E1B2E; background: transparent; color: #8E1B2E; font: inherit; font-weight: 600; font-size: 16px;">Check</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 28px 16px 0; display: flex; flex-direction: column;">
+    <sc-for list="{{panels}}" as="pn" hint-placeholder-count="4">
+      <div style="border-top: 1px solid #E5DADB;">
+        <button type="button" aria-expanded="{{pn.open}}" onClick="{{pn.toggle}}" style="width: 100%; min-height: 58px; border: 0; background: transparent; padding: 14px 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; font: inherit; font-size: 17px; font-weight: 600; color: #22171A;">
+          {{pn.title}}
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="transform: {{pn.rotate}}; transition: transform 200ms;"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <sc-if value="{{pn.open}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 0 0 18px; display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{pn.lines}}" as="ln" hint-placeholder-count="2">
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #3E2F32;">{{ln}}</p>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+    <div style="border-top: 1px solid #E5DADB;"></div>
+  </section>
+
+  <section style="padding: 32px 16px 0; display: flex; flex-direction: column; gap: 12px;">
+    <h2 style="margin: 0; font-family: Besley, Georgia, serif; font-weight: 700; font-size: 24px; line-height: 1.2;">Reviews</h2>
+    <div style="border-radius: 20px; border: 1px dashed #CDBFC1; padding: 18px 16px; display: flex; flex-direction: column; gap: 8px;">
+      <span style="font-size: 16px; font-weight: 600;">No reviews yet</span>
+      <span style="font-size: 15px; line-height: 1.55; color: #5E4F52;">Lily is new to Heartwell. We only publish reviews from people who bought from us, so the first ones will come from our first customers.</span>
+      <a href="#" style="font-size: 15px; font-weight: 600; color: #8E1B2E; padding-top: 2px;">Ask us anything on WhatsApp</a>
+    </div>
+  </section>
+
+  <section style="padding: 32px 0 0; display: flex; flex-direction: column; gap: 14px;">
+    <h2 style="margin: 0; padding: 0 16px; font-family: Besley, Georgia, serif; font-weight: 700; font-size: 24px; line-height: 1.2;">You might also like</h2>
+    <div class="hscroll" style="display: flex; gap: 12px; overflow-x: auto; padding: 0 16px 4px; scrollbar-width: none;">
+      <sc-for list="{{related}}" as="r" hint-placeholder-count="3">
+        <a href="#" style="flex: 0 0 168px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: #22171A;">
+          <span style="display: block; aspect-ratio: 1 / 1; border-radius: 18px; overflow: hidden; background: #F5F1EF;">
+            <img src="{{r.img}}" alt="{{r.alt}}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          </span>
+          <span style="font-size: 15px; font-weight: 600; line-height: 1.3;">{{r.name}}</span>
+          <span style="font-family: Besley, Georgia, serif; font-weight: 700; font-size: 18px;">{{r.price}}</span>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer style="margin-top: 36px; background: #4A0D17; color: #FFFFFF; padding: 28px 16px 120px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="/_blob/bf76a52477ed141082a7f1a5bd9f14f7" alt="" style="width: 44px; height: 31px; display: block;">
+      <img src="/_blob/907c5177a27cba384cb1b9660caacd91" alt="Heartwell" style="width: 128px; height: 24px; display: block;">
+    </div>
+    <span style="font-size: 14px; color: #DCC6CA;">The full footer is shown on the home page.</span>
+  </footer>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,.97); border-top: 1px solid #E5DADB; padding: 12px 16px 16px; display: flex; align-items: center; gap: 14px;">
+    <div style="display: flex; flex-direction: column; flex: 0 0 auto;">
+      <span style="font-family: Besley, Georgia, serif; font-weight: 700; font-size: 22px; line-height: 1.1;">{{size.price}}</span>
+      <span style="font-size: 13px; color: #5E4F52;">Pay on delivery</span>
+    </div>
+    <button type="button" onClick="{{addToBasket}}" style="flex: 1 1 auto; height: 52px; border-radius: 999px; border: 0; background: linear-gradient(180deg,#A3243A 0%,#7E1627 100%); color: #FFFFFF; font: inherit; font-weight: 600; font-size: 17px;">Add to basket</button>
+  </div>
+
+  <sc-if value="{{basketOpen}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; left: 0; right: 0; top: 0; height: 844px; display: flex; flex-direction: column; justify-content: flex-end;">
+      <button type="button" aria-label="Close basket" onClick="{{closeBasket}}" style="position: absolute; inset: 0; border: 0; padding: 0; background: rgba(40,8,14,.55);"></button>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" style="position: relative; background: #FFFFFF; border-radius: 24px 24px 0 0; padding: 10px 16px 24px; display: flex; flex-direction: column; gap: 16px;">
+        <span style="align-self: center; width: 40px; height: 5px; border-radius: 999px; background: #DCCFD0;"></span>
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <h2 id="sheet-title" style="margin: 0; font-family: Besley, Georgia, serif; font-weight: 700; font-size: 22px;">Added to your basket</h2>
+          <button type="button" aria-label="Close" onClick="{{closeBasket}}" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #22171A; padding: 0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <img src="{{current.img}}" alt="" style="width: 84px; height: 84px; border-radius: 14px; object-fit: cover; display: block;">
+          <div style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto;">
+            <span style="font-size: 16px; font-weight: 600; line-height: 1.3;">Lily High Back {{size.label}}</span>
+            <span style="font-size: 14px; color: #5E4F52;">{{current.name}} plush velvet, {{back.label}}</span>
+            <span style="font-family: Besley, Georgia, serif; font-weight: 700; font-size: 18px; padding-top: 2px;">{{size.price}}</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-top: 1px solid #EFE7E7; border-bottom: 1px solid #EFE7E7;">
+          <div style="display: flex; justify-content: space-between; font-size: 15px;"><span>Delivery to UK Mainland</span><span style="font-weight: 600; color: #8E1B2E;">Free</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 15px;"><span>To pay today</span><span style="font-weight: 600;">£0</span></div>
+          <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 600;"><span>To pay on delivery</span><span>{{size.price}}</span></div>
+        </div>
+        <a href="#" style="height: 56px; border-radius: 999px; background: linear-gradient(180deg,#A3243A 0%,#7E1627 100%); color: #FFFFFF; font-weight: 600; font-size: 17px; display: flex; align-items: center; justify-content: center; text-decoration: none;">Go to checkout</a>
+        <button type="button" onClick="{{closeBasket}}" style="height: 52px; border-radius: 999px; border: 1.5px solid #8E1B2E; background: transparent; color: #8E1B2E; font: inherit; font-weight: 600; font-size: 16px;">Keep shopping</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":3760}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { colour: 0, size: 1, back: 0, checked: true, basketOpen: false, inBasket: false, open: 0 };
+  }
+  renderVals() {
+    const s = this.state;
+    const colourData = [
+      { name: 'Grey', hex: '#7d7d7d', img: '/_blob/28b59cd7da19b980563e5c8b95f31d23' },
+      { name: 'Black', hex: '#1b1b1e', img: '/_blob/0428f75cd87b7df17b3d7582383e431f' },
+      { name: 'Navy blue', hex: '#1e2a53', img: '/_blob/886eaf8ca434f44ce94ec18f70b99528' },
+      { name: 'Beige', hex: '#b6a494', img: '/_blob/70e63e224052d3ca8a5bba73482cf1fb' }
+    ];
+    const sizeData = [
+      { label: '3+2 Seater', price: '£749' },
+      { label: '5 Seater Corner', price: '£749' },
+      { label: 'U-Shape', price: '£879' },
+      { label: 'Armed U-Shape', price: '£949' }
+    ];
+    const backData = [{ label: 'High back' }, { label: 'Scattered back' }];
+    const panelData = [
+      { title: 'About this sofa', lines: [
+        'Lily is built for long evenings: deep seats, a tall back that supports your head and shoulders, and plush velvet that feels soft from the first sit.',
+        'The corner shape fits neatly into the angle of a room and seats five, with a scatter cushion in each corner. Every Lily is made to order in the UK, in the colour shown or any of our 70 fabrics.'
+      ] },
+      { title: 'Specifications', lines: [
+        'Frame: [frame material]. Seat: [seat construction]. Feet: [finish].',
+        'Back: high back with fixed cushions. All cushions included. Fabric as shown: plush velvet.'
+      ] },
+      { title: 'Delivery and returns', lines: [
+        'Free delivery to the ground floor anywhere on UK Mainland. Most orders arrive in 2 to 4 working days; some Wales and Scotland postcodes take 5 to 7.',
+        'Upstairs delivery from £20, assembly £20 and old sofa removal £10 a seat can be added at checkout. Made-to-order pieces cannot be returned for a change of mind; faults are always covered.'
+      ] },
+      { title: 'Care', lines: [
+        'Plump the cushions weekly and vacuum with a soft brush. Blot spills straight away with a clean, dry cloth; do not rub.'
+      ] }
+    ];
+    return {
+      colours: colourData.map((c, i) => ({
+        name: c.name, hex: c.hex, checked: s.colour === i ? 'true' : 'false',
+        ring: s.colour === i ? '2px solid #8E1B2E' : '1px solid #E5DADB',
+        pick: () => this.setState({ colour: i })
+      })),
+      current: { name: colourData[s.colour].name, img: colourData[s.colour].img, alt: 'Lily corner sofa in ' + colourData[s.colour].name.toLowerCase() + ' plush velvet, in a bright living room' },
+      sizes: sizeData.map((z, i) => ({
+        label: z.label, price: z.price, checked: s.size === i ? 'true' : 'false',
+        border: s.size === i ? '2px solid #8E1B2E' : '1px solid #E5DADB',
+        bg: s.size === i ? '#F4E7C6' : '#FFFFFF',
+        pick: () => this.setState({ size: i })
+      })),
+      size: sizeData[s.size],
+      backs: backData.map((b, i) => ({
+        label: b.label, checked: s.back === i ? 'true' : 'false',
+        bg: s.back === i ? '#8E1B2E' : 'transparent',
+        fg: s.back === i ? '#FFFFFF' : '#8E1B2E',
+        pick: () => this.setState({ back: i })
+      })),
+      back: backData[s.back],
+      checked: s.checked,
+      checkPostcode: () => this.setState({ checked: true }),
+      panels: panelData.map((p, i) => ({
+        title: p.title, lines: p.lines, open: s.open === i,
+        rotate: s.open === i ? 'rotate(180deg)' : 'none',
+        toggle: () => this.setState({ open: s.open === i ? -1 : i })
+      })),
+      related: [
+        { name: 'Malibu High Back Corner', price: '£749', img: '/_blob/037d06704b915b81248a3f985fdc197c', alt: 'Malibu corner sofa in oatmeal' },
+        { name: 'Ashton High Back 3+2', price: '£749', img: '/_blob/fc2acbe5ebd8132cda6ad8437012341b', alt: 'Ashton 3 and 2 seater sofas in grey' },
+        { name: 'Roma Recliner 3+2', price: '£599', img: '/_blob/985eaacfcd32fe311def0bf716f13fca', alt: 'Roma reclining sofas in black' }
+      ],
+      inBasket: s.inBasket,
+      basketOpen: s.basketOpen,
+      addToBasket: () => this.setState({ basketOpen: true, inBasket: true }),
+      openBasket: () => this.setState({ basketOpen: true }),
+      closeBasket: () => this.setState({ basketOpen: false })
+    };
+  }
+}
+</script>
+</body>
+</html>
