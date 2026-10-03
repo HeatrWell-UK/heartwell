@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Besley, Figtree } from 'next/font/google'
 import './globals.css'
-import { AnnouncementBar } from '@/components/layout/AnnouncementBar'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
 import { BRAND, BRAND_COLOURS } from '@/config/brand'
 import { META_DESCRIPTION } from '@/config/promises'
 import { METADATA_BASE } from '@/config/site'
@@ -46,14 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
-        <div id="page" className="flex flex-1 flex-col">
-          <AnnouncementBar />
-          <Header />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+        {children}
       </body>
     </html>
   )

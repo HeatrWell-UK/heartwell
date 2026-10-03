@@ -37,6 +37,17 @@ npm run dev
 
 Every deployment is `noindex` until go-live sets `SITE_INDEXABLE=true` on the real domain. Tracking runs only when `NEXT_PUBLIC_APP_ENV=production` on the production host. The code reads no host-specific variables, so moving hosts means copying environment variables, not changing code.
 
+## Database
+
+Supabase (London). Two projects: `heartwell-staging` (used by every Vercel environment while we build) and `heartwell-prod` (connected at the move to Hostinger).
+
+- **Schema changes are migration files** in `supabase/migrations/`, applied to both projects with the same version numbers. Never edit the schema in the dashboard.
+- **Business rules live in Postgres:** pricing, offers, the order lifecycle, confirmation and tracking (`place_order`, `confirm_order`, `price_order`, ...). The browser never sends a price.
+- **Tests that run in the database:** `supabase/tests/order_flow.sql` (run in the SQL editor; it rolls itself back and ends with `ALL_TESTS_PASSED`).
+- **TypeScript and SQL agree:** `tests/delivery-parity.test.ts` checks the TypeScript delivery rules against answers captured from the database (`supabase/tests/delivery_parity.sql` regenerates them).
+- **Types:** `src/types/database.ts` is generated from the staging project. Regenerate after every migration.
+- **Admins:** add an email to `public.admins`; the person signs in at `/admin/login` and their account is linked on first sign-in.
+
 ## Deploying
 
 Vercel is connected to this repository and deploys every push:

@@ -8,12 +8,31 @@ export function formatPrice(amount: number): string {
   return Number.isInteger(amount) ? GBP_WHOLE.format(amount) : GBP_PENCE.format(amount)
 }
 
-const LONG_DATE = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'long', day: 'numeric', month: 'long' })
 const SHORT_DATE = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', day: '2-digit', month: '2-digit', year: 'numeric' })
+
+/**
+ * "Tuesday 6 October", "Tuesday 6 October 2026" or "6 October 2026", assembled
+ * from parts so the house style (no commas) never depends on the browser's
+ * date patterns. timeZone 'UTC' is for calendar dates already pinned to a day.
+ */
+export function ukDate(
+  date: Date,
+  { weekday = true, year = false, timeZone = 'Europe/London' }: { weekday?: boolean; year?: boolean; timeZone?: string } = {},
+): string {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    weekday: weekday ? 'long' : undefined,
+    day: 'numeric',
+    month: 'long',
+    year: year ? 'numeric' : undefined,
+  }).formatToParts(date)
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value
+  return [weekday ? get('weekday') : null, get('day'), get('month'), year ? get('year') : null].filter(Boolean).join(' ')
+}
 
 /** "Tuesday 6 October" */
 export function formatLongDate(date: Date): string {
-  return LONG_DATE.format(date)
+  return ukDate(date)
 }
 
 /** "06/10/2026" */

@@ -6,13 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 3 (foundations): **done and live on the staging link, waiting for the owner's approval**. On approval, `staging` is merged into `main`. |
+| **Current phase** | Phase 4 (database): **built and live on the staging link; waiting for the owner to create their admin sign-in and check the Status page** (steps in the Phase 4 entry). Phase 3 approved and merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
-| **Next phase** | Phase 4: Database and core server logic |
-| **Next prompt** | `Phase 4 — Database. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 4. Supabase projects heartwell-prod and heartwell-staging exist (plan: <Pro/Free>). Admin emails: <emails>.` |
+| **Admin** | https://heartwell-staging.vercel.app/admin (sign-in: Supabase email and password; allowlist in `public.admins`) |
+| **Next phase** | Phase 5: Catalogue import and Heartwell descriptions |
+| **Next prompt** | `Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5. Range names: <keep / rename>. The "Leather" recliners are: <genuine / bonded / PU / not sure>.` (No Cloudinary keys needed: images are copied with the connected Cloudinary tools.) |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -31,8 +32,21 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Vercel: team **Heartwell** (slug `heartwell`, `team_ROWTCazIeGNQ0zVEY4xIvRLg`, Hobby, login heartwellsofa@gmail.com), project **heartwell** (`prj_kXuZGVcI3xbw2inPEgTKNE6XUpq5`, Next.js, Node 24, functions in `lhr1`, preview toolbar off, Vercel Authentication off). Vercel deploys straight from the GitHub repo (owner's decision); the build runs the leak check first (`prebuild`).
 - Vercel environment variables: `NEXT_PUBLIC_APP_ENV=staging` on all environments during the build; `NEXT_PUBLIC_SUPPORT_EMAIL`; `NEXT_PUBLIC_SITE_URL` = heartwellfurniture.vercel.app (production), heartwell-staging.vercel.app (preview), localhost (development). No `SITE_INDEXABLE` anywhere.
 - Leak check: banned values live in `reference/leak-terms.txt` (local only). After changing it or the catalogue, run `npm run leaks:fingerprints` and commit `scripts/sister-fingerprints.json`, which holds hashes only.
+- Supabase: organisation "Heartwellsofa" (free plan, owner's choice for now; D2 recommends Pro for production before launch). Projects in London: **heartwell-staging** `jfacgarejzvpuitiuvrk` and **heartwell-prod** `oeakyeibdczedgvncomk`. Every Vercel environment uses staging during the build (`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` set in Vercel); production's database is connected at Phase 18B. Free projects pause after a week without use: restore heartwell-prod from the dashboard when it's needed.
+- Database rules: every schema change is a file in `supabase/migrations/` applied to both projects with the same version (the MCP tool records its own time, so the files are named after staging's recorded versions and production's rows are updated to match). Security definer functions live in the unexposed `private` schema behind thin `public` wrappers, so Supabase's security advisor stays empty: keep it that way.
+- Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 4 October 2026 — Phase 4: database and core server logic
+- **Owner:** Phase 3 approved (merged into `main`). Supabase on the free plan; admin email heartwellsofa@gmail.com.
+- **Supabase:** created heartwell-staging and heartwell-prod in London (free, $0). Ten migrations applied to both; their functions, columns, policies, grants and cron jobs are byte-for-byte identical (fingerprint check). Security advisor: no findings on either.
+- **Schema:** product types, category tree (no cycles), ranges with two named axes and a trade name for OrderFlow, products with numeric dimensions, colourways (SKUs), materials library with per-collection surcharge, offer codes and tiers; orders with HW-100101-style references, test flag, delivery zone, attribution and consent; order lines that keep the name, SKU, price and basket position as ordered; order history with who changed what; conversion outbox (exactly-once key); email log; job runs; attribution sessions and actions; WhatsApp enquiries (HW-WA- references); basket reminders; newsletter; samples (limit from settings); reviews (order-verified, approved only) with stats; ad-visitor offer tokens; OrderFlow (off until Phase 17); daily clean-up and OrderFlow re-send jobs.
+- **Rules in the database:** `shop_settings` holds delivery prices, the delivery and preferred-date windows, offer tier amounts and the sample limit. `price_order`/`place_order` price everything from the catalogue and settings, refuse non-mainland postcodes (the database classifies them itself), check the delivery date in UK time and stop on a price mismatch. The lifecycle trigger allows only valid status changes and stamps each timestamp once. Staff tools (`place_manual_order`, `update_order_details`, `set_order_status`, `set_order_test`) check `is_admin()` themselves.
+- **Tests:** `supabase/tests/order_flow.sql` (49 checks, run on staging, rolls itself back): all pass. It caught one real gap, order lines with no fixed order, fixed by migration `order_line_position`. In the app: 249 tests, including 214 that check the TypeScript postcode and delivery rules give exactly the database's answers, plus delivery windows, UK date format and the Status page verdicts.
+- **App:** Supabase clients (request-bound, public and secret-key), session-refreshing proxy for `/admin`, `requireAdmin()`/`adminGuard()`, admin sign-in (email and password), admin shell in the sister admin's layout with Heartwell's colours, Home overview and the **Status** page (green, amber or red with a plain-English reason), `/api/health` now checks the database (503 if it can't). Storefront pages moved into a `(shop)` group so the admin has no shop header.
+- **Deferred to their phases (by design):** Vault secrets and the website-calling cron jobs (conversion sending, review requests, digest, hourly health check) arrive with their endpoints; the secret key (`SUPABASE_SECRET_KEY`) is needed from Phase 10.
+- **Waiting on the owner:** create the admin sign-in in the Supabase dashboard and switch off public sign-ups (steps in the chat), then check the Status page.
 
 ### 4 October 2026 — Phase 3: foundations
 - **Owner decisions:** GitHub org HeatrWell-UK, repo heartwell; **no preview password** (anyone with the link can see it; still noindex); **Vercel while we build**, moving to Hostinger before ads and real orders. `PLAN.md` (version 1.1: section 8, Phase 3, new Phase 18B "Move to Hostinger", costs, risks) and `CLAUDE.md` updated to match.

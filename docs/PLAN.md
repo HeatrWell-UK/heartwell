@@ -456,7 +456,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | 4 | ~~A staging password~~ Not needed: the preview is open to anyone with the link (your choice) | — |
 | 5 | Supabase: a "Heartwell" organisation with two projects (`heartwell-prod`, `heartwell-staging`, London region) in the Supabase account connected to Claude, and the Pro/free decision (D2) | Phase 4 |
 | 6 | Email address(es) of everyone who logs into the admin | Phase 4 |
-| 7 | Cloudinary API key and secret for the Heartwell account, pasted into a local `.env` file (I'll show where; I don't need to see them) | Phase 5 |
+| 7 | ~~Cloudinary API key and secret~~ Not needed: images are copied with the Cloudinary tools already connected | — |
 | 8 | Range names: keep or rename (D4); what the "Leather" recliners actually are (D9) | Phase 5 |
 | 9 | SMTP password for `enquiries@heartwellsofa.co.uk`; create the alias `orders@heartwellsofa.co.uk`; which inbox gets shop notifications; an optional personal inbox for copies of everything | Phase 10 |
 | 10 | A postcode-to-address lookup key for Heartwell (Homedata, as the sister uses, or Ideal Postcodes / getAddress.io) | Phase 10 |
@@ -543,6 +543,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   Phase 4 — Database. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 4. Supabase projects heartwell-prod and heartwell-staging exist (plan: <Pro/Free>). Admin emails: <emails>.
   ```
 - **Phone test:** log in at staging `/admin` and open Status: database green; things not set up yet show amber with a plain-English reason.
+- **As built (4 October 2026):** everything above, with two deliberate deferrals: Vault secrets and the cron jobs that call website endpoints arrive with those endpoints (Phases 13, 14, 17). Admin sign-in is Supabase email and password; the owner creates the account in the Supabase dashboard (no email set-up needed before Phase 10).
 - **Done means:** both databases match the migrations in the repo; Supabase's security advisor shows no warnings; pricing and postcode tests pass.
 
 ---
@@ -551,10 +552,10 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 
 - **Goal:** the full catalogue in both databases, in Heartwell's own words.
 - **Builds:** the repeatable import script with every clean-up in section 2; numeric dimensions; product types and category tree; ranges (renamed if D4); variants (SKUs unchanged); fabrics; offer tiers; the 110 product, 7 category and 70 swatch originals copied into Heartwell's Cloudinary (`heartwell/source/`, untouched) and used temporarily; **new descriptions, highlights and SEO text for 64 products, 16 ranges and every category**; a read-only admin **Catalogue check** page.
-- **Prepare:** items 7 and 8.
+- **Prepare:** item 8.
 - **Prompt:**
   ```
-  Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5. Cloudinary keys are in .env. Range names: <keep / rename>. The "Leather" recliners are: <genuine / bonded / PU / not sure>.
+  Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5. Range names: <keep / rename>. The "Leather" recliners are: <genuine / bonded / PU / not sure>.
   ```
 - **Phone test:** open Admin → Catalogue check; scroll a few products: photo, price, sizes, dimensions and the new description all look right.
 - **Done means:** 64 products, 105 variants, 70 fabrics in both databases; the leak scan finds no sister text or IDs; every image is served from Heartwell's Cloudinary.

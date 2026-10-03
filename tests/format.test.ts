@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatLongDate, formatPrice, formatShortDate } from '@/lib/format'
+import { formatLongDate, formatPrice, formatShortDate, ukDate } from '@/lib/format'
 
 describe('formatPrice', () => {
   it('shows whole pounds without pence', () => {
@@ -15,6 +15,12 @@ describe('formatPrice', () => {
 describe('dates', () => {
   it('writes long dates the British way', () => {
     expect(formatLongDate(new Date('2026-10-06T12:00:00Z'))).toBe('Tuesday 6 October')
+  })
+
+  it('never puts a comma in a date, with or without the year', () => {
+    const d = new Date('2027-01-09T12:00:00Z')
+    expect(ukDate(d, { year: true })).toBe('Saturday 9 January 2027')
+    expect(ukDate(d, { weekday: false, year: true })).toBe('9 January 2027')
   })
 
   it('uses UK time, not UTC, for the day', () => {
