@@ -1,5 +1,9 @@
 name: CI
 
+# Every push is checked. Pushes to `staging` and `main` are then deployed to
+# Vercel, but only if every check passed, so nothing unchecked ever reaches the
+# preview link. (During the build Vercel hosts the site; see docs/PLAN.md §8.)
+
 on:
   push:
     branches: ['**']
@@ -29,3 +33,45 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+
+  deploy:
+    needs: verify
+    if: github.event_name == 'push' && (github.ref_name == 'staging' || github.ref_name == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # One deployment per branch at a time; a newer push waits rather than racing.
+    concurrency:
+      group: deploy-${{ github.ref_name }}
+      cancel-in-progress: false
+    env:
+      VERCEL_ORG_ID: team_ROWTCazIeGNQ0zVEY4xIvRLg
+      VERCEL_PROJECT_ID: prj_kXuZGVcI3xbw2inPEgTKNE6XUpq5
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_CLI: vercel@62.2.0
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Check the Vercel token is set
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::The VERCEL_TOKEN repository secret is missing, so nothing was deployed. See README → Deploying."
+            exit 1
+          fi
+      - name: Deploy the approved build (main)
+        if: github.ref_name == 'main'
+        run: |
+          npx --yes $VERCEL_CLI pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes $VERCEL_CLI build --prod --token="$VERCEL_TOKEN"
+          url=$(npx --yes $VERCEL_CLI deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "Deployed $url" >> "$GITHUB_STEP_SUMMARY"
+      - name: Deploy the preview (staging)
+        if: github.ref_name == 'staging'
+        run: |
+          npx --yes $VERCEL_CLI pull --yes --environment=preview --git-branch=staging --token="$VERCEL_TOKEN"
+          npx --yes $VERCEL_CLI build --token="$VERCEL_TOKEN"
+          url=$(npx --yes $VERCEL_CLI deploy --prebuilt --token="$VERCEL_TOKEN")
+          npx --yes $VERCEL_CLI alias set "$url" heartwell-staging.vercel.app --scope heartwell --token="$VERCEL_TOKEN"
+          echo "Deployed $url → https://heartwell-staging.vercel.app" >> "$GITHUB_STEP_SUMMARY"

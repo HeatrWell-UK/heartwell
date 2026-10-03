@@ -4,7 +4,7 @@ Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Main
 
 ## Workflow
 - One phase per prompt, in the order in `docs/PLAN.md`. If a phase is too big, split it and update the plan.
-- Work on a feature branch → merge to `staging` (Hostinger preview, password-protected) → after the owner approves → `main` (production).
+- Work on a feature branch → merge to `staging` (preview link: Vercel during the build, Hostinger from Phase 18B; open to anyone with the link, always noindex) → after the owner approves → `main` (production).
 - End of every phase: deploy to staging, give a short phone checklist, update `docs/PROGRESS.md`, remind the owner of the next prompt.
 - The owner trusts the builds: verify (types, lint, tests, build) but don't demo or screenshot for the sake of it. Always suggest a better way when there is one.
 - Check current docs for Next.js, Supabase, Cloudinary, Meta and Hostinger rather than relying on memory.
@@ -31,7 +31,7 @@ Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Main
 
 ## Code and platform
 - Next.js 16 (App Router), React 19, TypeScript strict, Tailwind v4, Supabase, Cloudinary (custom loader), Nodemailer via Hostinger SMTP.
-- Hosted on Hostinger Node.js apps (not Vercel): no Vercel crons or env vars; scheduled jobs run from Supabase pg_cron; behind the proxy, build origins from forwarded headers (`externalOrigin`).
+- Hosting: Vercel (team "Heartwell", Hobby, lhr1) while we build, with `NEXT_PUBLIC_APP_ENV=staging` on every Vercel environment; Hostinger Node.js apps from Phase 18B, before ads or real orders. Keep the code portable: no Vercel crons, no `VERCEL_*` variables in logic, no Vercel-only features; scheduled jobs run from Supabase pg_cron; behind the proxy, build origins from forwarded headers (`externalOrigin`).
 - Schema changes only as files in `supabase/migrations/`, applied to staging and production.
 - Customer-facing UI follows `docs/DESIGN.md` and must not resemble the sister shop (no warm cream, no amber accent, no Fraunces or Geist, no heavy motion). CSS-only motion. Phone-first; built for the Facebook and Instagram in-app browsers.
 - The admin keeps the sister shop's admin design, with Heartwell branding.

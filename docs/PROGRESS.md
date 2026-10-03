@@ -6,12 +6,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 2 (design): revision 2 (red velvet and gold, original logo) published, **waiting for the owner's approval or changes** |
-| **Design preview** | https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y · spec in `docs/DESIGN.md` · source in `design/` |
-| **Next phase** | Phase 3: Foundations (after the design is approved) |
-| **Next prompt** | After design approval: `Phase 3 — Foundations. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 3. GitHub organisation: <org>. The empty private repo <org>/heartwell exists. Staging password: <password>. I'm logged into hPanel on the hosting account and ready to follow your steps.` |
-| **Staging link** | Not yet (created in Phase 3) |
-| **Production** | Not yet (go-live is Phase 19) |
+| **Current phase** | Phase 3 (foundations): built, verified and on GitHub. **The first deploy waits on the owner adding the `VERCEL_TOKEN` secret** (see the Phase 3 entry). |
+| **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
+| **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
+| **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
+| **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
+| **Next phase** | Phase 4: Database and core server logic |
+| **Next prompt** | `Phase 4 — Database. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 4. Supabase projects heartwell-prod and heartwell-staging exist (plan: <Pro/Free>). Admin emails: <emails>.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -26,8 +27,22 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - The Supabase account connected via MCP had no projects as of 3 Oct 2026.
 - Logo concept: `reference/Logo-Concept.jpeg` (brown/cream heart-shaped sofa, "Heartwell / SOFA").
 - Sister repo cloned read-only at `../sister-uksofashop-readonly` (from a zip of master on 3 Oct 2026; no git history).
+- GitHub: organisation **HeatrWell-UK**, private repo **heartwell** (`main` = approved, `staging` = preview). Local commits are authored as "Heartwell <heartwellsofa@gmail.com>". The push sign-in is held by Git Credential Manager on the owner's PC.
+- Vercel: team **Heartwell** (slug `heartwell`, `team_ROWTCazIeGNQ0zVEY4xIvRLg`, Hobby, login heartwellsofa@gmail.com), project **heartwell** (`prj_kXuZGVcI3xbw2inPEgTKNE6XUpq5`, Next.js, Node 24, functions in `lhr1`, preview toolbar off, Vercel Authentication off). Vercel isn't connected to GitHub; GitHub Actions deploys with the CLI using the `VERCEL_TOKEN` repository secret.
+- Vercel environment variables: `NEXT_PUBLIC_APP_ENV=staging` on all environments during the build; `NEXT_PUBLIC_SUPPORT_EMAIL`; `NEXT_PUBLIC_SITE_URL` = heartwellfurniture.vercel.app (production), heartwell-staging.vercel.app (preview), localhost (development). No `SITE_INDEXABLE` anywhere.
+- Leak check: banned values live in `reference/leak-terms.txt` (local only). After changing it or the catalogue, run `npm run leaks:fingerprints` and commit `scripts/sister-fingerprints.json`, which holds hashes only.
 
 ## Log
+
+### 4 October 2026 — Phase 3: foundations
+- **Owner decisions:** GitHub org HeatrWell-UK, repo heartwell; **no preview password** (anyone with the link can see it; still noindex); **Vercel while we build**, moving to Hostinger before ads and real orders. `PLAN.md` (version 1.1: section 8, Phase 3, new Phase 18B "Move to Hostinger", costs, risks) and `CLAUDE.md` updated to match.
+- **Built:** Next.js 16.3 / React 19.3 / TypeScript 6 strict / Tailwind 4.3 project; design tokens and fonts (Besley, Figtree) from `DESIGN.md`; brand assets script (logo WebP, favicon, icons, OG image); Cloudinary loader that never re-runs generative transforms; security headers, CSP and noindex; config single sources (`env`, `site`, `brand`, `contact`, `promises`, `navigation`); UI kit (Button, Field inputs, Badge, Price, Accordion); announcement bar, header, swipe menu drawer (works in in-app browsers, focus and inert handled), footer; home page (heart-frame hero with an AI room photo, promise tiles, how ordering works); 404, error pages, robots (disallow all until go-live), manifest, `/api/health`, `/styleguide`.
+- Contact details not supplied yet (phone, WhatsApp, address, company details) are `null` and hidden everywhere, never shown as placeholders.
+- **Leak check:** fingerprint-based (hashes of the sister's name, domain, emails, phone, address, socials, account IDs and product description passages), so the repo holds no sister values at all. Runs as the pre-commit hook (`--staged`) and in CI (`--all`). Verified that it catches spaced phone numbers, IDs inside code and copied description text.
+- **CI:** GitHub Actions runs the leak check, lint, types, 16 tests and the build on every push, then deploys `staging` and `main` to Vercel only if all of that passed.
+- `npm run verify` passes locally. First commit pushed to `main` and `staging`.
+- Vercel can't link the repo until the Vercel login is connected to GitHub, and Hobby may refuse an organisation's private repo. CI deploys with a token instead, which also means nothing unchecked can be deployed.
+- **Waiting on the owner:** create a Vercel token and add it as the `VERCEL_TOKEN` secret on the GitHub repo (steps in the chat). Then the next push deploys the staging link.
 
 ### 3 October 2026 — Phase 2: design revision 2 (red velvet and gold)
 - Owner feedback on revision 1: good, but keep the **original logo** (only change its colour), use **red velvet and golden gradients**, **no green or pink**. Everything else unchanged.
@@ -57,25 +72,3 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Checked current docs: Next.js 16.3.x is the current LTS line; Hostinger runs Node.js apps on Business and Cloud plans with GitHub auto-deploy and no preview deployments; Cloudinary background removal = 75 transformations per image and generative background replace = 230; the UK cookie exemptions for analytics took effect on 5 February 2026 (ICO guidance 29 April 2026).
 - Wrote `docs/PLAN.md` (19 phases plus later phases, feature map, tracking, catalogue and photo plans, deployment, what's needed from the owner, decisions), `CLAUDE.md` and this log.
 - **Waiting on:** the owner's approval of the plan.
-
-## 3 October 2026 — Phase 3 Foundations (in progress, paused at usage limit)
-
-Decisions:
-- GitHub org **HeatrWell-UK**, private repo **heartwell**. No preview password: the owner wants the preview open to anyone (it stays noindex).
-- **Hosting during the build: Vercel** (team "Heartwell", Hobby, region lhr1). Hobby is non-commercial only, so before real orders or ads we move to Hostinger Node.js (or Vercel Pro). Code stays portable: own `APP_ENV` gate, `externalOrigin`, pg_cron jobs, no Vercel-only features.
-
-Done:
-- Next.js 16 / React 19 / TS strict / Tailwind v4 scaffold, ESLint, Vitest, config files (env, site, brand, contact, promises, navigation).
-- Design tokens in `globals.css`, brand assets script (icons, favicon, OG image), Cloudinary loader, security headers and noindex in `next.config.ts`.
-- UI kit (Button, Field, Badge, Price, Accordion), Logo, AnnouncementBar, Header, swipe MenuDrawer, Footer.
-- `layout.tsx`, home page (Hero, PromiseTiles, HowOrderingWorks), not-found, error, global-error, robots, manifest, `/api/health`.
-
-Still to do in Phase 3:
-1. `/styleguide` page (noindex).
-2. `scripts/check-sister-leaks.mjs` (`--staged` / `--all`, obfuscated patterns, skip docs/ and CLAUDE.md), `.githooks/pre-commit`, `.github/workflows/ci.yml` (Node 24: leaks, lint, typecheck, test, build).
-3. `.env.example`, `README.md`, tests (loader, format, leak scanner).
-4. `npm run verify` and fix anything it finds (not yet run on the new pages).
-5. `git init -b main`, `core.hooksPath .githooks`, first commit, `staging` branch, push both to HeatrWell-UK/heartwell (owner completes the GitHub sign-in popup).
-6. Vercel project "heartwell" linked to the repo: lhr1, Node 24.x, env `NEXT_PUBLIC_APP_ENV` (preview=staging, production=production), `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPPORT_EMAIL`; no `SITE_INDEXABLE`. If Hobby refuses the private org repo, install the Vercel GitHub App on the org or deploy by CLI.
-7. Update PLAN.md (section 8, Phase 3, Phase 19 plus a Hostinger rehearsal step) and CLAUDE.md (Vercel during the build, open preview).
-8. Phone checklist, preview link, Phase 4 prompt.

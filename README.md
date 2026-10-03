@@ -33,9 +33,18 @@ npm run dev
 | | Branch | Host | `NEXT_PUBLIC_APP_ENV` |
 | --- | --- | --- | --- |
 | Preview | `staging` and feature branches | Vercel preview deployments | `staging` |
-| Production | `main` | Vercel during the build; Hostinger Node.js before ads and real orders | `production` |
+| Production | `main` | Vercel during the build (with `staging` settings); Hostinger Node.js before ads and real orders | `production` (from the move to Hostinger) |
 
 Every deployment is `noindex` until go-live sets `SITE_INDEXABLE=true` on the real domain. Tracking runs only when `NEXT_PUBLIC_APP_ENV=production` on the production host. The code reads no host-specific variables, so moving hosts means copying environment variables, not changing code.
+
+## Deploying
+
+GitHub Actions (`.github/workflows/ci.yml`) checks every push. On `staging` and `main` it then deploys to the Vercel project `heartwell`, but only if every check passed:
+
+- `staging` → https://heartwell-staging.vercel.app (the preview link)
+- `main` → https://heartwellfurniture.vercel.app (the approved build)
+
+It needs one repository secret, `VERCEL_TOKEN` (a Vercel token scoped to the Heartwell team). If it's missing or expired, the deploy job fails with a clear message and the site stays on the last good build.
 
 ## The leak check
 
