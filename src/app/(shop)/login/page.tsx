@@ -12,8 +12,10 @@ export const dynamic = 'force-dynamic'
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams
-  const destination = safeNextPath(next)
-  if (await getAdmin()) redirect(destination)
+  // Only carry a destination the address asked for; the sign-in action
+  // supplies the default, so a plain /login names nothing behind it.
+  const destination = safeNextPath(next, '')
+  if (await getAdmin()) redirect(destination || '/admin')
 
   return (
     <section className="mx-auto flex w-full max-w-md flex-col gap-6 px-4 py-10 lg:py-16">

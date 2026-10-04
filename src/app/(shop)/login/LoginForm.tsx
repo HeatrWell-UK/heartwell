@@ -13,7 +13,7 @@ export function LoginForm({ next }: { next: string }) {
 
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
-      <input type="hidden" name="next" value={next} />
+      {next && <input type="hidden" name="next" value={next} />}
       {state.error && (
         <p
           role="alert"
