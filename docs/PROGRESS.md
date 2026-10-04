@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 4 (database): **built and live on the staging link; waiting for the owner to create their admin sign-in and check the Status page** (steps in the Phase 4 entry). Phase 3 approved and merged into `main`. |
+| **Current phase** | Phase 4 approved and merged into `main` (4 October 2026). Next: Phase 5, the catalogue import as working data. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 5: Catalogue import and Heartwell descriptions |
-| **Next prompt** | `Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5. Range names: <keep / rename>. The "Leather" recliners are: <genuine / bonded / PU / not sure>.` (No Cloudinary keys needed: images are copied with the connected Cloudinary tools.) |
+| **Next phase** | Phase 5: Catalogue import (working data). Order from here: 5, 8–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -37,6 +37,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 4 October 2026 — Phase 4 approved; plan reordered
+- Phase 4 approved and merged into `main`.
+- **D4 decided: keep the range names** (they're the design names known across the UK); the title style is refreshed later.
+- **Owner's direction: build the whole site first, then finish the catalogue's look and words.** Plan updated: Phase 5 imports the catalogue as working data (repeatable, keyed on slugs and SKUs, temporary photos, no descriptions); photos move to 17A–17B and new titles, descriptions and SEO to the new 17C. Order: 5, 8–17, 17A–17C, 18, 18B, 19.
+- **Wiping later:** possible on staging (it holds only test orders), but not needed: re-running the import or editing in the admin updates rows in place, which keeps URLs, IDs and order history stable. Production gets the finished catalogue at Phase 18B, so the live shop starts clean either way.
 
 ### 4 October 2026 — Phase 4: database and core server logic
 - **Owner:** Phase 3 approved (merged into `main`). Supabase on the free plan; admin email heartwellsofa@gmail.com.

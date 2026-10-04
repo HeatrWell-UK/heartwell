@@ -320,14 +320,15 @@ You create two Supabase projects (London); I apply every migration to both throu
 A repeatable script reads `reference/catalogue/*.jsonl` and writes Heartwell's own rows (new IDs, matched by slug):
 
 - 7 categories → placed in the new tree (fixing the self-parent).
-- 16 ranges with their axis names (and new Heartwell names if you choose D4; the original name is kept privately as the back-office name for OrderFlow).
+- 16 ranges with their axis names, keeping their names (D4: they're the design names customers know).
 - 64 products: cleaned titles, numeric dimensions parsed from the text (checked by eye), product type assigned, made-to-order and origin flags, featured flags, specifications normalised.
 - 105 variants with SKUs **unchanged** (the warehouse and OrderFlow know them), colours tidied, price adjustments.
 - 6 fabric collections and 70 fabrics, with their swatch photos copied.
 - 64 offer tiers.
-- **Descriptions are not imported.** I write new ones in Heartwell's voice: a range story plus size-specific detail, highlights and SEO titles and descriptions. Delivery wording comes from the single source. You can edit them all in the admin.
+- **The import is repeatable:** keyed on slugs and SKUs, so running it again updates rows in place rather than duplicating them, and IDs, URLs and order history never change. A finished catalogue replaces the working one by updating, not by wiping.
+- **Descriptions are not imported** (they're the sister's words). Until Phase 17C, product pages show the specifications. Then I write new ones in Heartwell's voice: a range story plus size-specific detail, highlights and SEO titles and descriptions. Delivery wording comes from the single source. You can edit them all in the admin.
 
-### 6.3 New product photos (Phases 6–7)
+### 6.3 New product photos (Phases 17A–17B, after the site is built)
 
 The sister photos are studio renders of each piece in a dark room (grey walls, dark wooden floor). Heartwell keeps the same furniture and gives it a new setting that matches the approved design. I tested the options against your Heartwell Cloudinary account (Free plan, 25 credits a month, currently empty):
 
@@ -341,8 +342,8 @@ The sister photos are studio renders of each piece in a dark room (grey walls, d
 How it runs:
 
 1. **Originals copied once** from the sister's Cloudinary into `heartwell/source/` and never touched again.
-2. **Pilot (Phase 6):** both approaches on 6 representative pieces (fabric sofa, corner, U-shape, leather recliner, electric recliner, footstool), shown side by side on an admin **Photos** page. You pick the direction.
-3. **Full run (Phase 7):** each result is saved as a **new permanent asset**, so it is never regenerated or charged again, in square (catalogue/ads) and 4:5 (Instagram) crops. Every image appears in the Photos page to **approve, regenerate (new seed) or reject**; only approved images go live.
+2. **Pilot (Phase 17A):** both approaches on 6 representative pieces (fabric sofa, corner, U-shape, leather recliner, electric recliner, footstool), shown side by side on an admin **Photos** page. You pick the direction.
+3. **Full run (Phase 17B):** each result is saved as a **new permanent asset**, so it is never regenerated or charged again, in square (catalogue/ads) and 4:5 (Instagram) crops. Every image appears in the Photos page to **approve, regenerate (new seed) or reject**; only approved images go live.
 4. **Honesty rule:** the furniture's shape, legs, stitching and colour must be unchanged. Anything distorted is rejected. Product images must represent the product accurately under consumer law.
 
 ---
@@ -457,7 +458,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | 5 | Supabase: a "Heartwell" organisation with two projects (`heartwell-prod`, `heartwell-staging`, London region) in the Supabase account connected to Claude, and the Pro/free decision (D2) | Phase 4 |
 | 6 | Email address(es) of everyone who logs into the admin | Phase 4 |
 | 7 | ~~Cloudinary API key and secret~~ Not needed: images are copied with the Cloudinary tools already connected | — |
-| 8 | Range names: keep or rename (D4); what the "Leather" recliners actually are (D9) | Phase 5 |
+| 8 | What the "Leather" recliners actually are (D9). Range names: decided, keep (D4) | Phase 17C |
 | 9 | SMTP password for `enquiries@heartwellsofa.co.uk`; create the alias `orders@heartwellsofa.co.uk`; which inbox gets shop notifications; an optional personal inbox for copies of everything | Phase 10 |
 | 10 | A postcode-to-address lookup key for Heartwell (Homedata, as the sister uses, or Ideal Postcodes / getAddress.io) | Phase 10 |
 | 11 | **Customer phone number** (shown on the site, click-to-call) | Phase 10 |
@@ -482,7 +483,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | D1 | Purchase to Meta: **automatic** 30 min after confirmation (with Hold / Send now), or manual like the sister shop | **Automatic.** Faster learning for Meta, nothing forgotten, still protected by the hold window and test flags. |
 | D2 | Supabase production plan | **Pro ($25/month).** Free projects pause when idle and have no daily backups. Staging can stay free. |
 | D3 | Photo direction | **AI room scenes for every main photo** (updated after the design-phase test: the cut-out method fails on these images). Budget: two free months, or one month of Cloudinary Plus. |
-| D4 | Range names (Verona, Lily, …): keep, or give Heartwell its own names | **Rename** (e.g. Verona → a new Heartwell name), keeping SKUs and sending the original name to OrderFlow. Customers can't find the identical sofa at the sister shop by name, search engines see a distinct catalogue, and the warehouse sees nothing different. |
+| D4 | Range names (Verona, Lily, …): keep, or give Heartwell its own names | **Decided 4 October 2026: keep.** They're the design names customers across the UK know. The title style is refreshed in Phase 17C. |
 | D5 | Logo wording and colours | Drop "SOFA" under the name (Heartwell will sell dining, wardrobes and beds), or use "FURNITURE". The concept's cream and caramel are close to the sister's cream and amber, which the brief rules out; we'll settle this in the design phase. |
 | D6 | Offers at launch | **Yes:** a Heartwell code plus the automatic ad-visitor offer, same tiers (£50 / £30 / £20). It gives ads a reason to act now, honestly. |
 | D7 | Customer accounts | **Drop** (see section 4). |
@@ -494,6 +495,8 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 ---
 
 ## 11. The phases
+
+**Order (updated 4 October 2026):** 1–5, 8–17, 17A–17C, 18, 18B, 19. The whole site is built on the imported catalogue first; photos and catalogue words come once it's finished.
 
 Each phase gives the goal, what gets built, what to prepare, **the exact prompt**, how to test on your phone and what "done" means. Text in `<angle brackets>` is filled in by you.
 
@@ -548,46 +551,18 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 
 ---
 
-### Phase 5 — Catalogue import and Heartwell descriptions
+### Phase 5 — Catalogue import (working data)
 
-- **Goal:** the full catalogue in both databases, in Heartwell's own words.
-- **Builds:** the repeatable import script with every clean-up in section 2; numeric dimensions; product types and category tree; ranges (renamed if D4); variants (SKUs unchanged); fabrics; offer tiers; the 110 product, 7 category and 70 swatch originals copied into Heartwell's Cloudinary (`heartwell/source/`, untouched) and used temporarily; **new descriptions, highlights and SEO text for 64 products, 16 ranges and every category**; a read-only admin **Catalogue check** page.
-- **Prepare:** item 8.
-- **Prompt:**
-  ```
-  Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5. Range names: <keep / rename>. The "Leather" recliners are: <genuine / bonded / PU / not sure>.
-  ```
-- **Phone test:** open Admin → Catalogue check; scroll a few products: photo, price, sizes, dimensions and the new description all look right.
-- **Done means:** 64 products, 105 variants, 70 fabrics in both databases; the leak scan finds no sister text or IDs; every image is served from Heartwell's Cloudinary.
-
----
-
-### Phase 6 — Product photos: pilot
-
-- **Goal:** lock the photo recipe so every range comes out in the same room.
-- **Update (3 October 2026):** the direction was already tested in the design phase (AI room scenes won, see 6.3). This phase is now the pipeline and prompt-tuning step.
-- **Builds:** the photo pipeline script; the room prompt tightened and tested on about 10 pieces covering every shape (corner, U-shape, 3+2, recliner, armchair, footstool, light and dark fabrics); the admin **Photos** page (original vs result, seed, regenerate, approve); a credit-usage readout from Cloudinary.
+- **Goal:** the real catalogue on staging, so every page from Phase 8 on is built and tested against real sofas, sizes, prices and fabrics.
+- **Update (4 October 2026):** the owner wants the whole site built first and the catalogue's look and words finished afterwards. New titles, descriptions and photos moved to Phases 17A–17C. Range names stay (D4): they're the design names customers know.
+- **Builds:** the repeatable import script with every clean-up in section 2, **keyed on slugs and SKUs so re-running it updates rows in place** (IDs, URLs and order history stay stable); numeric dimensions; product types and the category tree; ranges (names kept); variants (SKUs unchanged); fabrics; offer tiers; the product, category and swatch originals copied into Heartwell's Cloudinary (`heartwell/source/`, untouched) and used as **temporary** photos; descriptions left empty (the sister's text is never imported; pages show the specifications until 17C); a read-only admin **Catalogue check** page. Staging only: production receives the finished catalogue in Phase 18B.
 - **Prepare:** nothing.
 - **Prompt:**
   ```
-  Phase 6 — Photo pilot. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 6.
+  Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5.
   ```
-- **Phone test:** open Admin → Photos, compare the versions, and reply with your choice and any changes (warmer, lighter floor, a different backdrop colour…).
-- **Done means:** you've chosen the direction; the cost per image is confirmed from Cloudinary usage.
-
----
-
-### Phase 7 — Product photos: full run and approval
-
-- **Goal:** every live variant shows an approved Heartwell photo.
-- **Builds:** the batch run in the chosen direction; new permanent assets in square and 4:5 crops; approve / regenerate / reject in Admin → Photos; approved photos linked to variants, products, ranges and categories.
-- **Prepare:** 20–30 minutes on your phone to approve photos.
-- **Prompt:**
-  ```
-  Phase 7 — Photo run. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 7. Direction chosen in Phase 6: <A / B / mix, plus any notes>.
-  ```
-- **Phone test:** approve the batch in Admin → Photos; regenerate any you don't like.
-- **Done means:** every active variant has an approved photo; the originals are untouched; credits stay within budget.
+- **Phone test:** open Admin → Catalogue check; scroll a few products: photo, price, sizes, dimensions and fabrics look right.
+- **Done means:** 64 products, 105 variants and 70 fabrics on staging; re-running the import changes nothing; the leak scan finds no sister text or IDs; every image is served from Heartwell's Cloudinary.
 
 ---
 
@@ -723,6 +698,50 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** one clearly marked order appears in OrderFlow tagged Heartwell (then you delete it there); turning off a setting on staging makes the Health card go red and sends an alert.
 - **Done means:** every integration reports its health.
+
+---
+
+### Phase 17A — Product photos: pilot (was Phase 6)
+
+- **Goal:** lock the photo recipe so every range comes out in the same room.
+- **Moved (4 October 2026):** after the site is built, at the owner's request.
+- **Update (3 October 2026):** the direction was already tested in the design phase (AI room scenes won, see 6.3). This phase is now the pipeline and prompt-tuning step.
+- **Builds:** the photo pipeline script; the room prompt tightened and tested on about 10 pieces covering every shape (corner, U-shape, 3+2, recliner, armchair, footstool, light and dark fabrics); the admin **Photos** page (original vs result, seed, regenerate, approve); a credit-usage readout from Cloudinary.
+- **Prepare:** nothing.
+- **Prompt:**
+  ```
+  Phase 17A — Photo pilot. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A.
+  ```
+- **Phone test:** open Admin → Photos, compare the versions, and reply with your choice and any changes (warmer, lighter floor, a different backdrop colour…).
+- **Done means:** you've chosen the direction; the cost per image is confirmed from Cloudinary usage.
+
+---
+
+### Phase 17B — Product photos: full run and approval (was Phase 7)
+
+- **Goal:** every live variant shows an approved Heartwell photo.
+- **Builds:** the batch run in the chosen direction; new permanent assets in square and 4:5 crops; approve / regenerate / reject in Admin → Photos; approved photos linked to variants, products, ranges and categories.
+- **Prepare:** 20–30 minutes on your phone to approve photos.
+- **Prompt:**
+  ```
+  Phase 17B — Photo run. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17B. Direction chosen in Phase 17A: <A / B / mix, plus any notes>.
+  ```
+- **Phone test:** approve the batch in Admin → Photos; regenerate any you don't like.
+- **Done means:** every active variant has an approved photo; the originals are untouched; credits stay within budget.
+
+---
+
+### Phase 17C — Catalogue content: titles, descriptions and SEO
+
+- **Goal:** every product, range and category in Heartwell's own words, ready for launch.
+- **Builds:** the restyled title format (range names kept, D4); **new descriptions, highlights and SEO titles and descriptions for 64 products, 16 ranges and every category**, written in Heartwell's voice with delivery wording from `src/config/promises.ts`; the leather wording settled (D9); everything editable in the admin. Updated in place, so product URLs and IDs don't change.
+- **Prepare:** item 8 (what the "leather" recliners are).
+- **Prompt:**
+  ```
+  Phase 17C — Catalogue content. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17C. The "Leather" recliners are: <genuine / bonded / PU / not sure>. Title style: <any preferences>.
+  ```
+- **Phone test:** open five products of different shapes: title, description and highlights read well and match the photos and specifications.
+- **Done means:** no empty descriptions; the leak scan finds no sister text; every page has its own SEO title and description.
 
 ---
 
