@@ -54,12 +54,18 @@ export function ProductPurchase({
   const noun = p.typeName.toLowerCase()
   const fabricCount = p.fabrics.reduce((n, c) => n + c.fabrics.length, 0)
 
-  // Keep the address in step with the choice, so a shared link opens on it.
+  // Once the customer changes colour or fabric, keep the address in step so a
+  // shared link opens on their choice. Every other parameter (an ad's utm_ and
+  // click IDs) is kept exactly as it arrived.
+  const chosen = useRef(false)
   useEffect(() => {
-    if (!variant) return
-    const href = productHref(p.slug, variant.sku, fabric?.fabric.code)
-    if (`${window.location.pathname}${window.location.search}` !== href) window.history.replaceState(null, '', href)
-  }, [p.slug, variant, fabric])
+    if (!chosen.current || !variant) return
+    const url = new URL(window.location.href)
+    url.searchParams.set('variant', variant.sku)
+    if (fabric) url.searchParams.set('fabric', fabric.fabric.code)
+    else url.searchParams.delete('fabric')
+    if (url.href !== window.location.href) window.history.replaceState(null, '', url)
+  }, [variant, fabric])
 
   const images = useMemo(() => {
     const alt = (colour: string | null) => (colour ? `${p.title} in ${colour.toLowerCase()}` : p.title)
@@ -138,6 +144,7 @@ export function ProductPurchase({
                       className="sr-only"
                       checked={!fabric && v.id === variant?.id}
                       onChange={() => {
+                        chosen.current = true
                         setVariantId(v.id)
                         setFabric(null)
                       }}
@@ -256,6 +263,7 @@ export function ProductPurchase({
           collections={p.fabrics}
           chosen={fabric}
           onChoose={(choice) => {
+            chosen.current = true
             setFabric(choice)
             setFabricsOpen(false)
           }}
