@@ -1770,6 +1770,7 @@ export type Database = {
       confirm_order: { Args: { p_order_id: string }; Returns: Json }
       create_whatsapp_enquiry: { Args: { p_input: Json }; Returns: Json }
       health_ping: { Args: never; Returns: Json }
+      import_catalogue: { Args: { p: Json; p_update?: boolean }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       issue_paid_offer_entitlement: {
         Args: { p_arrival_id?: string; p_source: string; p_visitor_id: string }

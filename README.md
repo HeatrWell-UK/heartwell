@@ -48,6 +48,21 @@ Supabase (London). Two projects: `heartwell-staging` (used by every Vercel envir
 - **Types:** `src/types/database.ts` is generated from the staging project. Regenerate after every migration.
 - **Admins:** add an email to `public.admins`; the person signs in at `/login` (an ordinary-looking sign-in page, not linked from the site) and their account is linked on first sign-in. `/admin` sends anyone else to `/login`.
 
+## Catalogue
+
+The catalogue was imported from the local, git-ignored `reference/catalogue/` files. Only cleaned Heartwell data reaches the database: no descriptions, reviews or anything else from the source shop. The admin's **Catalogue** page shows what is stored and what's missing.
+
+- **Cleaning rules** are code with tests: `src/lib/catalogue/clean.ts` (dimensions text to numbers, shapes and seats, titles, web addresses, colours, specifications) and `src/lib/catalogue/import-config.ts` (product types, category tree, mappings, size order).
+- **The import is one database function,** `public.import_catalogue(payload, p_update default true)`, matched on slugs, SKUs and (collection, code). Re-running it adds new rows and updates changed ones in place; IDs and web addresses never change. It never touches what the owner controls: shown/hidden and featured flags, descriptions and SEO text, and any photo already replaced (only photos still in `heartwell/source/` are refreshed). With `p_update = false` existing rows are left alone.
+- **Don't re-run it after Phase 17C** without `p_update = false`, or the old titles come back.
+
+To re-run (everything stays in `reference/`, nothing is committed):
+
+1. `node scripts/catalogue/build-import.mjs` builds `reference/.import/catalogue.json` and prints a dimensions table to check by eye, warnings and checksums.
+2. Images, only if new ones were added: sign one upload set per folder with Cloudinary's `sign-upload` into `reference/.import/upload-credentials.json`, then run `node scripts/catalogue/copy-images.mjs` (server to server, skips what's already copied), then run step 1 again.
+3. Sign one upload for the payload into `reference/.import/payload-credentials.json`, then `node scripts/catalogue/upload-payload.mjs`. It prints two SQL statements: the database fetches the file with `pg_net`, then imports it after checking its md5.
+4. Run `supabase/tests/catalogue_checksums.sql` and compare it with the checksums from step 1. A second import should report zero changes.
+
 ## Deploying
 
 Vercel is connected to this repository and deploys every push:

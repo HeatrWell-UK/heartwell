@@ -6,12 +6,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { HouseIcon, PulseIcon, SignOutIcon, type Icon } from '@phosphor-icons/react'
+import { CouchIcon, HouseIcon, PulseIcon, SignOutIcon, type Icon } from '@phosphor-icons/react'
 import { signOut } from '@/app/admin/actions'
 import { cn } from '@/lib/cn'
 
 const NAV: { href: string; label: string; icon: Icon }[] = [
   { href: '/admin', label: 'Home', icon: HouseIcon },
+  { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon },
   { href: '/admin/status', label: 'Status', icon: PulseIcon },
 ]
 

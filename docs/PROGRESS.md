@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 4 approved and merged into `main` (4 October 2026). Next: Phase 5, the catalogue import as working data. |
+| **Current phase** | Phase 5 (catalogue import) built and on the staging link, waiting for approval (4 October 2026). |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 5: Catalogue import (working data). Order from here: 5, 8–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5.` |
+| **Next phase** | Phase 8: Product page and basket. Order from here: 8–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 5 approved. Phase 8 — Product page and basket. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 8.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -24,7 +24,8 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - OrderFlow: the **same** OrderFlow as the sister shop, with its own key; Heartwell orders are tagged (HW- references).
 - "Visit us": Heartwell has its **own address** (different from the sister's showroom); details to come in Phase 16.
 - **Never mention the sister shop** on the Heartwell site (the owner chose to keep them separate).
-- Heartwell's Cloudinary (connected via MCP): Free plan, 25 credits/month, empty as of 3 Oct 2026.
+- Heartwell's Cloudinary (connected via MCP): Free plan, 25 credits/month (about 3.6 used by 4 Oct 2026). Folders: `heartwell/brand`, `heartwell/samples` (design photos), `heartwell/source/{variants,gallery,categories,fabrics}` (the 162 imported originals, tag `heartwell-source`, never edited), `heartwell/import` (the catalogue payload file, tag `heartwell-import`, catalogue data only; safe to delete). Uploads are signed with the `sign-upload` tool; the account's default preset makes them `overwrite: true`.
+- Catalogue (Phase 5): imported into **staging only**; production gets the finished catalogue at Phase 18B by copying staging's catalogue tables. How to re-run: README "Catalogue". The Lily range's 23 original photos are missing from the source library (404); the owner is asked for originals (PLAN section 9, item 23).
 - The Supabase account connected via MCP had no projects as of 3 Oct 2026.
 - Logo concept: `reference/Logo-Concept.jpeg` (brown/cream heart-shaped sofa, "Heartwell / SOFA").
 - Sister repo cloned read-only at `../sister-uksofashop-readonly` (from a zip of master on 3 Oct 2026; no git history).
@@ -37,6 +38,17 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 4 October 2026 — Phase 5: catalogue import (working data)
+- **Imported into staging:** 64 products, 105 colourways (SKUs unchanged), 16 ranges (names kept), 3 product types (sofa, armchair, footstool), 9 categories in Heartwell's tree, 6 fabric collections with 70 fabrics, 64 offer tiers, 138 category links. No descriptions, reviews or other source text. Production has the import function but no catalogue (it gets the finished one at Phase 18B).
+- **Cleaning (code with tests):** free-text dimensions became numbers: width, depth, height, both sides of corners, U-shapes with the back in the middle, and each piece of a 3+2 set. Every row was checked by eye against the source text. Shapes and seat counts were derived; titles and size labels tidied ("Arm Chair" became "Armchair", "U-Shaped", "3+2 Seater"); web addresses made consistent (`3-2`, `armchair`); RGB colour values turned into swatch colours, and the one colourway with no name (BU-T) named Truffle; specifications mapped to typed fields (material, feet, arms, cushions, USB, cup holders…); reclining set from the categories (electric/manual); sizes ordered within each range (armchair, 2, 3, 3+2, corners, L, U, armed U, footstool). The size-order test caught a real bug (3+2 sorted as a 2 seater), fixed before the final import.
+- **Photos:** 162 of 185 originals copied server to server into Heartwell's Cloudinary (`heartwell/source/`); every image the database uses is on Heartwell's account. **23 Lily colourway photos no longer exist in the source library** (404 under every name variation), so the 7 Lily products show "No photo" until originals arrive (PLAN item 23). Every file name was checked against the leak fingerprints first.
+- **Import function:** migration `import_catalogue` (both projects, identical, security advisor clean). Matched on slugs, SKUs and (collection, code); refreshes changed rows in place but never touches shown/featured flags, descriptions/SEO, or photos that have already been replaced. Checked on staging: a second run reports zero changes; a price change updates one row; a replaced photo, a hidden product and insert-only mode survive a re-import; an unknown reference stops the whole import (rolled-back test). The checksums of products, colourways, fabrics, image addresses and offer tiers in the database equal those of the built payload (`supabase/tests/catalogue_checksums.sql`).
+- **Getting the payload in:** the ~100 KB payload goes to Heartwell's Cloudinary as an unguessable raw file, the database fetches it with `pg_net` and imports it only if its md5 matches. No database key on this machine, and no hand-copying.
+- **Admin:** new **Catalogue** page (nav item): totals, a "Need attention" list (missing photos, sizes, colour names), every product grouped by range with photo, price, size line, colourways with SKUs, categories, offer tier and flags, plus the fabric library with swatches. Read-only; editing arrives with the product pages.
+- **Checks:** `npm run verify` passes (lint, types, 268 tests, build, leak check over 155 files).
+- **Worth knowing for 17C:** "Leather Sofas" includes faux and tech leather pieces (D9); corner names like "4 Seater Corner 1c2" are trade shorthand and need customer wording; some source sizes only give widths (Hannah, Nova 3+2, the electric corners).
+- **Waiting on the owner:** approve Phase 5 from the phone checklist; Lily originals when available (not urgent, needed by 17A). Still open from before: enable GitHub Actions; create the admin sign-in and switch off public sign-ups if not done.
 
 ### 4 October 2026 — Phase 4 approved; plan reordered
 - Phase 4 approved and merged into `main`.

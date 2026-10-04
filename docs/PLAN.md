@@ -473,6 +473,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | 20 | Social profile links (Facebook, Instagram, TikTok if any) | Phase 16 |
 | 21 | UptimeRobot (free) account, if you approve D8 | Phase 17 |
 | 22 | Both Hostinger accounts available for about an hour | Phase 19 |
+| 23 | **Original photos of the Lily range** (7 pieces, 23 colourways): they're missing from the source library, so the import has none. Supplier or studio photos, any background | Phase 17A |
 
 ---
 
@@ -563,6 +564,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** open Admin → Catalogue check; scroll a few products: photo, price, sizes, dimensions and fabrics look right.
 - **Done means:** 64 products, 105 variants and 70 fabrics on staging; re-running the import changes nothing; the leak scan finds no sister text or IDs; every image is served from Heartwell's Cloudinary.
+- **Done (4 October 2026):** all of the above. One gap: the 23 Lily colourway photos don't exist in the source library any more (404), so the Lily range has no photos until item 23 arrives. How to re-run the import is in the README ("Catalogue").
 
 ---
 
@@ -707,7 +709,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 - **Moved (4 October 2026):** after the site is built, at the owner's request.
 - **Update (3 October 2026):** the direction was already tested in the design phase (AI room scenes won, see 6.3). This phase is now the pipeline and prompt-tuning step.
 - **Builds:** the photo pipeline script; the room prompt tightened and tested on about 10 pieces covering every shape (corner, U-shape, 3+2, recliner, armchair, footstool, light and dark fabrics); the admin **Photos** page (original vs result, seed, regenerate, approve); a credit-usage readout from Cloudinary.
-- **Prepare:** nothing.
+- **Prepare:** item 23 (Lily originals), so the pilot can include that range.
 - **Prompt:**
   ```
   Phase 17A — Photo pilot. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A.
@@ -761,7 +763,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 18B — Move to Hostinger
 
 - **Goal:** the shop runs on the hosting account before any ad money or real order touches it.
-- **Does:** creates the Hostinger staging and production Node.js apps on `staging` and `main` (section 8.3); copies environment variables and sets production's `NEXT_PUBLIC_APP_ENV=production`; checks forwarded-header origins, pg_cron jobs and SMTP from Hostinger; full checkout test on Hostinger staging; production app ready on its temporary address for Phase 19. Vercel stays as a fallback.
+- **Does:** creates the Hostinger staging and production Node.js apps on `staging` and `main` (section 8.3); copies environment variables and sets production's `NEXT_PUBLIC_APP_ENV=production`; checks forwarded-header origins, pg_cron jobs and SMTP from Hostinger; copies the finished catalogue from staging into production (catalogue tables only, never test orders; not by re-running the reference import, which would bring back the old titles); full checkout test on Hostinger staging; production app ready on its temporary address for Phase 19. Vercel stays as a fallback.
 - **Prepare:** item 3 in section 9.
 - **Prompt:**
   ```
