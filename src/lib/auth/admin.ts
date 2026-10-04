@@ -27,10 +27,13 @@ export const getAdmin = cache(async (): Promise<AdminUser | null> => {
   return { userId: claims.sub, email: typeof claims.email === 'string' ? claims.email : '' }
 })
 
-/** For admin pages: the admin, or a redirect to sign in. */
-export async function requireAdmin(): Promise<AdminUser> {
+/**
+ * For admin pages: the admin, or a redirect to the ordinary sign-in page. A
+ * signed-in account that isn't an admin is treated exactly like no account.
+ */
+export async function requireAdmin(next = '/admin'): Promise<AdminUser> {
   const admin = await getAdmin()
-  if (!admin) redirect('/admin/login')
+  if (!admin) redirect(next === '/admin' ? '/login' : `/login?next=${encodeURIComponent(next)}`)
   return admin
 }
 

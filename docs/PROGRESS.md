@@ -11,7 +11,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
-| **Admin** | https://heartwell-staging.vercel.app/admin (sign-in: Supabase email and password; allowlist in `public.admins`) |
+| **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
 | **Next phase** | Phase 5: Catalogue import and Heartwell descriptions |
 | **Next prompt** | `Phase 5 — Catalogue import. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 5. Range names: <keep / rename>. The "Leather" recliners are: <genuine / bonded / PU / not sure>.` (No Cloudinary keys needed: images are copied with the connected Cloudinary tools.) |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
@@ -46,6 +46,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - **Tests:** `supabase/tests/order_flow.sql` (49 checks, run on staging, rolls itself back): all pass. It caught one real gap, order lines with no fixed order, fixed by migration `order_line_position`. In the app: 249 tests, including 214 that check the TypeScript postcode and delivery rules give exactly the database's answers, plus delivery windows, UK date format and the Status page verdicts.
 - **App:** Supabase clients (request-bound, public and secret-key), session-refreshing proxy for `/admin`, `requireAdmin()`/`adminGuard()`, admin sign-in (email and password), admin shell in the sister admin's layout with Heartwell's colours, Home overview and the **Status** page (green, amber or red with a plain-English reason), `/api/health` now checks the database (503 if it can't). Storefront pages moved into a `(shop)` group so the admin has no shop header.
 - **Deferred to their phases (by design):** Vault secrets and the website-calling cron jobs (conversion sending, review requests, digest, hourly health check) arrive with their endpoints; the secret key (`SUPABASE_SECRET_KEY`) is needed from Phase 10.
+- **Owner feedback:** the admin sign-in should look like a normal account sign-in. Changed: `/admin` now redirects to `/login`, an ordinary "Sign in" page in the shop's own frame (noindex, not linked, robots-disallowed). Failed sign-ins and non-admin accounts get one generic "don't match" message, so nothing reveals an admin area; an admin lands on the page they asked for.
 - **Waiting on the owner:** create the admin sign-in in the Supabase dashboard and switch off public sign-ups (steps in the chat), then check the Status page.
 
 ### 4 October 2026 — Phase 3: foundations

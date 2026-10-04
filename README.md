@@ -46,7 +46,7 @@ Supabase (London). Two projects: `heartwell-staging` (used by every Vercel envir
 - **Tests that run in the database:** `supabase/tests/order_flow.sql` (run in the SQL editor; it rolls itself back and ends with `ALL_TESTS_PASSED`).
 - **TypeScript and SQL agree:** `tests/delivery-parity.test.ts` checks the TypeScript delivery rules against answers captured from the database (`supabase/tests/delivery_parity.sql` regenerates them).
 - **Types:** `src/types/database.ts` is generated from the staging project. Regenerate after every migration.
-- **Admins:** add an email to `public.admins`; the person signs in at `/admin/login` and their account is linked on first sign-in.
+- **Admins:** add an email to `public.admins`; the person signs in at `/login` (an ordinary-looking sign-in page, not linked from the site) and their account is linked on first sign-in. `/admin` sends anyone else to `/login`.
 
 ## Deploying
 
