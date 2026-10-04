@@ -18,14 +18,22 @@ const PRODUCT_FIELDS = `
   specifications, description, highlights, gallery_images, seo_title, seo_description,
   type:product_types(slug, name, spec_fields, material_kinds),
   range:ranges(id, slug, name, axis1_name, axis2_name),
-  category:categories!products_primary_category_id_fkey(id, slug, name, parent:categories!categories_parent_id_fkey(slug, name)),
+  category:categories!products_primary_category_id_fkey(id, slug, name, parent_id),
   variants:product_variants(id, sku, colour_name, colour_hex, material_label, price_adjustment, image_url, sort)
 `
 
 const bySort = <T extends { sort: number }>(a: T, b: T) => a.sort - b.sort
 
-/** A many-to-one embed, which the generated types sometimes describe as a list. */
-const one = <T,>(x: T | T[] | null | undefined): T | null => (Array.isArray(x) ? (x[0] ?? null) : (x ?? null))
+/** The whole category tree: small, and read on every product and category page. */
+export const getCategories = unstable_cache(
+  async () => {
+    const { data, error } = await createPublicClient().from('categories').select('id, slug, name, parent_id, sort').order('sort')
+    if (error) throw new Error(`Categories: ${error.message}`)
+    return data
+  },
+  ['categories-v1'],
+  { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
+)
 
 async function loadProductPage(slug: string): Promise<ProductPageData | null> {
   const db = createPublicClient()
@@ -44,7 +52,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     image: v.image_url,
   }))
 
-  const [siblings, fabrics, related, reviews] = await Promise.all([
+  const [siblings, fabrics, related, reviews, categories] = await Promise.all([
     p.range
       ? db
           .from('products')
@@ -70,6 +78,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
           .limit(80)
       : null,
     db.from('reviews').select('customer_name, rating, title, comment, created_at').eq('product_id', p.id).eq('is_approved', true).order('created_at', { ascending: false }).limit(20),
+    getCategories(),
   ])
   for (const r of [siblings, fabrics, related, reviews]) if (r?.error) throw new Error(`Product ${slug}: ${r.error.message}`)
 
@@ -113,7 +122,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
   }
 
   const material = typeof specs.material === 'string' ? specs.material : ''
-  const parent = one(p.category?.parent)
+  const parent = p.category?.parent_id ? (categories.find((c) => c.id === p.category?.parent_id) ?? null) : null
   return {
     id: p.id,
     slug: p.slug,
