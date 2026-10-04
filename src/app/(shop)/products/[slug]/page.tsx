@@ -1,0 +1,120 @@
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
+import { ProductPurchase, type PurchaseProduct } from '@/components/product/ProductPurchase'
+import { PostcodeCheck } from '@/components/product/PostcodeCheck'
+import { PromiseRows } from '@/components/product/PromiseRows'
+import { Measurements } from '@/components/product/Measurements'
+import { WillItFit } from '@/components/product/WillItFit'
+import { ProductDetails } from '@/components/product/ProductDetails'
+import { Reviews } from '@/components/product/Reviews'
+import { RelatedRail } from '@/components/product/ProductCard'
+import { CONTACT, whatsAppHref } from '@/config/contact'
+import { SITE_URL } from '@/config/site'
+import { getDeliveryInfo, getProductPage } from '@/lib/product/load'
+import { pickFabric, pickVariant } from '@/lib/product/helpers'
+import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
+import type { ProductPageData } from '@/lib/product/types'
+
+type Props = {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ variant?: string | string[]; fabric?: string | string[] }>
+}
+
+const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)
+
+/** Only what the interactive part needs, so the page sends the browser no more than that. */
+function purchaseProps(p: ProductPageData): PurchaseProduct {
+  const { slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range } = p
+  return { slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range }
+}
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProductPage(slug)
+  if (!product) return {}
+  const variant = pickVariant(product.variants, first((await searchParams).variant))
+  const image = shareImageUrl(variant?.image ?? product.gallery[0] ?? null)
+  const title = product.seoTitle ?? product.title
+  const description = productDescription(product)
+  return {
+    title,
+    description,
+    alternates: { canonical: `/products/${product.slug}` },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: `/products/${product.slug}`,
+      ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: variant?.colourName ? `${product.title} in ${variant.colourName}` : product.title }] } : {}),
+    },
+  }
+}
+
+export default async function ProductPage({ params, searchParams }: Props) {
+  const { slug } = await params
+  const [product, delivery, query] = await Promise.all([getProductPage(slug), getDeliveryInfo(), searchParams])
+  if (!product) notFound()
+
+  const variant = pickVariant(product.variants, first(query.variant))
+  const fabric = product.madeToOrder ? pickFabric(product.fabrics, first(query.fabric)) : null
+  const noun = product.typeName.toLowerCase()
+  const name = product.range?.name ?? product.title
+
+  const wa = whatsAppHref(`Hi Heartwell, I have a question about the ${product.title}: ${SITE_URL}/products/${product.slug}`)
+  const askHref = wa ?? `mailto:${CONTACT.email}?subject=${encodeURIComponent(product.title)}`
+  const askLabel = wa ? 'Ask us anything on WhatsApp' : 'Ask us anything by email'
+
+  const crumbs = product.category
+    ? [...(product.category.parent ? [product.category.parent] : []), product.category].map((c) => ({
+        name: c.name,
+        href: c.slug === 'sofas' ? '/sofas' : `/sofas/${c.slug}`,
+      }))
+    : []
+
+  return (
+    <article className="pb-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdString([
+            productJsonLd(product, SITE_URL),
+            breadcrumbJsonLd([...crumbs.map((c) => ({ name: c.name, path: c.href })), { name: product.title, path: `/products/${product.slug}` }], SITE_URL),
+          ]),
+        }}
+      />
+      <Breadcrumbs items={crumbs} />
+
+      <ProductPurchase product={purchaseProps(product)} initialVariantId={variant?.id ?? null} initialFabric={fabric}>
+        <PostcodeCheck windowLabel={delivery.windowLabel} />
+        <PromiseRows madeToOrder={product.madeToOrder} />
+      </ProductPurchase>
+
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 pt-8 lg:px-6 lg:pt-14">
+        <div className="flex flex-col gap-8 px-4 lg:grid lg:grid-cols-2 lg:gap-12 lg:px-0">
+          <div className="flex flex-col gap-4">
+            <Measurements
+              shape={product.shape}
+              noun={noun}
+              dimensions={product.dimensions}
+              pieces={product.pieces}
+              note={product.dimensionsNote}
+              askHref={askHref}
+            />
+            <WillItFit
+              depth={product.dimensions.depth_cm}
+              height={product.dimensions.height_cm}
+              inSections={product.shape === 'corner' || product.shape === 'u-shape' || product.shape === 'set'}
+              askHref={askHref}
+            />
+          </div>
+          <div className="flex flex-col gap-8">
+            <ProductDetails product={product} delivery={delivery} />
+            <Reviews reviews={product.reviews} name={name} askHref={askHref} askLabel={askLabel} />
+          </div>
+        </div>
+        <RelatedRail title="You might also like" products={product.related} />
+      </div>
+    </article>
+  )
+}

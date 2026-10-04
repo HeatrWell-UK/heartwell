@@ -57,7 +57,14 @@ function ProductCard({ p }: { p: CatalogueRow }) {
           </div>
           <p className="text-sm text-zinc-600">
             {[p.type?.name, options].filter(Boolean).join(' · ')}
-            <span className="text-zinc-400"> · /{p.slug}</span>
+            {p.is_active && (
+              <>
+                {' · '}
+                <a href={`/products/${p.slug}`} target="_blank" rel="noopener" className="font-medium text-zinc-700 underline underline-offset-2">
+                  View on site
+                </a>
+              </>
+            )}
           </p>
           <p className="text-sm text-zinc-700">{size ?? <span className="text-zinc-400">Size not known</span>}</p>
         </div>

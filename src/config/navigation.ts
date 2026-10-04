@@ -17,6 +17,7 @@ export const SHOP_LINKS: NavLink[] = [
 ]
 
 export const HELP_LINKS: NavLink[] = [
+  { label: 'Saved sofas', href: '/saved' },
   { label: 'Delivery and returns', href: '/delivery-and-returns' },
   { label: 'Track my order', href: '/track-order' },
   { label: 'Fabric samples', href: '/fabric-samples' },
