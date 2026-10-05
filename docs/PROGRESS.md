@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 9 (home, categories, search and navigation) built and on the staging link, waiting for approval (6 October 2026). Phase 8 approved and merged into `main`. |
+| **Current phase** | Phase 10 (checkout and orders) built and on the staging link; waiting for the owner to add two keys in Vercel, then approval (6 October 2026). Phase 9 approved and merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 10: Checkout, orders and confirmation. Order from here: 10–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 9 approved. Phase 10 — Checkout and orders. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 10. SMTP password is set in the Vercel project (Preview). Shop notifications go to <email>; copies to <email or none>. Address lookup key: <provider, key set in Vercel>. Phone: <number>. WhatsApp: <number>.` (items 9–12 in PLAN section 9) |
+| **Next phase** | Phase 11: Admin dashboard and orders. Order from here: 11–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 10 approved. Phase 11 — Admin orders. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 11.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -37,10 +37,22 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Database rules: every schema change is a file in `supabase/migrations/` applied to both projects with the same version (the MCP tool records its own time, so the files are named after staging's recorded versions and production's rows are updated to match). Security definer functions live in the unexposed `private` schema behind thin `public` wrappers, so Supabase's security advisor stays empty: keep it that way.
 - Pushing from this PC: Git Credential Manager holds two GitHub accounts (heartwellsofa, Muzan787), so a background push must name one: `git -c credential.username=heartwellsofa push`.
 - Connectors: Supabase, Vercel and GitHub were reconnected to the Heartwell accounts by the owner on 6 Oct 2026. If the Supabase connector ever lists a project called "Onium", it's signed into the wrong account: never touch that project.
+- Phone and WhatsApp: 07848 477056 (`src/config/contact.ts`). Shop notifications go to enquiries@heartwellsofa.co.uk (the default) with a copy to heartwellsofa@gmail.com (`SHOP_NOTIFY_COPY`, read from the owner's "heartwellsofa3gmail.com", assumed to mean @gmail.com). Outside production, customer emails go to heartwellsofa@gmail.com (`EMAIL_TEST_INBOX`).
+- Hosting settings checkout needs (Vercel now, Hostinger from 18B): `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` (both secret, added by the owner; I never see them). Optional: `ADDRESS_LOOKUP_PROVIDER` + `ADDRESS_LOOKUP_KEY`, `MAIL_FROM` (once the orders@ alias exists), `SMTP_HOST/PORT/USER` (default smtp.hostinger.com:465 as enquiries@).
 - Site addresses: departments `/sofas`, categories `/sofas/<category>`, products `/products/<slug>` (`?variant=<SKU>&fabric=<code>`), ranges `/ranges/<range>`, `/search`, `/fabrics`, `/basket`, `/saved`, `/visit-us` (404 until the address is set).
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 6 October 2026 — Phase 10: checkout, orders and confirmation
+- **Owner:** Phase 9 approved; merged into `main`. Phone and WhatsApp 07848 477056; notifications to enquiries@ with a copy to heartwellsofa@gmail.com. No address-lookup provider named yet.
+- **Checkout** (`/checkout`, one page, phone first): name, mobile, optional email → postcode → address (picked from a lookup when one is set up, typed otherwise) → floor and lift, assembly, old sofa removal with seats → preferred day (from shop settings) → notes, offer code, "remind me about my basket" opt-in → summary with live totals → "Place order: pay nothing today". Totals shown are the database's own (`price_order`); `place_order` refuses any other figure. Northern Ireland, the islands and (without a lookup) IV40/PA34 get a WhatsApp or email quote instead. Plain-English errors point at the field; rate limits on quotes, orders, lookups, confirming and tracking; a hidden field catches bots. Every order outside production is a test order.
+- **After ordering:** `/order/<id>` (reference, nothing to pay today, "confirm in your email"), `/confirm-order/<id>` (opening it never confirms; the button does; cancelled and already-confirmed states), `/track-order` (HW reference and postcode, posted so the postcode never sits in an address).
+- **Emails** (Nodemailer through Hostinger SMTP, sent just after the response so they can't hold up or undo an order, each logged in `email_log` as sent, failed or skipped): customer "Please confirm" with the button, lines, extras, totals, address, the delivery window or preferred day and the made-to-order notice; shop "New order" with the customer, a WhatsApp "Ask them to confirm" button pre-filled with the confirm link, SKUs and a copy block for OrderFlow; shop "confirmed by the customer". Outside production, customer emails go to the test inbox with the intended address noted.
+- **Admin Status** now turns red without the server key or email, and shows address lookup (amber until a provider is set).
+- **Checked:** against the real staging database (rolled back): the exact input the site builds prices and places an order correctly (2 × £499, second floor without lift £30, assembly £20, three-seat removal £30 = £1,078), a wrong total is refused, the order is a test, pending, with its visit IDs. With the public key: confirm works once and reports "already confirmed" after; tracking matches reference and postcode in any case and refuses a wrong postcode. On the preview: every new page answers (bad IDs 404); in a phone-sized browser a Belfast postcode gets the quote route with Place order disabled, a Leeds one opens the address fields; "Go to checkout" appears after adding to basket. Tests caught two real input problems (an email with a trailing space was refused; an address typed over two lines got a double comma). `npm run verify` passes (320 tests).
+- **Test order left on staging:** HW-100106 (Preview Test Order, pending, test) for trying the confirm page.
+- **Waiting on the owner:** add `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` in Vercel (the SMTP password wasn't there), then place a test order from the phone checklist; choose an address-lookup provider (optional); check that the heartwellsofa.co.uk mailbox has SPF and DKIM switched on in Hostinger so emails don't land in spam.
 
 ### 6 October 2026 — Phase 9: home, categories, search and navigation
 - **Owner:** Phase 8 approved; merged into `main`. Supabase, Vercel and GitHub reconnected to the Heartwell accounts.

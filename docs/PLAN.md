@@ -607,6 +607,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** place an order on staging with a mainland postcode and extras → receive both emails → tap Confirm → track the order. Try a Belfast postcode and you're routed to WhatsApp.
 - **Done means:** totals always match the database; emails arrive in the inbox (not spam); non-mainland is routed correctly; staging orders are flagged as test.
+- **As built (6 October 2026):** `/checkout` (one page), `/order/<id>` (placed), `/confirm-order/<id>` (confirms on the button only), `/track-order` (reference and postcode posted, never in the address). Totals shown come from `price_order` and `place_order` refuses any other figure. Address lookup works with Homedata, Ideal Postcodes or getAddress.io on the server (`ADDRESS_LOOKUP_PROVIDER`, `ADDRESS_LOOKUP_KEY`); without one, customers type the address and IV40/PA34 go to a quote. Emails are sent after the response (`after()`), each logged in `email_log`; outside production customer emails go to `EMAIL_TEST_INBOX`. Needs `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` in the hosting settings (the Status page turns red without them).
 
 ---
 
