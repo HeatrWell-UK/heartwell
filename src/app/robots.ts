@@ -6,7 +6,7 @@ import { SITE_URL } from '@/config/site'
 export default function robots(): MetadataRoute.Robots {
   if (!SITE_INDEXABLE) return { rules: [{ userAgent: '*', disallow: '/' }] }
   return {
-    rules: [{ userAgent: '*', allow: '/', disallow: ['/admin', '/login', '/api/', '/confirm-order/', '/basket', '/saved', '/checkout'] }],
+    rules: [{ userAgent: '*', allow: '/', disallow: ['/admin', '/login', '/api/', '/confirm-order/', '/basket', '/saved', '/checkout', '/search'] }],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
   }

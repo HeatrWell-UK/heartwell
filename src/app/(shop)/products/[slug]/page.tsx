@@ -12,6 +12,8 @@ import { RelatedRail } from '@/components/product/ProductCard'
 import { CONTACT, whatsAppHref } from '@/config/contact'
 import { SITE_URL } from '@/config/site'
 import { getDeliveryInfo, getProductPage } from '@/lib/product/load'
+import { getCategories } from '@/lib/catalogue/listing'
+import { categoryHref, trail } from '@/lib/catalogue/tree'
 import { pickFabric, pickVariant } from '@/lib/product/helpers'
 import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
 import type { ProductPageData } from '@/lib/product/types'
@@ -53,7 +55,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function ProductPage({ params, searchParams }: Props) {
   const { slug } = await params
-  const [product, delivery, query] = await Promise.all([getProductPage(slug), getDeliveryInfo(), searchParams])
+  const [product, delivery, query, tree] = await Promise.all([getProductPage(slug), getDeliveryInfo(), searchParams, getCategories()])
   if (!product) notFound()
 
   const variant = pickVariant(product.variants, first(query.variant))
@@ -65,12 +67,8 @@ export default async function ProductPage({ params, searchParams }: Props) {
   const askHref = wa ?? `mailto:${CONTACT.email}?subject=${encodeURIComponent(product.title)}`
   const askLabel = wa ? 'Ask us anything on WhatsApp' : 'Ask us anything by email'
 
-  const crumbs = product.category
-    ? [...(product.category.parent ? [product.category.parent] : []), product.category].map((c) => ({
-        name: c.name,
-        href: c.slug === 'sofas' ? '/sofas' : `/sofas/${c.slug}`,
-      }))
-    : []
+  const categoryNode = product.category ? tree.find((c) => c.slug === product.category?.slug) : undefined
+  const crumbs = categoryNode ? trail(tree, categoryNode).map((c) => ({ name: c.name, href: categoryHref(tree, c) })) : []
 
   return (
     <article className="pb-14">

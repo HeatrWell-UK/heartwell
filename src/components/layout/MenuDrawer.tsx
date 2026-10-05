@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { ListIcon, XIcon } from '@phosphor-icons/react'
-import { ABOUT_LINKS, HELP_LINKS, SHOP_LINKS } from '@/config/navigation'
+import { ABOUT_LINKS, BROWSE_LINKS, HELP_LINKS } from '@/config/navigation'
+import type { NavSection } from '@/lib/catalogue/listing'
 import { LogoLockup } from '@/components/brand/Logo'
 
 /**
@@ -19,7 +20,7 @@ import { LogoLockup } from '@/components/brand/Logo'
  * It is a fixed overlay rather than a popover, so it works in every in-app
  * browser, including older iPhones. While open, the page behind is `inert`.
  */
-export function MenuDrawer() {
+export function MenuDrawer({ shop }: { shop: NavSection[] }) {
   const [mounted, setMounted] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -148,7 +149,28 @@ export function MenuDrawer() {
                   </button>
                 </div>
                 <div className="flex flex-col gap-6 px-3 py-5">
-                  <MenuSection title="Shop sofas" links={SHOP_LINKS} linkClass={linkClass} onNavigate={close} />
+                  <form action="/search" role="search" className="flex gap-2 px-3">
+                    <label htmlFor="menu-search" className="sr-only">
+                      Search sofas
+                    </label>
+                    <input
+                      id="menu-search"
+                      name="q"
+                      type="search"
+                      enterKeyHint="search"
+                      placeholder="Search sofas"
+                      className="h-12 min-w-0 flex-1 rounded-[var(--radius-field)] border-[1.5px] border-field bg-white px-3.5 text-ink placeholder:text-slate/70 focus:border-velvet focus:outline-none"
+                    />
+                  </form>
+                  {shop.map((section, i) => (
+                    <MenuSection
+                      key={section.title}
+                      title={section.title}
+                      links={i === 0 ? [...section.links, ...BROWSE_LINKS] : section.links}
+                      linkClass={linkClass}
+                      onNavigate={close}
+                    />
+                  ))}
                   <MenuSection title="Help" links={HELP_LINKS} linkClass={linkClass} onNavigate={close} />
                   <MenuSection title="Heartwell" links={ABOUT_LINKS} linkClass={linkClass} onNavigate={close} />
                 </div>

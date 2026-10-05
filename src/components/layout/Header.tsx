@@ -3,6 +3,7 @@ import { MagnifyingGlassIcon } from '@phosphor-icons/react/ssr'
 import { LogoLockup } from '@/components/brand/Logo'
 import { MenuDrawer } from './MenuDrawer'
 import { BasketLink } from './BasketLink'
+import type { NavSection } from '@/lib/catalogue/listing'
 
 const iconButton = 'flex size-11 items-center justify-center rounded-full text-ink hover:bg-stone'
 
@@ -11,11 +12,11 @@ const iconButton = 'flex size-11 items-center justify-center rounded-full text-i
  * The basket shows how many items are in it on this device; search arrives
  * with the catalogue pages (Phase 9).
  */
-export function Header() {
+export function Header({ shop }: { shop: NavSection[] }) {
   return (
     <header className="border-b border-line-soft bg-white">
       <div className="mx-auto flex h-[60px] max-w-[1200px] items-center justify-between px-2 lg:px-6">
-        <MenuDrawer />
+        <MenuDrawer shop={shop} />
         <Link href="/" aria-label="Heartwell home" className="rounded-md">
           <LogoLockup />
         </Link>

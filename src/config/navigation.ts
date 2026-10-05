@@ -1,5 +1,8 @@
-// Menu and footer links. Category links become database-driven in Phase 9;
-// until then this is the single list both the menu and the footer read.
+// Menu and footer links. The shop links come from the category tree (see
+// getShopNavigation); SHOP_LINKS is only the fallback when the database can't
+// be reached. Help and About links are the single list the menu and footer read.
+
+import { CONTACT } from './contact'
 
 export interface NavLink {
   label: string
@@ -25,9 +28,16 @@ export const HELP_LINKS: NavLink[] = [
   { label: 'Contact us', href: '/contact' },
 ]
 
+/** Browse links shown under the shop links. */
+export const BROWSE_LINKS: NavLink[] = [
+  { label: 'Shop by range', href: '/ranges' },
+  { label: 'Our fabrics', href: '/fabrics' },
+]
+
 export const ABOUT_LINKS: NavLink[] = [
   { label: 'About Heartwell', href: '/about' },
-  { label: 'Visit us', href: '/visit-us' },
+  // Only once there's an address to visit.
+  ...(CONTACT.visitAddress ? [{ label: 'Visit us', href: '/visit-us' }] : []),
   { label: 'Reviews', href: '/reviews' },
   { label: 'Guides', href: '/guides' },
 ]

@@ -1,14 +1,14 @@
 import 'server-only'
 import { unstable_cache } from 'next/cache'
 import { createPublicClient } from '@/lib/supabase/public'
+import { CATALOGUE_TAG, getCategories } from '@/lib/catalogue/listing'
 import { deliveryWindow } from '@/lib/delivery/window'
 import { fromPrice } from '@/lib/catalogue/pricing'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
 import { specRows, type SpecField } from './specs'
 import type { DeliveryInfo, FabricCollectionView, ProductCardView, ProductPageData, SiblingView, VariantView } from './types'
 
-/** Cache tags: the admin revalidates these when the catalogue or settings change (Phase 12). */
-export const CATALOGUE_TAG = 'catalogue'
+/** Cache tag for shop settings; the catalogue's is CATALOGUE_TAG. The admin revalidates both (Phase 12). */
 export const SETTINGS_TAG = 'settings'
 const FIVE_MINUTES = 300
 
@@ -23,17 +23,6 @@ const PRODUCT_FIELDS = `
 `
 
 const bySort = <T extends { sort: number }>(a: T, b: T) => a.sort - b.sort
-
-/** The whole category tree: small, and read on every product and category page. */
-export const getCategories = unstable_cache(
-  async () => {
-    const { data, error } = await createPublicClient().from('categories').select('id, slug, name, parent_id, sort').order('sort')
-    if (error) throw new Error(`Categories: ${error.message}`)
-    return data
-  },
-  ['categories-v1'],
-  { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
-)
 
 async function loadProductPage(slug: string): Promise<ProductPageData | null> {
   const db = createPublicClient()

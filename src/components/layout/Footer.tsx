@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { LogoStacked } from '@/components/brand/Logo'
 import { CONTACT, phoneHref } from '@/config/contact'
-import { ABOUT_LINKS, HELP_LINKS, LEGAL_LINKS, SHOP_LINKS } from '@/config/navigation'
+import { ABOUT_LINKS, BROWSE_LINKS, HELP_LINKS, LEGAL_LINKS } from '@/config/navigation'
+import type { NavSection } from '@/lib/catalogue/listing'
 
 const linkClass = 'text-[15px] text-on-wine-link no-underline hover:text-white hover:underline'
 
 /** Wine footer with the gold logo. Contact and company lines appear only once set in config. */
-export function Footer() {
+export function Footer({ shop }: { shop: NavSection[] }) {
   const t = CONTACT.trading
   const tel = phoneHref()
   const year = new Date().getFullYear()
@@ -16,7 +17,11 @@ export function Footer() {
         <LogoStacked reversed width={190} />
 
         <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
-          <FooterColumn title="Shop" links={SHOP_LINKS.filter((l) => l.href !== '/sofas/fabric-sofas' && l.href !== '/sofas/leather-sofas')} />
+          {/* Shape categories and the department link; fabric and leather are in the menu. */}
+          <FooterColumn
+            title="Shop"
+            links={[...(shop[0]?.links ?? []).filter((l) => !/fabric|leather/.test(l.href)), BROWSE_LINKS[0]!]}
+          />
           <FooterColumn title="Help" links={HELP_LINKS} />
           <FooterColumn title="Heartwell" links={ABOUT_LINKS} />
         </div>
