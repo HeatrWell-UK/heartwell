@@ -2,7 +2,8 @@ import 'server-only'
 import { unstable_cache } from 'next/cache'
 import { createPublicClient } from '@/lib/supabase/public'
 import { CATALOGUE_TAG, getCategories } from '@/lib/catalogue/listing'
-import { deliveryWindow } from '@/lib/delivery/window'
+import { deliveryWindow, earliestPreferredDate, latestPreferredDate } from '@/lib/delivery/window'
+import type { DeliverySettings } from '@/lib/delivery/pricing'
 import { fromPrice } from '@/lib/catalogue/pricing'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
 import { specRows, type SpecField } from './specs'
@@ -154,13 +155,13 @@ const loadDeliverySettings = unstable_cache(
     const { data, error } = await createPublicClient()
       .from('shop_settings')
       .select(
-        'upstairs_first_floor, upstairs_per_extra_floor, assembly_fee, removal_per_seat, delivery_min_working_days, delivery_max_working_days, preferred_date_min_days, preferred_date_max_days',
+        'upstairs_first_floor, upstairs_per_extra_floor, max_floor, assembly_fee, removal_per_seat, removal_min_seats, removal_max_seats, removal_default_seats, delivery_min_working_days, delivery_max_working_days, preferred_date_min_days, preferred_date_max_days',
       )
       .single()
     if (error) throw new Error(`Shop settings: ${error.message}`)
     return data
   },
-  ['delivery-settings-v1'],
+  ['delivery-settings-v2'],
   { revalidate: FIVE_MINUTES, tags: [SETTINGS_TAG] },
 )
 
@@ -175,5 +176,32 @@ export async function getDeliveryInfo(now = new Date()): Promise<DeliveryInfo> {
     upstairsPerExtraFloor: s.upstairs_per_extra_floor,
     assemblyFee: s.assembly_fee,
     removalPerSeat: s.removal_per_seat,
+  }
+}
+
+export interface CheckoutSettings {
+  delivery: DeliverySettings
+  windowLabel: string
+  earliestDate: string
+  latestDate: string
+}
+
+/** Everything checkout needs to price extras and offer delivery days, from shop_settings. */
+export async function getCheckoutSettings(now = new Date()): Promise<CheckoutSettings> {
+  const s = await loadDeliverySettings()
+  return {
+    delivery: {
+      upstairs_first_floor: s.upstairs_first_floor,
+      upstairs_per_extra_floor: s.upstairs_per_extra_floor,
+      max_floor: s.max_floor,
+      assembly_fee: s.assembly_fee,
+      removal_per_seat: s.removal_per_seat,
+      removal_min_seats: s.removal_min_seats,
+      removal_max_seats: s.removal_max_seats,
+      removal_default_seats: s.removal_default_seats,
+    },
+    windowLabel: deliveryWindow(s, now).label,
+    earliestDate: earliestPreferredDate(s, now),
+    latestDate: latestPreferredDate(s, now),
   }
 }

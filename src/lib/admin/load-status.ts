@@ -32,6 +32,7 @@ export async function loadStatus() {
       supabaseConfigured: SUPABASE_CONFIGURED,
       secretKeyConfigured: SUPABASE_SECRET_CONFIGURED,
       smtpConfigured: INTEGRATIONS.smtp,
+      addressLookupConfigured: INTEGRATIONS.addressLookup,
       trackingConfigured: INTEGRATIONS.metaTracking,
     },
     data,

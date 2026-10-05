@@ -33,6 +33,7 @@ export interface StatusContext {
   supabaseConfigured: boolean
   secretKeyConfigured: boolean
   smtpConfigured: boolean
+  addressLookupConfigured: boolean
   trackingConfigured: boolean
 }
 
@@ -98,10 +99,10 @@ export function buildStatusChecks(
   checks.push({
     key: 'server_key',
     title: 'Server key',
-    level: ctx.secretKeyConfigured ? 'ok' : 'warn',
+    level: ctx.secretKeyConfigured ? 'ok' : 'error',
     summary: ctx.secretKeyConfigured
       ? 'Set. The checkout can place orders.'
-      : 'Not set yet. The checkout needs it to place orders (Phase 10).',
+      : 'Not set. The checkout can’t place orders until SUPABASE_SECRET_KEY is added in the hosting settings.',
   })
 
   // Catalogue
@@ -138,7 +139,12 @@ export function buildStatusChecks(
 
   // Email
   if (!ctx.smtpConfigured) {
-    checks.push({ key: 'email', title: 'Email', level: 'warn', summary: 'Not set up yet. Order emails arrive in Phase 10.' })
+    checks.push({
+      key: 'email',
+      title: 'Email',
+      level: 'error',
+      summary: 'Not set up. Orders are saved, but no emails go out until SMTP_PASSWORD is added in the hosting settings.',
+    })
   } else {
     const failing = data.email.failed_24h > 0
     checks.push({
@@ -150,6 +156,16 @@ export function buildStatusChecks(
         : `Working. Last email sent ${when(data.email.last_sent)}.`,
     })
   }
+
+  // Address lookup
+  checks.push({
+    key: 'address_lookup',
+    title: 'Address lookup',
+    level: ctx.addressLookupConfigured ? 'ok' : 'warn',
+    summary: ctx.addressLookupConfigured
+      ? 'Set. Customers pick their address from a list.'
+      : 'Not set up. Customers type their address instead, and the two mixed Scottish districts (IV40, PA34) get a delivery quote.',
+  })
 
   // Scheduled jobs
   const jobLevels: Level[] = []

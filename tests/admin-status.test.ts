@@ -9,6 +9,7 @@ const ctx: StatusContext = {
   supabaseConfigured: true,
   secretKeyConfigured: false,
   smtpConfigured: false,
+  addressLookupConfigured: false,
   trackingConfigured: false,
 }
 
@@ -31,21 +32,27 @@ const data: AdminStatusData = {
 const byKey = (checks: ReturnType<typeof buildStatusChecks>) => Object.fromEntries(checks.map((c) => [c.key, c.level]))
 
 describe('admin status', () => {
-  it('shows the Phase 4 picture: database green, things not set up amber, nothing red', () => {
+  it('goes red once checkout is on but its server key or email is missing; optional parts stay amber', () => {
     const checks = buildStatusChecks(ctx, data, null)
     expect(byKey(checks)).toEqual({
       database: 'ok',
       environment: 'ok',
-      server_key: 'warn',
+      server_key: 'error',
       catalogue: 'warn',
       orders: 'ok',
-      email: 'warn',
+      email: 'error',
+      address_lookup: 'warn',
       jobs: 'warn',
       tracking: 'warn',
       orderflow: 'warn',
     })
-    expect(overallLevel(checks)).toBe('warn')
+    expect(overallLevel(checks)).toBe('error')
     for (const c of checks) expect(c.summary.length).toBeGreaterThan(10)
+  })
+
+  it('is green for checkout once the server key, email and lookup are set', () => {
+    const checks = buildStatusChecks({ ...ctx, secretKeyConfigured: true, smtpConfigured: true, addressLookupConfigured: true }, data, null)
+    expect(byKey(checks)).toMatchObject({ server_key: 'ok', email: 'ok', address_lookup: 'ok' })
   })
 
   it('goes red when the database cannot be read', () => {

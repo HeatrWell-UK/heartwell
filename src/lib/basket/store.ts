@@ -96,6 +96,7 @@ export function useBasket() {
     setQuantity: (id: string, quantity: number) => basketStore.set(setQuantity(basketStore.get(), id, quantity)),
     remove: (id: string) => basketStore.set(removeLine(basketStore.get(), id)),
     refresh: (fresh: Record<string, BasketLineView | null>) => basketStore.set(refreshLines(basketStore.get(), fresh)),
+    clear: () => basketStore.set([]),
   }
 }
 
@@ -124,5 +125,26 @@ export function recallPostcode(): string {
     return window.localStorage.getItem(POSTCODE_KEY) ?? ''
   } catch {
     return ''
+  }
+}
+
+/**
+ * IDs for this browser and this visit, so a basket reminder can be matched
+ * to the order if the shopper goes on to buy. Phase 14 builds the full
+ * attribution ledger on the same IDs. Null when storage isn't available.
+ */
+export function visitIds(): { visitorId: string; sessionId: string; arrivalId: string } | null {
+  try {
+    const get = (store: Storage, key: string) => {
+      let v = store.getItem(key)
+      if (!v || !/^[0-9a-f-]{36}$/i.test(v)) {
+        v = newId()
+        store.setItem(key, v)
+      }
+      return v
+    }
+    return { visitorId: get(window.localStorage, 'hw-visitor'), sessionId: get(window.sessionStorage, 'hw-session'), arrivalId: get(window.sessionStorage, 'hw-arrival') }
+  } catch {
+    return null
   }
 }
