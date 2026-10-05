@@ -22,12 +22,29 @@ export function Gallery({
 }) {
   const listRef = useRef<HTMLUListElement>(null)
   const [index, setIndex] = useState(0)
+  // Photos after the first wait until the page has loaded (or the customer
+  // swipes), so the main photo has the connection to itself.
+  const [showRest, setShowRest] = useState(false)
+
+  useEffect(() => {
+    if (showRest) return
+    const show = () => setShowRest(true)
+    // Safari has no requestIdleCallback.
+    const later = () => {
+      if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(show, { timeout: 2000 })
+      else setTimeout(show, 200)
+    }
+    if (document.readyState === 'complete') later()
+    else window.addEventListener('load', later, { once: true })
+    return () => window.removeEventListener('load', later)
+  }, [showRest])
 
   useEffect(() => {
     const list = listRef.current
     if (!list) return
     let frame = 0
     const onScroll = () => {
+      setShowRest(true)
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(() => setIndex(Math.round(list.scrollLeft / Math.max(1, list.clientWidth))))
     }
@@ -59,15 +76,17 @@ export function Gallery({
                 className="relative aspect-square w-full shrink-0 snap-center bg-stone"
                 aria-label={images.length > 1 ? `Photo ${i + 1} of ${images.length}` : undefined}
               >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  priority={priority && i === 0}
-                  fetchPriority={priority && i === 0 ? 'high' : undefined}
-                  sizes="(min-width: 1200px) 620px, (min-width: 1024px) 52vw, 100vw"
-                  className="object-cover"
-                />
+                {(i === 0 || showRest) && (
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    priority={priority && i === 0}
+                    fetchPriority={priority && i === 0 ? 'high' : undefined}
+                    sizes="(min-width: 1200px) 620px, (min-width: 1024px) 52vw, 100vw"
+                    className="object-cover"
+                  />
+                )}
               </li>
             ))}
           </ul>
@@ -95,7 +114,10 @@ export function Gallery({
             <button
               type="button"
               aria-label="Next photo"
-              onClick={() => go(Math.min(images.length - 1, index + 1))}
+              onClick={() => {
+                setShowRest(true)
+                go(Math.min(images.length - 1, index + 1))
+              }}
               disabled={index === images.length - 1}
               className="absolute right-3 top-1/2 hidden size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-ink shadow-sm disabled:opacity-0 lg:flex"
             >

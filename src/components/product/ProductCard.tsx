@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ImageIcon } from '@phosphor-icons/react/ssr'
 import { Price } from '@/components/ui/Price'
+import { WhenNear } from '@/components/ui/WhenNear'
 import type { ProductCardView } from '@/lib/product/types'
 
 /** A product in a rail or grid: photo, name and price. */
@@ -11,7 +12,9 @@ export function ProductCard({ product }: { product: ProductCardView }) {
       <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
         {product.image ? (
           // Fixed width: one 1× and one 2× file (168 px on phones, 270 px in the desktop grid).
-          <Image src={product.image} alt={product.imageAlt} width={270} height={270} className="size-full object-cover" />
+          <WhenNear className="block size-full">
+            <Image src={product.image} alt={product.imageAlt} width={270} height={270} className="size-full object-cover" />
+          </WhenNear>
         ) : (
           <span className="flex h-full items-center justify-center text-slate">
             <ImageIcon aria-hidden="true" size={32} />
