@@ -57,7 +57,7 @@ export function BasketView() {
           {basket.lines.map((line) => (
             <li key={line.id} className="flex gap-3 py-4">
               <Link href={productHref(line.view.slug, line.view.sku)} className="relative size-[88px] shrink-0 overflow-hidden rounded-2xl bg-stone">
-                {line.view.image && <Image src={line.view.image} alt="" fill sizes="88px" className="object-cover" />}
+                {line.view.image && <Image src={line.view.image} alt="" width={88} height={88} className="size-full object-cover" />}
                 <span className="sr-only">{line.view.title}</span>
               </Link>
               <div className="flex min-w-0 flex-1 flex-col gap-1">

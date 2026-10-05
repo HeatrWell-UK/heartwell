@@ -49,7 +49,8 @@ export function Sheet({
             <XIcon aria-hidden="true" size={22} />
           </button>
         </div>
-        <div className="overflow-y-auto overscroll-contain px-4 pb-6 pt-2">{children}</div>
+        {/* Contents render only while open, so a closed sheet adds nothing to the page. */}
+        <div className="overflow-y-auto overscroll-contain px-4 pb-6 pt-2">{open && children}</div>
       </div>
     </dialog>
   )

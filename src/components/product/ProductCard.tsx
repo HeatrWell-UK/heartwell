@@ -5,12 +5,13 @@ import { Price } from '@/components/ui/Price'
 import type { ProductCardView } from '@/lib/product/types'
 
 /** A product in a rail or grid: photo, name and price. */
-export function ProductCard({ product, sizes = '168px' }: { product: ProductCardView; sizes?: string }) {
+export function ProductCard({ product }: { product: ProductCardView }) {
   return (
     <Link href={`/products/${product.slug}`} className="flex flex-col gap-2 text-ink no-underline hover:text-ink">
       <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
         {product.image ? (
-          <Image src={product.image} alt={product.imageAlt} fill sizes={sizes} className="object-cover" />
+          // Fixed width: one 1× and one 2× file (168 px on phones, 270 px in the desktop grid).
+          <Image src={product.image} alt={product.imageAlt} width={270} height={270} className="size-full object-cover" />
         ) : (
           <span className="flex h-full items-center justify-center text-slate">
             <ImageIcon aria-hidden="true" size={32} />
@@ -33,7 +34,7 @@ export function RelatedRail({ title, products }: { title: string; products: Prod
       <ul className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:px-0">
         {products.map((p) => (
           <li key={p.slug} className="w-[168px] shrink-0 snap-start lg:w-auto">
-            <ProductCard product={p} sizes="(min-width: 1024px) 270px, 168px" />
+            <ProductCard product={p} />
           </li>
         ))}
       </ul>

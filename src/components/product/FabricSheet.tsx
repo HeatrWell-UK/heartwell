@@ -17,7 +17,7 @@ export interface ChosenFabric {
 export function FabricSwatch({ fabric, size = 48 }: { fabric: FabricView; size?: number }) {
   return (
     <span className="pinked relative block shrink-0 overflow-hidden" style={{ width: size, height: size, backgroundColor: fabric.hex ?? '#F5F1EF' }}>
-      {fabric.image && <Image src={fabric.image} alt="" fill sizes={`${size}px`} className="object-cover" />}
+      {fabric.image && <Image src={fabric.image} alt="" width={size} height={size} className="size-full object-cover" />}
     </span>
   )
 }

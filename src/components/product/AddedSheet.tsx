@@ -23,7 +23,7 @@ export function AddedSheet({ item, onClose }: { item: AddedItem | null; onClose:
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-3">
             <span className="relative size-[84px] shrink-0 overflow-hidden rounded-2xl bg-stone">
-              {item.image && <Image src={item.image} alt="" fill sizes="84px" className="object-cover" />}
+              {item.image && <Image src={item.image} alt="" width={84} height={84} className="size-full object-cover" />}
             </span>
             <div className="flex min-w-0 flex-col gap-0.5">
               <span className="font-semibold leading-snug">{item.title}</span>
