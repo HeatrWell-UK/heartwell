@@ -111,9 +111,9 @@ export async function getShopNavigation(): Promise<NavSection[]> {
   }))
 }
 
-/** "Corner Sofas" -> "Corner sofas", keeping "3+2" and "U-Shaped" readable. */
+/** "Corner Sofas" -> "Corner sofas", "U-Shaped Sofas" -> "U-shaped sofas". The first letter and "3+2" are kept. */
 export function sentenceCase(name: string): string {
-  return name.replace(/(\s)([A-Z])([a-z])/g, (_, s: string, c: string, rest: string) => `${s}${c.toLowerCase()}${rest}`)
+  return name.replace(/([\s-])([A-Z])([a-z])/g, (_, s: string, c: string, rest: string) => `${s}${c.toLowerCase()}${rest}`)
 }
 
 export interface FabricCollection {

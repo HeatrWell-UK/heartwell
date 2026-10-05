@@ -592,6 +592,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** home → category → filter by size and price → product → back. Search "corner grey".
 - **Done means:** every product and category is reachable; the sitemap validates; the pages meet the same speed and accessibility targets.
+- **As built (6 October 2026):** departments live at `/<department>` and their categories at `/<department>/<category>`, read from the category tree, so a "Dining" department needs data only. Filters come from each product type's `filters` list, with live counts and shareable addresses (`?shape=corner&colour=grey&sort=price-asc`); filtered and sorted pages are noindex with a canonical to the plain page. Also built: range pages (`/ranges`, `/ranges/<range>`), `/search`, the fabric library (`/fabrics`), the menu and footer from the tree (search in the menu), `sitemap.xml`. Category copy is in the database (migration `category_copy`, fills empty fields only). The Visit us page and home section exist but stay hidden until the address is set (Phase 16). Lighthouse mobile: performance 91–96, accessibility 100 on home, a category, a range and search.
 
 ---
 

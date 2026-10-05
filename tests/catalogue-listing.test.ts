@@ -202,3 +202,12 @@ describe('popular right now', () => {
     expect(pickPopular(list, 3).map((p) => p.slug)).toEqual(['a1', 'd1', 'c1'])
   })
 })
+
+describe('single-option filters', () => {
+  it('shows "Made to order" only when it narrows the list', () => {
+    const some = [product('a', { madeToOrder: true }), product('b')]
+    expect(facetsFor(some, {}).some((f) => f.key === 'made_to_order')).toBe(true)
+    const all = [product('a', { madeToOrder: true }), product('b', { madeToOrder: true })]
+    expect(facetsFor(all, {}).some((f) => f.key === 'made_to_order')).toBe(false)
+  })
+})

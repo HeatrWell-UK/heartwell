@@ -210,7 +210,10 @@ export function facetsFor(products: ListingProduct[], filters: ActiveFilters): F
     const order = ORDER[key]
     values.sort((a, b) => (order ? order.indexOf(a) - order.indexOf(b) : Number(a) - Number(b)))
     const options = values.map((value) => ({ value, label: labelOf(key, value), count: counts.get(value) ?? 0, selected: selected.includes(value) }))
-    if (options.length > 1 || options.some((o) => o.selected)) facets.push({ key, label: GROUP_LABEL[key], single: SINGLE.has(key), options })
+    // A group is worth showing when it can narrow the list: several options, or
+    // one option (like "Made to order") that only some of the pieces have.
+    const narrows = options.length > 1 || (options.length === 1 && options[0]!.count > 0 && options[0]!.count < pool.length)
+    if (narrows || options.some((o) => o.selected)) facets.push({ key, label: GROUP_LABEL[key], single: SINGLE.has(key), options })
   }
   return facets
 }

@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 8 (product page and basket) built and on the staging link, waiting for approval (6 October 2026). Phase 5 approved and merged into `main`. |
+| **Current phase** | Phase 9 (home, categories, search and navigation) built and on the staging link, waiting for approval (6 October 2026). Phase 8 approved and merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 9: Home, categories, search and navigation. Order from here: 9–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 8 approved. Phase 9 — Home, categories and search. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 9.` |
+| **Next phase** | Phase 10: Checkout, orders and confirmation. Order from here: 10–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 9 approved. Phase 10 — Checkout and orders. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 10. SMTP password is set in the Vercel project (Preview). Shop notifications go to <email>; copies to <email or none>. Address lookup key: <provider, key set in Vercel>. Phone: <number>. WhatsApp: <number>.` (items 9–12 in PLAN section 9) |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -36,10 +36,21 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Supabase: organisation "Heartwellsofa" (free plan, owner's choice for now; D2 recommends Pro for production before launch). Projects in London: **heartwell-staging** `jfacgarejzvpuitiuvrk` and **heartwell-prod** `oeakyeibdczedgvncomk`. Every Vercel environment uses staging during the build (`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` set in Vercel); production's database is connected at Phase 18B. Free projects pause after a week without use: restore heartwell-prod from the dashboard when it's needed.
 - Database rules: every schema change is a file in `supabase/migrations/` applied to both projects with the same version (the MCP tool records its own time, so the files are named after staging's recorded versions and production's rows are updated to match). Security definer functions live in the unexposed `private` schema behind thin `public` wrappers, so Supabase's security advisor stays empty: keep it that way.
 - Pushing from this PC: Git Credential Manager holds two GitHub accounts (heartwellsofa, Muzan787), so a background push must name one: `git -c credential.username=heartwellsofa push`.
-- Connectors (6 Oct 2026): the Supabase connector is signed into a different Supabase account (it lists only a project called "Onium"; never touch it) and the Vercel connector has lost the Heartwell team. Both need reconnecting to the Heartwell accounts before Phase 10 (migrations, logs, env checks). The site itself is unaffected.
+- Connectors: Supabase, Vercel and GitHub were reconnected to the Heartwell accounts by the owner on 6 Oct 2026. If the Supabase connector ever lists a project called "Onium", it's signed into the wrong account: never touch that project.
+- Site addresses: departments `/sofas`, categories `/sofas/<category>`, products `/products/<slug>` (`?variant=<SKU>&fabric=<code>`), ranges `/ranges/<range>`, `/search`, `/fabrics`, `/basket`, `/saved`, `/visit-us` (404 until the address is set).
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 6 October 2026 — Phase 9: home, categories, search and navigation
+- **Owner:** Phase 8 approved; merged into `main`. Supabase, Vercel and GitHub reconnected to the Heartwell accounts.
+- **Home** completed as designed: hero, promises, how ordering works, shop by shape (top-view plans), popular right now (featured pieces with photos, one per range), "Your sofa, in your fabric" (wine section with real fabric colours; the samples line appears with Phase 13), "Buying from us for the first time?", Visit us (hidden until the address is set) and "Questions people ask" with answers from the promises and shop settings.
+- **Categories** from the tree: `/sofas` and `/sofas/<category>` (a new department or category needs data only). Filters from each product type (shape, seats, width, price, material, colour family, reclining, made to order) with live counts in a phone sheet or a desktop sidebar, removable chips, four sorts, and shareable addresses. Filtered and sorted views are noindex with a canonical to the plain page. Breadcrumbs everywhere, with structured data.
+- **Category copy** written fresh for all 9 categories (introduction, more detail, search title and description), stored in the database by migration `category_copy` (both projects; fills empty fields only, so admin edits are never overwritten). Leather wording names no covering beyond what each product page states (D9 still open).
+- **Ranges** (`/ranges`, `/ranges/verona`…), **search** (`/search`: understands "u shape", "3 and 2", "gray", word starts like "recl"; falls back to closest matches), **fabrics** (`/fabrics`: all 70 swatches), the **menu and footer** from the tree (search box in the menu; "Visit us" hidden until there's an address), and **sitemap.xml** (home, 9 categories, 17 range pages, 64 products, fabrics).
+- **Checked on the preview:** every new page answers correctly (unknown addresses 404); counts match the database (64 in Sofas, 31 corners, 5 U-shaped, 13 recliners); in a phone-sized browser the filter sheet ticks, counts ("Show 23 sofas"), chips, clear and sort all work. Lighthouse mobile: home 91, corner sofas 96, Verona 92, search 91 for performance; accessibility 100 on all. Fixed during testing: "Made to order" (a one-option filter) was hidden; "U-Shaped sofas" now reads "U-shaped sofas". `npm run lint` now fails on warnings too. `npm run verify` passes (307 tests).
+- **Still pointing at later phases:** Help and About links (delivery and returns, track my order, contact, about, reviews, guides, terms, privacy) are built in Phases 10, 13 and 16.
+- **Waiting on the owner:** approve Phase 9 from the phone checklist; for Phase 10, items 9–12 in PLAN section 9 (SMTP password in Vercel, notification inboxes, address lookup key, phone and WhatsApp numbers).
 
 ### 6 October 2026 — Phase 8: product page and basket
 - **Owner:** Phase 5 approved; merged into `main`.
