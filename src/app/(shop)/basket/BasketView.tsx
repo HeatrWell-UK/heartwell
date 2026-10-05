@@ -37,7 +37,7 @@ export function BasketView() {
       })
   }, [hydrated, basket])
 
-  if (!hydrated) return <div className="min-h-[50vh]" aria-busy="true" />
+  if (!hydrated) return <div aria-busy="true" />
 
   if (basket.lines.length === 0) {
     return (

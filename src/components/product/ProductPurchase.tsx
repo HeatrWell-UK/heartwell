@@ -123,7 +123,7 @@ export function ProductPurchase({
           </div>
 
           {p.variants.length > 0 && (
-            <fieldset className="flex flex-col gap-3 pt-6">
+            <fieldset className="mt-6 flex flex-col gap-3">
               <legend className="pb-3 text-[15px]">
                 <span className="font-semibold">Colour: </span>
                 <span className="text-slate">{fabric ? `${fabric.fabric.name}, ${fabric.collection.name}` : (variant?.colourName ?? 'As shown')}</span>

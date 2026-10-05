@@ -180,7 +180,7 @@ export function Measurements({
             </ul>
           ) : (
             figures.length > 0 && (
-              <dl className="mt-2 grid grid-cols-3 gap-2 border-t border-line-soft pt-3">
+              <dl className="mt-2 flex flex-wrap gap-x-8 gap-y-2 border-t border-line-soft pt-3">
                 {figures.map((f) => (
                   <div key={f.label} className="flex flex-col">
                     <dt className="text-[13px] text-slate">{f.label}</dt>

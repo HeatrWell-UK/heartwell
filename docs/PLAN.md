@@ -578,6 +578,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** open a product on staging (and again from an Instagram DM): switch sizes and colours, pick a fabric, check your postcode, add to basket, close the app, reopen, and the basket is still there.
 - **Done means:** Lighthouse mobile performance ≥ 90 and accessibility ≥ 95 on the product page; it works in both in-app browsers.
+- **As built (6 October 2026):** product pages live at `/products/<slug>`; ads and shared links open a colourway with `?variant=<SKU>` and a made-to-order fabric with `&fabric=<code>`, and every other parameter (utm_, fbclid) is left untouched for Phase 14. Lighthouse mobile on the preview: performance 94–98, accessibility 100 on four kinds of product page. Checkout and samples are built-in switches (`src/config/features.ts`), off until Phases 10 and 13. Delivery and returns details in the structured data are left for Phase 16, so nothing is claimed before the policies are final. Breadcrumbs point at `/sofas` and `/sofas/<category>`, which Phase 9 builds.
 
 ---
 

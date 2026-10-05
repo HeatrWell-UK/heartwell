@@ -34,7 +34,7 @@ export function RelatedRail({ title, products }: { title: string; products: Prod
       <h2 id="related" className="px-4 text-2xl lg:px-0">
         {title}
       </h2>
-      <ul className="no-scrollbar flex snap-x gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:px-0">
+      <ul className="no-scrollbar flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:px-0">
         {products.map((p) => (
           <li key={p.slug} className="w-[168px] shrink-0 snap-start lg:w-auto">
             <ProductCard product={p} />

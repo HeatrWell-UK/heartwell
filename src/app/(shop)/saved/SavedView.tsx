@@ -36,7 +36,7 @@ export function SavedView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, key])
 
-  if (!hydrated || (cards === null && saved.items.length > 0)) return <div className="min-h-[40vh]" aria-busy="true" />
+  if (!hydrated || (cards === null && saved.items.length > 0)) return <div aria-busy="true" />
 
   const shown = (cards ?? []).filter((c) => saved.isSaved(c.slug))
   if (shown.length === 0) {

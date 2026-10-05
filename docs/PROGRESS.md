@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 5 (catalogue import) built and on the staging link, waiting for approval (4 October 2026). |
+| **Current phase** | Phase 8 (product page and basket) built and on the staging link, waiting for approval (6 October 2026). Phase 5 approved and merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 8: Product page and basket. Order from here: 8–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 5 approved. Phase 8 — Product page and basket. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 8.` |
+| **Next phase** | Phase 9: Home, categories, search and navigation. Order from here: 9–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 8 approved. Phase 9 — Home, categories and search. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 9.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -35,9 +35,20 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Leak check: banned values live in `reference/leak-terms.txt` (local only). After changing it or the catalogue, run `npm run leaks:fingerprints` and commit `scripts/sister-fingerprints.json`, which holds hashes only.
 - Supabase: organisation "Heartwellsofa" (free plan, owner's choice for now; D2 recommends Pro for production before launch). Projects in London: **heartwell-staging** `jfacgarejzvpuitiuvrk` and **heartwell-prod** `oeakyeibdczedgvncomk`. Every Vercel environment uses staging during the build (`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` set in Vercel); production's database is connected at Phase 18B. Free projects pause after a week without use: restore heartwell-prod from the dashboard when it's needed.
 - Database rules: every schema change is a file in `supabase/migrations/` applied to both projects with the same version (the MCP tool records its own time, so the files are named after staging's recorded versions and production's rows are updated to match). Security definer functions live in the unexposed `private` schema behind thin `public` wrappers, so Supabase's security advisor stays empty: keep it that way.
+- Pushing from this PC: Git Credential Manager holds two GitHub accounts (heartwellsofa, Muzan787), so a background push must name one: `git -c credential.username=heartwellsofa push`.
+- Connectors (6 Oct 2026): the Supabase connector is signed into a different Supabase account (it lists only a project called "Onium"; never touch it) and the Vercel connector has lost the Heartwell team. Both need reconnecting to the Heartwell accounts before Phase 10 (migrations, logs, env checks). The site itself is unaffected.
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 6 October 2026 — Phase 8: product page and basket
+- **Owner:** Phase 5 approved; merged into `main`.
+- **Product page** (`/products/<slug>`, as designed): swipeable photos opening on the ad's colour (`?variant=`), save heart, made-to-order and made-in-the-UK badges, price with "Free delivery" and "Pay nothing today", colour swatches, a fabric picker for made-to-order pieces (all 70 fabrics, pinked swatches; the chosen fabric is named and the photo's colour stated honestly), size cards and back style across the range (keeping the colour where the other size has it), Add to basket and WhatsApp (hidden until the number is set), an instant postcode check (free to LS6 with today's delivery dates; islands and Northern Ireland to a quote; IV40/PA34 "depends on the address"; remembered for checkout), payment, guarantee and returns rows, measurements drawn to scale (straight, corner, U-shape, 3+2), will-it-fit, specifications by product type, delivery and returns with prices from `shop_settings`, care advice, honest reviews (empty state), related pieces from other ranges, a sticky buy bar and an "Added to your basket" sheet. Structured data: ProductGroup with one offer per colourway, breadcrumbs, no ratings. Share images cut to 1200×630 from the product photo.
+- **Basket** (`/basket`) and **Saved** (`/saved`) live on the device, survive the app closing, and stay in step across tabs. The basket page refreshes titles, prices and availability from the catalogue and drops anything withdrawn; the header shows the count. Checkout and samples are switched off (`src/config/features.ts`) until Phases 10 and 13.
+- **Fixed during testing:** a nested category lookup the database API rejects (now read from a cached category tree); fixed-size images were asking for 16 widths each (HTML down from 346 KB to 136 KB, fewer Cloudinary transformations); extra gallery and related photos now wait, so the main photo loads alone; changing colour keeps an ad's utm_ and fbclid in the address; the basket page no longer jumps while it loads.
+- **Checked on the preview:** Lighthouse mobile performance 94–98 and accessibility 100 (Verona corner, Salone 3+2, Roma armchair, Lily U-shape without photos); basket 100 accessibility. In a phone-sized browser: colour and fabric change the address without losing ad parameters, Add to basket opens the sheet with focus inside, the count and totals update, the basket survives navigation and reload, saving works, an unknown product is a 404. `npm run verify` passes (291 tests).
+- **Known until Phase 9:** breadcrumbs, "Shop sofas" and search point at pages Phase 9 builds. Titles and size names are still the imported ones until 17C (for example "Roma Recliner Armchair Manual Sofa", "4 Seater Corner 1c2").
+- **Waiting on the owner:** approve Phase 8 from the phone checklist; reconnect the Supabase and Vercel connectors to the Heartwell accounts before Phase 10.
 
 ### 4 October 2026 — Phase 5: catalogue import (working data)
 - **Imported into staging:** 64 products, 105 colourways (SKUs unchanged), 16 ranges (names kept), 3 product types (sofa, armchair, footstool), 9 categories in Heartwell's tree, 6 fabric collections with 70 fabrics, 64 offer tiers, 138 category links. No descriptions, reviews or other source text. Production has the import function but no catalogue (it gets the finished one at Phase 18B).
