@@ -1753,6 +1753,8 @@ export type Database = {
     }
     Functions: {
       add_order_note: { Args: { p_note: string; p_order_id: string }; Returns: undefined }
+      admin_delete_product: { Args: { p_product_id: string }; Returns: Json }
+      admin_save_product: { Args: { p: Json }; Returns: Json }
       admin_status: { Args: never; Returns: Json }
       calculate_order_offer: {
         Args: {

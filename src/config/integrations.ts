@@ -8,6 +8,8 @@ export const INTEGRATIONS = {
   smtp: has('SMTP_PASSWORD'),
   /** Postcode-to-address lookup for checkout (optional; customers can type it). */
   addressLookup: has('ADDRESS_LOOKUP_PROVIDER', 'ADDRESS_LOOKUP_KEY'),
+  /** Photo uploads from the admin's product editor (optional; photos can be picked or pasted). */
+  photoUploads: has('CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET'),
   /** Meta Pixel and Conversions API (Phase 14). */
   metaTracking: has('NEXT_PUBLIC_META_PIXEL_ID', 'META_CAPI_ACCESS_TOKEN'),
 } as const

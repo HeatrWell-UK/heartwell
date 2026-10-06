@@ -34,6 +34,7 @@ export interface StatusContext {
   secretKeyConfigured: boolean
   smtpConfigured: boolean
   addressLookupConfigured: boolean
+  photoUploadsConfigured: boolean
   trackingConfigured: boolean
 }
 
@@ -165,6 +166,16 @@ export function buildStatusChecks(
     summary: ctx.addressLookupConfigured
       ? 'Set. Customers pick their address from a list.'
       : 'Not set up. Customers type their address instead, and the two mixed Scottish districts (IV40, PA34) get a delivery quote.',
+  })
+
+  // Photo uploads from the product editor
+  checks.push({
+    key: 'photo_uploads',
+    title: 'Photo uploads',
+    level: ctx.photoUploadsConfigured ? 'ok' : 'warn',
+    summary: ctx.photoUploadsConfigured
+      ? 'Set. Photos can be uploaded from the product editor.'
+      : 'Not set up. Photos can still be picked from the library or pasted as Cloudinary links. Add CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET to upload from your phone.',
   })
 
   // Scheduled jobs
