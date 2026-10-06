@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 10 (checkout and orders) built and on the staging link; waiting for the owner to add two keys in Vercel, then approval (6 October 2026). Phase 9 approved and merged into `main`. |
+| **Current phase** | Phase 11 (admin dashboard and orders) built and on the staging link, waiting for approval (6 October 2026). Phase 10 approved and merged into `main`; its two Vercel keys are still to be added. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 11: Admin dashboard and orders. Order from here: 11–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 10 approved. Phase 11 — Admin orders. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 11.` |
+| **Next phase** | Phase 12: Admin catalogue, settings and the rest. Order from here: 12–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 11 approved. Phase 12 — Admin catalogue and settings. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 12.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -43,6 +43,16 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 6 October 2026 — Phase 11: admin dashboard and orders
+- **Owner:** Phase 10 approved; merged into `main`. `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` are still not in Vercel, so website orders and all emails wait on them (the admin itself works without them).
+- **Orders** (`/admin/orders`): "Needs attention" by default (waiting, confirmed, processing; real orders only), filters for every status and for test orders with counts, tiles (needs attention, to collect, processing, on its way), search by reference, name, phone (however it's spaced), postcode or email, 20 a page, a WhatsApp button on each.
+- **One order** (`/admin/orders/<id>`): the next step as one button; after each change a ready-written WhatsApp message to the customer for that status (asking to confirm, booking the day, on its way with the amount to have ready, thank you, cancelled with the reason); customer emails for confirmed (by staff), on its way, delivered and cancelled (processing is internal); a warning when a later stage was recorded than the status shows; customer, address, preferred day and notes; lines with fabric and SKU; money and the driver's extras; timeline and history in UK and Pakistan time; copy block for OrderFlow; printable delivery note (`/note`: who, where, what, floor and lift, assembly, removal, what to collect, signature); edit (details, lines, fabrics, agreed prices, delivery charge; the database recalculates totals); corrections with a reason (cancelling needs one), the test flag, "where it came from" override, staff notes, and delete for test orders only (typing DELETE).
+- **WhatsApp or phone orders** (`/admin/orders/new`): customer, products with fabric and agreed prices, delivery charge, HW-WA reference, test option.
+- **Dashboard**: needs attention, waiting to confirm, to collect, products on sale; a Health card listing whatever isn't green (it grows with tracking and jobs in Phases 14 and 17); the latest five orders. The admin installs on a phone's home screen as "HW Admin" (`/admin-manifest.webmanifest`, outside `/admin` so it loads without the sign-in cookie). The menu gains Orders and hides itself when printing.
+- **Database:** migration `admin_order_tools` (both projects, advisor clean): `delete_test_order` (refuses real orders), `set_order_attribution` and `add_order_note` (both written to the order's history), each admin-checked in the private schema. Checked as the admin account in a rolled-back transaction: a non-admin is refused; confirm then processing work and are logged; moving back to waiting is refused; a real order can't be deleted; a test order can.
+- **Checked:** every admin page sends signed-out visitors to `/login` and back; the manifest is served as a manifest. A test holds the status moves offered to exactly the database's rule. `npm run verify` passes (330 tests).
+- **Waiting on the owner:** approve Phase 11 from the phone checklist; add the two Vercel keys from Phase 10.
 
 ### 6 October 2026 — Phase 10: checkout, orders and confirmation
 - **Owner:** Phase 9 approved; merged into `main`. Phone and WhatsApp 07848 477056; notifications to enquiries@ with a copy to heartwellsofa@gmail.com. No address-lookup provider named yet.

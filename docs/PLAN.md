@@ -621,6 +621,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** add the admin to your home screen; take the Phase 10 test order through every status; take a WhatsApp order by hand; print a delivery note.
 - **Done means:** feature parity with the sister shop's orders admin.
+- **As built (6 October 2026):** `/admin/orders` (needs attention by default; filters, counts, workload tiles, search, paging), `/admin/orders/<id>` (next step, WhatsApp message per status, customer status emails for confirmed, on its way, delivered and cancelled, timeline and history in UK and Pakistan time, copy block, edit, corrections with a reason, test flag, source override, notes, delete for test orders only), `/admin/orders/<id>/note` (printable delivery note), `/admin/orders/new` (WhatsApp or phone order with the HW-WA reference), dashboard with a Health card, installable admin (`/admin-manifest.webmanifest`). Better than the sister shop: one page per order instead of everything on one long list, search, notes, and real orders can't be deleted (cancel instead). Meta conversion buttons arrive with Phase 14; the review ask with Phase 13.
 
 ---
 
