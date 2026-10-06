@@ -625,23 +625,25 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 
 ---
 
-### Phase 12 — Admin: catalogue, settings and the rest
+### Phase 12 — Admin: catalogue and settings
 
-- **Goal:** the owner manages everything else, and new product types are routine.
-- **Builds:** Inventory (generalised product form: type, range, sizes and styles, numeric dimensions, typed specs, variants, Cloudinary image picker, descriptions, SEO, active/featured); category tree; reviews moderation; samples queue; videos; leads; **Settings** (delivery prices, date window, offer code and tiers, tracking mode, test-order rules); `docs/ADDING-PRODUCT-TYPES.md`.
+- **Goal:** the owner manages the catalogue and the shop settings, and new product types are routine.
+- **Builds:** Inventory (generalised product form: type, range, sizes and styles, numeric dimensions, typed specs, variants, Cloudinary image picker, descriptions, SEO, active/featured); product types; category tree; ranges; fabric and material library; **Settings** (delivery prices, date window, offer codes and tiers); `docs/ADDING-PRODUCT-TYPES.md`.
+- **Split (6 October 2026):** reviews moderation, the samples queue, videos and leads moved to Phase 13, where those flows are built (an admin page for data that doesn't exist yet can't be tested); the tracking mode and test-order rules moved to Phase 14 with the tracking they control.
 - **Prompt:**
   ```
   Phase 12 — Admin catalogue and settings. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 12.
   ```
 - **Phone test:** create a test "Coffee table" product (to prove the catalogue isn't sofa-only), change a price, see it on the site within a minute, then delete it.
 - **Done means:** adding a new product type takes data entry, not code.
+- **As built (6 October 2026):** `/admin/catalogue` (inventory: search by name, range, colour or SKU; type and shown/hidden/needs-attention filters; Add a product), `/admin/catalogue/new` (`?type=`, `?copy=<id>` to start from another product), `/admin/catalogue/<id>` (one form for every type: basics, offer tier, range options, categories, shown and featured, sizes, the type's Specifications fields with suggestions from values in use, pieces for sets, origin and made to order, colourways with SKUs, swatches, price differences and photos, gallery, description, highlights, search title and description; hide, or delete when never ordered), `/admin/catalogue/structure` (product types with their fields, filters, materials, removal unit and Google/Meta category; category tree; ranges; fabric collections and colours), `/admin/settings` (delivery extras and dates, offer amounts, ad-offer days, sample limit, offer codes). The photo picker uploads from the phone straight to Cloudinary when `CLOUDINARY_API_KEY`/`CLOUDINARY_API_SECRET` are set (signed by the server; the admin's CSP allows api.cloudinary.com), and otherwise picks from the catalogue's photos or takes a pasted Cloudinary link. Products save through one admin-checked database function (`admin_save_product`, one transaction; colourways removed from the form are deleted, or hidden if ordered); deleting refuses ordered products (`admin_delete_product`). Every save expires the shop's cached catalogue or settings (`updateTag`). Known limit: checkout's take-away option and a few lines of shop wording still say "sofa" whatever the type (listed in `docs/ADDING-PRODUCT-TYPES.md`); worth making type-aware before the first non-sofa product goes on sale.
 
 ---
 
 ### Phase 13 — WhatsApp, samples, reviews and automation
 
 - **Goal:** the lead and after-sale flows.
-- **Builds:** WhatsApp buttons with HW-WA references and saved enquiries, plus reliable app hand-off from in-app browsers; samples (Fabrics guide page, Samples page, product dialog; 5 for £5); reviews (request email 3 days after delivery, signed guest links, reviews page, product reviews, structured data only from real reviews); newsletter double opt-in; basket reminders worked from Leads; contact form; pg_cron jobs live with last-run times on the Status page.
+- **Builds:** WhatsApp buttons with HW-WA references and saved enquiries, plus reliable app hand-off from in-app browsers; samples (Fabrics guide page, Samples page, product dialog; 5 for £5); reviews (request email 3 days after delivery, signed guest links, reviews page, product reviews, structured data only from real reviews); newsletter double opt-in; basket reminders worked from Leads; contact form; pg_cron jobs live with last-run times on the Status page. **Admin (moved from Phase 12):** reviews moderation, the samples queue, WhatsApp enquiries and leads, videos.
 - **Prompt:**
   ```
   Phase 13 — WhatsApp, samples and reviews. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 13.
@@ -654,7 +656,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 14 — Meta Pixel, Conversions API, GA4 and attribution
 
 - **Goal:** complete, deduplicated, privacy-safe measurement.
-- **Builds:** consent modal; GA4 with Consent Mode and URL redaction; the Pixel (production host + consent only); the event layer with shared IDs and the server mirror; advanced matching at checkout; first-party attribution (all visitors, opt-out; Meta IDs consent-only) saved on orders, enquiries, samples and leads; `conversion_outbox` with automatic/manual Purchase, OrderDelivered, retries and stored responses; the admin **Tracking** page; test-traffic rules (staging, test orders, staff-device exclusion, QA links); Meta test mode for staging; GA4 server-side purchase.
+- **Builds:** consent modal; GA4 with Consent Mode and URL redaction; the Pixel (production host + consent only); the event layer with shared IDs and the server mirror; advanced matching at checkout; first-party attribution (all visitors, opt-out; Meta IDs consent-only) saved on orders, enquiries, samples and leads; `conversion_outbox` with automatic/manual Purchase, OrderDelivered, retries and stored responses; the admin **Tracking** page (with the tracking mode, moved from Phase 12); test-traffic rules (staging, test orders, staff-device exclusion, QA links); Meta test mode for staging; GA4 server-side purchase.
 - **Prepare:** items 14 and 15.
 - **Prompt:**
   ```

@@ -33,6 +33,7 @@ export async function loadStatus() {
       secretKeyConfigured: SUPABASE_SECRET_CONFIGURED,
       smtpConfigured: INTEGRATIONS.smtp,
       addressLookupConfigured: INTEGRATIONS.addressLookup,
+      photoUploadsConfigured: INTEGRATIONS.photoUploads,
       trackingConfigured: INTEGRATIONS.metaTracking,
     },
     data,

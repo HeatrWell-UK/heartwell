@@ -6,15 +6,17 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CouchIcon, HouseIcon, PulseIcon, ReceiptIcon, SignOutIcon, type Icon } from '@phosphor-icons/react'
+import { CouchIcon, GearSixIcon, HouseIcon, PulseIcon, ReceiptIcon, SignOutIcon, type Icon } from '@phosphor-icons/react'
 import { signOut } from '@/app/admin/actions'
 import { cn } from '@/lib/cn'
 
-const NAV: { href: string; label: string; icon: Icon }[] = [
+// Status is reached from Home and Settings on phones, so the tab bar fits five.
+const NAV: { href: string; label: string; icon: Icon; phone?: false }[] = [
   { href: '/admin', label: 'Home', icon: HouseIcon },
   { href: '/admin/orders', label: 'Orders', icon: ReceiptIcon },
   { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon },
-  { href: '/admin/status', label: 'Status', icon: PulseIcon },
+  { href: '/admin/settings', label: 'Settings', icon: GearSixIcon },
+  { href: '/admin/status', label: 'Status', icon: PulseIcon, phone: false },
 ]
 
 function isActive(pathname: string, href: string) {
@@ -68,7 +70,7 @@ export function AdminNav({ email }: { email: string }) {
         className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#140b0e]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden print:hidden"
       >
         <div className="flex items-stretch justify-around px-2 py-1.5">
-          {NAV.map(({ href, label, icon: NavIcon }) => {
+          {NAV.filter((n) => n.phone !== false).map(({ href, label, icon: NavIcon }) => {
             const active = isActive(pathname, href)
             return (
               <Link
