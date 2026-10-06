@@ -1752,6 +1752,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_order_note: { Args: { p_note: string; p_order_id: string }; Returns: undefined }
       admin_status: { Args: never; Returns: Json }
       calculate_order_offer: {
         Args: {
@@ -1768,6 +1769,7 @@ export type Database = {
       }
       clean_text: { Args: { p_max: number; p_text: string }; Returns: string }
       confirm_order: { Args: { p_order_id: string }; Returns: Json }
+      delete_test_order: { Args: { p_order_id: string }; Returns: Json }
       create_whatsapp_enquiry: { Args: { p_input: Json }; Returns: Json }
       health_ping: { Args: never; Returns: Json }
       import_catalogue: { Args: { p: Json; p_update?: boolean }; Returns: Json }
@@ -1834,6 +1836,10 @@ export type Database = {
       request_samples: { Args: { p_input: Json }; Returns: Json }
       require_admin: { Args: never; Returns: undefined }
       run_daily_cleanup: { Args: never; Returns: Json }
+      set_order_attribution: {
+        Args: { p_note?: string; p_order_id: string; p_source: string }
+        Returns: undefined
+      }
       set_order_status: {
         Args: { p_order_id: string; p_reason?: string; p_status: string }
         Returns: Json

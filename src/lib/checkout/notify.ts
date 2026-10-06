@@ -4,7 +4,7 @@ import { EMAIL } from '@/config/email'
 import { SITE_URL } from '@/config/site'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmail } from '@/lib/email/send'
-import { customerOrderEmail, shopConfirmedEmail, shopOrderEmail, type OrderEmailData } from '@/lib/email/order-emails'
+import { customerOrderEmail, customerStatusEmail, EMAILED_STATUSES, shopConfirmedEmail, shopOrderEmail, type EmailedStatus, type OrderEmailData } from '@/lib/email/order-emails'
 import { fabricLabel } from '@/lib/product/helpers'
 import { floorName } from '@/lib/delivery/pricing'
 import { getDeliveryInfo } from '@/lib/product/load'
@@ -92,4 +92,13 @@ export async function sendOrderConfirmedEmail(id: string): Promise<void> {
   if (!order) return
   const email = shopConfirmedEmail(order, { adminUrl: adminUrl() })
   await sendEmail({ kind: 'order_confirmed_shop', to: EMAIL.shopTo, cc: EMAIL.shopCopy, ...email, orderId: id, toCustomer: false })
+}
+
+/** After staff move an order on: tell the customer (when they gave an email and the status is one we email about). */
+export async function sendStatusEmail(id: string, status: string, cancellationReason?: string | null): Promise<void> {
+  if (!EMAILED_STATUSES.includes(status)) return
+  const order = await loadOrderForEmail(id)
+  if (!order?.customerEmail) return
+  const email = customerStatusEmail(order, status as EmailedStatus, { trackUrl: `${SITE_URL}/track-order`, shop: shopContact(), cancellationReason })
+  await sendEmail({ kind: `order_${status}_customer`, to: order.customerEmail, ...email, orderId: id, toCustomer: true })
 }

@@ -6,12 +6,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CouchIcon, HouseIcon, PulseIcon, SignOutIcon, type Icon } from '@phosphor-icons/react'
+import { CouchIcon, HouseIcon, PulseIcon, ReceiptIcon, SignOutIcon, type Icon } from '@phosphor-icons/react'
 import { signOut } from '@/app/admin/actions'
 import { cn } from '@/lib/cn'
 
 const NAV: { href: string; label: string; icon: Icon }[] = [
   { href: '/admin', label: 'Home', icon: HouseIcon },
+  { href: '/admin/orders', label: 'Orders', icon: ReceiptIcon },
   { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon },
   { href: '/admin/status', label: 'Status', icon: PulseIcon },
 ]
@@ -25,7 +26,7 @@ export function AdminNav({ email }: { email: string }) {
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/10 bg-[#140b0e] lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-white/10 bg-[#140b0e] lg:flex print:hidden">
         <div className="border-b border-white/10 p-6">
           <p className="font-display text-xl font-bold tracking-tight text-white">
             Heartwell <span className="text-gold-pale">Admin</span>
@@ -64,7 +65,7 @@ export function AdminNav({ email }: { email: string }) {
 
       <nav
         aria-label="Admin"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#140b0e]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#140b0e]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden print:hidden"
       >
         <div className="flex items-stretch justify-around px-2 py-1.5">
           {NAV.map(({ href, label, icon: NavIcon }) => {

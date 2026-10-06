@@ -4,6 +4,9 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: { template: '%s | Heartwell Admin', default: 'Heartwell Admin' },
   robots: { index: false, follow: false },
+  // Installable on the owner's phone (Add to Home Screen) as its own app.
+  manifest: '/admin-manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'HW Admin', statusBarStyle: 'black-translucent' },
 }
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {

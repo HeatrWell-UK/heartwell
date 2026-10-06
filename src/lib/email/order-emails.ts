@@ -213,3 +213,61 @@ export function shopConfirmedEmail(o: OrderEmailData, opts: { adminUrl: string }
   const text = [`${test}${o.reference} confirmed by ${o.customerName}.`, `Ring ${o.customerPhone} to book the delivery day.`, '', itemsText(o, true), '', `Admin: ${opts.adminUrl}`].join('\n')
   return { subject, html: layout(subject, body, `${o.customerName} confirmed ${o.reference}`), text }
 }
+
+export type EmailedStatus = 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+export const EMAILED_STATUSES: readonly string[] = ['confirmed', 'shipped', 'delivered', 'cancelled']
+
+/** To the customer when staff move the order on. Processing is internal, so it isn't emailed. */
+export function customerStatusEmail(
+  o: OrderEmailData,
+  status: EmailedStatus,
+  opts: { trackUrl: string; shop: ShopContact; cancellationReason?: string | null },
+): RenderedEmail {
+  const contact = `${opts.shop.phoneDisplay ? `Ring ${opts.shop.phoneDisplay} or email` : 'Email'} ${opts.shop.email}`
+  const content: Record<EmailedStatus, { subject: string; heading: string; lines: string[]; showItems: boolean; track: boolean }> = {
+    confirmed: {
+      subject: `Your Heartwell order ${o.reference} is confirmed`,
+      heading: `Your order is confirmed`,
+      lines: [`Thank you, ${firstName(o.customerName)}. We’ll ring you to book your delivery day.`, `Nothing to pay until it’s in your room: ${money(o.totalAmount)} to the driver, in cash or by bank transfer.`],
+      showItems: true,
+      track: true,
+    },
+    shipped: {
+      subject: `Your Heartwell order ${o.reference} is on its way`,
+      heading: `Your order is on its way`,
+      lines: [`The driver will ring before arriving.`, `Please have ${money(o.totalAmount)} ready for the driver, in cash or by bank transfer, once it’s in your room.`],
+      showItems: true,
+      track: true,
+    },
+    delivered: {
+      subject: `Your Heartwell order ${o.reference} has been delivered`,
+      heading: `Thank you for choosing Heartwell`,
+      lines: [
+        `We hope you love it. If anything isn’t right, reply to this email and we’ll sort it out.`,
+        `Your frame and springs have a 1-year guarantee. Keep this email as your record of the order.`,
+      ],
+      showItems: true,
+      track: false,
+    },
+    cancelled: {
+      subject: `Your Heartwell order ${o.reference} has been cancelled`,
+      heading: `Your order has been cancelled`,
+      lines: [
+        `Order ${o.reference} has been cancelled${opts.cancellationReason ? `: ${opts.cancellationReason}` : ''}. Nothing has been or will be taken.`,
+        `If that’s not what you expected, please get in touch. ${contact}.`,
+      ],
+      showItems: false,
+      track: false,
+    },
+  }
+  const c = content[status]
+  const body = [
+    h(c.heading),
+    ...c.lines.map((l) => p(escapeHtml(l))),
+    c.showItems ? itemsTable(o, false) : '',
+    c.track ? button(opts.trackUrl, 'Track my order') : '',
+    p(`Your reference is ${escapeHtml(o.reference)}. ${escapeHtml(contact)}.`, `font-size:15px;color:${C.slate}`),
+  ].join('')
+  const text = [c.heading, '', ...c.lines, '', c.showItems ? itemsText(o, false) : '', c.track ? `Track your order: ${opts.trackUrl}` : '', '', `Your reference is ${o.reference}. ${contact}.`].join('\n')
+  return { subject: c.subject, html: layout(c.subject, body, c.lines[0] ?? c.heading), text }
+}

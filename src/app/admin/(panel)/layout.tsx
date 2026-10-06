@@ -9,7 +9,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   return (
     <>
       <AdminNav email={admin.email} />
-      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 lg:ml-64 lg:px-10 lg:pb-10 lg:pt-10">
+      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 lg:ml-64 lg:px-10 lg:pb-10 lg:pt-10 print:m-0 print:max-w-none print:p-0">
         {children}
       </main>
     </>
