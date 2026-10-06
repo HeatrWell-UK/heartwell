@@ -25,6 +25,9 @@ const csp = [
   ...(isProd ? ['upgrade-insecure-requests'] : []),
 ].join('; ')
 
+// The admin also uploads photos straight to Cloudinary (signed by the server).
+const adminCsp = csp.replace("connect-src 'self'", "connect-src 'self' https://api.cloudinary.com")
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
@@ -48,6 +51,8 @@ const nextConfig: NextConfig = {
           ...(indexable ? [] : [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
         ],
       },
+      // Later entries win for the same header, so this replaces the policy on admin pages only.
+      { source: '/admin/:path*', headers: [{ key: 'Content-Security-Policy', value: adminCsp }] },
     ]
   },
 }

@@ -10,6 +10,7 @@ const ctx: StatusContext = {
   secretKeyConfigured: false,
   smtpConfigured: false,
   addressLookupConfigured: false,
+  photoUploadsConfigured: false,
   trackingConfigured: false,
 }
 
@@ -42,6 +43,7 @@ describe('admin status', () => {
       orders: 'ok',
       email: 'error',
       address_lookup: 'warn',
+      photo_uploads: 'warn',
       jobs: 'warn',
       tracking: 'warn',
       orderflow: 'warn',
@@ -51,8 +53,8 @@ describe('admin status', () => {
   })
 
   it('is green for checkout once the server key, email and lookup are set', () => {
-    const checks = buildStatusChecks({ ...ctx, secretKeyConfigured: true, smtpConfigured: true, addressLookupConfigured: true }, data, null)
-    expect(byKey(checks)).toMatchObject({ server_key: 'ok', email: 'ok', address_lookup: 'ok' })
+    const checks = buildStatusChecks({ ...ctx, secretKeyConfigured: true, smtpConfigured: true, addressLookupConfigured: true, photoUploadsConfigured: true }, data, null)
+    expect(byKey(checks)).toMatchObject({ server_key: 'ok', email: 'ok', address_lookup: 'ok', photo_uploads: 'ok' })
   })
 
   it('goes red when the database cannot be read', () => {
