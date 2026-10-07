@@ -10,6 +10,8 @@ import { TextArea, TextInput } from '@/components/ui/Field'
 import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import { useBasket, visitIds, rememberPostcode } from '@/lib/basket/store'
+import { isQaVisit, readConsent, sessionFbclid, touchForOrder, track } from '@/lib/tracking/browser'
+import { TRACKING } from '@/config/tracking'
 import { useHydrated } from '@/lib/basket/use-hydrated'
 import { deliveryLines, floorName, quoteDelivery, type DeliverySettings } from '@/lib/delivery/pricing'
 import { isUkPhone } from '@/lib/checkout/phone'
@@ -71,6 +73,14 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
       .catch(() => {})
   }, [hydrated, basket])
 
+  // InitiateCheckout, once per visit to the checkout page.
+  const begun = useRef(false)
+  useEffect(() => {
+    if (!hydrated || begun.current || basket.lines.length === 0) return
+    begun.current = true
+    track('InitiateCheckout', { contents: basket.lines.map((l) => ({ id: l.variantId, quantity: l.quantity, item_price: l.view.unitPrice })), value: basket.subtotal })
+  }, [hydrated, basket.lines, basket.subtotal])
+
   const items = useMemo(() => basket.lines.map((l) => ({ id: l.id, variantId: l.variantId, materialId: l.materialId, quantity: l.quantity })), [basket.lines])
   const extras = useMemo(() => ({ floor, hasLift: floor > 0 && hasLift, assembly, removal, removalSeats: removal ? removalSeats : null }), [floor, hasLift, assembly, removal, removalSeats])
   const quoteInput = useMemo(() => ({ items, extras, promotionCode: code || undefined }), [items, extras, code])
@@ -103,6 +113,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const canOrderHere = address.outcome.kind === 'free' || address.outcome.kind === 'depends'
   const basketSummary = basket.lines.map((l) => `${l.quantity} x ${l.view.title} (${l.view.option})`).join('; ')
 
+  const leadSent = useRef(false)
   const saveReminder = (opt: boolean) => {
     const visitor = visitIds()
     if (!opt || !visitor) return
@@ -114,7 +125,34 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
       whatsAppOptIn: isUkPhone(phone),
       name,
       basket: basket.lines.map((l) => ({ title: l.view.title, option: l.view.option, quantity: l.quantity, slug: l.view.slug })),
-    }).catch(() => {})
+    })
+      .then((r) => {
+        // A reminder opt-in is a Lead, counted once per checkout visit.
+        if (r.ok && !leadSent.current) {
+          leadSent.current = true
+          track('Lead', { contentName: 'Basket reminder', value: basket.subtotal })
+        }
+      })
+      .catch(() => {})
+  }
+
+  /** OrderPlaced (a funnel step; the Purchase comes from the server once they confirm), with Meta's advanced matching. */
+  const orderPlaced = (value: number) => {
+    if (window.__hwTracking?.pixel && readConsent().marketing && window.fbq && TRACKING.metaPixelId) {
+      // The Pixel hashes these in the browser before anything leaves it.
+      const parts = name.trim().split(/\s+/)
+      const digits = phone.replace(/\D/g, '')
+      window.fbq('init', TRACKING.metaPixelId, {
+        em: email.trim().toLowerCase() || undefined,
+        ph: digits ? digits.replace(/^0/, '44') : undefined,
+        fn: parts[0]?.toLowerCase() || undefined,
+        ln: parts.length > 1 ? parts[parts.length - 1]!.toLowerCase() : undefined,
+        zp: address.postcode.replace(/\s+/g, '').toLowerCase() || undefined,
+        country: 'gb',
+        external_id: visitIds()?.visitorId,
+      })
+    }
+    track('OrderPlaced', { contents: basket.lines.map((l) => ({ id: l.variantId, quantity: l.quantity, item_price: l.view.unitPrice })), value })
   }
 
   const validate = (): Partial<Record<FieldKey, string>> => {
@@ -155,8 +193,11 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
       expectedTotal: shown.total,
       visitor: visitIds(),
       website,
+      attribution: { touch: touchForOrder(), fbclid: sessionFbclid()?.fbclid ?? null },
+      qa: isQaVisit(),
     }).catch(() => ({ ok: false as const, error: { code: 'NETWORK', message: 'We couldn’t reach the shop. Please check your connection and try again; your order wasn’t placed.' } as PlainError }))
     if (res.ok) {
+      orderPlaced(shown.total)
       basket.clear()
       router.push(`/order/${res.id}`)
       return

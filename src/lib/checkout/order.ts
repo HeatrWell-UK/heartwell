@@ -5,6 +5,7 @@
 
 import { z } from 'zod'
 import { isUkPhone, formatUkPhone } from './phone'
+import { consentForOrder, type Consent } from '@/lib/tracking/consent'
 
 const Item = z.object({
   id: z.string().min(1).max(64),
@@ -30,6 +31,13 @@ export type QuoteInput = z.infer<typeof QuoteInput>
 
 const Visitor = z.object({ visitorId: z.uuid(), sessionId: z.uuid(), arrivalId: z.uuid() })
 
+const tag = z.string().trim().max(200).optional()
+/** How the shopper found us (first-party): the latest campaign tags, landing page and referring site. */
+const Attribution = z.object({
+  touch: z.object({ source: tag, medium: tag, campaign: tag, content: tag, term: tag, landing: z.string().startsWith('/').max(300).optional(), referrer: z.string().max(200).optional() }).nullable(),
+  fbclid: z.string().max(500).nullable(),
+})
+
 export const OrderInput = QuoteInput.extend({
   name: z.string().trim().min(2, 'Please enter your full name.').max(120),
   phone: z.string().trim().max(30).refine(isUkPhone, 'Please enter a UK phone number, like 07700 900123.'),
@@ -43,6 +51,9 @@ export const OrderInput = QuoteInput.extend({
   visitor: Visitor.nullable(),
   /** A field people never see; bots fill it in. */
   website: z.string().max(200),
+  attribution: Attribution.optional(),
+  /** Placed during a ?qa=1 visit: a test order. */
+  qa: z.boolean().optional(),
 })
 export type OrderInput = z.infer<typeof OrderInput>
 
@@ -61,15 +72,70 @@ export function pricingPayload(q: QuoteInput) {
   }
 }
 
-/** Why an order is a test: staging, or details that say so. Test orders never count anywhere. */
-export function testReason(o: Pick<OrderInput, 'name' | 'email'>, appEnv: string): string | null {
+/** Why an order is a test: staging, a staff device, a QA link, or details that say so. Test orders never count anywhere. */
+export function testReason(o: Pick<OrderInput, 'name' | 'email'>, appEnv: string, flags: { qa?: boolean; staffDevice?: boolean } = {}): string | null {
   if (appEnv !== 'production') return `placed on ${appEnv}`
+  if (flags.staffDevice) return 'placed on a staff device'
+  if (flags.qa) return 'QA link'
   if (/\btest\b/i.test(o.name) || /^test[.+@]|@example\.(com|org|net)$/i.test(o.email)) return 'test details'
   return null
 }
 
-export function orderPayload(o: OrderInput, ctx: { appEnv: string; mixedAreaEvidence: 'island' | 'mainland' | null }) {
-  const reason = testReason(o, ctx.appEnv)
+/** What the server knows about the shopper's tracking choices when the order is placed. */
+export interface OrderTracking {
+  consent: Consent
+  staffDevice: boolean
+  /** Meta's browser cookies, when present. */
+  fbp: string | null
+  fbc: string | null
+  /** From GA4's _ga cookie, when analytics was accepted. */
+  gaClientId: string | null
+  ip: string | null
+  userAgent: string | null
+}
+
+/**
+ * The order's attribution and tracking fields. Campaign tags and the landing
+ * page are first-party (kept unless statistics were switched off); Meta's
+ * identifiers, the IP address and the browser go only with marketing consent.
+ */
+export function trackingPayload(o: Pick<OrderInput, 'visitor' | 'attribution'>, t: OrderTracking | undefined, now = new Date()) {
+  const marketing = t?.consent.marketing ?? false
+  const touch = t?.consent.statistics === false ? null : (o.attribution?.touch ?? null)
+  const fbclid = marketing ? (o.attribution?.fbclid ?? null) : null
+  const attribution = {
+    ...(o.visitor ? { visitor_id: o.visitor.visitorId, session_id: o.visitor.sessionId, arrival_id: o.visitor.arrivalId } : {}),
+    ...(touch
+      ? {
+          utm_source: touch.source ?? null,
+          utm_medium: touch.medium ?? null,
+          utm_campaign: touch.campaign ?? null,
+          utm_content: touch.content ?? null,
+          utm_term: touch.term ?? null,
+          landing_page: touch.landing ?? null,
+          referrer: touch.referrer ?? null,
+        }
+      : {}),
+    ...(marketing
+      ? {
+          fbclid,
+          meta_fbp: t?.fbp ?? null,
+          // Meta's documented _fbc format, when the Pixel hasn't set one.
+          meta_fbc: t?.fbc ?? (fbclid ? `fb.1.${now.getTime()}.${fbclid}` : null),
+        }
+      : {}),
+    ...(t?.consent.analytics && t.gaClientId ? { ga_client_id: t.gaClientId } : {}),
+  }
+  return {
+    tracking_consent: t ? consentForOrder(t.consent) : 'unknown',
+    attribution,
+    customer_ip: marketing ? (t?.ip ?? null) : null,
+    customer_user_agent: marketing ? (t?.userAgent ?? null) : null,
+  }
+}
+
+export function orderPayload(o: OrderInput, ctx: { appEnv: string; mixedAreaEvidence: 'island' | 'mainland' | null; tracking?: OrderTracking }) {
+  const reason = testReason(o, ctx.appEnv, { qa: o.qa, staffDevice: ctx.tracking?.staffDevice })
   return {
     ...pricingPayload(o),
     customer_name: o.name.replace(/\s+/g, ' ').trim(),
@@ -88,9 +154,7 @@ export function orderPayload(o: OrderInput, ctx: { appEnv: string; mixedAreaEvid
     expected_total: o.expectedTotal,
     is_test: reason !== null,
     test_reason: reason,
-    // Phase 14 adds consent and the full attribution ledger; until then only the visit IDs.
-    tracking_consent: 'unknown',
-    attribution: o.visitor ? { visitor_id: o.visitor.visitorId, session_id: o.visitor.sessionId, arrival_id: o.visitor.arrivalId } : {},
+    ...trackingPayload(o, ctx.tracking),
   }
 }
 

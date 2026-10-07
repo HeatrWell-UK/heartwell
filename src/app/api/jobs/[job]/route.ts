@@ -9,6 +9,10 @@ import { SMTP_CONFIGURED } from '@/config/email'
 import { createPublicClient } from '@/lib/supabase/public'
 import { sendReviewRequest, type ReviewRequestRow } from '@/lib/leads/notify'
 import type { Database, Json } from '@/types/database'
+import { SITE_URL } from '@/config/site'
+import { liveAllowed } from '@/config/tracking'
+import { processConversion, type OutboxRow, type ReportResult } from '@/lib/tracking/conversions'
+import { GA4_SETUP, getTrackingSettings, META_SETUP, sendToGa4, sendToMeta } from '@/lib/tracking/server'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -34,7 +38,31 @@ async function reviewRequests(db: SupabaseClient<Database>, ticket: string): Pro
   return { status: failed > 0 && sent === 0 ? 'failed' : 'ok', detail: { asked: due.length, sent, failed } }
 }
 
-const JOBS: Record<string, Job> = { 'review-requests': reviewRequests }
+/** Send what the conversion outbox has due (Purchase, OrderDelivered, GA4 purchase), in the admin's tracking mode. */
+async function conversions(db: SupabaseClient<Database>, ticket: string): Promise<Outcome> {
+  const { data, error } = await db.rpc('conversions_due', { p_ticket: ticket, p_limit: 25 })
+  if (error) throw new Error(error.message)
+  const rows = (data ?? []) as unknown as OutboxRow[]
+  if (rows.length === 0) return { status: 'ok', detail: { due: 0 } }
+  const { mode: setting } = await getTrackingSettings()
+  const ctx = {
+    setting,
+    // Jobs have no visitor request: the live check uses the site's own address.
+    liveAllowed: liveAllowed(new URL(SITE_URL).host),
+    siteUrl: SITE_URL,
+    send: { setup: { meta: META_SETUP, ga4: GA4_SETUP }, meta: sendToMeta, ga4: sendToGa4 },
+  }
+  const results: ReportResult[] = []
+  for (const row of rows) results.push(await processConversion(row, ctx))
+  const report = await db.rpc('conversions_report', { p_ticket: ticket, p_results: results as unknown as Json })
+  if (report.error) throw new Error(report.error.message)
+  const count = (s: string) => results.filter((r) => r.status === s).length
+  const sent = count('sent')
+  const failed = count('failed')
+  return { status: failed > 0 && sent === 0 ? 'failed' : 'ok', detail: { due: rows.length, sent, failed, closed: count('skipped'), mode: setting } }
+}
+
+const JOBS: Record<string, Job> = { 'review-requests': reviewRequests, conversions }
 
 export async function POST(request: Request, { params }: { params: Promise<{ job: string }> }) {
   const { job } = await params

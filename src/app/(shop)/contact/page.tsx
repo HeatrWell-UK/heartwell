@@ -5,6 +5,7 @@ import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { buttonClasses } from '@/components/ui/Button'
 import { CONTACT, phoneHref } from '@/config/contact'
 import { ContactForm } from './ContactForm'
+import { TelLink } from '@/components/tracking/TelLink'
 
 export const metadata: Metadata = {
   title: 'Contact us',
@@ -27,10 +28,10 @@ export default function ContactPage() {
             Message us on WhatsApp
           </WhatsAppButton>
           {tel && CONTACT.phoneDisplay && (
-            <a href={tel} className="flex min-h-11 items-center gap-3 text-[17px] font-semibold">
+            <TelLink href={tel} className="flex min-h-11 items-center gap-3 text-[17px] font-semibold">
               <PhoneIcon aria-hidden="true" size={24} className="text-velvet" />
               {CONTACT.phoneDisplay}
-            </a>
+            </TelLink>
           )}
           <a href={`mailto:${CONTACT.email}`} className="flex min-h-11 items-center gap-3 text-[17px] font-semibold">
             <EnvelopeSimpleIcon aria-hidden="true" size={24} className="text-velvet" />
