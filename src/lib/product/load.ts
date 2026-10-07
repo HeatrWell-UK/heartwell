@@ -1,6 +1,7 @@
 import 'server-only'
 import { unstable_cache } from 'next/cache'
 import { createPublicClient } from '@/lib/supabase/public'
+import { cloudinaryVideo } from '@/lib/videos'
 import { CATALOGUE_TAG, getCategories } from '@/lib/catalogue/listing'
 import { deliveryWindow, earliestPreferredDate, latestPreferredDate } from '@/lib/delivery/window'
 import type { DeliverySettings } from '@/lib/delivery/pricing'
@@ -16,7 +17,7 @@ const FIVE_MINUTES = 300
 const PRODUCT_FIELDS = `
   id, slug, title, base_price, axis1_value, axis2_value, made_to_order, origin,
   width_cm, depth_cm, height_cm, side_a_cm, side_b_cm, dimensions_note,
-  specifications, description, highlights, gallery_images, seo_title, seo_description,
+  specifications, description, highlights, gallery_images, seo_title, seo_description, review_count, average_rating,
   type:product_types(slug, name, spec_fields, material_kinds),
   range:ranges(id, slug, name, axis1_name, axis2_name),
   category:categories!products_primary_category_id_fkey(id, slug, name, parent_id),
@@ -42,7 +43,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     image: v.image_url,
   }))
 
-  const [siblings, fabrics, related, reviews, categories] = await Promise.all([
+  const [siblings, fabrics, related, reviews, categories, videos] = await Promise.all([
     p.range
       ? db
           .from('products')
@@ -69,8 +70,9 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
       : null,
     db.from('reviews').select('customer_name, rating, title, comment, created_at').eq('product_id', p.id).eq('is_approved', true).order('created_at', { ascending: false }).limit(20),
     getCategories(),
+    db.from('videos').select('url, caption, kind, sort').eq('product_id', p.id).eq('is_active', true).order('sort').limit(6),
   ])
-  for (const r of [siblings, fabrics, related, reviews]) if (r?.error) throw new Error(`Product ${slug}: ${r.error.message}`)
+  for (const r of [siblings, fabrics, related, reviews, videos]) if (r?.error) throw new Error(`Product ${slug}: ${r.error.message}`)
 
   const siblingViews: SiblingView[] = (siblings?.data ?? []).map((s) => ({
     slug: s.slug,
@@ -86,10 +88,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
       slug: c.slug,
       name: c.name,
       surcharge: c.surcharge,
-      fabrics: [...c.materials]
-        .filter((m) => m.is_swatchable)
-        .sort(bySort)
-        .map((m) => ({ id: m.id, code: m.code, name: m.name, hex: m.hex, image: m.image_url })),
+      fabrics: [...c.materials].sort(bySort).map((m) => ({ id: m.id, code: m.code, name: m.name, hex: m.hex, image: m.image_url })),
     }))
     .filter((c) => c.fabrics.length > 0)
 
@@ -145,10 +144,15 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     fabrics: fabricViews,
     related: relatedViews,
     reviews: (reviews.data ?? []).map((r) => ({ name: r.customer_name, rating: r.rating, title: r.title, comment: r.comment, date: r.created_at })),
+    videos: (videos.data ?? []).flatMap((v) => {
+      const video = cloudinaryVideo(v.url)
+      return video ? [{ mp4: video.mp4, poster: video.poster, caption: v.caption, fromCustomer: v.kind === 'customer' }] : []
+    }),
+    reviewStats: p.review_count > 0 ? { count: p.review_count, average: Number(p.average_rating) } : null,
   }
 }
 
-export const getProductPage = unstable_cache(loadProductPage, ['product-page-v1'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
+export const getProductPage = unstable_cache(loadProductPage, ['product-page-v2'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
 
 const loadDeliverySettings = unstable_cache(
   async () => {
@@ -205,3 +209,14 @@ export async function getCheckoutSettings(now = new Date()): Promise<CheckoutSet
     latestDate: latestPreferredDate(s, now),
   }
 }
+
+/** How many fabric samples one request may ask for (shop_settings.sample_limit). */
+export const getSampleLimit = unstable_cache(
+  async (): Promise<number> => {
+    const { data, error } = await createPublicClient().from('shop_settings').select('sample_limit').single()
+    if (error) throw new Error(`Shop settings: ${error.message}`)
+    return data.sample_limit
+  },
+  ['sample-limit-v1'],
+  { revalidate: FIVE_MINUTES, tags: [SETTINGS_TAG] },
+)

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { WhenNear } from '@/components/ui/WhenNear'
 import { FEATURES } from '@/config/features'
+import { SAMPLES } from '@/config/samples'
 import { formatPrice } from '@/lib/format'
 import { getFabricLibrary } from '@/lib/catalogue/listing'
 
@@ -25,6 +26,11 @@ export default async function FabricsPage() {
           Our made-to-order sofas can be made in any of these {total} fabrics. Choose the sofa first, then tap “Or choose from {total} fabrics” on
           its page. Colours on screens vary a little{FEATURES.samples ? ', so order samples if you’d like to see them in your room.' : '.'}
         </p>
+        {FEATURES.samples && (
+          <Link href={SAMPLES.href} className="self-start text-[15px] font-semibold">
+            Order fabric samples, {SAMPLES.fee} for the set
+          </Link>
+        )}
         <Link href="/sofas?mto=yes" className="self-start text-[15px] font-semibold">
           See the sofas you can have in these fabrics
         </Link>

@@ -349,6 +349,57 @@ export type Database = {
           },
         ]
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          customer_ip: string | null
+          customer_user_agent: string | null
+          email: string
+          id: string
+          is_test: boolean
+          message: string
+          name: string
+          order_reference: string | null
+          phone: string | null
+          replied_at: string | null
+          status: string
+          topic: string
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_ip?: string | null
+          customer_user_agent?: string | null
+          email: string
+          id?: string
+          is_test?: boolean
+          message: string
+          name: string
+          order_reference?: string | null
+          phone?: string | null
+          replied_at?: string | null
+          status?: string
+          topic?: string
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_ip?: string | null
+          customer_user_agent?: string | null
+          email?: string
+          id?: string
+          is_test?: boolean
+          message?: string
+          name?: string
+          order_reference?: string | null
+          phone?: string | null
+          replied_at?: string | null
+          status?: string
+          topic?: string
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
       conversion_outbox: {
         Row: {
           attempts: number
@@ -470,6 +521,7 @@ export type Database = {
           job: string
           started_at: string
           status: string
+          ticket: string | null
         }
         Insert: {
           detail?: Json | null
@@ -479,6 +531,7 @@ export type Database = {
           job: string
           started_at?: string
           status?: string
+          ticket?: string | null
         }
         Update: {
           detail?: Json | null
@@ -488,6 +541,7 @@ export type Database = {
           job?: string
           started_at?: string
           status?: string
+          ticket?: string | null
         }
         Relationships: []
       }
@@ -901,6 +955,7 @@ export type Database = {
           referrer: string | null
           removal_seats: number | null
           review_request_sent_at: string | null
+          review_token: string
           session_id: string | null
           shipped_at: string | null
           shipping_address: string
@@ -969,6 +1024,7 @@ export type Database = {
           referrer?: string | null
           removal_seats?: number | null
           review_request_sent_at?: string | null
+          review_token?: string
           session_id?: string | null
           shipped_at?: string | null
           shipping_address: string
@@ -1037,6 +1093,7 @@ export type Database = {
           referrer?: string | null
           removal_seats?: number | null
           review_request_sent_at?: string | null
+          review_token?: string
           session_id?: string | null
           shipped_at?: string | null
           shipping_address?: string
@@ -1375,6 +1432,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_approved: boolean
+          is_test: boolean
           order_id: string | null
           product_id: string | null
           rating: number
@@ -1388,6 +1446,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_approved?: boolean
+          is_test?: boolean
           order_id?: string | null
           product_id?: string | null
           rating: number
@@ -1401,6 +1460,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_approved?: boolean
+          is_test?: boolean
           order_id?: string | null
           product_id?: string | null
           rating?: number
@@ -1752,8 +1812,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_order_note: { Args: { p_note: string; p_order_id: string }; Returns: undefined }
+      add_order_note: {
+        Args: { p_note: string; p_order_id: string }
+        Returns: undefined
+      }
       admin_delete_product: { Args: { p_product_id: string }; Returns: Json }
+      admin_review_request: { Args: { p_order_id: string }; Returns: Json }
       admin_save_product: { Args: { p: Json }; Returns: Json }
       admin_status: { Args: never; Returns: Json }
       calculate_order_offer: {
@@ -1771,13 +1835,23 @@ export type Database = {
       }
       clean_text: { Args: { p_max: number; p_text: string }; Returns: string }
       confirm_order: { Args: { p_order_id: string }; Returns: Json }
-      delete_test_order: { Args: { p_order_id: string }; Returns: Json }
       create_whatsapp_enquiry: { Args: { p_input: Json }; Returns: Json }
+      delete_test_order: { Args: { p_order_id: string }; Returns: Json }
       health_ping: { Args: never; Returns: Json }
       import_catalogue: { Args: { p: Json; p_update?: boolean }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       issue_paid_offer_entitlement: {
         Args: { p_arrival_id?: string; p_source: string; p_visitor_id: string }
+        Returns: Json
+      }
+      job_claim: { Args: { p_job: string; p_ticket: string }; Returns: Json }
+      job_finish: {
+        Args: {
+          p_detail: Json
+          p_error: string
+          p_status: string
+          p_ticket: string
+        }
         Returns: Json
       }
       newsletter_confirm: { Args: { p_token: string }; Returns: Json }
@@ -1837,6 +1911,11 @@ export type Database = {
       }
       request_samples: { Args: { p_input: Json }; Returns: Json }
       require_admin: { Args: never; Returns: undefined }
+      review_invite: { Args: { p_token: string }; Returns: Json }
+      review_requests_due: {
+        Args: { p_limit: number; p_ticket: string }
+        Returns: Json
+      }
       run_daily_cleanup: { Args: never; Returns: Json }
       set_order_attribution: {
         Args: { p_note?: string; p_order_id: string; p_source: string }
@@ -1849,6 +1928,17 @@ export type Database = {
       set_order_test: {
         Args: { p_is_test: boolean; p_order_id: string; p_reason?: string }
         Returns: undefined
+      }
+      submit_review: {
+        Args: {
+          p_comment: string
+          p_name: string
+          p_product_id: string
+          p_rating: number
+          p_title: string
+          p_token: string
+        }
+        Returns: Json
       }
       track_order: {
         Args: { p_postcode: string; p_reference: string }

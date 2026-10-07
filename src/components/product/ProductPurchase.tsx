@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Price } from '@/components/ui/Price'
 import { buttonClasses } from '@/components/ui/Button'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
-import { whatsAppHref } from '@/config/contact'
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { SITE_URL } from '@/config/site'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
@@ -22,7 +22,7 @@ import { StickyBuyBar } from './StickyBuyBar'
 
 export type PurchaseProduct = Pick<
   ProductPageData,
-  'slug' | 'title' | 'typeName' | 'basePrice' | 'madeToOrder' | 'madeInUk' | 'variants' | 'siblings' | 'fabrics' | 'gallery' | 'range'
+  'id' | 'slug' | 'title' | 'typeName' | 'basePrice' | 'madeToOrder' | 'madeInUk' | 'variants' | 'siblings' | 'fabrics' | 'gallery' | 'range'
 >
 
 /**
@@ -91,7 +91,7 @@ export function ProductPurchase({
     setAdded({ title: p.title, option, image, price })
   }
 
-  const wa = whatsAppHref(`Hi Heartwell, I have a question about the ${p.title} (${option}): ${SITE_URL}${productHref(p.slug, variant?.sku, fabric?.fabric.code)}`)
+  const waMessage = `Hi Heartwell, I have a question about the ${p.title} (${option}): ${SITE_URL}${productHref(p.slug, variant?.sku, fabric?.fabric.code)}`
 
   return (
     <>
@@ -242,12 +242,17 @@ export function ProductPurchase({
             >
               {variant ? 'Add to basket' : 'Not available to order online'}
             </button>
-            {wa && (
-              <a href={wa} className={buttonClasses({ variant: 'secondary', block: true })}>
-                <WhatsAppGlyph />
-                Ask about this {noun} on WhatsApp
-              </a>
-            )}
+            <WhatsAppButton
+              message={waMessage}
+              context="product"
+              productId={p.id}
+              variantId={variant?.id}
+              productName={p.title}
+              className={buttonClasses({ variant: 'secondary', block: true })}
+            >
+              <WhatsAppGlyph />
+              Ask about this {noun} on WhatsApp
+            </WhatsAppButton>
           </div>
 
           {children}

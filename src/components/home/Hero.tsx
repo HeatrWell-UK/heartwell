@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { ButtonLink, buttonClasses } from '@/components/ui/Button'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
-import { whatsAppHref } from '@/config/contact'
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 
 const HERO_IMAGE =
   'https://res.cloudinary.com/iv3tp2iq/image/upload/v1791033930/heartwell/samples/malibu-high-back-5-seater-corner-oatmeal-room.jpg'
@@ -12,7 +12,6 @@ const HERO_IMAGE =
  * one main action. The frame is used here only.
  */
 export function Hero() {
-  const wa = whatsAppHref('Hi Heartwell, I have a question about your sofas.')
   return (
     <section className="mx-auto grid max-w-[1200px] gap-6 px-4 pt-4 lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-6 lg:pt-10">
       <div className="relative aspect-[358/420] w-full overflow-hidden bg-stone [border-radius:50%_50%_24px_24px/28%_28%_24px_24px] lg:order-2">
@@ -40,12 +39,10 @@ export function Hero() {
           <ButtonLink href="/sofas" block className="sm:w-auto sm:min-w-56">
             Shop sofas
           </ButtonLink>
-          {wa && (
-            <a href={wa} className={buttonClasses({ variant: 'secondary', block: true, className: 'sm:w-auto' })}>
-              <WhatsAppGlyph />
-              Ask us on WhatsApp
-            </a>
-          )}
+          <WhatsAppButton message="Hi Heartwell, I have a question about your sofas." context="home" className={buttonClasses({ variant: 'secondary', block: true, className: 'sm:w-auto' })}>
+            <WhatsAppGlyph />
+            Ask us on WhatsApp
+          </WhatsAppButton>
         </div>
       </div>
     </section>

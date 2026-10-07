@@ -9,6 +9,8 @@ import { createClient } from '@/lib/supabase/server'
 import { isStatus } from '@/lib/admin/orders'
 import { sendStatusEmail } from '@/lib/checkout/notify'
 import { isUkPhone, formatUkPhone } from '@/lib/checkout/phone'
+import { SMTP_CONFIGURED } from '@/config/email'
+import { sendReviewRequest, type ReviewRequestRow } from '@/lib/leads/notify'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const field = (form: FormData, name: string) => String(form.get(name) ?? '').trim()
@@ -185,4 +187,22 @@ export async function createManualOrder(input: unknown): Promise<FormResult> {
   if (error) return { ok: false, message: MESSAGES[codeOf(error.message)] ?? `Couldn’t save: ${error.message}` }
   revalidatePath('/admin/orders')
   return { ok: true, id: String((data as { id: string }).id) }
+}
+
+// The review email, now -----------------------------------------------------------
+
+/** Sends the review email straight away (it normally goes three days after delivery). */
+export async function askForReview(id: string): Promise<{ ok: boolean; message: string }> {
+  if (!UUID.test(id)) return { ok: false, message: 'Unknown order.' }
+  if (await adminGuard()) return { ok: false, message: MESSAGES.NOT_AUTHORISED! }
+  if (!SMTP_CONFIGURED) return { ok: false, message: 'Email isn’t set up yet (SMTP_PASSWORD), so nothing was sent.' }
+  const { data, error } = await (await createClient()).rpc('admin_review_request', { p_order_id: id })
+  if (error) {
+    const code = codeOf(error.message)
+    const words: Record<string, string> = { NOT_DELIVERED: 'Mark the order delivered first.', NO_EMAIL: 'There’s no email address on this order. Send the review link by WhatsApp instead.' }
+    return { ok: false, message: words[code] ?? `Couldn’t send it: ${error.message}` }
+  }
+  const sent = await sendReviewRequest(data as unknown as ReviewRequestRow)
+  revalidatePath(`/admin/orders/${id}`)
+  return sent === 'sent' ? { ok: true, message: 'Review email sent.' } : { ok: false, message: 'The email didn’t send. See Status for email problems.' }
 }

@@ -48,6 +48,20 @@ export function productJsonLd(p: ProductPageData, siteUrl: string) {
     description: productDescription(p),
     brand: { '@type': 'Brand', name: BRAND.name },
     ...(images.length ? { image: [...new Set(images)] } : {}),
+    // Ratings only from real, approved reviews: nothing at all until the first one.
+    ...(p.reviewStats
+      ? {
+          aggregateRating: { '@type': 'AggregateRating', ratingValue: p.reviewStats.average.toFixed(1), reviewCount: p.reviewStats.count, bestRating: 5, worstRating: 1 },
+          review: p.reviews.slice(0, 5).map((r) => ({
+            '@type': 'Review',
+            author: { '@type': 'Person', name: r.name },
+            datePublished: r.date.slice(0, 10),
+            reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+            ...(r.title ? { name: r.title } : {}),
+            ...(r.comment ? { reviewBody: r.comment } : {}),
+          })),
+        }
+      : {}),
     variesBy: ['https://schema.org/color'],
     hasVariant: p.variants.map((v) => ({
       '@type': 'Product',

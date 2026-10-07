@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Sheet } from '@/components/ui/Sheet'
 import { FEATURES } from '@/config/features'
+import { SAMPLES } from '@/config/samples'
 import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import type { FabricCollectionView, FabricView } from '@/lib/product/types'
@@ -49,8 +50,8 @@ export function FabricSheet({
         </p>
 
         {FEATURES.samples && (
-          <Link href="/fabric-samples" className="text-[15px] font-semibold">
-            Order up to 5 fabric samples
+          <Link href={chosen ? `${SAMPLES.href}?fabric=${encodeURIComponent(chosen.fabric.code)}` : SAMPLES.href} className="text-[15px] font-semibold">
+            Not sure? Order fabric samples, {SAMPLES.fee} for the set
           </Link>
         )}
 

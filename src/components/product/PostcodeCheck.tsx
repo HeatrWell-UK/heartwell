@@ -2,7 +2,7 @@
 
 import { useId, useState, useSyncExternalStore } from 'react'
 import { CheckIcon, InfoIcon, WarningCircleIcon } from '@phosphor-icons/react'
-import { CONTACT, whatsAppHref } from '@/config/contact'
+import { WhatsAppOrEmail } from '@/components/ui/WhatsAppButton'
 import { recallPostcode, rememberPostcode } from '@/lib/basket/store'
 import { postcodeOutcome, type PostcodeOutcome } from '@/lib/product/helpers'
 
@@ -31,10 +31,6 @@ export function PostcodeCheck({ windowLabel }: { windowLabel: string }) {
       rememberPostcode(result.postcode)
     }
   }
-
-  const ask = (postcode: string) =>
-    whatsAppHref(`Hi Heartwell, could I have a delivery quote for ${postcode}?`) ??
-    `mailto:${CONTACT.email}?subject=${encodeURIComponent(`Delivery quote for ${postcode}`)}`
 
   return (
     <section aria-labelledby={`${id}-label`} className="mt-6 flex flex-col gap-3 rounded-[var(--radius-card)] bg-stone px-4 py-[18px]">
@@ -89,9 +85,14 @@ export function PostcodeCheck({ windowLabel }: { windowLabel: string }) {
         {outcome.kind === 'quote' && (
           <Result tone="info">
             We deliver to {outcome.place ?? outcome.area} by arrangement, not through the online checkout.{' '}
-            <a href={ask(outcome.postcode)} className="font-semibold">
+            <WhatsAppOrEmail
+              message={`Hi Heartwell, could I have a delivery quote for ${outcome.postcode}?`}
+              context="delivery-quote"
+              emailSubject={`Delivery quote for ${outcome.postcode}`}
+              className="font-semibold"
+            >
               Ask us for a delivery quote
-            </a>
+            </WhatsAppOrEmail>
             .
           </Result>
         )}

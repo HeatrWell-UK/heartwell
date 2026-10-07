@@ -25,6 +25,17 @@ export interface AdminStatusData {
   orderflow: { enabled: boolean; configured: boolean; last_push: string | null }
 }
 
+/** One job's latest run, as the job itself reported it. */
+export function jobRunVerdict(run: AdminStatusData['jobs'][number], now = Date.now()): { level: Level; state: string } {
+  if (run.status === 'ok') return { level: 'ok', state: `ran ${when(run.finished_at ?? run.started_at)}` }
+  if (run.status === 'failed') return { level: 'error', state: `failed ${when(run.started_at)}: ${run.error ?? 'no message'}` }
+  if (run.status === 'skipped') return { level: 'warn', state: `skipped ${when(run.started_at)}: ${run.error ?? 'no reason given'}` }
+  // Still running: fine for a while; after 30 minutes the website never reported back.
+  return now - Date.parse(run.started_at) > 30 * 60_000
+    ? { level: 'error', state: `started ${when(run.started_at)} and never reported back` }
+    : { level: 'ok', state: 'running now' }
+}
+
 export interface StatusContext {
   appEnv: 'development' | 'staging' | 'production'
   siteUrl: string
@@ -181,16 +192,21 @@ export function buildStatusChecks(
   // Scheduled jobs
   const jobLevels: Level[] = []
   const jobDetails = data.cron.map((j) => {
-    const level: Level = !j.active ? 'warn' : j.last_status === 'failed' ? 'error' : j.last_status ? 'ok' : 'warn'
+    const name = j.name.replace(/^heartwell-/, '')
+    // Jobs that report their own outcome (job_runs) say what really happened;
+    // for the rest, pg_cron's own record of the run is all there is.
+    const run = data.jobs.find((r) => r.job === name)
+    const { level, state }: { level: Level; state: string } = !j.active
+      ? { level: 'warn', state: 'paused' }
+      : run
+        ? jobRunVerdict(run)
+        : j.last_status === 'failed'
+          ? { level: 'error', state: `failed ${when(j.last_run)}: ${j.last_message ?? 'no message'}` }
+          : j.last_status
+            ? { level: 'ok', state: `ran ${when(j.last_run)}` }
+            : { level: 'warn', state: 'waiting for its first run' }
     jobLevels.push(level)
-    const state = !j.active
-      ? 'paused'
-      : j.last_status === 'failed'
-        ? `failed ${when(j.last_run)}: ${j.last_message ?? 'no message'}`
-        : j.last_status
-          ? `ran ${when(j.last_run)}`
-          : 'waiting for its first run'
-    return { label: j.name.replace(/^heartwell-/, ''), value: state }
+    return { label: name, value: state }
   })
   const jobsLevel = data.cron.length === 0 ? 'error' : worst(jobLevels)
   checks.push({
