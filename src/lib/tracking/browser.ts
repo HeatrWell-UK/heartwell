@@ -98,10 +98,20 @@ const TOUCH_KEY = 'hw-touch'
 const FBCLID_KEY = 'hw-fbclid'
 const ARRIVAL_SENT = 'hw-arrival-sent'
 
-/** The campaign tags in an address (utm_*), trimmed. */
+/**
+ * The campaign tags in an address (utm_*), trimmed. When a tag appears twice
+ * the last one counts: Meta appends an ad's URL parameters after a catalogue
+ * link's own tags.
+ */
 export function tagsFrom(search: string): Omit<Touch, 'at' | 'landing' | 'referrer'> {
   const q = new URLSearchParams(search)
-  const get = (k: string) => q.get(k)?.trim().slice(0, 200) || undefined
+  const get = (k: string) =>
+    q
+      .getAll(k)
+      .map((v) => v.trim())
+      .filter(Boolean)
+      .at(-1)
+      ?.slice(0, 200) || undefined
   return { source: get('utm_source'), medium: get('utm_medium'), campaign: get('utm_campaign'), content: get('utm_content'), term: get('utm_term') }
 }
 

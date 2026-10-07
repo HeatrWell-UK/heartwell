@@ -20,10 +20,11 @@ import { SaveButton } from './SaveButton'
 import { FabricSheet, FabricSwatch, type ChosenFabric } from './FabricSheet'
 import { AddedSheet, type AddedItem } from './AddedSheet'
 import { StickyBuyBar } from './StickyBuyBar'
+import { OfferStrip } from '@/components/offer/OfferStrip'
 
 export type PurchaseProduct = Pick<
   ProductPageData,
-  'id' | 'slug' | 'title' | 'typeName' | 'basePrice' | 'madeToOrder' | 'madeInUk' | 'variants' | 'siblings' | 'fabrics' | 'gallery' | 'range'
+  'id' | 'slug' | 'title' | 'typeName' | 'basePrice' | 'madeToOrder' | 'madeInUk' | 'variants' | 'siblings' | 'fabrics' | 'gallery' | 'range' | 'offerTier'
 >
 
 /**
@@ -35,11 +36,14 @@ export function ProductPurchase({
   product: p,
   initialVariantId,
   initialFabric,
+  offer,
   children,
 }: {
   product: PurchaseProduct
   initialVariantId: string | null
   initialFabric: ChosenFabric | null
+  /** What an ad visitor’s offer takes off this piece, and the code to use elsewhere. */
+  offer: { amount: number; code: string | null }
   children: ReactNode
 }) {
   const basket = useBasket()
@@ -95,7 +99,7 @@ export function ProductPurchase({
     basket.add({
       variantId: variant.id,
       materialId: fabric?.fabric.id ?? null,
-      view: { slug: p.slug, sku: variant.sku, title: p.title, option, image, unitPrice: price, madeToOrder: p.madeToOrder },
+      view: { slug: p.slug, sku: variant.sku, title: p.title, option, image, unitPrice: price, madeToOrder: p.madeToOrder, offerTier: p.offerTier },
     })
     setAdded({ title: p.title, option, image, price })
     track('AddToCart', { contents: [{ id: variant.id, quantity: 1, item_price: price }], contentName: p.title, value: price })
@@ -130,6 +134,7 @@ export function ProductPurchase({
               <span className="text-[15px] font-semibold text-velvet">Free delivery</span>
             </p>
             <p className="text-[15px] text-slate">Pay nothing today. Pay the driver when it arrives.</p>
+            <OfferStrip amount={Math.min(offer.amount, price)} noun={noun} code={offer.code} className="mt-1" />
           </div>
 
           {p.variants.length > 0 && (
