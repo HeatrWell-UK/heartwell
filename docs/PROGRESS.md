@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 12 (admin catalogue and settings) built and on the staging link, waiting for approval (6 October 2026). Phase 11 approved and merged into `main`. The two Vercel keys from Phase 10 are still to be added. |
+| **Current phase** | Phase 13 (WhatsApp, samples, reviews, leads and website jobs) built and on the staging link, waiting for approval (7 October 2026). Phase 12 approved and merged into `main`. The two Vercel keys from Phase 10 are still to be added, and most of Phase 13 needs them too. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 13: WhatsApp, samples, reviews and automation (now also the admin for reviews, samples, enquiries, leads and videos). Order from here: 13–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 12 approved. Phase 13 — WhatsApp, samples and reviews. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 13.` |
+| **Next phase** | Phase 14: Meta Pixel, Conversions API, GA4 and attribution (needs plan items 14 and 15 from the owner). Order from here: 14–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 13 approved. Phase 14 — Meta and GA4 tracking. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 14. Pixel ID: <id>. The CAPI token and test event code are set in the Vercel project. GA4 Measurement ID: <id>; its API secret is set in the Vercel project. Purchase sending: <automatic / manual>.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -44,6 +44,18 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 7 October 2026 — Phase 13: WhatsApp, samples, reviews, leads and website jobs
+- **Owner:** Phase 12 approved; merged into `main`.
+- **WhatsApp:** every WhatsApp link on the shop (product, home, contact, delivery quotes, checkout quote, the order page) is one component. A tap adds an `HW-WA-…` reference on its own line, saves the enquiry in the background and opens WhatsApp the reliable way for the browser (Instagram/Facebook on iPhone: the app link, with WhatsApp's web page if the app doesn't open; on Android: an intent with the web page built in; elsewhere: wa.me). Checked in a browser: the message carries the reference, one enquiry is sent per tap, and a second tap reuses the reference. The enquiry is saved only once `SUPABASE_SECRET_KEY` is in Vercel; WhatsApp opens either way.
+- **Fabric samples** (`/fabric-samples`): pick up to the shop's limit (5), name, mobile, email and address; the £5 is arranged by phone or WhatsApp before posting (nothing paid online) and taken off the sofa. Links from the product's fabric sheet (with that fabric ticked), the home page and `/fabrics`. Emails to the customer and the shop. Every active colour now shows in the shop; "can be sent as a sample" limits only the samples page.
+- **Reviews:** each order has a private review link (`/review/<token>`, live once delivered, one review per product, held for approval). The email goes about 10am three days after delivery (daily job), or now from the order page. Approved reviews show on the product page (stars, "Bought from us") and `/reviews`; product structured data includes ratings only from real approved reviews.
+- **Also:** `/contact` (saved for the admin, emailed to the shop with reply-to the customer, a copy to the customer); newsletter double opt-in (footer sign-up; confirm and unsubscribe pages act on a button, so mail scanners can't sign anyone up); product videos (admin adds Cloudinary links or uploads; MP4 at automatic quality, loaded only when tapped).
+- **Website jobs:** pg_cron gives each run a one-time ticket and calls `/api/jobs/<job>`; the site claims the ticket, does the work and reports back to `job_runs`; the Status page shows that real outcome. No secret is stored anywhere. Staging's site address is set (`private.app_config`); production's stays empty until Phase 18B, so its runs show "skipped" until then.
+- **Admin:** Leads (samples to post, contact messages, WhatsApp enquiries with "take this order", basket reminders with the one reminder by email or WhatsApp, confirmed newsletter emails to copy), Reviews (publish, hide, delete), Videos, a More page on phones (Reviews, Videos, Settings, Status, Sign out), "waiting for you" on Home, review email controls on delivered orders.
+- **Database:** migration `leads_reviews_jobs` (both projects, versions aligned, advisors clean). Checked in rolled-back transactions as a visitor and as the admin: repeated WhatsApp references keep one row; review links refuse undelivered orders, other products, bad ratings and a second review; non-admins can't ask for reviews; job tickets work once, only after being claimed, and the review batch is stamped so nobody is asked twice.
+- **Checked:** every new page loads on the preview; admin pages send visitors to sign-in; job calls without a valid ticket are refused. End to end on staging: the database started a review-request run, the site claimed its ticket and reported back within a second ("skipped: email isn't set up yet", correct without `SMTP_PASSWORD`), and the ticket was used up. `npm run verify` passes (365 tests).
+- **Waiting on the owner:** approve Phase 13. **Add `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` to Vercel**: without them, samples, contact messages, newsletter sign-ups, saved enquiries and every email (including the review email) can't work, and the review job shows "skipped". Optional: `CLOUDINARY_API_KEY`/`CLOUDINARY_API_SECRET` for photo and video uploads. Confirm the samples wording (the £5 is arranged on a call or WhatsApp before posting, and comes off the sofa if they buy).
 
 ### 6 October 2026 — Phase 12: admin catalogue and settings
 - **Owner:** Phase 11 approved; merged into `main`.
