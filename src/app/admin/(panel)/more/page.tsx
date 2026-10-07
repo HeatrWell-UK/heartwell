@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { CaretRightIcon, GearSixIcon, PulseIcon, SignOutIcon, StarIcon, VideoCameraIcon } from '@phosphor-icons/react/ssr'
+import { CaretRightIcon, ChartLineUpIcon, GearSixIcon, PulseIcon, SignOutIcon, StarIcon, VideoCameraIcon } from '@phosphor-icons/react/ssr'
 import { signOut } from '@/app/admin/actions'
 import { createClient } from '@/lib/supabase/server'
 
@@ -13,6 +13,7 @@ export default async function AdminMorePage() {
   const links = [
     { href: '/admin/reviews', label: 'Reviews', note: count ? `${count} waiting` : 'Nothing waiting', icon: StarIcon },
     { href: '/admin/videos', label: 'Videos', note: 'On product pages', icon: VideoCameraIcon },
+    { href: '/admin/tracking', label: 'Tracking', note: 'Meta and Google: mode, purchases sent', icon: ChartLineUpIcon },
     { href: '/admin/settings', label: 'Settings', note: 'Delivery prices, offers, samples', icon: GearSixIcon },
     { href: '/admin/status', label: 'Status', note: 'Is everything working?', icon: PulseIcon },
   ]

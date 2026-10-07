@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 13 (WhatsApp, samples, reviews, leads and website jobs) built and on the staging link, waiting for approval (7 October 2026). Phase 12 approved and merged into `main`. The two Vercel keys from Phase 10 are still to be added, and most of Phase 13 needs them too. |
+| **Current phase** | Phase 14 (Meta Pixel, Conversions API, GA4 and attribution) built and on the staging link, waiting for approval (8 October 2026). Runs as a dry run until the Meta and Google accounts exist (`docs/TRACKING-SETUP.md`). Phase 13 approved and merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 14: Meta Pixel, Conversions API, GA4 and attribution (needs plan items 14 and 15 from the owner). Order from here: 14–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 13 approved. Phase 14 — Meta and GA4 tracking. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 14. Pixel ID: <id>. The CAPI token and test event code are set in the Vercel project. GA4 Measurement ID: <id>; its API secret is set in the Vercel project. Purchase sending: <automatic / manual>.` |
+| **Next phase** | Phase 15: Meta catalogue feed, offers and ad links (built ready to connect, like Phase 14). Order from here: 15–17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 14 approved. Phase 15 — Catalogue feed and offers. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 15. Offer code: <CODE, or "you suggest">. Ad-visitor offer at launch: <yes / no>. Commerce Manager isn't set up yet: build the feed ready to connect.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -40,10 +40,23 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Phone and WhatsApp: 07848 477056 (`src/config/contact.ts`). Shop notifications go to enquiries@heartwellsofa.co.uk (the default) with a copy to heartwellsofa@gmail.com (`SHOP_NOTIFY_COPY`, read from the owner's "heartwellsofa3gmail.com", assumed to mean @gmail.com). Outside production, customer emails go to heartwellsofa@gmail.com (`EMAIL_TEST_INBOX`).
 - Hosting settings checkout needs (Vercel now, Hostinger from 18B): `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` (both secret, added by the owner; I never see them). Optional: `CLOUDINARY_API_KEY` + `CLOUDINARY_API_SECRET` (photo uploads from the product editor; `CLOUDINARY_CLOUD_NAME` defaults to Heartwell's `iv3tp2iq`; uploads land in `heartwell/uploads`, tagged `heartwell-admin`, named by Cloudinary so nothing is overwritten), `ADDRESS_LOOKUP_PROVIDER` + `ADDRESS_LOOKUP_KEY`, `MAIL_FROM` (once the orders@ alias exists), `SMTP_HOST/PORT/USER` (default smtp.hostinger.com:465 as enquiries@).
 - Site addresses: departments `/sofas`, categories `/sofas/<category>`, products `/products/<slug>` (`?variant=<SKU>&fabric=<code>`), ranges `/ranges/<range>`, `/search`, `/fabrics`, `/basket`, `/saved`, `/visit-us` (404 until the address is set).
+- Tracking settings (none set yet; dry run until they are): `NEXT_PUBLIC_META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN` (secret), `META_TEST_EVENT_CODE`, `NEXT_PUBLIC_GA4_MEASUREMENT_ID`, `GA4_API_SECRET` (secret). Tick Production and Preview for each. Live events also need the live domain and `NEXT_PUBLIC_APP_ENV=production`. Steps: `docs/TRACKING-SETUP.md`.
 - Admin pages: `/admin` (home), `/admin/orders`, `/admin/catalogue` (inventory; `/new`, `/<id>`, `/structure` for types, categories, ranges and fabrics), `/admin/settings` (shop settings and offer codes), `/admin/status` (from Home and Settings on phones). Adding a new kind of product: `docs/ADDING-PRODUCT-TYPES.md`.
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 8 October 2026 — Phase 14: Meta Pixel, Conversions API, GA4 and attribution
+- **Owner:** Phase 13 approved; merged into `main`. `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` were added to Vercel, but for **Production only**: the staging link is a Preview deployment, so it still can't save enquiries, samples or messages, send email, or keep the tracking log. Tick **Preview** on both.
+- **Owner's direction:** no Meta or Google accounts yet. Build the whole flow now and connect later; the owner will ask for step-by-step setup when ready. Purchase sending: my recommendation (automatic after a hold, D1).
+- **How it runs without accounts:** tracking has three modes (Admin → Tracking): dry run (default; every event built exactly as it would be sent and shown, nothing leaves the site), test (Meta Test events and GA4's validator only) and live (only on heartwellfurniture.co.uk with `NEXT_PUBLIC_APP_ENV=production`). Missing IDs mean dry run, so no dummy secrets were put anywhere.
+- **Consent:** a bottom bar with equal "Reject all" / "Accept all" and "Choose what to allow" (our own visit statistics, Google Analytics, Facebook and Instagram ads), "Cookie settings" in the footer. Checked on a phone-sized screen: the choice is saved, the bar goes, and nothing loads on staging.
+- **Events:** ViewContent (each colourway), AddToCart, InitiateCheckout, Contact (WhatsApp and phone taps), Lead (samples, basket reminder), OrderPlaced with advanced matching; browser and server copies share one event ID; the server copy only with consent. Purchase and GA4 purchase on confirmation and OrderDelivered on delivery go from the server only, through the outbox: 30 minutes after confirming (or held for Send now), retried with backoff, Meta's reply kept, test and cancelled orders never counted, no order numbers or private links, hashed details, and the IP address, browser and Meta cookies only with consent (D10).
+- **Attribution:** campaign tags, landing page and referring site saved per visit and on each order (first-party); Meta's click ID only with consent. Staff devices (Admin → Tracking → This device) and `?qa=1` visits never count; their orders are test orders.
+- **Admin → Tracking:** what's set up (ticks, never values), mode and Purchase settings, this device, the Purchase queue with Send now / Hold / Don't send, a warning for Purchases sent for orders cancelled later, and the latest events with their payloads. Status shows tracking as amber until it's live.
+- **Database:** migration `tracking` (both projects, versions aligned, advisors clean): settings, the outbox filling itself on confirm/deliver/cancel, the ticketed sender and its 5-minute schedule, staff outbox actions, the tracking log (30 days). Checked in rolled-back transactions: queueing, manual hold, cancel after send, single hand-out of each row, retry backoff, staff buttons, visitors refused.
+- **Checked end to end on staging:** test order HW-100107 (kept as an example) was confirmed; its Meta Purchase and GA4 purchase were queued, claimed by the job, built, logged and closed in dry run within a second; the payloads carry hashed details only and the order's random purchase ID. `npm run verify` passes (386 tests).
+- **Waiting on the owner:** approve Phase 14; tick Preview on `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD`; when ready, create the Meta and Google accounts (`docs/TRACKING-SETUP.md`) and ask for the step-by-step.
 
 ### 7 October 2026 — Phase 13: WhatsApp, samples, reviews, leads and website jobs
 - **Owner:** Phase 12 approved; merged into `main`.

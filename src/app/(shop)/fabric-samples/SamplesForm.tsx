@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { Field, TextArea, TextInput } from '@/components/ui/Field'
 import { SAMPLES } from '@/config/samples'
 import { visitIds } from '@/lib/basket/store'
+import { track } from '@/lib/tracking/browser'
 import { cn } from '@/lib/cn'
 import { requestSamples, type SampleField } from './actions'
 
@@ -70,6 +71,7 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
     }))
     setSending(false)
     if (r.ok) {
+      track('Lead', { contentName: 'Fabric samples', numItems: chosen.length })
       setDone(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return

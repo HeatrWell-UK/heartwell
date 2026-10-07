@@ -1,14 +1,17 @@
 'use server'
 
 import { after } from 'next/server'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { APP_ENV } from '@/config/env'
 import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/admin'
 import { clientIp, rateLimit } from '@/lib/http/rate-limit'
 import { ADDRESS_LOOKUP_CONFIGURED, findAddresses, LookupError } from '@/lib/address/lookup'
 import { classifyDeliveryPostcode, resolveDeliveryPostcode } from '@/lib/delivery/postcode'
-import { explainOrderError, OrderInput, orderPayload, pricingPayload, QuoteInput, testReason, type PlainError } from '@/lib/checkout/order'
+import { explainOrderError, OrderInput, orderPayload, pricingPayload, QuoteInput, testReason, type OrderTracking, type PlainError } from '@/lib/checkout/order'
+import { CONSENT_COOKIE, STAFF_COOKIE } from '@/config/tracking'
+import { parseConsent } from '@/lib/tracking/consent'
+import { ga4ClientIdFromCookie } from '@/lib/tracking/ga4-event'
 import { sendOrderPlacedEmails } from '@/lib/checkout/notify'
 import { isUkPhone, formatUkPhone } from '@/lib/checkout/phone'
 
@@ -113,9 +116,19 @@ export async function placeOrder(input: unknown): Promise<PlaceOrderResult> {
   if (classification.kind === 'invalid') return { ok: false, error: explainOrderError('INVALID_POSTCODE') }
   if (classification.kind !== 'classified' || classification.zone !== 'MAINLAND_STANDARD') return { ok: false, error: explainOrderError('NOT_MAINLAND') }
 
-  const payload = orderPayload({ ...order, postcode: classification.postcode }, { appEnv: APP_ENV, mixedAreaEvidence: evidence })
-  const userAgent = (await headers()).get('user-agent')?.slice(0, 400) ?? null
-  const { data, error } = await createAdminClient().rpc('place_order', { p_input: { ...payload, customer_user_agent: userAgent } })
+  // Consent and Meta's and Google's cookies come from the request itself, never from the page.
+  const jar = await cookies()
+  const tracking: OrderTracking = {
+    consent: parseConsent(jar.get(CONSENT_COOKIE)?.value),
+    staffDevice: jar.get(STAFF_COOKIE)?.value === '1',
+    fbp: jar.get('_fbp')?.value ?? null,
+    fbc: jar.get('_fbc')?.value ?? null,
+    gaClientId: ga4ClientIdFromCookie(jar.get('_ga')?.value),
+    ip: await clientIp(),
+    userAgent: (await headers()).get('user-agent')?.slice(0, 400) ?? null,
+  }
+  const payload = orderPayload({ ...order, postcode: classification.postcode }, { appEnv: APP_ENV, mixedAreaEvidence: evidence, tracking })
+  const { data, error } = await createAdminClient().rpc('place_order', { p_input: payload })
   if (error) return { ok: false, error: explainOrderError(error.message) }
 
   const placed = data as { id: string; reference: string }

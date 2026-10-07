@@ -4,6 +4,8 @@ import { CONTACT, phoneHref } from '@/config/contact'
 import { ABOUT_LINKS, BROWSE_LINKS, HELP_LINKS, LEGAL_LINKS } from '@/config/navigation'
 import type { NavSection } from '@/lib/catalogue/listing'
 import { NewsletterSignup } from './NewsletterSignup'
+import { CookieSettingsButton } from '@/components/tracking/CookieSettingsButton'
+import { TelLink } from '@/components/tracking/TelLink'
 
 const linkClass = 'text-[15px] text-on-wine-link no-underline hover:text-white hover:underline'
 
@@ -31,9 +33,9 @@ export function Footer({ shop }: { shop: NavSection[] }) {
           <div className="flex flex-col gap-2">
             <span className="text-[15px] font-bold">Talk to us</span>
             {CONTACT.phoneDisplay && tel && (
-              <a href={tel} className={linkClass}>
+              <TelLink href={tel} className={linkClass}>
                 {CONTACT.phoneDisplay}
-              </a>
+              </TelLink>
             )}
             <a href={`mailto:${CONTACT.email}`} className={linkClass}>
               {CONTACT.email}
@@ -57,6 +59,7 @@ export function Footer({ shop }: { shop: NavSection[] }) {
                 {l.label}
               </Link>
             ))}
+            <CookieSettingsButton className="text-[13px] text-on-wine-link underline underline-offset-2" />
             <span className="text-[13px] text-on-wine-muted">© {year} Heartwell</span>
           </div>
         </div>
