@@ -18,6 +18,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...rangesFrom(listing).map((r) => ({ url: url(`/ranges/${r.slug}`), changeFrequency: 'weekly' as const, priority: 0.7 })),
     ...listing.map((p) => ({ url: url(`/products/${p.slug}`), changeFrequency: 'weekly' as const, priority: 0.8 })),
     { url: url('/fabrics'), changeFrequency: 'monthly', priority: 0.5 },
+    { url: url('/fabric-samples'), changeFrequency: 'monthly', priority: 0.5 },
+    { url: url('/reviews'), changeFrequency: 'weekly', priority: 0.5 },
+    { url: url('/contact'), changeFrequency: 'yearly', priority: 0.4 },
     ...(CONTACT.visitAddress ? [{ url: url('/visit-us'), changeFrequency: 'monthly' as const, priority: 0.5 }] : []),
   ]
 }

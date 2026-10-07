@@ -6,5 +6,5 @@ export const FEATURES = {
   /** Checkout and placing an order (Phase 10). */
   checkout: true,
   /** Ordering fabric samples (Phase 13). */
-  samples: false,
+  samples: true,
 } as const

@@ -4,7 +4,8 @@ import { CheckCircleIcon, EnvelopeSimpleIcon } from '@phosphor-icons/react/ssr'
 import { buttonClasses } from '@/components/ui/Button'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { OrderLines } from '@/components/checkout/OrderLines'
-import { CONTACT, whatsAppHref } from '@/config/contact'
+import { CONTACT } from '@/config/contact'
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { orderForCustomer } from '@/lib/checkout/read'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 
@@ -17,7 +18,6 @@ export default async function OrderPlacedPage({ params }: { params: Promise<{ id
   if (!order) notFound()
   const first = order.customerName.split(/\s+/)[0]
   const confirmed = order.status !== 'pending_cod'
-  const wa = whatsAppHref(`Hi Heartwell, I've just placed order ${order.reference}.`)
 
   return (
     <div className="mx-auto flex max-w-[40rem] flex-col gap-6 px-4 pb-16 pt-6 lg:pt-10">
@@ -56,12 +56,10 @@ export default async function OrderPlacedPage({ params }: { params: Promise<{ id
         </p>
       )}
 
-      {wa && (
-        <a href={wa} className={buttonClasses({ variant: 'secondary', block: true })}>
-          <WhatsAppGlyph />
-          Message us about {order.reference}
-        </a>
-      )}
+      <WhatsAppButton message={`Hi Heartwell, I've just placed order ${order.reference}.`} context="order-placed" enquiry={false} className={buttonClasses({ variant: 'secondary', block: true })}>
+        <WhatsAppGlyph />
+        Message us about {order.reference}
+      </WhatsAppButton>
 
       <section aria-labelledby="summary" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line p-5">
         <h2 id="summary" className="text-[22px]">

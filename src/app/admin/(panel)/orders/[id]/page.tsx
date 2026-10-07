@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeftIcon, CalendarBlankIcon, EnvelopeSimpleIcon, MapPinIcon, NoteIcon, PhoneIcon, TruckIcon, WarningIcon } from '@phosphor-icons/react/ssr'
 import { OrderStatusBadge, SOURCE_LABEL, Tag } from '@/components/admin/OrderBits'
 import { CopyButton } from '@/components/admin/ClientButtons'
+import { ActButton } from '@/components/admin/ActButton'
 import { EditOrderPanel } from '@/components/admin/OrderForms'
 import { getOrder, lineOption, orderPickers } from '@/lib/admin/load-orders'
 import { ALLOWED_MOVES, dualTime, isStatus, NEXT_STEP, stageAheadOfStatus, STATUS_LABEL, statusMessage, whatsAppTo, type OrderStatus } from '@/lib/admin/orders'
@@ -13,7 +14,7 @@ import { formatPrice } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 import { floorName } from '@/lib/delivery/pricing'
 import { SITE_URL } from '@/config/site'
-import { addNote, changeStatus, deleteTestOrder, setAttribution, setTestFlag } from '../actions'
+import { addNote, askForReview, changeStatus, deleteTestOrder, setAttribution, setTestFlag } from '../actions'
 
 export const metadata: Metadata = { title: 'Order' }
 export const dynamic = 'force-dynamic'
@@ -242,6 +243,29 @@ export default async function OrderPage({ params, searchParams }: Props) {
           />
         )}
       </div>
+
+      {status === 'delivered' && (
+        <section aria-labelledby="review" className={`${card} flex flex-col gap-2`}>
+          <h2 id="review" className="font-semibold">
+            Review
+          </h2>
+          <p className="text-sm text-zinc-600">
+            {order.review_request_sent_at
+              ? `Review email sent ${dualTime(order.review_request_sent_at)?.uk}.`
+              : order.customer_email
+                ? 'The review email goes automatically three days after delivery (about 10am).'
+                : 'No email address, so no review email. Send the review link by WhatsApp if they’d like to leave one.'}
+          </p>
+          {order.customer_email && (
+            <ActButton
+              act={askForReview.bind(null, order.id)}
+              label={order.review_request_sent_at ? 'Send it again' : 'Send the review email now'}
+              confirm={order.review_request_sent_at ? 'They’ve already had one. Send another?' : undefined}
+            />
+          )}
+          <CopyButton text={`${SITE_URL}/review/${order.review_token}`} label="Copy their review link" className="self-start" />
+        </section>
+      )}
 
       <section aria-labelledby="timeline" className={card}>
         <h2 id="timeline" className="mb-3 font-semibold">

@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react'
 import { InfoIcon } from '@phosphor-icons/react'
-import { CONTACT, whatsAppHref } from '@/config/contact'
+import { WhatsAppOrEmail } from '@/components/ui/WhatsAppButton'
 import { TextInput } from '@/components/ui/Field'
 import { postcodeOutcome, type PostcodeOutcome } from '@/lib/product/helpers'
 import { recallPostcode } from '@/lib/basket/store'
@@ -83,12 +83,6 @@ export function AddressStep({
   }
 
   const o = value.outcome
-  const quoteHref =
-    o.kind === 'quote'
-      ? (whatsAppHref(`Hi Heartwell, could I have a delivery quote for ${o.postcode}? I'd like: ${basketSummary}`) ??
-        `mailto:${CONTACT.email}?subject=${encodeURIComponent(`Delivery quote for ${o.postcode}`)}&body=${encodeURIComponent(`I'd like: ${basketSummary}`)}`)
-      : null
-
   return (
     <div className="flex flex-col gap-4">
       <div className={fieldClass}>
@@ -126,7 +120,7 @@ export function AddressStep({
         )}
       </div>
 
-      {o.kind === 'quote' && quoteHref && (
+      {o.kind === 'quote' && (
         <div role="status" className="flex flex-col gap-2 rounded-[var(--radius-field)] bg-gold-cream-tint p-4 text-[15px]">
           <p className="flex items-start gap-2">
             <InfoIcon aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-velvet" />
@@ -135,9 +129,15 @@ export function AddressStep({
               delivery quote.
             </span>
           </p>
-          <a href={quoteHref} className="self-start font-semibold">
+          <WhatsAppOrEmail
+            message={`Hi Heartwell, could I have a delivery quote for ${o.postcode}? I'd like: ${basketSummary}`}
+            context="checkout-quote"
+            emailSubject={`Delivery quote for ${o.postcode}`}
+            emailBody={`I'd like: ${basketSummary}`}
+            className="self-start font-semibold"
+          >
             Ask for a delivery quote
-          </a>
+          </WhatsAppOrEmail>
         </div>
       )}
 

@@ -6,21 +6,42 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CouchIcon, GearSixIcon, HouseIcon, PulseIcon, ReceiptIcon, SignOutIcon, type Icon } from '@phosphor-icons/react'
+import {
+  ChatCircleTextIcon,
+  CouchIcon,
+  DotsThreeOutlineIcon,
+  GearSixIcon,
+  HouseIcon,
+  PulseIcon,
+  ReceiptIcon,
+  SignOutIcon,
+  StarIcon,
+  VideoCameraIcon,
+  type Icon,
+} from '@phosphor-icons/react'
 import { signOut } from '@/app/admin/actions'
 import { cn } from '@/lib/cn'
 
-// Status is reached from Home and Settings on phones, so the tab bar fits five.
-const NAV: { href: string; label: string; icon: Icon; phone?: false }[] = [
+// Phones get five tabs; the rest (and Sign out) live on the More page.
+const NAV: { href: string; label: string; icon: Icon; phone?: false; desktop?: false }[] = [
   { href: '/admin', label: 'Home', icon: HouseIcon },
   { href: '/admin/orders', label: 'Orders', icon: ReceiptIcon },
+  { href: '/admin/leads', label: 'Leads', icon: ChatCircleTextIcon },
+  { href: '/admin/reviews', label: 'Reviews', icon: StarIcon, phone: false },
   { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon },
-  { href: '/admin/settings', label: 'Settings', icon: GearSixIcon },
+  { href: '/admin/videos', label: 'Videos', icon: VideoCameraIcon, phone: false },
+  { href: '/admin/settings', label: 'Settings', icon: GearSixIcon, phone: false },
   { href: '/admin/status', label: 'Status', icon: PulseIcon, phone: false },
+  { href: '/admin/more', label: 'More', icon: DotsThreeOutlineIcon, desktop: false },
 ]
 
+/** The sections the More tab stands for on phones. */
+const MORE_PAGES = ['/admin/more', '/admin/reviews', '/admin/videos', '/admin/settings', '/admin/status']
+
 function isActive(pathname: string, href: string) {
-  return href === '/admin' ? pathname === href : pathname.startsWith(href)
+  if (href === '/admin') return pathname === href
+  if (href === '/admin/more') return MORE_PAGES.some((p) => pathname.startsWith(p))
+  return pathname.startsWith(href)
 }
 
 export function AdminNav({ email }: { email: string }) {
@@ -36,7 +57,7 @@ export function AdminNav({ email }: { email: string }) {
           <p className="mt-1 truncate text-xs text-zinc-500">{email}</p>
         </div>
         <nav aria-label="Admin" className="flex-1 space-y-1 overflow-y-auto p-4">
-          {NAV.map(({ href, label, icon: NavIcon }) => {
+          {NAV.filter((n) => n.desktop !== false).map(({ href, label, icon: NavIcon }) => {
             const active = isActive(pathname, href)
             return (
               <Link
@@ -84,12 +105,6 @@ export function AdminNav({ email }: { email: string }) {
               </Link>
             )
           })}
-          <form action={signOut} className="flex">
-            <button type="submit" className="flex min-h-12 min-w-16 flex-col items-center justify-center gap-0.5 px-2">
-              <SignOutIcon aria-hidden="true" size={24} className="text-zinc-400" />
-              <span className="text-[11px] font-medium text-zinc-400">Sign out</span>
-            </button>
-          </form>
         </div>
       </nav>
     </>

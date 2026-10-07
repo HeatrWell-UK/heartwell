@@ -120,7 +120,8 @@ export interface FabricCollection {
   slug: string
   name: string
   surcharge: number
-  fabrics: { code: string; name: string; hex: string | null; image: string | null }[]
+  /** Every colour on sale; `swatchable` ones can also be posted as samples. */
+  fabrics: { id: string; code: string; name: string; hex: string | null; image: string | null; swatchable: boolean }[]
 }
 
 /** The fabric library for made-to-order pieces, in display order. */
@@ -129,7 +130,7 @@ export const getFabricLibrary = unstable_cache(
     if (!SUPABASE_CONFIGURED) return []
     const { data, error } = await createPublicClient()
       .from('material_collections')
-      .select('slug, name, surcharge, sort, materials(code, name, hex, image_url, sort, is_swatchable)')
+      .select('slug, name, surcharge, sort, materials(id, code, name, hex, image_url, sort, is_swatchable)')
       .order('sort')
     if (error) throw new Error(`Fabrics: ${error.message}`)
     return data
@@ -137,14 +138,11 @@ export const getFabricLibrary = unstable_cache(
         slug: c.slug,
         name: c.name,
         surcharge: c.surcharge,
-        fabrics: [...c.materials]
-          .filter((m) => m.is_swatchable)
-          .sort(bySort)
-          .map((m) => ({ code: m.code, name: m.name, hex: m.hex, image: m.image_url })),
+        fabrics: [...c.materials].sort(bySort).map((m) => ({ id: m.id, code: m.code, name: m.name, hex: m.hex, image: m.image_url, swatchable: m.is_swatchable })),
       }))
       .filter((c) => c.fabrics.length > 0)
   },
-  ['fabric-library-v1'],
+  ['fabric-library-v2'],
   { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
 )
 

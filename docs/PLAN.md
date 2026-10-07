@@ -650,6 +650,14 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** tap WhatsApp on a product (the message carries the reference); request samples; mark the test order delivered and trigger the review email; leave a review; approve it.
 - **Done means:** every scheduled job shows a recent successful run.
+- **As built (7 October 2026):**
+  - **WhatsApp:** every customer-facing WhatsApp link is one component. On tap it adds an `HW-WA-YYMMDD-XXXXXX` reference (made in the browser from the database's own alphabet, so WhatsApp opens at once), saves the enquiry in the background (`/api/whatsapp-enquiry`, path only, no ad click IDs until consent in Phase 14) and opens WhatsApp the reliable way for the browser: `whatsapp://` in the Instagram/Facebook browser on iPhone (falling back to wa.me if the app doesn't open), an Android intent with a built-in wa.me fallback, a normal wa.me link elsewhere. Help with an existing order makes no reference.
+  - **Samples:** `/fabric-samples` (choose up to `sample_limit`, prefilled from `?fabric=CODE`; name, mobile, email, address; the £5 is settled by phone or WhatsApp before posting, nothing paid online), linked from the product's fabric sheet, the home fabric story and `/fabrics`. Every active colour now shows in the shop; "can be sent as a sample" only limits the samples page.
+  - **Reviews:** a private review link per order (`/review/<token>`, shown once delivered), a daily job that emails it three days after delivery (and a "send it now" button on delivered orders), held for approval, then shown on the product page with stars and on `/reviews`; product structured data gets `aggregateRating` and reviews only once real approved reviews exist.
+  - **Also:** `/contact` (stored, emailed to the shop with reply-to the customer, acknowledgement to the customer), newsletter double opt-in (footer sign-up, confirm and unsubscribe pages that act on a button press, not on opening the link), product videos.
+  - **Jobs:** pg_cron starts each website job with a one-time ticket (`private.start_site_job`) and calls `/api/jobs/<job>`; the site claims the ticket, does the work and reports the outcome to `job_runs`, which the Status page reads. No shared secret anywhere. The website address per project is `private.app_config.site_url` (set on staging; production's is set at Phase 18B, until then its runs show "skipped").
+  - **Admin:** Leads (samples, messages, WhatsApp enquiries with "take this order", basket reminders, newsletter), Reviews, Videos, a More page on phones, a "waiting for you" line on Home.
+  - **Basket reminders stay manual:** staff send the one reminder the shopper asked for from Leads (email or WhatsApp). An automatic reminder can be added later if the owner wants it.
 
 ---
 

@@ -3,6 +3,7 @@ import { LogoStacked } from '@/components/brand/Logo'
 import { CONTACT, phoneHref } from '@/config/contact'
 import { ABOUT_LINKS, BROWSE_LINKS, HELP_LINKS, LEGAL_LINKS } from '@/config/navigation'
 import type { NavSection } from '@/lib/catalogue/listing'
+import { NewsletterSignup } from './NewsletterSignup'
 
 const linkClass = 'text-[15px] text-on-wine-link no-underline hover:text-white hover:underline'
 
@@ -26,16 +27,19 @@ export function Footer({ shop }: { shop: NavSection[] }) {
           <FooterColumn title="Heartwell" links={ABOUT_LINKS} />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-[15px] font-bold">Talk to us</span>
-          {CONTACT.phoneDisplay && tel && (
-            <a href={tel} className={linkClass}>
-              {CONTACT.phoneDisplay}
+        <div className="grid gap-8 sm:grid-cols-2">
+          <div className="flex flex-col gap-2">
+            <span className="text-[15px] font-bold">Talk to us</span>
+            {CONTACT.phoneDisplay && tel && (
+              <a href={tel} className={linkClass}>
+                {CONTACT.phoneDisplay}
+              </a>
+            )}
+            <a href={`mailto:${CONTACT.email}`} className={linkClass}>
+              {CONTACT.email}
             </a>
-          )}
-          <a href={`mailto:${CONTACT.email}`} className={linkClass}>
-            {CONTACT.email}
-          </a>
+          </div>
+          <NewsletterSignup />
         </div>
 
         <div className="flex flex-col gap-3 border-t border-white/15 pt-5">

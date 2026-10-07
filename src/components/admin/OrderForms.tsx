@@ -221,11 +221,11 @@ export function EditOrderForm({ orderId, initial, initialLines, variants, fabric
 }
 
 /** Taking an order that came in on WhatsApp or by phone. */
-export function ManualOrderForm({ variants, fabrics }: { variants: PickerVariant[]; fabrics: PickerFabric[] }) {
+export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { variants: PickerVariant[]; fabrics: PickerFabric[]; initialReference?: string }) {
   const router = useRouter()
   const id = useId()
   const [source, setSource] = useState<'whatsapp' | 'phone'>('whatsapp')
-  const [reference, setReference] = useState('')
+  const [reference, setReference] = useState(initialReference)
   const [isTest, setIsTest] = useState(false)
   const [customer, setCustomer] = useState<CustomerValue>({ name: '', phone: '', email: '', address: '', postcode: '', preferredDate: '', notes: '', deliveryCharge: '0' })
   const [lines, setLines] = useState<LineValue[]>([{ key: newKey(), itemId: null, variantId: '', materialId: null, quantity: 1, unitPrice: '' }])

@@ -10,6 +10,8 @@ export interface OutgoingEmail {
   to: string
   /** Copies (shop emails only). */
   cc?: string
+  /** Where replies go, when not the shop’s own address (a contact-form message to the shop replies to the customer). */
+  replyTo?: string
   subject: string
   html: string
   text: string
@@ -82,7 +84,7 @@ export async function sendEmail(email: OutgoingEmail): Promise<'sent' | 'failed'
   try {
     const info = await transport().sendMail({
       from: EMAIL.from,
-      replyTo: EMAIL.replyTo,
+      replyTo: email.replyTo ?? EMAIL.replyTo,
       to,
       cc: email.cc || undefined,
       subject,
