@@ -10,6 +10,16 @@ import type { ProductPageData } from './types'
 
 const CLOUDINARY_PLAIN = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/
 
+/**
+ * A 1080×1080 square for catalogue ads, the whole piece kept in frame on the
+ * shop's stone background. Links that already carry a transformation are
+ * left alone.
+ */
+export function squareImageUrl(src: string): string {
+  const m = CLOUDINARY_PLAIN.exec(src)
+  return m ? `${m[1]}c_pad,b_rgb:F5F1EF,w_1080,h_1080,f_jpg,q_auto/${m[2]}` : src
+}
+
 /** A 1200×630 share image (Facebook, WhatsApp, iMessage) cut from a product photo. */
 export function shareImageUrl(src: string | null): string | null {
   if (!src) return null

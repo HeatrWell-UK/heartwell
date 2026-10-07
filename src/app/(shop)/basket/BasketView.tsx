@@ -13,11 +13,14 @@ import { useBasket } from '@/lib/basket/store'
 import { useHydrated } from '@/lib/basket/use-hydrated'
 import { MAX_QUANTITY } from '@/lib/basket/model'
 import { productHref } from '@/lib/product/helpers'
+import { basketOfferAmount, type TierAmounts } from '@/lib/offers/paid'
+import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
 import { refreshBasket } from './actions'
 
-export function BasketView() {
+export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmounts; offerCode: string | null }) {
   const basket = useBasket()
   const hydrated = useHydrated()
+  const offerEnds = useOfferEnds()
   const [removed, setRemoved] = useState(0)
   const refreshed = useRef(false)
 
@@ -48,6 +51,10 @@ export function BasketView() {
       </div>
     )
   }
+
+  // Shown as the database works it out; checkout's figure is the one that counts.
+  const offer = offerEnds ? basketOfferAmount(basket.lines.map((l) => ({ tier: l.view.offerTier ?? null, lineTotal: l.view.unitPrice * l.quantity })), offerAmounts) : 0
+  const toPay = basket.subtotal - offer
 
   return (
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-12">
@@ -118,6 +125,7 @@ export function BasketView() {
         <h2 id="summary" className="text-[22px]">
           Summary
         </h2>
+        <OfferStrip amount={offer} code={offerCode} />
         <dl className="flex flex-col gap-2 text-[15px]">
           <div className="flex justify-between">
             <dt>
@@ -125,6 +133,12 @@ export function BasketView() {
             </dt>
             <dd>{formatPrice(basket.subtotal)}</dd>
           </div>
+          {offer > 0 && (
+            <div className="flex justify-between">
+              <dt>Your offer</dt>
+              <dd>−{formatPrice(offer)}</dd>
+            </div>
+          )}
           <div className="flex justify-between">
             <dt>Delivery to UK Mainland</dt>
             <dd className="font-semibold text-velvet">Free</dd>
@@ -135,7 +149,7 @@ export function BasketView() {
           </div>
           <div className="flex justify-between text-[17px] font-semibold">
             <dt>To pay on delivery</dt>
-            <dd>{formatPrice(basket.subtotal)}</dd>
+            <dd>{formatPrice(toPay)}</dd>
           </div>
         </dl>
         <p className="text-sm leading-snug text-slate">

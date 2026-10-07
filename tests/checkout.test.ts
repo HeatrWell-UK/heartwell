@@ -49,6 +49,7 @@ describe('checkout input', () => {
       items: [{ item_id: 'line-1', variant_id: V, material_id: M, quantity: 2 }],
       extras: { floor: 2, has_lift: true, assembly: true, removal: false, removal_seats: null },
       promotion_code: 'EXTRA20',
+      offer_entitlement_token: null,
     })
     const p = orderPayload(order(), { appEnv: 'production', mixedAreaEvidence: null })
     expect(p).toMatchObject({

@@ -6,13 +6,15 @@ import { getShopNavigation, type NavSection } from '@/lib/catalogue/listing'
 import { SHOP_LINKS } from '@/config/navigation'
 import { Tracking } from '@/components/tracking/Tracking'
 import { getTrackingSettings } from '@/lib/tracking/server'
+import { OfferCapture } from '@/components/offer/OfferCapture'
+import { getOfferSettings } from '@/lib/offers/server'
 
 /**
  * The storefront's frame: announcement bar, header, footer. #page is what the
  * menu drawer marks inert while it's open.
  */
 export async function ShopShell({ children }: { children: ReactNode }) {
-  const [nav, tracking] = await Promise.all([getShopNavigation().catch(() => [] as NavSection[]), getTrackingSettings()])
+  const [nav, tracking, offers] = await Promise.all([getShopNavigation().catch(() => [] as NavSection[]), getTrackingSettings(), getOfferSettings()])
   const shop: NavSection[] = nav.length ? nav : [{ title: 'Shop sofas', links: SHOP_LINKS }]
   return (
     <div id="page" className="flex flex-1 flex-col">
@@ -23,6 +25,7 @@ export async function ShopShell({ children }: { children: ReactNode }) {
       </main>
       <Footer shop={shop} />
       <Tracking mode={tracking.mode} />
+      <OfferCapture enabled={offers.adOffer} />
     </div>
   )
 }

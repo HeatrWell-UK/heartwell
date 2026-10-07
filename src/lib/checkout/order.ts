@@ -57,8 +57,12 @@ export const OrderInput = QuoteInput.extend({
 })
 export type OrderInput = z.infer<typeof OrderInput>
 
-/** The pricing part of the database input (price_order and place_order share it). */
-export function pricingPayload(q: QuoteInput) {
+/**
+ * The pricing part of the database input (price_order and place_order share
+ * it). The ad-visitor offer’s token comes from its httpOnly cookie, never from
+ * the page.
+ */
+export function pricingPayload(q: QuoteInput, offerToken: string | null = null) {
   return {
     items: q.items.map((i) => ({ item_id: i.id, variant_id: i.variantId, material_id: i.materialId, quantity: i.quantity })),
     extras: {
@@ -69,6 +73,7 @@ export function pricingPayload(q: QuoteInput) {
       removal_seats: q.extras.removal ? q.extras.removalSeats : null,
     },
     promotion_code: q.promotionCode?.trim().toUpperCase() || null,
+    offer_entitlement_token: offerToken,
   }
 }
 
@@ -134,10 +139,10 @@ export function trackingPayload(o: Pick<OrderInput, 'visitor' | 'attribution'>, 
   }
 }
 
-export function orderPayload(o: OrderInput, ctx: { appEnv: string; mixedAreaEvidence: 'island' | 'mainland' | null; tracking?: OrderTracking }) {
+export function orderPayload(o: OrderInput, ctx: { appEnv: string; mixedAreaEvidence: 'island' | 'mainland' | null; tracking?: OrderTracking; offerToken?: string | null }) {
   const reason = testReason(o, ctx.appEnv, { qa: o.qa, staffDevice: ctx.tracking?.staffDevice })
   return {
-    ...pricingPayload(o),
+    ...pricingPayload(o, ctx.offerToken ?? null),
     customer_name: o.name.replace(/\s+/g, ' ').trim(),
     customer_phone: formatUkPhone(o.phone),
     customer_email: o.email.trim().toLowerCase() || null,
