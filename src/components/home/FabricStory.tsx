@@ -1,6 +1,8 @@
 import { ScissorsIcon } from '@phosphor-icons/react/ssr'
 import { ButtonLink } from '@/components/ui/Button'
+import Link from 'next/link'
 import { FEATURES } from '@/config/features'
+import { SAMPLES } from '@/config/samples'
 import type { FabricCollection } from '@/lib/catalogue/listing'
 
 /**
@@ -29,7 +31,9 @@ export function FabricStory({ collections }: { collections: FabricCollection[] }
           {FEATURES.samples && (
             <p className="flex items-start gap-3 rounded-2xl bg-white/8 p-4 text-[15px] text-on-wine">
               <ScissorsIcon aria-hidden="true" size={24} className="shrink-0 text-gold-pale" />
-              Not sure? Order 5 samples for £5. We take the £5 off when you buy your sofa.
+              <span>
+                Not sure? <Link href={SAMPLES.href} className="font-semibold text-on-wine underline">Order fabric samples</Link>, {SAMPLES.fee} for the set. We take the {SAMPLES.fee} off when you buy your sofa.
+              </span>
             </p>
           )}
           <ButtonLink href="/fabrics" variant="gold" block className="lg:w-auto lg:self-start lg:px-10">

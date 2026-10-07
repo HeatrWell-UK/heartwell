@@ -91,6 +91,10 @@ export interface ProductPageData {
   fabrics: FabricCollectionView[]
   related: ProductCardView[]
   reviews: ReviewView[]
+  /** Active videos of this product (a customer’s, or the shop’s own). */
+  videos: { mp4: string; poster: string; caption: string | null; fromCustomer: boolean }[]
+  /** From every approved review (the list above shows the latest 20). Null until the first. */
+  reviewStats: { count: number; average: number } | null
 }
 
 export interface DeliveryInfo {

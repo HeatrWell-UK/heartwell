@@ -8,8 +8,10 @@ import { Measurements } from '@/components/product/Measurements'
 import { WillItFit } from '@/components/product/WillItFit'
 import { ProductDetails } from '@/components/product/ProductDetails'
 import { Reviews } from '@/components/product/Reviews'
+import { Videos } from '@/components/product/Videos'
 import { RelatedRail } from '@/components/product/ProductCard'
 import { CONTACT, whatsAppHref } from '@/config/contact'
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { SITE_URL } from '@/config/site'
 import { getDeliveryInfo, getProductPage } from '@/lib/product/load'
 import { getCategories } from '@/lib/catalogue/listing'
@@ -27,8 +29,8 @@ const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v
 
 /** Only what the interactive part needs, so the page sends the browser no more than that. */
 function purchaseProps(p: ProductPageData): PurchaseProduct {
-  const { slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range } = p
-  return { slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range }
+  const { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range } = p
+  return { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range }
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
@@ -63,9 +65,16 @@ export default async function ProductPage({ params, searchParams }: Props) {
   const noun = product.typeName.toLowerCase()
   const name = product.range?.name ?? product.title
 
-  const wa = whatsAppHref(`Hi Heartwell, I have a question about the ${product.title}: ${SITE_URL}/products/${product.slug}`)
-  const askHref = wa ?? `mailto:${CONTACT.email}?subject=${encodeURIComponent(product.title)}`
-  const askLabel = wa ? 'Ask us anything on WhatsApp' : 'Ask us anything by email'
+  const question = `Hi Heartwell, I have a question about the ${product.title}: ${SITE_URL}/products/${product.slug}`
+  // Plain links for the small "ask us" notes; the reviews block gets the full WhatsApp button.
+  const askHref = whatsAppHref(question) ?? `mailto:${CONTACT.email}?subject=${encodeURIComponent(product.title)}`
+  const ask = CONTACT.whatsAppNumber ? (
+    <WhatsAppButton message={question} context="product-reviews" productId={product.id} productName={product.title}>
+      Ask us anything on WhatsApp
+    </WhatsAppButton>
+  ) : (
+    <a href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(product.title)}`}>Ask us anything by email</a>
+  )
 
   const categoryNode = product.category ? tree.find((c) => c.slug === product.category?.slug) : undefined
   const crumbs = categoryNode ? trail(tree, categoryNode).map((c) => ({ name: c.name, href: categoryHref(tree, c) })) : []
@@ -108,7 +117,8 @@ export default async function ProductPage({ params, searchParams }: Props) {
           </div>
           <div className="flex flex-col gap-8">
             <ProductDetails product={product} delivery={delivery} />
-            <Reviews reviews={product.reviews} name={name} askHref={askHref} askLabel={askLabel} />
+            <Videos videos={product.videos} title={product.title} />
+            <Reviews reviews={product.reviews} stats={product.reviewStats} name={name} ask={ask} />
           </div>
         </div>
         <RelatedRail title="You might also like" products={product.related} />

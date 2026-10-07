@@ -6,6 +6,8 @@ import { OrderStatusBadge, Tag } from '@/components/admin/OrderBits'
 import { loadStatus } from '@/lib/admin/load-status'
 import { overallLevel } from '@/lib/admin/status'
 import { listOrders, orderOverview } from '@/lib/admin/load-orders'
+import { leadCounts } from '@/lib/admin/load-leads'
+import { createClient } from '@/lib/supabase/server'
 import { dualTime } from '@/lib/admin/orders'
 import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/cn'
@@ -14,7 +16,19 @@ export const metadata: Metadata = { title: 'Home' }
 export const dynamic = 'force-dynamic'
 
 export default async function AdminHomePage() {
-  const [{ data, checks }, overview, recent] = await Promise.all([loadStatus(), orderOverview(), listOrders({ filter: 'all', q: '', page: 1 })])
+  const [{ data, checks }, overview, recent, leads, reviews] = await Promise.all([
+    loadStatus(),
+    orderOverview(),
+    listOrders({ filter: 'all', q: '', page: 1 }),
+    leadCounts(),
+    createClient().then((db) => db.from('reviews').select('id', { count: 'exact', head: true }).eq('is_approved', false)),
+  ])
+  const waiting = [
+    { label: 'samples to post', count: leads.samples, href: '/admin/leads?tab=samples' },
+    { label: 'messages', count: leads.messages, href: '/admin/leads?tab=messages' },
+    { label: 'reviews to check', count: reviews.count ?? 0, href: '/admin/reviews' },
+    { label: 'basket reminders', count: leads.baskets, href: '/admin/leads?tab=baskets' },
+  ].filter((w) => w.count > 0)
   const overall = overallLevel(checks)
   // The Health card: what needs fixing, in the Status page's words. It grows as tracking and jobs arrive (Phases 14 and 17).
   const problems = checks.filter((c) => c.level !== 'ok')
@@ -51,6 +65,17 @@ export default async function AdminHomePage() {
           </Link>
         ))}
       </div>
+
+      {waiting.length > 0 && (
+        <section aria-label="Waiting for you" className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <span className="text-sm font-semibold text-amber-950">Waiting for you:</span>
+          {waiting.map((w) => (
+            <Link key={w.href} href={w.href} className="flex min-h-10 items-center rounded-full bg-white px-3.5 text-sm font-semibold text-zinc-900 ring-1 ring-amber-200 hover:text-zinc-900">
+              {w.count} {w.label}
+            </Link>
+          ))}
+        </section>
+      )}
 
       <section aria-labelledby="health" className="flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
         <div className="flex items-center justify-between gap-3">
