@@ -11,6 +11,7 @@ import { SITE_URL } from '@/config/site'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
 import { useBasket } from '@/lib/basket/store'
+import { track } from '@/lib/tracking/browser'
 import { unitPrice } from '@/lib/catalogue/pricing'
 import { backOptions, optionLabel, productHref, sizeOptions } from '@/lib/product/helpers'
 import type { ProductPageData } from '@/lib/product/types'
@@ -67,6 +68,14 @@ export function ProductPurchase({
     if (url.href !== window.location.href) window.history.replaceState(null, '', url)
   }, [variant, fabric])
 
+  // ViewContent for each colourway looked at (variant ID = the Meta catalogue item ID).
+  const viewedId = variant?.id
+  useEffect(() => {
+    if (viewedId) track('ViewContent', { contentIds: [viewedId], contentName: p.title, value: price })
+    // Price follows the colourway; only a new colourway is a new view.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewedId])
+
   const images = useMemo(() => {
     const alt = (colour: string | null) => (colour ? `${p.title} in ${colour.toLowerCase()}` : p.title)
     const list = [
@@ -89,6 +98,7 @@ export function ProductPurchase({
       view: { slug: p.slug, sku: variant.sku, title: p.title, option, image, unitPrice: price, madeToOrder: p.madeToOrder },
     })
     setAdded({ title: p.title, option, image, price })
+    track('AddToCart', { contents: [{ id: variant.id, quantity: 1, item_price: price }], contentName: p.title, value: price })
   }
 
   const waMessage = `Hi Heartwell, I have a question about the ${p.title} (${option}): ${SITE_URL}${productHref(p.slug, variant?.sku, fabric?.fabric.code)}`

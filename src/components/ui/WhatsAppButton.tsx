@@ -9,6 +9,7 @@ import { useRef, type ReactNode } from 'react'
 import { CONTACT, whatsAppHref } from '@/config/contact'
 import { visitIds } from '@/lib/basket/store'
 import { mintReference, platformOf, whatsAppLaunch, withReference } from '@/lib/whatsapp/handoff'
+import { track } from '@/lib/tracking/browser'
 
 /** The last reference, kept on the device for 30 days so a later order can be linked to the chat. */
 const LAST_REFERENCE = 'hw-wa-ref'
@@ -44,6 +45,8 @@ export function WhatsAppButton({ message, context, productId, variantId, product
       if (!prepared.current.sent) {
         prepared.current.sent = true
         saveEnquiry({ reference, context, productId, variantId, productName })
+        // Meta's "contacted the business" event, once per reference.
+        track('Contact', { ...(variantId ? { contentIds: [variantId] } : {}), ...(productName ? { contentName: productName } : {}) })
       }
     }
 

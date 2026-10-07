@@ -1590,11 +1590,14 @@ export type Database = {
           paid_offer_days: number
           preferred_date_max_days: number
           preferred_date_min_days: number
+          purchase_hold_minutes: number
+          purchase_mode: string
           removal_default_seats: number
           removal_max_seats: number
           removal_min_seats: number
           removal_per_seat: number
           sample_limit: number
+          tracking_mode: string
           updated_at: string
           upstairs_first_floor: number
           upstairs_per_extra_floor: number
@@ -1612,11 +1615,14 @@ export type Database = {
           paid_offer_days?: number
           preferred_date_max_days?: number
           preferred_date_min_days?: number
+          purchase_hold_minutes?: number
+          purchase_mode?: string
           removal_default_seats?: number
           removal_max_seats?: number
           removal_min_seats?: number
           removal_per_seat?: number
           sample_limit?: number
+          tracking_mode?: string
           updated_at?: string
           upstairs_first_floor?: number
           upstairs_per_extra_floor?: number
@@ -1634,14 +1640,59 @@ export type Database = {
           paid_offer_days?: number
           preferred_date_max_days?: number
           preferred_date_min_days?: number
+          purchase_hold_minutes?: number
+          purchase_mode?: string
           removal_default_seats?: number
           removal_max_seats?: number
           removal_min_seats?: number
           removal_per_seat?: number
           sample_limit?: number
+          tracking_mode?: string
           updated_at?: string
           upstairs_first_floor?: number
           upstairs_per_extra_floor?: number
+        }
+        Relationships: []
+      }
+      tracking_log: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          event_name: string
+          id: number
+          is_test: boolean
+          mode: string
+          payload: Json | null
+          platform: string
+          response: Json | null
+          source: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          event_name: string
+          id?: never
+          is_test?: boolean
+          mode: string
+          payload?: Json | null
+          platform: string
+          response?: Json | null
+          source: string
+          status: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          event_name?: string
+          id?: never
+          is_test?: boolean
+          mode?: string
+          payload?: Json | null
+          platform?: string
+          response?: Json | null
+          source?: string
+          status?: string
         }
         Relationships: []
       }
@@ -1817,6 +1868,10 @@ export type Database = {
         Returns: undefined
       }
       admin_delete_product: { Args: { p_product_id: string }; Returns: Json }
+      admin_outbox_action: {
+        Args: { p_action: string; p_id: string }
+        Returns: Json
+      }
       admin_review_request: { Args: { p_order_id: string }; Returns: Json }
       admin_save_product: { Args: { p: Json }; Returns: Json }
       admin_status: { Args: never; Returns: Json }
@@ -1835,6 +1890,14 @@ export type Database = {
       }
       clean_text: { Args: { p_max: number; p_text: string }; Returns: string }
       confirm_order: { Args: { p_order_id: string }; Returns: Json }
+      conversions_due: {
+        Args: { p_limit: number; p_ticket: string }
+        Returns: Json
+      }
+      conversions_report: {
+        Args: { p_results: Json; p_ticket: string }
+        Returns: Json
+      }
       create_whatsapp_enquiry: { Args: { p_input: Json }; Returns: Json }
       delete_test_order: { Args: { p_order_id: string }; Returns: Json }
       health_ping: { Args: never; Returns: Json }

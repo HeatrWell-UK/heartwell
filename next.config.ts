@@ -9,13 +9,19 @@ const indexable = process.env.SITE_INDEXABLE === 'true' && process.env.NEXT_PUBL
  * 'unsafe-inline' for scripts is required by Next.js' inline bootstrap without
  * nonces; 'unsafe-eval' only in development (React Refresh).
  */
+// Meta Pixel and GA4 (Phase 14). They load only on the live domain, after
+// consent where it's needed (src/components/tracking/Tracking.tsx); these lines
+// just let them work when they do.
+const META = 'https://connect.facebook.net https://www.facebook.com'
+const GOOGLE = 'https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com'
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isProd ? '' : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline'${isProd ? '' : " 'unsafe-eval'"} https://connect.facebook.net https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://res.cloudinary.com",
+  `img-src 'self' data: blob: https://res.cloudinary.com ${META} ${GOOGLE}`,
   "font-src 'self' data:",
-  "connect-src 'self'",
+  `connect-src 'self' ${META} ${GOOGLE}`,
   "media-src 'self' https://res.cloudinary.com",
   "frame-src 'none'",
   "object-src 'none'",

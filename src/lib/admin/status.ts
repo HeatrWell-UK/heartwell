@@ -225,15 +225,21 @@ export function buildStatusChecks(
   })
 
   // Tracking
+  const trackingMode = String(data.settings.tracking_mode ?? 'dry_run')
   checks.push({
     key: 'tracking',
     title: 'Meta and Google tracking',
-    level: !ctx.trackingConfigured ? 'warn' : data.conversions.failed > 0 ? 'error' : 'ok',
-    summary: !ctx.trackingConfigured
-      ? 'Not set up yet (Phase 14). Nothing is sent to Meta or Google.'
-      : data.conversions.failed > 0
-        ? `${data.conversions.failed} conversions failed to send.`
-        : `Working. Last conversion sent ${when(data.conversions.last_sent)}.`,
+    level: data.conversions.failed > 0 ? 'error' : ctx.trackingConfigured && trackingMode === 'live' ? 'ok' : 'warn',
+    summary:
+      data.conversions.failed > 0
+        ? `${data.conversions.failed} conversion${data.conversions.failed === 1 ? '' : 's'} failed to send. See Tracking.`
+        : !ctx.trackingConfigured
+          ? 'Not connected yet: events are built and checked (dry run) but nothing reaches Meta or Google. See Tracking.'
+          : trackingMode === 'live'
+            ? `Live. Last conversion sent ${when(data.conversions.last_sent)}.`
+            : trackingMode === 'test'
+              ? 'Connected, in test mode: events go to Meta’s Test events only.'
+              : 'Connected, in dry run: nothing is sent. Switch to Test or Live in Tracking.',
   })
 
   // OrderFlow
