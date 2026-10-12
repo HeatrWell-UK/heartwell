@@ -31,7 +31,7 @@ export default function PrivacyPage() {
     <ContentPage
       title="Privacy notice"
       intro={<p>We collect only what we need to sell and deliver your furniture and to run the shop well, and we never sell your details.</p>}
-      updated="2026-10-12"
+      updated="2026-10-13"
       contents={CONTENTS}
     >
       <h2 id="who">Who we are</h2>
@@ -64,7 +64,7 @@ export default function PrivacyPage() {
           own privacy policy.
         </li>
         <li>
-          <strong>Contact form:</strong> your name, contact details and message, to answer you.
+          <strong>Contact form:</strong> your name, contact details and message, to answer you, and your connection’s IP address and browser to stop misuse.
         </li>
         <li>
           <strong>Fabric samples:</strong> your name, contact details and address, to arrange and post them. We also note your connection’s IP address and
@@ -123,7 +123,8 @@ export default function PrivacyPage() {
       <h2 id="sharing">Who helps us</h2>
       <p>We share only what each needs, under contracts that protect it:</p>
       <ul>
-        <li>our delivery team and the order system they use, to deliver your order;</li>
+        <li>our delivery team, who need your name, phone number and address to deliver;</li>
+        <li>OrderFlow, the order system we use with them, which receives what you ordered, the total, your postcode and delivery day, but not your name or contact details;</li>
         <li>Supabase, which hosts our database in London;</li>
         <li>our website host, and Hostinger, which runs our email;</li>
         <li>Cloudinary, which stores and serves our photos and videos;</li>

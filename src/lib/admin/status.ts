@@ -22,7 +22,9 @@ export interface AdminStatusData {
   jobs: { job: string; status: string; started_at: string; finished_at: string | null; error: string | null }[]
   email: { last_sent: string | null; last_failed: string | null; failed_24h: number }
   conversions: { pending: number; failed: number; last_sent: string | null }
-  orderflow: { enabled: boolean; configured: boolean; last_push: string | null }
+  orderflow: { enabled: boolean; configured: boolean; last_push: string | null; last_ok?: string | null; failed_24h?: number; last_error?: string | null }
+  /** When Meta last fetched the catalogue feed (null until it has). */
+  feed?: { last_fetched: string; items: number } | null
 }
 
 /** One job's latest run, as the job itself reported it. */
@@ -63,6 +65,10 @@ export interface FeedFetchSummary {
   lastFetched: string | null
   items: number
 }
+
+/** The feed part of the status snapshot, as buildStatusChecks takes it. */
+export const feedSummary = (data: AdminStatusData | null): FeedFetchSummary | null =>
+  data ? { lastFetched: data.feed?.last_fetched ?? null, items: data.feed?.items ?? 0 } : null
 
 export function buildStatusChecks(
   ctx: StatusContext,
@@ -267,15 +273,21 @@ export function buildStatusChecks(
   }
 
   // OrderFlow
+  const of = data.orderflow
+  const failed = of.failed_24h ?? 0
   checks.push({
     key: 'orderflow',
     title: 'OrderFlow',
-    level: !data.orderflow.enabled ? 'warn' : data.orderflow.configured ? 'ok' : 'error',
-    summary: !data.orderflow.enabled
-      ? 'Off. It’s connected in Phase 17; until then orders stay here only.'
-      : data.orderflow.configured
-        ? `On. Last order sent ${when(data.orderflow.last_push)}.`
-        : 'Switched on, but the OrderFlow address or key is missing.',
+    level: !of.enabled ? 'warn' : !of.configured || failed > 0 ? 'error' : 'ok',
+    summary: !of.enabled
+      ? of.configured
+        ? 'Ready but switched off: orders stay here only. Send a test order, then switch it on in Settings.'
+        : 'Off: orders stay here only. Add OrderFlow’s address and key to Supabase Vault (docs/ORDERFLOW.md), then switch it on in Settings.'
+      : !of.configured
+        ? 'Switched on, but OrderFlow’s address or key is missing from Supabase Vault, so no orders are sent.'
+        : failed > 0
+          ? `${failed} ${failed === 1 ? 'order' : 'orders'} not accepted in the last 24 hours${of.last_error ? `: ${of.last_error}` : ''}. Each is tried again every 15 minutes.`
+          : `On. Last accepted ${when(of.last_ok ?? null)}.`,
   })
 
   return checks
