@@ -20,7 +20,8 @@ async function pingDatabase(): Promise<DatabaseState> {
 
 /**
  * For uptime monitoring: 200 when the site and its database answer, 503 when
- * the database doesn't. Phase 17 adds email, tracking and scheduled jobs.
+ * the database doesn't. /api/health/checks adds the hourly health check
+ * (email, OrderFlow, tracking, scheduled jobs).
  */
 export async function GET() {
   const database = await pingDatabase()

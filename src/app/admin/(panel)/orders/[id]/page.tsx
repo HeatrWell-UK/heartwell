@@ -15,6 +15,9 @@ import { formatDeliveryDate } from '@/lib/delivery/window'
 import { floorName } from '@/lib/delivery/pricing'
 import { SITE_URL } from '@/config/site'
 import { addNote, askForReview, changeStatus, deleteTestOrder, setAttribution, setTestFlag } from '../actions'
+import { sendToOrderFlow } from '../../settings/orderflow-actions'
+import { pushVerdict, type PushRow } from '@/lib/admin/orderflow'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = { title: 'Order' }
 export const dynamic = 'force-dynamic'
@@ -48,7 +51,7 @@ const EVENT_LABEL: Record<string, string> = {
 
 export default async function OrderPage({ params, searchParams }: Props) {
   const [{ id }, sp] = await Promise.all([params, searchParams])
-  const [order, pickers] = await Promise.all([getOrder(id), orderPickers()])
+  const [order, pickers, pushLog] = await Promise.all([getOrder(id), orderPickers(), (await createClient()).rpc('admin_orderflow_log', { p_order_id: id })])
   if (!order) notFound()
 
   const status = (isStatus(order.status) ? order.status : 'pending_cod') as OrderStatus
@@ -59,6 +62,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const ahead = stageAheadOfStatus({ status: order.status, confirmedAt: order.confirmed_at, processingAt: order.processing_at, shippedAt: order.shipped_at, deliveredAt: order.delivered_at })
   const view = toEmailData(order)
   const moved = sp.moved && isStatus(sp.moved) ? sp.moved : null
+  const pushes = ((pushLog.data ?? []) as unknown as (PushRow & { pushed_at: string; manual: boolean })[])
 
   const timeline: [string, string | null][] = [
     ['Placed', order.created_at],
@@ -266,6 +270,34 @@ export default async function OrderPage({ params, searchParams }: Props) {
           <CopyButton text={`${SITE_URL}/review/${order.review_token}`} label="Copy their review link" className="self-start" />
         </section>
       )}
+
+      <section aria-labelledby="orderflow" className={`${card} flex flex-col gap-2`}>
+        <h2 id="orderflow" className="font-semibold">
+          OrderFlow
+        </h2>
+        {pushes.length > 0 ? (
+          <ul className="flex flex-col gap-1 text-sm">
+            {pushes.map((p) => {
+              const v = pushVerdict(p)
+              return (
+                <li key={p.pushed_at} className={v.tone === 'bad' ? 'text-red-700' : v.tone === 'wait' ? 'text-amber-700' : 'text-zinc-700'}>
+                  {dualTime(p.pushed_at)?.uk}: {v.text}
+                  {p.manual ? ' (sent by hand)' : ''}
+                </li>
+              )
+            })}
+          </ul>
+        ) : (
+          <p className="text-sm text-zinc-600">
+            {order.is_test ? 'Test orders aren’t sent to OrderFlow automatically.' : 'Not sent yet. Real orders go automatically once OrderFlow is switched on in Settings.'}
+          </p>
+        )}
+        <ActButton
+          act={sendToOrderFlow.bind(null, order.id)}
+          label={order.is_test ? 'Send to OrderFlow (marked TEST)' : 'Send to OrderFlow now'}
+          confirm={order.is_test ? 'This is a test order. Send it to OrderFlow marked TEST? Delete it there afterwards.' : undefined}
+        />
+      </section>
 
       <section aria-labelledby="timeline" className={card}>
         <h2 id="timeline" className="mb-3 font-semibold">
