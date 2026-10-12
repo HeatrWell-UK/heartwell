@@ -463,7 +463,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | 10 | A postcode-to-address lookup key for Heartwell (Homedata, as the sister uses, or Ideal Postcodes / getAddress.io) | Phase 10 |
 | 11 | **Customer phone number** (shown on the site, click-to-call) | Phase 10 |
 | 12 | **WhatsApp Business number** (a UK mobile) | Phase 10 |
-| 13 | OrderFlow: the ingest URL and a **new key for Heartwell**, and whether OrderFlow can display a shop/brand field (else the HW- prefix is the tag) | Phase 17 |
+| 13 | OrderFlow: the ingest URL and a **new key for Heartwell**. Their spec and a key arrived in chat on 13 October 2026; the real address (their project’s URL) is still to come. Still to do, by the owner: get the address and a fresh key, and put both in Supabase Vault (`docs/ORDERFLOW.md`); reply to OrderFlow with the statuses and sample in that file | Phase 17 / before go-live |
 | 14 | Meta: Business portfolio, Facebook Page, Instagram account, ad account; **Pixel/dataset ID**; a **Conversions API access token** (system user); a test event code | Phase 14 |
 | 15 | GA4: Measurement ID and a Measurement Protocol API secret | Phase 14 |
 | 16 | Commerce Manager catalogue created (my steps). Not yet: the feed is built ready to connect (Admin → Ad links) | When the Meta accounts exist |
@@ -471,7 +471,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | 18 | ~~**Visit us** address, opening hours, appointment rules~~ Done (Unit 4, Blacker Street, Burnley; 9am to 5pm; book a day ahead). Still wanted: which **days** you open, the postcode confirmed (BB10 2AF?), and photos or videos of the premises | Phase 16 / any time |
 | 19 | Legal trading details: company name, company number, registered office, VAT number (if registered), and whether Heartwell is a trading name of an existing company. Skipped in Phase 16; needed before go-live (they fill the footer, terms and privacy notice automatically) | Before Phase 19 |
 | 20 | Social profile links (Facebook, Instagram, TikTok if any). The owner will send them at the end | Before Phase 19 |
-| 21 | UptimeRobot (free) account, if you approve D8 | Phase 17 |
+| 21 | UptimeRobot (free) account, if you approve D8. Steps in `docs/MONITORING.md`; set up at go-live | Phase 19 |
 | 22 | Both Hostinger accounts available for about an hour | Phase 19 |
 | 23 | **Original photos of the Lily range** (7 pieces, 23 colourways): they're missing from the source library, so the import has none. Supplier or studio photos, any background | Phase 17A |
 
@@ -737,6 +737,14 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** one clearly marked order appears in OrderFlow tagged Heartwell (then you delete it there); turning off a setting on staging makes the Health card go red and sends an alert.
 - **Done means:** every integration reports its health.
+- **As built (13 October 2026).** OrderFlow sent its spec (JSON shape, deferred trigger, rounding, yyyy-MM-dd, Vault, 15-minute re-send, no customer details) and its key in the chat; secrets stay with the owner, so the key was not written anywhere by me (`docs/ORDERFLOW.md` has the owner's Vault steps and asks for a fresh key).
+  - **OrderFlow** (migrations `orderflow_monitoring`, `orderflow_fabric_variant`): Phase 4's deferred trigger (sends at commit, with the items) and update trigger kept; payload now matches their spec exactly (`placed_at` as `…Z`, two-decimal money, `delivery_date` yyyy-MM-dd or left out, the full fabric label for made-to-order lines, no customer fields). Replies are recorded from pg_net onto `orderflow.push_log` (status, outcome, error); a push with no reply after 5 hours is marked lost. The 15-minute job records replies, then re-sends only orders changed in 3 days that OrderFlow hasn't accepted since their last change. Real orders only automatically; any order can be sent by hand (test orders arrive as `TEST HW-…`). Admin → Settings → **OrderFlow** (connected?, on/off, send the latest test order, latest sends with OrderFlow's answers) and an OrderFlow section on every order page (its sends, Send now). The Status check goes red when switched on without Vault values or when an order isn't accepted. The leak check now refuses OrderFlow keys.
+  - **Status snapshot:** `private.status_data()` is now the one source for the admin Status/Home pages and the hourly check (adds OrderFlow replies and the feed's last fetch).
+  - **Hourly health check** (`heartwell-health-check`, 7 past each hour): the website rebuilds the Health card's verdicts from the snapshot; red ones go to `private.alerts`, which decides what to email: each problem once, again after a day if still red, and once when fixed (one email to the shop inbox and copy, `[staging]` outside production).
+  - **`/api/health/checks`** for UptimeRobot: 503 when anything is red or the hourly check has stopped (over 2h15m), counts only. Steps in `docs/MONITORING.md` (D8: the owner sets it up at go-live).
+  - **Monday digest** (`heartwell-monday-digest`, Mondays 07:00 UTC): last Monday–Sunday (UK time): confirmed orders and value against the week before, placed/delivered/cancelled/awaiting, confirmed orders by Meta ads (campaign and ad), Google ads, WhatsApp, phone, other links or direct, visits (and from Meta ads), enquiries and leads, top landing pages with orders. Real orders only.
+  - Data-retention jobs were done in Phase 16 (migration `retention`). The privacy notice now describes OrderFlow exactly (items, total, postcode and delivery day only) and the contact form's abuse protection.
+  - Checked in rolled-back transactions on staging: no Vault values → nothing sent; with dummy values an automatic push of a real order is logged, an accepted reply stops the re-send, a 401 is recorded ("OrderFlow refused the key"), counted on the Status card and re-sent; alerts email once, stay quiet the next hour and report "fixed" when cleared; the digest's week is Monday 5 to Sunday 11 October; visitors can't call any of the new admin or snapshot functions.
 
 ---
 

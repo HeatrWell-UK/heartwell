@@ -1898,6 +1898,10 @@ export type Database = {
         Returns: undefined
       }
       admin_delete_product: { Args: { p_product_id: string }; Returns: Json }
+      admin_orderflow: { Args: never; Returns: Json }
+      admin_orderflow_collect: { Args: never; Returns: number }
+      admin_orderflow_log: { Args: { p_order_id: string }; Returns: Json }
+      admin_orderflow_push: { Args: { p_order_id: string }; Returns: Json }
       admin_outbox_action: {
         Args: { p_action: string; p_id: string }
         Returns: Json
@@ -1930,7 +1934,14 @@ export type Database = {
       }
       create_whatsapp_enquiry: { Args: { p_input: Json }; Returns: Json }
       delete_test_order: { Args: { p_order_id: string }; Returns: Json }
+      digest_data: { Args: { p_ticket: string }; Returns: Json }
       health_ping: { Args: never; Returns: Json }
+      health_report: {
+        Args: { p_problems: Json; p_ticket: string }
+        Returns: Json
+      }
+      health_snapshot: { Args: { p_ticket: string }; Returns: Json }
+      health_state: { Args: never; Returns: Json }
       import_catalogue: { Args: { p: Json; p_update?: boolean }; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       issue_paid_offer_entitlement: {

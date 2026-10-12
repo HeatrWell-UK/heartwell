@@ -62,6 +62,7 @@ describe('leak scanner', () => {
     expect(categories(`${'-----BEGIN '}PRIVATE KEY-----`)).toEqual(['secret'])
     expect(categories(`${'ey' + 'J'}${fake}.${'ey' + 'J'}${fake}.${fake}`)).toEqual(['secret'])
     expect(categories(`token=${'EA' + 'A'}${'B'.repeat(40)}`)).toEqual(['secret'])
+    expect(categories(`x-orderflow-key: ${'ofw_' + 'live_'}${'aB3'.repeat(10)}`)).toEqual(['secret'])
   })
 
   it('leaves publishable keys and variable names alone', () => {

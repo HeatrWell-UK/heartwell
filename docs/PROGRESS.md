@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 16 (content, policies and trust pages) built and on the staging link, waiting for approval (12 October 2026). Phase 15 approved and merged into `main`. |
+| **Current phase** | Phase 17 (OrderFlow, monitoring and the Monday digest) built and on the staging link, waiting for approval (13 October 2026). OrderFlow is ready and switched off until its address and key are in Supabase Vault. Phase 16 approved and merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 17: OrderFlow, monitoring and the Monday digest. Order from here: 17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 16 approved. Phase 17 — OrderFlow and monitoring. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17. OrderFlow URL and Heartwell key: <set in the Vercel project / given here>. UptimeRobot: <yes / no>.` |
+| **Next phase** | Phase 17A: product photo pilot. Order from here: 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 17 approved. Phase 17A — Photo pilot. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -21,7 +21,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Hosting account: Hostinger **Business Web Hosting**, 2 Node.js app slots free (the other 3 are used/in preview). Staging and production take both.
 - Domains (heartwellfurniture.co.uk, heartwellsofa.co.uk) are on the owner's separate Hostinger account. heartwellsofa.co.uk email must keep working.
 - Customer email: enquiries@heartwellsofa.co.uk (one setting).
-- OrderFlow: the **same** OrderFlow as the sister shop, with its own key; Heartwell orders are tagged (HW- references).
+- OrderFlow: the **same** OrderFlow as the sister shop, with its own key; Heartwell orders are tagged (HW- references). Pushed from the database (`orderflow` schema) once `orderflow_ingest_url` and `orderflow_ingest_key` are in Supabase Vault and it’s switched on in Admin → Settings; set-up and the reply OrderFlow asked for in `docs/ORDERFLOW.md`. Monitoring, alerts, the Monday digest and UptimeRobot steps: `docs/MONITORING.md`.
 - "Visit us": Heartwell's own address, Unit 4, Blacker Street, Burnley BB10 2AF (postcode to confirm), 9am to 5pm, by appointment booked a day ahead (owner, 12 October 2026; opening days to confirm). Set in `src/config/contact.ts`.
 - **Never mention the sister shop** on the Heartwell site (the owner chose to keep them separate).
 - Heartwell's Cloudinary (connected via MCP): Free plan, 25 credits/month (about 3.6 used by 4 Oct 2026). Folders: `heartwell/brand`, `heartwell/samples` (design photos), `heartwell/source/{variants,gallery,categories,fabrics}` (the 162 imported originals, tag `heartwell-source`, never edited), `heartwell/import` (the catalogue payload file, tag `heartwell-import`, catalogue data only; safe to delete). Uploads are signed with the `sign-upload` tool; the account's default preset makes them `overwrite: true`.
@@ -47,6 +47,16 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 13 October 2026 — Phase 17: OrderFlow, monitoring and the Monday digest
+- **Owner:** Phase 16 approved; merged into `main`. OrderFlow's integration spec arrived, with what looks like the live key pasted in the message. I didn't write the key anywhere (secrets are the owner's to add, in Supabase Vault); `docs/ORDERFLOW.md` asks for a fresh one, since this one has been in a chat. Their real ingest address wasn't in the message (it had a placeholder).
+- **OrderFlow:** most of it was built in Phase 4 (sends at commit so the items are never missing, never fails a sale, Vault, 15-minute re-send). Now it matches their spec exactly: `placed_at` in the form they want, money to 2 decimal places, `delivery_date` as yyyy-MM-dd or left out, no customer details, and the full fabric ("Blue, Plush Soft Velvet (PL09)") for made-to-order lines. OrderFlow's replies are recorded; the 15-minute job only re-sends orders it hasn't accepted since their last change. Admin → Settings → OrderFlow shows whether it's connected, switches it on and off, sends the latest test order (it arrives as `TEST HW-…`) and lists the latest sends with OrderFlow's answers; each order's page shows its own sends and has Send now. The Status page goes red if it's switched on without the Vault values or an order isn't accepted. The leak check now blocks OrderFlow keys.
+- **For OrderFlow** (they asked for these): the status list and a sample order are in `docs/ORDERFLOW.md`, ready to forward.
+- **Health check, every hour:** it works out the same red/amber/green as the Status page and emails the shop inbox when something turns red (once, again a day later if still red, and once when fixed). `/api/health/checks` gives UptimeRobot a 503 when anything is red or the check has stopped; steps in `docs/MONITORING.md`.
+- **Monday digest:** every Monday at 7am, last week's confirmed orders and value against the week before, where they came from (Meta campaign and ad, Google, WhatsApp, phone, direct), visits and enquiries, and the top landing pages. Real orders only.
+- **Database:** migrations `orderflow_monitoring`, `health_state` and `orderflow_fabric_variant` (both projects, versions aligned, advisors clean). Checked in rolled-back transactions: without Vault values nothing is sent; with dummy values a real order's push is logged, an accepted reply stops the re-send, a refused key is recorded, shown on the Status card and retried; alerts email once and then report "fixed"; the digest covers Monday to Sunday UK time; visitors can't reach any of the new functions.
+- **Checked:** `npm run verify` passes (436 tests).
+- **Waiting on the owner:** approve Phase 17. Get OrderFlow's real address and a fresh key, add both to Supabase Vault (staging to test, production for go-live), then Admin → Settings → OrderFlow → Send test order, check it arrived as `TEST HW-…` and delete it there. Forward the status list and sample in `docs/ORDERFLOW.md` to OrderFlow. **Tick Preview on `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD`**: without them staging can't send the alert or the digest. At go-live: UptimeRobot (`docs/MONITORING.md`).
 
 ### 12 October 2026 — Phase 16: content, policies and trust pages
 - **Owner:** Phase 15 approved; merged into `main`. Visit us: Unit 4, Blacker Street, Burnley, 9am to 5pm, appointments booked a day ahead. Company details skipped for now; social links to come at the end.

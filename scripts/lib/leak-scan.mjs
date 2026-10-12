@@ -32,6 +32,7 @@ const SECRET_PATTERNS = [
   ['Cloudinary URL with API secret', /cloudinary:\/\/\d+:[A-Za-z0-9_-]+@/],
   ['Anthropic API key', /\bsk-ant-[A-Za-z0-9_-]{20,}/],
   ['GitHub token', /\b(?:ghp|gho|ghs|ghu|github_pat)_[A-Za-z0-9_]{20,}/],
+  ['OrderFlow ingest key', /\bofw_(?:live|test)_[A-Za-z0-9]{16,}/],
 ]
 
 /** Lower-case words and numbers, everything else dropped. */

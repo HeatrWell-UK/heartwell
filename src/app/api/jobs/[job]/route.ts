@@ -5,7 +5,13 @@
 // a ticket works once, for one job, for 15 minutes.
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { SMTP_CONFIGURED } from '@/config/email'
+import { EMAIL, SMTP_CONFIGURED } from '@/config/email'
+import { APP_ENV } from '@/config/env'
+import { sendEmail } from '@/lib/email/send'
+import { buildStatusChecks, feedSummary, type AdminStatusData } from '@/lib/admin/status'
+import { statusContext } from '@/lib/admin/status-context'
+import { alertEmail, problemsFrom, type AlertNotice } from '@/lib/monitoring/alerts'
+import { digestEmail, type DigestData } from '@/lib/reports/digest'
 import { createPublicClient } from '@/lib/supabase/public'
 import { sendReviewRequest, type ReviewRequestRow } from '@/lib/leads/notify'
 import type { Database, Json } from '@/types/database'
@@ -62,7 +68,40 @@ async function conversions(db: SupabaseClient<Database>, ticket: string): Promis
   return { status: failed > 0 && sent === 0 ? 'failed' : 'ok', detail: { due: rows.length, sent, failed, closed: count('skipped'), mode: setting } }
 }
 
-const JOBS: Record<string, Job> = { 'review-requests': reviewRequests, conversions }
+/**
+ * Every hour: the Health card's own verdicts, worked out here from the
+ * database's snapshot. Red ones are reported to the database, which says
+ * which are new (or still red a day later) and which have been fixed; those
+ * go to the shop in one email.
+ */
+async function healthCheck(db: SupabaseClient<Database>, ticket: string): Promise<Outcome> {
+  const snapshot = await db.rpc('health_snapshot', { p_ticket: ticket })
+  if (snapshot.error) throw new Error(snapshot.error.message)
+  const data = snapshot.data as unknown as AdminStatusData
+  const problems = problemsFrom(buildStatusChecks(statusContext(), data, null, feedSummary(data)))
+  const report = await db.rpc('health_report', { p_ticket: ticket, p_problems: problems as unknown as Json })
+  if (report.error) throw new Error(report.error.message)
+  const { notify, resolved } = report.data as unknown as { notify: AlertNotice[]; resolved: { key: string; title: string }[] }
+  let emailed: 'sent' | 'failed' | 'skipped' | 'nothing new' = 'nothing new'
+  if (notify.length > 0 || resolved.length > 0) {
+    const email = alertEmail(notify, resolved, { statusUrl: `${SITE_URL}/admin/status`, appEnv: APP_ENV })
+    emailed = await sendEmail({ kind: 'health_alert', to: EMAIL.shopTo, cc: EMAIL.shopCopy, ...email, toCustomer: false })
+  }
+  return { status: 'ok', detail: { red: problems.map((p) => p.key), newly: notify.map((n) => n.key), fixed: resolved.map((r) => r.key), emailed } }
+}
+
+/** Monday morning: last week's orders, sources, enquiries and landing pages, to the shop. */
+async function mondayDigest(db: SupabaseClient<Database>, ticket: string): Promise<Outcome> {
+  if (!SMTP_CONFIGURED) return { status: 'skipped', detail: { reason: 'Email isn’t set up yet (SMTP_PASSWORD)' } }
+  const { data, error } = await db.rpc('digest_data', { p_ticket: ticket })
+  if (error) throw new Error(error.message)
+  const digest = data as unknown as DigestData
+  const email = digestEmail(digest, { adminUrl: `${SITE_URL}/admin`, appEnv: APP_ENV })
+  const sent = await sendEmail({ kind: 'monday_digest', to: EMAIL.shopTo, cc: EMAIL.shopCopy, ...email, toCustomer: false })
+  return { status: sent === 'failed' ? 'failed' : 'ok', detail: { confirmed: Number(digest.orders.confirmed), sent } }
+}
+
+const JOBS: Record<string, Job> = { 'review-requests': reviewRequests, conversions, 'health-check': healthCheck, 'monday-digest': mondayDigest }
 
 export async function POST(request: Request, { params }: { params: Promise<{ job: string }> }) {
   const { job } = await params
