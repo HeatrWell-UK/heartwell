@@ -1,33 +1,55 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { VisitUs } from '@/components/home/VisitUs'
+import { addressLine, directionsHref, VisitUs } from '@/components/home/VisitUs'
 import { BRAND } from '@/config/brand'
-import { CONTACT } from '@/config/contact'
+import { CONTACT, visitBookingText, visitHoursText } from '@/config/contact'
 import { SITE_URL } from '@/config/site'
 import { jsonLdString } from '@/lib/product/seo'
 
-// The page exists once the owner supplies the address (Phase 16); until then it's a 404, never a placeholder.
+// The page exists only while there's an address (src/config/contact.ts); without one it's a 404, never a placeholder.
+const a = CONTACT.visitAddress
+
 export const metadata: Metadata = {
   title: 'Visit us',
+  description: a ? `See Heartwell’s sofas and fabrics at ${addressLine(a)}. ${visitHoursText()}. ${visitBookingText()}` : undefined,
   alternates: { canonical: '/visit-us' },
 }
 
 export default function VisitUsPage() {
-  const a = CONTACT.visitAddress
   if (!a) notFound()
+  const v = CONTACT.visit
   const business = {
     '@context': 'https://schema.org',
     '@type': 'FurnitureStore',
+    '@id': `${SITE_URL}/visit-us#store`,
     name: BRAND.name,
     url: SITE_URL,
-    address: { '@type': 'PostalAddress', streetAddress: a.street, addressLocality: a.locality, postalCode: a.postcode, addressCountry: 'GB' },
+    image: `${SITE_URL}/opengraph-image.jpg`,
+    email: CONTACT.email,
     ...(CONTACT.phoneE164 ? { telephone: CONTACT.phoneE164 } : {}),
-    ...(CONTACT.openingHours ? { openingHours: CONTACT.openingHours } : {}),
+    address: { '@type': 'PostalAddress', streetAddress: a.street, addressLocality: a.locality, postalCode: a.postcode, addressCountry: 'GB' },
+    hasMap: directionsHref(a),
+    // Days only once the owner confirms them; until then search engines get no hours rather than wrong ones.
+    ...(v.days.length ? { openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: v.days, opens: v.opens, closes: v.closes }] } : {}),
+    currenciesAccepted: 'GBP',
+    paymentAccepted: 'Cash, Bank transfer',
   }
   return (
-    <div className="mx-auto flex max-w-[46rem] flex-col gap-6 px-4 pb-16 pt-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[46rem] flex-col gap-8 px-4 pb-16 pt-6 lg:pt-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(business) }} />
       <VisitUs headingLevel="h1" />
+      <section aria-labelledby="before" className="hw-prose">
+        <h2 id="before">Before you come</h2>
+        <ul>
+          <li>Tell us which sofas you’d like to see when you book, and we’ll tell you what we can show you.</li>
+          <li>Bring the measurements of your room and the narrowest door on the way in. Our <Link href="/will-it-fit">measuring guide</Link> shows how.</li>
+          <li>A photo of your room helps when you’re choosing a fabric colour.</li>
+        </ul>
+        <p>
+          Can’t get to {a.locality}? Everything can be done online or on WhatsApp, and <Link href="/fabric-samples">fabric samples</Link> come by post.
+        </p>
+      </section>
     </div>
   )
 }

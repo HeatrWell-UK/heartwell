@@ -9,9 +9,10 @@ import { TelLink } from '@/components/tracking/TelLink'
 
 const linkClass = 'text-[15px] text-on-wine-link no-underline hover:text-white hover:underline'
 
-/** Wine footer with the gold logo. Contact and company lines appear only once set in config. */
+/** Wine footer with the gold logo. Contact, address and company lines appear only once set in config. */
 export function Footer({ shop }: { shop: NavSection[] }) {
   const t = CONTACT.trading
+  const a = CONTACT.visitAddress
   const tel = phoneHref()
   const year = new Date().getFullYear()
   return (
@@ -40,6 +41,11 @@ export function Footer({ shop }: { shop: NavSection[] }) {
             <a href={`mailto:${CONTACT.email}`} className={linkClass}>
               {CONTACT.email}
             </a>
+            {a && (
+              <Link href="/visit-us" className={linkClass}>
+                {a.street}, {a.locality} {a.postcode} <span className="text-on-wine-muted">(visits by appointment)</span>
+              </Link>
+            )}
           </div>
           <NewsletterSignup />
         </div>
