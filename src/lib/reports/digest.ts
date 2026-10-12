@@ -2,6 +2,7 @@
 // private.digest_data (real orders only, Monday to Sunday UK time). Pure, so
 // the figures and wording are tested.
 
+import { envLabel } from '@/config/env'
 import { formatPrice, ukDate } from '@/lib/format'
 import { button, C, escapeHtml, h, layout, p, type RenderedEmail } from '@/lib/email/layout'
 
@@ -50,7 +51,7 @@ export function digestEmail(raw: DigestData, opts: { adminUrl: string; appEnv: s
   const confirmed = n(o.confirmed)
   const value = n(o.confirmed_value)
   const week = weekLabel(raw)
-  const where = opts.appEnv === 'production' ? '' : `[${opts.appEnv}] `
+  const where = opts.appEnv === 'production' ? '' : `[${envLabel(opts.appEnv)}] `
   const subject = `${where}Last week at Heartwell: ${confirmed} ${confirmed === 1 ? 'order' : 'orders'} confirmed, ${formatPrice(value)}`
   const f = raw.funnel
 

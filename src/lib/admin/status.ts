@@ -110,7 +110,7 @@ export function buildStatusChecks(
     summary:
       ctx.appEnv === 'production'
         ? 'Live settings.'
-        : 'Staging settings: hidden from search engines, tracking off, test orders only.',
+        : 'Pre-launch: hidden from search engines, tracking off, orders are tests and customer emails go to the test inbox.',
     details: [
       { label: 'Environment', value: ctx.appEnv },
       { label: 'Site address', value: ctx.siteUrl },

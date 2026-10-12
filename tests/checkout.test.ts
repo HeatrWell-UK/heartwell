@@ -76,7 +76,7 @@ describe('checkout input', () => {
   })
 
   it('marks every order outside production as a test, and test details in production', () => {
-    expect(testReason({ name: 'Ann Smith', email: 'ann@example.co.uk' }, 'staging')).toBe('placed on staging')
+    expect(testReason({ name: 'Ann Smith', email: 'ann@example.co.uk' }, 'staging')).toBe('placed before launch')
     expect(testReason({ name: 'Ann Smith', email: 'ann@example.co.uk' }, 'production')).toBeNull()
     expect(testReason({ name: 'Test Order', email: '' }, 'production')).toBe('test details')
     expect(testReason({ name: 'Ann', email: 'someone@example.com' }, 'production')).toBe('test details')

@@ -3,6 +3,7 @@
 // never disagree. Pure: tested without a database or a mailbox.
 
 import type { StatusCheck } from '@/lib/admin/status'
+import { envLabel } from '@/config/env'
 import { button, C, escapeHtml, h, layout, p, type RenderedEmail } from '@/lib/email/layout'
 
 export interface Problem {
@@ -28,7 +29,7 @@ const ukTime = (iso: string) =>
 
 /** One email: what's broken (new, or still broken a day later), and what's been fixed since the last one. */
 export function alertEmail(notify: AlertNotice[], resolved: { key: string; title: string }[], opts: { statusUrl: string; appEnv: string }): RenderedEmail {
-  const where = opts.appEnv === 'production' ? '' : `[${opts.appEnv}] `
+  const where = opts.appEnv === 'production' ? '' : `[${envLabel(opts.appEnv)}] `
   const subject =
     notify.length > 0
       ? `${where}Heartwell needs attention: ${notify.map((n) => n.title).join(', ')}`

@@ -90,7 +90,7 @@ describe('alerts', () => {
 
   it('says when everything is back to normal, and marks staging', () => {
     const email = alertEmail([], [{ key: 'email', title: 'Email' }], { statusUrl: 'https://x.test/admin/status', appEnv: 'staging' })
-    expect(email.subject).toBe('[staging] Heartwell is back to normal: Email')
+    expect(email.subject).toBe('[pre-launch] Heartwell is back to normal: Email')
   })
 
   it('keeps the uptime monitor green only while nothing is red and the check still runs', () => {
@@ -140,7 +140,7 @@ describe('Monday digest', () => {
   it('reads well in a quiet week', () => {
     const quiet = { ...digest, orders: { ...digest.orders, confirmed: 0, confirmed_value: 0, prev_confirmed: 0, prev_confirmed_value: 0 }, channels: [], landing: [] }
     const email = digestEmail(quiet, { adminUrl: 'https://x.test/admin', appEnv: 'staging' })
-    expect(email.subject).toBe('[staging] Last week at Heartwell: 0 orders confirmed, £0')
+    expect(email.subject).toBe('[pre-launch] Last week at Heartwell: 0 orders confirmed, £0')
     expect(email.text).not.toContain('Where confirmed orders came from')
   })
 })

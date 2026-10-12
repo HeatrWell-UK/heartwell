@@ -15,7 +15,7 @@ When you're ready, say so and we'll go through this together, screen by screen (
 | Purchase | From the server only, when the customer **confirms**, once per order, 30 minutes later (Send now / Hold / Don't send in Admin → Tracking). Value = the database's total including delivery extras. OrderDelivered follows on delivery. |
 | Customer details | Hashed email, phone, name, postcode and our visitor ID on server events. IP address, browser and Meta's cookies only for customers who accepted (decision D10). Never order numbers, links or raw postcodes. |
 | GA4 | Consent Mode (no cookies until accepted), addresses redacted; purchases sent from the server so revenue matches the database. |
-| Never counts | Staging and previews, test orders, `?qa=1` visits, and devices excluded in Admin → Tracking → This device. |
+| Never counts | The site before go-live, test orders, `?qa=1` visits, and devices excluded in Admin → Tracking → This device. |
 | Your own record | Campaign tags (utm_), landing page and referring site on every order, WhatsApp enquiry and lead, for every visitor unless they switch it off. |
 
 ## What you'll create
@@ -35,7 +35,7 @@ When you're ready, say so and we'll go through this together, screen by screen (
 
 ## Where each value goes
 
-All in Vercel → the heartwell project → Settings → Environment Variables (and the same names on Hostinger after the move in Phase 18B). Tick **Production** and **Preview** for each, then redeploy.
+All in Vercel → the heartwell project → Settings → Environment Variables (and the same names on Hostinger after the move in Phase 18B). Tick **Production** for each, then redeploy.
 
 | Name | What | Sensitive? |
 | --- | --- | --- |
@@ -49,8 +49,8 @@ Admin → Tracking then shows a tick for each one (never the values).
 
 ## Switching on, in order
 
-1. **Dry run** (now): check Admin → Tracking → Recent events after browsing staging with cookies accepted.
-2. **Test**, on staging: set the mode to **Test**. Server events and test-order Purchases appear in Events Manager → **Test events**; GA4 purchases go to Google's checker. Nothing counts.
+1. **Dry run** (now): check Admin → Tracking → Recent events after browsing the site with cookies accepted.
+2. **Test**, before go-live: set the mode to **Test**. Server events and test-order Purchases appear in Events Manager → **Test events**; GA4 purchases go to Google's checker. Nothing counts.
 3. **At go-live** (Phase 19, on heartwellfurniture.co.uk with `NEXT_PUBLIC_APP_ENV=production`): stay on **Test** and browse the live site through Events Manager's test link. Each event should show from both **Browser** and **Server**, deduplicated. Then switch to **Live**.
 4. **In your ads**: use a link from the admin's **Ad links** page as the website address, and paste the URL parameters from the same page into every ad, so every sale shows its campaign and ad in the admin and ad visitors get the ad offer.
 

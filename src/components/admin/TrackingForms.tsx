@@ -11,7 +11,7 @@ import { OutcomeNote, primaryButton, secondaryButton, TextField, type Outcome } 
 const MODES: { value: TrackingMode; title: string; body: string }[] = [
   { value: 'dry_run', title: 'Dry run', body: 'Every event is built and shown below, and nothing is sent anywhere. Safe at any time.' },
   { value: 'test', title: 'Test', body: 'Events go to Meta’s Test events tab and GA4’s checker only. Nothing counts towards ads or reports.' },
-  { value: 'live', title: 'Live', body: 'Real events from the live site. Staging, test orders, QA links and staff devices still never count.' },
+  { value: 'live', title: 'Live', body: 'Real events from the live site. Test orders, QA links and staff devices still never count.' },
 ]
 
 export function TrackingSettingsForm({ initial }: { initial: { mode: TrackingMode; purchaseMode: 'automatic' | 'manual'; holdMinutes: number } }) {

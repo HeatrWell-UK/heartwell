@@ -31,8 +31,8 @@ This document is the single plan for the whole project. Every build session star
 
 - **One phase per prompt.** Each phase below has the exact prompt to send. If a phase turns out too big, I split it and update this plan.
 - **Order:** Step 1 study (done) → Step 2 this plan (needs your approval) → Step 3 design (needs your approval) → build phases. No application code is written before the plan and the design are approved.
-- **Preview links.** The design phase is shown as a private claude.ai page you can open on your phone. From the first build phase onwards, every phase goes onto the **staging site**: a Vercel preview link while we build, Hostinger's staging app from Phase 18B. It's open to anyone with the link and never indexed.
-- **At the end of every build phase** I put it on the staging link, give you a short phone checklist, update `docs/PROGRESS.md`, and remind you of the next prompt.
+- **One site** (changed 13 October 2026, your decision). Every phase goes straight onto the one site (heartwellfurniture.vercel.app while we build, Hostinger from Phase 18B, heartwellfurniture.co.uk from go-live). Until go-live it's in pre-launch mode: hidden from search engines, every order a test, customer emails to you, no tracking. There's no staging copy and no approval step: you trust the work.
+- **At the end of every build phase** I tell you what I did, what I need from you, what to check on the site (a short phone list) and what's next (the next prompt), and update `docs/PROGRESS.md`.
 - **I don't demo for the sake of it.** I verify that builds, type checks and tests pass; I don't send screenshots of everything.
 - **Suggestions.** Wherever I see a better way than the sister shop, I say so and explain why. You decide.
 
@@ -103,17 +103,20 @@ Not carried over: next-pwa / service worker (it broke the sister's image loading
 
 ### 3.2 Environments
 
+**Changed 13 October 2026 (owner's decision): one site, one database, no staging and no approval step.**
+
 | Environment | Where | Data | Tracking | Who sees it |
 | --- | --- | --- | --- | --- |
-| Local | My machine | Staging database | Off | Me |
-| **Staging** (preview link) | Branch `staging`. Vercel preview while we build; Hostinger Node.js app #1 from Phase 18B | Staging database | Off (optional Meta test mode, see 7.6) | Anyone with the link, `noindex` |
-| **Production** | Branch `main`. Vercel production while we build (run with staging settings, so nothing counts); Hostinger Node.js app #2 at heartwellfurniture.co.uk from Phase 18B | Production database (from Phase 18B) | On (production host only) | Everyone, after go-live |
+| Local | My machine | The one database | Off | Me |
+| **The site** | Branch `main`. Vercel (heartwellfurniture.vercel.app) while we build; one Hostinger Node.js app from Phase 18B; heartwellfurniture.co.uk from go-live | The one Supabase project (`jfacgarejzvpuitiuvrk`) | Off until go-live, then on (production host only) | Anyone with the link, `noindex` until go-live; everyone after |
 
-Your Business plan has two free Node.js app slots, which is exactly this. A third environment would need an upgrade to Cloud Startup (10 apps). Until Phase 18B both slots stay free.
+Until go-live the site runs in **pre-launch mode** (`NEXT_PUBLIC_APP_ENV=staging`): hidden from search engines, every order a test order, customer emails redirected to the owner's test inbox, no tracking. The owner checks each phase on the real site; nothing there counts until Phase 19 switches the site to production.
+
+One Hostinger Node.js app is used; the second slot stays free.
 
 ### 3.3 Database
 
-- **Two Supabase projects** in London (eu-west-2): `heartwell-prod` and `heartwell-staging`. Test orders never touch real data.
+- **One Supabase project** in London (eu-west-2): `jfacgarejzvpuitiuvrk` (named heartwell-staging until the owner renames it; changed 13 October 2026, the empty heartwell-prod project is retired). Test orders are flagged `is_test` and never count.
 - **All schema changes are migration files in `supabase/migrations/`**, applied to both. Never edited in the dashboard.
 - **Money rules stay in Postgres:** `place_order`, `confirm_order`, `order_for_confirmation`, `track_order`, `place_manual_order`, `update_order_details`, `request_swatches`, the offer calculator, review stats.
 - **Improvement:** delivery prices, the preferred-date window and offer tier amounts move into a `shop_settings` table that both the database functions and the website read. The sister shop keeps them in two places (TypeScript and SQL) and relies on a mismatch error to notice drift. With one table, the owner can change a price in the admin and it changes everywhere.
@@ -150,7 +153,7 @@ Jobs: conversion sending (every 5 min), OrderFlow re-send (every 15 min), review
 
 - Sent through Hostinger SMTP, logged in as `enquiries@heartwellsofa.co.uk` and shown as `orders@heartwellsofa.co.uk` (an alias you create), with replies to `enquiries@`. The address and the email domain are **one setting each**, so moving email to heartwellfurniture.co.uk later is a one-line change.
 - Every send is written to `email_log` (type, status, error). Repeated failures raise an alert (3.9).
-- Staging never emails real customers: every staging email is redirected to your test inbox.
+- Before go-live the site never emails real customers: every customer email is redirected to your test inbox.
 
 ### 3.8 Tracking architecture (summary; details in section 7)
 
@@ -162,7 +165,7 @@ Jobs: conversion sending (every 5 min), OrderFlow re-send (every 15 min), review
 ### 3.9 Test traffic and "it's obvious when something breaks"
 
 - Tracking runs only when **both** the host is a production host **and** `APP_ENV=production`.
-- Orders have an `is_test` flag. It is set automatically on staging, for QA links (`?qa=1`) and for orders matching test patterns; the owner can also set it from the admin. Test orders never send conversions, never reach OrderFlow and are left out of reports.
+- Orders have an `is_test` flag. It is set automatically before go-live, for QA links (`?qa=1`) and for orders matching test patterns; the owner can also set it from the admin. Test orders never send conversions, never reach OrderFlow and are left out of reports.
 - **Improvement:** an "Exclude this device" switch in the admin stops your own phone's browsing from counting as customer activity.
 - **Improvement:** an admin **Health** card shows the last accepted Meta event, the last email sent, the last run of every scheduled job, OrderFlow push errors and the last time Meta fetched the catalogue feed, each green, amber or red with a plain-English reason. The health check emails you when something turns red, and a free external monitor (UptimeRobot, decision D8) alerts your phone if the site or the email/tracking checks go down. That covers the case where email itself is what broke.
 
@@ -395,8 +398,8 @@ You described WhatsApp clicks and sample requests as "leads". In Meta's terms a 
 
 ### 7.6 Testing without polluting data
 
-- Staging never loads the production Pixel and never sends live events.
-- During setup, a **Meta test mode** sends staging events to Events Manager's **Test events** tab only (using the test event code), so we can see browser and server copies arrive and deduplicate.
+- The pre-launch site never loads the production Pixel and never sends live events.
+- During setup, a **Meta test mode** sends events to Events Manager's **Test events** tab only (using the test event code), from the site, so we can see browser and server copies arrive and deduplicate.
 - QA links, test orders and excluded staff devices never count.
 
 ### 7.7 Domain verification
@@ -411,30 +414,28 @@ GA4 for site analytics, using Consent Mode v2 (defaults denied; cookieless pings
 
 ## 8. From GitHub to Vercel and Hostinger, preview links and domains
 
-### 8.1 Code flow while we build (Vercel)
+### 8.1 Code flow (one site)
 
 ```
-my work (feature branch) ──► staging branch ──► Vercel preview (auto-deploy on push) = your preview link
-                                    │  you approve the phase
-                                    ▼
-                              main branch ──► Vercel production (auto-deploy) = the approved build
+my work (local phase branch, verified) ──► main ──► the site (auto-deploy on push)
 ```
 
+- **Changed 13 October 2026:** no `staging` branch, no preview link and no approval step. Only `main` is pushed; Vercel's preview deployments are switched off, so the site is the only deployment.
 - Repository `HeatrWell-UK/heartwell`, **public until launch** (owner's decision, 4 October 2026), made private again in Phase 19. Public means anyone can read the code and the docs, so: no secrets in files (the leak check also blocks credential formats), no customer data in the repo, and GitHub's secret scanning and push protection stay on.
-- **Vercel is connected to the repository** (Vercel's GitHub app on HeatrWell-UK). Every push deploys: `staging` to the preview link, `main` to the approved build, any other branch to its own preview. Project `heartwell` (team "Heartwell"), Node 24, functions in London (`lhr1`).
-- The build runs the **leak and credential check first** (`prebuild`), so a leak fails the build and never deploys. TypeScript errors fail it too. Every push also runs GitHub Actions (lint, type check, tests, leak check, build); a red run means the deployment from that push needs fixing. The pre-commit hook runs the leak check locally as well.
+- **Vercel is connected to the repository** (Vercel's GitHub app on HeatrWell-UK). A push to `main` deploys the site. Project `heartwell` (team "Heartwell"), Node 24, functions in London (`lhr1`).
+- The build runs the **leak and credential check first** (`prebuild`), so a leak fails the build and never deploys. TypeScript errors fail it too. Every push also runs GitHub Actions (lint, type check, tests, leak check, build). The pre-commit hook runs the leak check locally as well.
 - Environment variables live in the Vercel project; `.env.example` lists the names, and secrets are never committed.
-- **Why Vercel for now:** nothing to set up, a fresh preview after every push, and both Hostinger slots stay free. Vercel's free Hobby plan is for non-commercial use only, so it hosts the build, never the live shop.
+- **Why Vercel for now:** nothing to set up and the Hostinger slots stay free. Vercel's free Hobby plan is for non-commercial use only, so it hosts the build, never the live shop.
 - **Kept portable:** the code reads its own `APP_ENV`, never Vercel's variables; scheduled jobs run from Supabase pg_cron, not Vercel Cron; origins come from forwarded headers (`externalOrigin`). Moving host means copying environment variables, not changing code.
 
-### 8.2 Preview links
+### 8.2 The site's address while we build
 
-The `staging` branch has a fixed Vercel address (recorded in `docs/PROGRESS.md`). It's open to anyone with the link (your choice: no password), `noindex`, uses the staging database, sends its emails to you and has tracking off. It redeploys a minute or two after every push to `staging`. Every other branch also gets its own preview address. During the build, **both** Vercel environments run with `NEXT_PUBLIC_APP_ENV=staging`, so nothing on Vercel ever counts as the real shop.
+heartwellfurniture.vercel.app (recorded in `docs/PROGRESS.md`). Open to anyone with the link, `noindex`, pre-launch mode (see 3.2). Every build also has its own snapshot address on Vercel; those are protected by Vercel's login, so only the site's address is public.
 
 ### 8.3 Moving to Hostinger before ads and real orders (Phase 18B)
 
-- Create the two Hostinger Node.js apps (staging on `staging`, production on `main`) in the hosting account, copy the environment variables, and set production's `NEXT_PUBLIC_APP_ENV=production`.
-- Staging first: a full checkout test on Hostinger's temporary address, then production. Vercel stays as a fallback until the live domain has run on Hostinger for a week; then the Vercel project is deleted.
+- Create **one** Hostinger Node.js app on `main` in the hosting account and copy the environment variables (still pre-launch until Phase 19).
+- A full checkout test on Hostinger's temporary address. Vercel stays as a fallback until the live domain has run on Hostinger for a week; then the Vercel project is deleted.
 - **If you'd rather stay on Vercel:** the Pro plan ($20 a month) allows commercial use, and the code runs unchanged on either.
 
 ### 8.4 Domains (exact steps in Phase 19)
@@ -482,7 +483,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | # | Decision | My recommendation |
 | --- | --- | --- |
 | D1 | Purchase to Meta: **automatic** 30 min after confirmation (with Hold / Send now), or manual like the sister shop | **Automatic.** Faster learning for Meta, nothing forgotten, still protected by the hold window and test flags. |
-| D2 | Supabase production plan | **Pro ($25/month).** Free projects pause when idle and have no daily backups. Staging can stay free. |
+| D2 | Supabase production plan | **Pro ($25/month).** Free projects pause when idle and have no daily backups. (One project now, so one Pro plan.) |
 | D3 | Photo direction | **AI room scenes for every main photo** (updated after the design-phase test: the cut-out method fails on these images). Budget: two free months, or one month of Cloudinary Plus. |
 | D4 | Range names (Verona, Lily, …): keep, or give Heartwell its own names | **Decided 4 October 2026: keep.** They're the design names customers across the UK know. The title style is refreshed in Phase 17C. |
 | D5 | Logo wording and colours | Drop "SOFA" under the name (Heartwell will sell dining, wardrobes and beds), or use "FURNITURE". The concept's cream and caramel are close to the sister's cream and amber, which the brief rules out; we'll settle this in the design phase. |
@@ -795,7 +796,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 18 — Quality pass
 
 - **Goal:** fast, accessible, secure and clean before launch.
-- **Does:** speed audit on key pages (Web Vitals, images, JavaScript); WCAG 2.2 AA audit; in-app browser checklist (Facebook and Instagram on iPhone and Android); security review (RLS audit, Supabase advisors, headers, rate limits, secrets); full sister-leak audit; end-to-end checkout test on staging; British English proofread. Everything found is fixed; findings saved in `docs/QA-REPORT.md`.
+- **Does:** speed audit on key pages (Web Vitals, images, JavaScript); WCAG 2.2 AA audit; in-app browser checklist (Facebook and Instagram on iPhone and Android); security review (RLS audit, Supabase advisors, headers, rate limits, secrets); full sister-leak audit; end-to-end checkout test on the site; British English proofread. Everything found is fixed; findings saved in `docs/QA-REPORT.md`.
 - **Prompt:**
   ```
   Phase 18 — Quality pass. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 18.
@@ -808,21 +809,21 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 18B — Move to Hostinger
 
 - **Goal:** the shop runs on the hosting account before any ad money or real order touches it.
-- **Does:** creates the Hostinger staging and production Node.js apps on `staging` and `main` (section 8.3); copies environment variables and sets production's `NEXT_PUBLIC_APP_ENV=production`; checks forwarded-header origins, pg_cron jobs and SMTP from Hostinger; copies the finished catalogue from staging into production (catalogue tables only, never test orders; not by re-running the reference import, which would bring back the old titles); full checkout test on Hostinger staging; production app ready on its temporary address for Phase 19. Vercel stays as a fallback.
+- **Does:** creates one Hostinger Node.js app on `main` (section 8.3); copies environment variables (still pre-launch); points the database's scheduled jobs at the new address; checks forwarded-header origins, pg_cron jobs and SMTP from Hostinger; full checkout test on Hostinger's temporary address, ready for Phase 19. Vercel stays as a fallback. (Changed 13 October 2026: one site and one database, so there's no staging app and no catalogue copy.)
 - **Prepare:** item 3 in section 9.
 - **Prompt:**
   ```
   Phase 18B — Move to Hostinger. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 18B. I'm logged into hPanel on the hosting account and ready to follow your steps.
   ```
-- **Phone test:** open the Hostinger staging address; place and confirm a test order; the admin Health card is green.
-- **Done means:** both Hostinger apps redeploy on push, and staging on Hostinger behaves exactly as it did on Vercel.
+- **Phone test:** open the Hostinger address; place and confirm a test order; the admin Health card is green.
+- **Done means:** the Hostinger app redeploys on push and behaves exactly as the site did on Vercel.
 
 ---
 
 ### Phase 19 — Go-live
 
 - **Goal:** Heartwell is live.
-- **Does:** production settings; DNS steps (exact, by account); heartwellsofa.co.uk redirect with email untouched (verified before and after); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
+- **Does:** production settings (`NEXT_PUBLIC_APP_ENV=production`: the site leaves pre-launch mode, so test orders are cleared or kept flagged first); DNS steps (exact, by account); heartwellsofa.co.uk redirect with email untouched (verified before and after); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
 - **Prepare:** item 22.
 - **Prompt:**
   ```
@@ -854,7 +855,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 | --- | --- | --- |
 | Vercel Hobby | Free | Hosts the build only (non-commercial); replaced by Hostinger in Phase 18B. |
 | Hostinger Business (hosting account) | Already paid | Uses your 2 remaining Node.js slots from Phase 18B. |
-| Supabase | $25/month for production (recommended), staging free | D2. |
+| Supabase | $25/month for the one project (recommended) | D2. |
 | Cloudinary | Free plan (25 credits/month) | Photos ≈ 13–15 credits once; normal delivery well inside the plan at launch traffic. |
 | Address lookup | Small, pay-per-use | Homedata or an alternative. |
 | Meta, GA4, Search Console, UptimeRobot | Free | |
@@ -867,8 +868,8 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 | Risk | Handling |
 | --- | --- |
 | Hostinger Business resources under an ad spike | Cached pages, Cloudinary images, small JavaScript; monitor; upgrade path to Cloud Startup with no code changes. |
-| Only two app slots | Staging and production use both. A third project on this account would need an upgrade. |
-| Vercel Hobby is for non-commercial use | Used only while we build, with staging settings and `noindex`; the move to Hostinger (Phase 18B) comes before ads or real orders. |
+| Only two app slots | The site uses one; one stays free. |
+| Vercel Hobby is for non-commercial use | Used only while we build, in pre-launch mode and `noindex`; the move to Hostinger (Phase 18B) comes before ads or real orders. |
 | Public repository until launch | Anyone can read the code and docs (including that Heartwell and the sister shop are related), and anything pushed stays in forks and caches even after the repo goes private. The leak and credential check runs before every commit, in CI and before every build; customer data never enters the repo; secrets live only in the host's environment variables. Made private in Phase 19. |
 | In-app browser quirks | Phone-first testing in both apps every phase; no pop-ups, sign-ins or downloads. |
 | Email from heartwellsofa.co.uk while the site is heartwellfurniture.co.uk | SPF, DKIM and DMARC checked on heartwellsofa.co.uk; one setting to move email to the main domain later (recommended once it's set up). |

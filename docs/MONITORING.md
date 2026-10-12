@@ -8,7 +8,7 @@ Nothing should fail quietly. Three layers watch the shop:
 | **Hourly health check** (pg_cron → the website) | Anything on the Health card that turns **red** | An email to the shop inbox (and the copy address): once when it breaks, again a day later if it's still broken, and once when it's fixed |
 | **UptimeRobot** (outside, free) | The site or database down, the hourly check stopped, or anything red, **including email itself being broken** | UptimeRobot's own email and phone app |
 
-The alert email uses the same verdicts as the Health card, so they can never disagree. On staging the subject starts with `[staging]`.
+The alert email uses the same verdicts as the Health card, so they can never disagree. Before go-live the subject starts with `[pre-launch]`.
 
 ## The Monday digest
 
@@ -41,4 +41,4 @@ When "Heartwell checks" goes red, open Admin → Status to see why.
 | `heartwell-daily-cleanup` | daily, 3:15am UTC | Deletes data past its keeping period (privacy notice) |
 | `heartwell-monday-digest` | Mondays, 7am UTC | The Monday digest |
 
-Conversions, the health check, review emails and the digest are done by the website (the database starts them), so they need the site's address in `private.app_config` (`site_url`). Staging has it; production gets it at the move to Hostinger (Phase 18B). Until then production's runs show as "skipped" on its Status page.
+Conversions, the health check, review emails and the digest are done by the website (the database starts them), so they need the site's address in `private.app_config` (`site_url`). It's set to the site (heartwellfurniture.vercel.app) and changes at the move to Hostinger (Phase 18B) and at go-live.

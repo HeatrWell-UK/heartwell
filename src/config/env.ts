@@ -10,7 +10,7 @@ function readAppEnv(): AppEnv {
   return 'development'
 }
 
-/** development locally, staging on preview deployments, production on the live site. */
+/** development locally; staging on the one site until go-live (pre-launch); production once live. */
 export const APP_ENV: AppEnv = readAppEnv()
 
 /**
@@ -19,3 +19,12 @@ export const APP_ENV: AppEnv = readAppEnv()
  * the pre-launch site never compete with the live one in Google.
  */
 export const SITE_INDEXABLE = process.env.SITE_INDEXABLE === 'true' && APP_ENV === 'production'
+
+/**
+ * How the environment is named to people. Until go-live the one site runs with
+ * APP_ENV "staging": the pre-launch site, where orders are tests and customer
+ * emails go to the test inbox.
+ */
+export function envLabel(appEnv: string): string {
+  return appEnv === 'staging' ? 'pre-launch' : appEnv
+}

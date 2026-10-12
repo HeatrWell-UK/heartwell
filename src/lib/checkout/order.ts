@@ -77,9 +77,9 @@ export function pricingPayload(q: QuoteInput, offerToken: string | null = null) 
   }
 }
 
-/** Why an order is a test: staging, a staff device, a QA link, or details that say so. Test orders never count anywhere. */
+/** Why an order is a test: before launch, a staff device, a QA link, or details that say so. Test orders never count anywhere. */
 export function testReason(o: Pick<OrderInput, 'name' | 'email'>, appEnv: string, flags: { qa?: boolean; staffDevice?: boolean } = {}): string | null {
-  if (appEnv !== 'production') return `placed on ${appEnv}`
+  if (appEnv !== 'production') return appEnv === 'staging' ? 'placed before launch' : `placed on ${appEnv}`
   if (flags.staffDevice) return 'placed on a staff device'
   if (flags.qa) return 'QA link'
   if (/\btest\b/i.test(o.name) || /^test[.+@]|@example\.(com|org|net)$/i.test(o.email)) return 'test details'
