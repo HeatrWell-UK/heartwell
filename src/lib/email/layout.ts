@@ -2,6 +2,9 @@
 // white card on stone, Arial body text and pill buttons. Plain, table-based
 // HTML with inline styles, so it reads well in Gmail, Outlook and phone apps.
 
+import { CONTACT } from '@/config/contact'
+import { SITE_URL } from '@/config/site'
+
 export interface RenderedEmail {
   subject: string
   html: string
@@ -25,7 +28,18 @@ export function layout(title: string, body: string, preheader: string): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden">
 <tr><td style="background:${C.wine};padding:18px 24px;border-bottom:3px solid #B58A2F"><span style="font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:bold;color:${C.gold}">Heartwell</span></td></tr>
 <tr><td style="padding:24px;${FONT};font-size:16px;line-height:1.5;color:${C.ink}">${body}</td></tr>
+<tr><td style="padding:14px 24px 18px;border-top:1px solid ${C.line};${FONT};font-size:12px;line-height:1.5;color:${C.slate}">${emailFooter()}</td></tr>
 </table></td></tr></table></body></html>`
+}
+
+/** Who we are and where, on every email (consumer law asks for it on order confirmations), with the policies a customer may need. */
+export function emailFooter(): string {
+  const t = CONTACT.trading
+  const a = CONTACT.visitAddress
+  const who = t.companyName ? `${t.companyName}, trading as Heartwell${t.companyNumber ? `, company number ${t.companyNumber}` : ''}` : 'Heartwell'
+  const where = a ? `${a.street}, ${a.locality} ${a.postcode}` : null
+  const links = [link(`${SITE_URL}/delivery-and-returns`, 'Delivery and returns'), link(`${SITE_URL}/terms`, 'Terms of sale'), link(`${SITE_URL}/privacy`, 'Privacy')]
+  return [escapeHtml([who, where, CONTACT.email].filter(Boolean).join(' · ')), links.join(' · ')].join('<br>')
 }
 
 export const p = (html: string, extra = '') => `<p style="margin:0 0 14px;${extra}">${html}</p>`
@@ -35,3 +49,11 @@ export const button = (href: string, label: string, colour = C.velvet) =>
 export const link = (href: string, label: string) => `<a href="${escapeHtml(href)}" style="color:${C.velvet}">${escapeHtml(label)}</a>`
 /** Text the shop can copy, in a grey box. */
 export const pre = (text: string) => `<pre style="margin:0 0 18px;padding:12px;background:${C.stone};border-radius:8px;font-size:13px;line-height:1.5;white-space:pre-wrap">${escapeHtml(text)}</pre>`
+
+/** The same, for plain-text emails. */
+export function emailFooterText(): string {
+  const t = CONTACT.trading
+  const a = CONTACT.visitAddress
+  const who = t.companyName ? `${t.companyName}, trading as Heartwell${t.companyNumber ? `, company number ${t.companyNumber}` : ''}` : 'Heartwell'
+  return [[who, a ? `${a.street}, ${a.locality} ${a.postcode}` : null, CONTACT.email].filter(Boolean).join(' · '), `Delivery and returns: ${SITE_URL}/delivery-and-returns`, `Terms of sale: ${SITE_URL}/terms`].join('\n')
+}

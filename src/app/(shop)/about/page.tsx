@@ -1,0 +1,81 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { ContentPage } from '@/components/content/ContentPage'
+import { CONTACT, visitBookingText } from '@/config/contact'
+import { BRAND } from '@/config/brand'
+import { POLICIES, PROMISES } from '@/config/promises'
+
+export const metadata: Metadata = {
+  title: 'About Heartwell',
+  description: `${BRAND.shortDescription} Here’s how we work, and why.`,
+  alternates: { canonical: '/about' },
+}
+
+export default function AboutPage() {
+  const a = CONTACT.visitAddress
+  return (
+    <ContentPage
+      title="About Heartwell"
+      intro={<p>{BRAND.shortDescription}</p>}
+    >
+      <h2 id="why">Why you pay on delivery</h2>
+      <p>
+        Buying a sofa online from a name you haven’t heard of is a leap. So we take the risk instead of you: nothing is paid when you order, and you pay
+        the driver in cash or by bank transfer only once your sofa is in your room and you’ve had a good look at it. No card details, no deposit.
+      </p>
+
+      <h2 id="how">How it works</h2>
+      <ol>
+        <li>Choose your sofa online or on WhatsApp. It takes a couple of minutes, and there’s no account to set up.</li>
+        <li>Tap Confirm on the link we send you, and we ring or WhatsApp to book your delivery day.</li>
+        <li>We bring it to your room, free to UK Mainland addresses. You check it, then you pay.</li>
+      </ol>
+
+      <h2 id="made-to-order">Made for you</h2>
+      <p>
+        {PROMISES.madeToOrder.long} If you’d like to see a fabric before you choose, we post <Link href="/fabric-samples">samples</Link>, and you can browse{' '}
+        <Link href="/fabrics">every fabric</Link> online.
+      </p>
+
+      <h2 id="promises">What we promise</h2>
+      <ul>
+        <li>
+          <strong>{PROMISES.delivery.label}:</strong> {PROMISES.delivery.long}
+        </li>
+        <li>
+          <strong>{PROMISES.payment.label}:</strong> {PROMISES.payment.long}
+        </li>
+        <li>
+          <strong>{PROMISES.guarantee.label}:</strong> {PROMISES.guarantee.long}
+        </li>
+        <li>
+          <strong>{POLICIES.changeOfMindDays} days to change your mind</strong> on ready-made pieces, and faults always put right. The details are in{' '}
+          <Link href="/delivery-and-returns">Delivery and returns</Link>.
+        </li>
+      </ul>
+
+      <h2 id="reviews">Honest reviews only</h2>
+      <p>
+        Every review on this site comes from a customer who bought from us, through a private link we send after delivery. We publish the good and the
+        bad (holding back only abuse or someone’s personal details), we never write them ourselves, and we never show a star rating we haven’t earned. You’ll find them on each sofa’s page and on our{' '}
+        <Link href="/reviews">reviews page</Link>.
+      </p>
+
+      {a && (
+        <>
+          <h2 id="visit">Where we are</h2>
+          <p>
+            You’re welcome to visit us at {a.street}, {a.locality} {a.postcode}. {visitBookingText()} <Link href="/visit-us">How to visit</Link>.
+          </p>
+        </>
+      )}
+
+      <h2 id="talk">Talk to a person</h2>
+      <p>
+        Questions about a sofa, a fabric, a doorway or an order are answered by people who know the furniture. WhatsApp is quickest
+        {CONTACT.phoneDisplay ? `, or ring ${CONTACT.phoneDisplay}` : ''}, or email <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.{' '}
+        <Link href="/contact">All the ways to reach us</Link>.
+      </p>
+    </ContentPage>
+  )
+}

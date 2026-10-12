@@ -6,14 +6,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 15 (Meta catalogue feed, offers and ad links) built and on the staging link, waiting for approval (8 October 2026). The feed is ready to connect once Commerce Manager exists. Phase 14 approved and merged into `main`. |
+| **Current phase** | Phase 16 (content, policies and trust pages) built and on the staging link, waiting for approval (12 October 2026). Phase 15 approved and merged into `main`. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **Staging link** | https://heartwell-staging.vercel.app (branch `staging`; open to anyone with the link, noindex) |
 | **Approved build** | https://heartwellfurniture.vercel.app (branch `main`) |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwell-staging.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking https://heartwell-staging.vercel.app/login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 16: content, policies and trust pages. Order from here: 16, 17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 15 approved. Phase 16 — Content and policies. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then build Phase 16. Visit us: <address, hours, appointment rules>. Company: <legal name, number, registered office, VAT>. Socials: <links>.` |
+| **Next phase** | Phase 17: OrderFlow, monitoring and the Monday digest. Order from here: 17, 17A–17C (photos and catalogue words), 18, 18B, 19. |
+| **Next prompt** | `Phase 16 approved. Phase 17 — OrderFlow and monitoring. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17. OrderFlow URL and Heartwell key: <set in the Vercel project / given here>. UptimeRobot: <yes / no>.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -22,7 +22,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Domains (heartwellfurniture.co.uk, heartwellsofa.co.uk) are on the owner's separate Hostinger account. heartwellsofa.co.uk email must keep working.
 - Customer email: enquiries@heartwellsofa.co.uk (one setting).
 - OrderFlow: the **same** OrderFlow as the sister shop, with its own key; Heartwell orders are tagged (HW- references).
-- "Visit us": Heartwell has its **own address** (different from the sister's showroom); details to come in Phase 16.
+- "Visit us": Heartwell's own address, Unit 4, Blacker Street, Burnley BB10 2AF (postcode to confirm), 9am to 5pm, by appointment booked a day ahead (owner, 12 October 2026; opening days to confirm). Set in `src/config/contact.ts`.
 - **Never mention the sister shop** on the Heartwell site (the owner chose to keep them separate).
 - Heartwell's Cloudinary (connected via MCP): Free plan, 25 credits/month (about 3.6 used by 4 Oct 2026). Folders: `heartwell/brand`, `heartwell/samples` (design photos), `heartwell/source/{variants,gallery,categories,fabrics}` (the 162 imported originals, tag `heartwell-source`, never edited), `heartwell/import` (the catalogue payload file, tag `heartwell-import`, catalogue data only; safe to delete). Uploads are signed with the `sign-upload` tool; the account's default preset makes them `overwrite: true`.
 - Catalogue (Phase 5): imported into **staging only**; production gets the finished catalogue at Phase 18B by copying staging's catalogue tables. How to re-run: README "Catalogue". The Lily range's 23 original photos are missing from the source library (404); the owner is asked for originals (PLAN section 9, item 23).
@@ -39,6 +39,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Connectors: Supabase, Vercel and GitHub were reconnected to the Heartwell accounts by the owner on 6 Oct 2026. If the Supabase connector ever lists a project called "Onium", it's signed into the wrong account: never touch that project.
 - Phone and WhatsApp: 07848 477056 (`src/config/contact.ts`). Shop notifications go to enquiries@heartwellsofa.co.uk (the default) with a copy to heartwellsofa@gmail.com (`SHOP_NOTIFY_COPY`, read from the owner's "heartwellsofa3gmail.com", assumed to mean @gmail.com). Outside production, customer emails go to heartwellsofa@gmail.com (`EMAIL_TEST_INBOX`).
 - Hosting settings checkout needs (Vercel now, Hostinger from 18B): `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` (both secret, added by the owner; I never see them). Optional: `CLOUDINARY_API_KEY` + `CLOUDINARY_API_SECRET` (photo uploads from the product editor; `CLOUDINARY_CLOUD_NAME` defaults to Heartwell's `iv3tp2iq`; uploads land in `heartwell/uploads`, tagged `heartwell-admin`, named by Cloudinary so nothing is overwritten), `ADDRESS_LOOKUP_PROVIDER` + `ADDRESS_LOOKUP_KEY`, `MAIL_FROM` (once the orders@ alias exists), `SMTP_HOST/PORT/USER` (default smtp.hostinger.com:465 as enquiries@).
+- Content pages: `/about`, `/visit-us`, `/contact`, `/faq`, `/delivery-and-returns`, `/terms`, `/privacy`, `/cookies`, `/care-guide`, `/will-it-fit`, `/guides` and `/guides/<slug>`, `/llms.txt`. Policy figures: `POLICIES` in `src/config/promises.ts`; FAQ, guides and the cookie list in `src/content/`.
 - Site addresses: departments `/sofas`, categories `/sofas/<category>`, products `/products/<slug>` (`?variant=<SKU>&fabric=<code>`), ranges `/ranges/<range>`, `/search`, `/fabrics`, `/basket`, `/saved`, `/visit-us` (404 until the address is set).
 - Offers: code **HEARTSOFA** (Admin → Settings); the automatic offer for ad visitors (7 days, tiers £50/£30/£20) is on. An ad link is any address with `utm_source=facebook` (or instagram/meta) and `utm_medium=paid_social`. Catalogue feed: `/feeds/meta-catalogue.xml` (Google’s `/feeds/google-merchant.xml` is dormant).
 - Tracking settings (none set yet; dry run until they are): `NEXT_PUBLIC_META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN` (secret), `META_TEST_EVENT_CODE`, `NEXT_PUBLIC_GA4_MEASUREMENT_ID`, `GA4_API_SECRET` (secret). Tick Production and Preview for each. Live events also need the live domain and `NEXT_PUBLIC_APP_ENV=production`. Steps: `docs/TRACKING-SETUP.md`.
@@ -46,6 +47,17 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 12 October 2026 — Phase 16: content, policies and trust pages
+- **Owner:** Phase 15 approved; merged into `main`. Visit us: Unit 4, Blacker Street, Burnley, 9am to 5pm, appointments booked a day ahead. Company details skipped for now; social links to come at the end.
+- **Visit us** is live on its own page, the home page, Contact, the footer and About: address, hours, "by appointment only: book at least a day ahead", a pre-filled "Book a visit on WhatsApp" button, ring us, directions in Google and Apple Maps. No embedded map (it would set Google cookies before consent and slow the page). Postcode BB10 2AF comes from the street (a few Blacker Street addresses are BB10 2AY); the opening days aren't shown or sent to Google until confirmed.
+- **New pages:** About, Questions and answers (16, with search-engine FAQ data), Delivery and returns (extras priced from the shop's settings), Terms of sale, Privacy notice, Cookies (every cookie and storage item), Care guide, Will it fit? (with a door check for any sofa), six Guides, llms.txt. Footer and menu link to them all; every footer link now leads to a real page.
+- **One source for every figure:** policy rules (14 days, refunds in 14 days, made-to-order changes within 2 working days, damage within 24 hours, £50 re-delivery, 1-year guarantee) live in `POLICIES`; the FAQ text is shared by the FAQ page, the home page and llms.txt; a test fails if the code ever stores something the Cookies page doesn't list.
+- **Search:** Organization details on the home page; free delivery and the return policy on every product offer; the sitemap lists the new pages.
+- **Privacy made true:** migration `retention` (both projects, versions aligned): the daily clean-up also removes sample requests after 2 years, email records after 2 years, WhatsApp enquiry records after 26 months, and newsletter addresses never confirmed (30 days) or unsubscribed. Checked in a rolled-back run.
+- **Emails:** every email now ends with who we are, the Burnley address and links to Delivery and returns, Terms and Privacy; the order confirmation also states the change-of-mind rule (and the made-to-order exemption when it applies), which consumer law expects in writing.
+- **Checked:** `npm run verify` passes (422 tests); every new page answers on the preview (an unknown guide is a 404), with no gaps in the text and prices from the database; the Delivery and returns table and Visit us read well at phone width; every new page is static, refreshed every 5 minutes; leak check clean.
+- **Waiting on the owner:** approve Phase 16. Confirm the opening **days** and the **postcode**. Company details (name, number, registered office, VAT) and social links before go-live: they slot into the footer, terms and privacy notice by themselves. Have the terms and privacy notice read by an adviser before launch (not legal advice; especially the made-to-order exemption and D10). Still: tick **Preview** on `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` in Vercel.
 
 ### 8 October 2026 — Phase 15: Meta catalogue feed, offers and ad links
 - **Owner:** Phase 14 approved; merged into `main`. Offer code **HEARTSOFA**; ad-visitor offer **on** at launch (D6); Commerce Manager not set up yet, so the feed is built ready to connect.

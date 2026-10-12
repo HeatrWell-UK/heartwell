@@ -34,6 +34,9 @@ export default async function FabricsPage() {
         <Link href="/sofas?mto=yes" className="self-start text-[15px] font-semibold">
           See the sofas you can have in these fabrics
         </Link>
+        <Link href="/guides/choosing-a-sofa-fabric" className="self-start text-[15px] font-semibold">
+          How to choose a fabric
+        </Link>
       </header>
       {collections.map((c, ci) => (
         <section key={c.slug} aria-labelledby={`c-${c.slug}`} className="flex flex-col gap-4">

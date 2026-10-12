@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
-import { EnvelopeSimpleIcon, PhoneIcon } from '@phosphor-icons/react/ssr'
+import Link from 'next/link'
+import { EnvelopeSimpleIcon, MapPinIcon, PhoneIcon } from '@phosphor-icons/react/ssr'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { buttonClasses } from '@/components/ui/Button'
-import { CONTACT, phoneHref } from '@/config/contact'
+import { CONTACT, phoneHref, visitBookingText, visitHoursText } from '@/config/contact'
 import { ContactForm } from './ContactForm'
 import { TelLink } from '@/components/tracking/TelLink'
 
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   const tel = phoneHref()
+  const a = CONTACT.visitAddress
   return (
     <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-16 pt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-14 lg:px-6 lg:pt-10">
       <div className="flex flex-col gap-5">
@@ -38,6 +40,23 @@ export default function ContactPage() {
             {CONTACT.email}
           </a>
         </div>
+        {a && (
+          <section aria-labelledby="visit" className="flex flex-col gap-1.5 rounded-[var(--radius-card)] bg-stone p-5 text-[16px] leading-relaxed">
+            <h2 id="visit" className="flex items-center gap-2 font-sans text-[17px] font-bold tracking-normal">
+              <MapPinIcon aria-hidden="true" size={22} className="text-velvet" />
+              Visit us
+            </h2>
+            <address className="not-italic">
+              {a.street}, {a.locality} {a.postcode}
+            </address>
+            <p className="text-slate">
+              {visitHoursText()}. {visitBookingText()}
+            </p>
+            <Link href="/visit-us" className="self-start font-semibold">
+              How to visit
+            </Link>
+          </section>
+        )}
       </div>
       <section aria-labelledby="form-title" className="flex flex-col gap-4">
         <h2 id="form-title" className="text-2xl">

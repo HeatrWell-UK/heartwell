@@ -87,7 +87,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLdString([
-            productJsonLd(product, SITE_URL),
+            productJsonLd(product, SITE_URL, delivery),
             breadcrumbJsonLd([...crumbs.map((c) => ({ name: c.name, path: c.href })), { name: product.title, path: `/products/${product.slug}` }], SITE_URL),
           ]),
         }}
