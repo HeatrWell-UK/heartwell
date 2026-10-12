@@ -4,6 +4,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { fromPrice, unitPrice } from '@/lib/catalogue/pricing'
 import { fabricLabel, productHref } from '@/lib/product/helpers'
 import type { ProductCardView } from '@/lib/product/types'
+import type { OfferTier } from '@/lib/offers/paid'
 import { MAX_LINES, MAX_SAVED, type BasketLineView } from './model'
 
 export const BasketIdentities = z
@@ -26,7 +27,7 @@ export async function freshBasketViews(lines: z.infer<typeof BasketIdentities>):
   const [variants, materials] = await Promise.all([
     db
       .from('product_variants')
-      .select('id, sku, colour_name, price_adjustment, image_url, product:products(slug, title, base_price, made_to_order, gallery_images, type:product_types(material_kinds))')
+      .select('id, sku, colour_name, price_adjustment, image_url, product:products(slug, title, base_price, made_to_order, gallery_images, type:product_types(material_kinds), tier:offer_product_tiers(tier))')
       .in('id', variantIds),
     materialIds.length
       ? db.from('materials').select('id, code, name, collection:material_collections(name, kind, surcharge)').in('id', materialIds)
@@ -64,6 +65,7 @@ export async function freshBasketViews(lines: z.infer<typeof BasketIdentities>):
       image: v.image_url ?? product.gallery_images[0] ?? null,
       unitPrice: unitPrice(product.base_price, v.price_adjustment, surcharge),
       madeToOrder: product.made_to_order,
+      offerTier: (one(product.tier)?.tier ?? null) as OfferTier | null,
     }
   }
   return result

@@ -7,6 +7,10 @@
 // `view` is the last-known title, photo and price for instant display, and the
 // basket page refreshes it from the catalogue.
 
+import type { OfferTier } from '@/lib/offers/paid'
+
+const TIERS = new Set<OfferTier>(['HIGH', 'MID', 'STANDARD', 'EXCLUDED'])
+
 export interface BasketLineView {
   slug: string
   sku: string
@@ -16,6 +20,8 @@ export interface BasketLineView {
   image: string | null
   unitPrice: number
   madeToOrder: boolean
+  /** The piece's offer tier, for showing an ad visitor's offer (missing on lines saved before Phase 15). */
+  offerTier?: OfferTier | null
 }
 
 export interface BasketLine {
@@ -103,6 +109,7 @@ export function parseBasket(raw: unknown): BasketLine[] {
         image: isText(v.image, 2000) ? v.image : null,
         unitPrice: v.unitPrice,
         madeToOrder: v.madeToOrder === true,
+        offerTier: TIERS.has(v.offerTier as OfferTier) ? (v.offerTier as OfferTier) : null,
       },
     })
   }

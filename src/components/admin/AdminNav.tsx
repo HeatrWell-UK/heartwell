@@ -13,6 +13,7 @@ import {
   DotsThreeOutlineIcon,
   GearSixIcon,
   HouseIcon,
+  LinkSimpleIcon,
   PulseIcon,
   ReceiptIcon,
   SignOutIcon,
@@ -32,13 +33,14 @@ const NAV: { href: string; label: string; icon: Icon; phone?: false; desktop?: f
   { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon },
   { href: '/admin/videos', label: 'Videos', icon: VideoCameraIcon, phone: false },
   { href: '/admin/tracking', label: 'Tracking', icon: ChartLineUpIcon, phone: false },
+  { href: '/admin/ad-links', label: 'Ad links', icon: LinkSimpleIcon, phone: false },
   { href: '/admin/settings', label: 'Settings', icon: GearSixIcon, phone: false },
   { href: '/admin/status', label: 'Status', icon: PulseIcon, phone: false },
   { href: '/admin/more', label: 'More', icon: DotsThreeOutlineIcon, desktop: false },
 ]
 
 /** The sections the More tab stands for on phones. */
-const MORE_PAGES = ['/admin/more', '/admin/reviews', '/admin/videos', '/admin/tracking', '/admin/settings', '/admin/status']
+const MORE_PAGES = ['/admin/more', '/admin/reviews', '/admin/videos', '/admin/tracking', '/admin/ad-links', '/admin/settings', '/admin/status']
 
 function isActive(pathname: string, href: string) {
   if (href === '/admin') return pathname === href

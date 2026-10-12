@@ -3,6 +3,7 @@
 
 import type { SizeFields } from '@/lib/catalogue/display'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
+import type { OfferTier } from '@/lib/offers/paid'
 
 export interface VariantView {
   id: string
@@ -95,6 +96,8 @@ export interface ProductPageData {
   videos: { mp4: string; poster: string; caption: string | null; fromCustomer: boolean }[]
   /** From every approved review (the list above shows the latest 20). Null until the first. */
   reviewStats: { count: number; average: number } | null
+  /** Which offer amount this piece gets (Admin → product → offer tier). Null when it has none. */
+  offerTier: OfferTier | null
 }
 
 export interface DeliveryInfo {

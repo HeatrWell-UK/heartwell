@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlusIcon } from '@phosphor-icons/react'
 import { checkSettings, SETTING_GROUPS, type SettingsDraft } from '@/lib/admin/settings-form'
-import { addOfferCode, deleteOfferCode, saveSettings, setOfferCodeActive, type SettingsResult } from '@/app/admin/(panel)/settings/actions'
+import { addOfferCode, deleteOfferCode, saveSettings, setAdOffer, setOfferCodeActive, type SettingsResult } from '@/app/admin/(panel)/settings/actions'
 import { Card, OutcomeNote, primaryButton, SaveBar, secondaryButton, TextField, type Outcome } from './Fields'
 
 const UNREACHABLE: SettingsResult = { ok: false, message: 'Couldn’t reach the server. Try again.' }
@@ -79,7 +79,7 @@ export function OfferCodes({ codes }: { codes: { code: string; label: string | n
   }
 
   return (
-    <Card title="Offer codes" intro="A live code gives the order its tier’s amount off at checkout. Codes are letters and numbers, 4 to 24 long.">
+    <Card title="Offer codes" intro="A live code gives the order its tier’s amount off at checkout. Codes are letters and numbers, 4 to 24 long. Put the code in your posts, ads or messages wherever you like; the shop itself shows it only to ad visitors.">
       {codes.length > 0 ? (
         <ul className="divide-y divide-zinc-100 rounded-lg ring-1 ring-zinc-200">
           {codes.map((c) => (
@@ -130,6 +130,42 @@ export function OfferCodes({ codes }: { codes: { code: string; label: string | n
           className={`${primaryButton} self-start`}
         >
           <PlusIcon aria-hidden="true" size={16} weight="bold" /> Add code
+        </button>
+      </div>
+      <OutcomeNote outcome={outcome} />
+    </Card>
+  )
+}
+
+export function AdOfferSwitch({ on, days, code }: { on: boolean; days: number; code: string | null }) {
+  const router = useRouter()
+  const [busy, setBusy] = useState(false)
+  const [outcome, setOutcome] = useState<Outcome>(null)
+  return (
+    <Card
+      title="Offer for ad visitors"
+      intro={
+        <>
+          Someone who opens the shop from one of your Meta ads gets their tier’s amount off for {days} {days === 1 ? 'day' : 'days'}, taken off automatically at checkout. The product page, basket and checkout say so, with the real end date.
+          {code ? ` They also see the newest live code (${code}) to use on another phone or computer.` : ' Add a live code below so they can use it on another phone or computer too.'}
+        </>
+      }
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[15px] font-semibold text-zinc-900">{on ? 'On' : 'Off'}</p>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true)
+            const r = await setAdOffer(!on).catch(() => UNREACHABLE)
+            setBusy(false)
+            setOutcome(r)
+            if (r.ok) router.refresh()
+          }}
+          className={secondaryButton}
+        >
+          {on ? 'Switch off' : 'Switch on'}
         </button>
       </div>
       <OutcomeNote outcome={outcome} />

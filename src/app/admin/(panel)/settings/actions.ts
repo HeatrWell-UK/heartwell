@@ -32,7 +32,18 @@ export async function addOfferCode(rawCode: string, rawLabel: string): Promise<S
   const label = String(rawLabel ?? '').trim().slice(0, 120) || null
   const { error } = await (await createClient()).from('offer_codes').insert({ code, label, is_active: true })
   if (error) return { ok: false, message: error.code === '23505' ? `${code} already exists.` : `Couldn’t add it: ${error.message}` }
+  // Ad visitors are shown the newest live code, which the shop caches with the settings.
+  updateTag(SETTINGS_TAG)
   return { ok: true, message: `${code} is live.` }
+}
+
+/** The automatic offer for ad visitors. Off stops new offers; ones already given run to their date. */
+export async function setAdOffer(on: boolean): Promise<SettingsResult> {
+  if (await adminGuard()) return SIGN_IN
+  const { error } = await (await createClient()).from('shop_settings').update({ paid_offer_enabled: on === true }).eq('id', true)
+  if (error) return { ok: false, message: `Couldn’t change it: ${error.message}` }
+  updateTag(SETTINGS_TAG)
+  return { ok: true, message: on ? 'Ad visitors get the offer again.' : 'Switched off. Offers already given still apply until their date.' }
 }
 
 export async function setOfferCodeActive(rawCode: string, active: boolean): Promise<SettingsResult> {
@@ -41,6 +52,7 @@ export async function setOfferCodeActive(rawCode: string, active: boolean): Prom
   if (!code) return { ok: false, message: 'Unknown code.' }
   const { error } = await (await createClient()).from('offer_codes').update({ is_active: active }).eq('code', code)
   if (error) return { ok: false, message: `Couldn’t change it: ${error.message}` }
+  updateTag(SETTINGS_TAG)
   return { ok: true, message: active ? `${code} is live again.` : `${code} is switched off.` }
 }
 
@@ -51,5 +63,6 @@ export async function deleteOfferCode(rawCode: string): Promise<SettingsResult> 
   // Orders keep the code as text, so deleting it never changes an order.
   const { error } = await (await createClient()).from('offer_codes').delete().eq('code', code)
   if (error) return { ok: false, message: `Couldn’t delete it: ${error.message}` }
+  updateTag(SETTINGS_TAG)
   return { ok: true, message: `${code} deleted.` }
 }

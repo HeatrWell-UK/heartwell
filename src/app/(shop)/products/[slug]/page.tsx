@@ -19,6 +19,8 @@ import { categoryHref, trail } from '@/lib/catalogue/tree'
 import { pickFabric, pickVariant } from '@/lib/product/helpers'
 import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
 import type { ProductPageData } from '@/lib/product/types'
+import { tierAmount } from '@/lib/offers/paid'
+import { getOfferSettings } from '@/lib/offers/server'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -29,8 +31,8 @@ const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v
 
 /** Only what the interactive part needs, so the page sends the browser no more than that. */
 function purchaseProps(p: ProductPageData): PurchaseProduct {
-  const { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range } = p
-  return { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range }
+  const { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier } = p
+  return { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier }
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
@@ -57,7 +59,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function ProductPage({ params, searchParams }: Props) {
   const { slug } = await params
-  const [product, delivery, query, tree] = await Promise.all([getProductPage(slug), getDeliveryInfo(), searchParams, getCategories()])
+  const [product, delivery, query, tree, offers] = await Promise.all([getProductPage(slug), getDeliveryInfo(), searchParams, getCategories(), getOfferSettings()])
   if (!product) notFound()
 
   const variant = pickVariant(product.variants, first(query.variant))
@@ -92,7 +94,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
       />
       <Breadcrumbs items={crumbs} />
 
-      <ProductPurchase product={purchaseProps(product)} initialVariantId={variant?.id ?? null} initialFabric={fabric}>
+      <ProductPurchase product={purchaseProps(product)} initialVariantId={variant?.id ?? null} initialFabric={fabric} offer={{ amount: tierAmount(product.offerTier, offers.amounts), code: offers.code }}>
         <PostcodeCheck windowLabel={delivery.windowLabel} />
         <PromiseRows madeToOrder={product.madeToOrder} />
       </ProductPurchase>

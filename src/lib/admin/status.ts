@@ -58,10 +58,18 @@ const when = (iso: string | null | undefined) =>
 
 const worst = (levels: Level[]): Level => (levels.includes('error') ? 'error' : levels.includes('warn') ? 'warn' : 'ok')
 
+/** Meta’s latest fetch of the catalogue feed (public.feed_fetches). */
+export interface FeedFetchSummary {
+  lastFetched: string | null
+  items: number
+}
+
 export function buildStatusChecks(
   ctx: StatusContext,
   data: AdminStatusData | null,
   dbError: string | null,
+  feed: FeedFetchSummary | null = null,
+  now = Date.now(),
 ): StatusCheck[] {
   const checks: StatusCheck[] = []
 
@@ -241,6 +249,22 @@ export function buildStatusChecks(
               ? 'Connected, in test mode: events go to Meta’s Test events only.'
               : 'Connected, in dry run: nothing is sent. Switch to Test or Live in Tracking.',
   })
+
+  // Catalogue feed: Commerce Manager fetches it hourly once connected.
+  if (feed) {
+    const age = feed.lastFetched ? now - Date.parse(feed.lastFetched) : null
+    checks.push({
+      key: 'catalogue_feed',
+      title: 'Meta catalogue feed',
+      level: age === null ? 'warn' : age > 26 * 3_600_000 ? 'error' : 'ok',
+      summary:
+        age === null
+          ? 'Not connected yet: Commerce Manager hasn’t fetched it. The address is on Ad links.'
+          : age > 26 * 3_600_000
+            ? `Meta last fetched it ${when(feed.lastFetched)}. It should be hourly: check the feed’s schedule in Commerce Manager.`
+            : `Meta fetched it ${when(feed.lastFetched)} (${feed.items} items).`,
+    })
+  }
 
   // OrderFlow
   checks.push({

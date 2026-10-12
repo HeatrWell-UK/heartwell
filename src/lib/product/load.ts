@@ -7,6 +7,7 @@ import { deliveryWindow, earliestPreferredDate, latestPreferredDate } from '@/li
 import type { DeliverySettings } from '@/lib/delivery/pricing'
 import { fromPrice } from '@/lib/catalogue/pricing'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
+import type { OfferTier } from '@/lib/offers/paid'
 import { specRows, type SpecField } from './specs'
 import type { DeliveryInfo, FabricCollectionView, ProductCardView, ProductPageData, SiblingView, VariantView } from './types'
 
@@ -21,7 +22,8 @@ const PRODUCT_FIELDS = `
   type:product_types(slug, name, spec_fields, material_kinds),
   range:ranges(id, slug, name, axis1_name, axis2_name),
   category:categories!products_primary_category_id_fkey(id, slug, name, parent_id),
-  variants:product_variants(id, sku, colour_name, colour_hex, material_label, price_adjustment, image_url, sort)
+  variants:product_variants(id, sku, colour_name, colour_hex, material_label, price_adjustment, image_url, sort),
+  tier:offer_product_tiers(tier)
 `
 
 const bySort = <T extends { sort: number }>(a: T, b: T) => a.sort - b.sort
@@ -149,10 +151,11 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
       return video ? [{ mp4: video.mp4, poster: video.poster, caption: v.caption, fromCustomer: v.kind === 'customer' }] : []
     }),
     reviewStats: p.review_count > 0 ? { count: p.review_count, average: Number(p.average_rating) } : null,
+    offerTier: ((Array.isArray(p.tier) ? p.tier[0] : p.tier)?.tier ?? null) as OfferTier | null,
   }
 }
 
-export const getProductPage = unstable_cache(loadProductPage, ['product-page-v2'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
+export const getProductPage = unstable_cache(loadProductPage, ['product-page-v3'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
 
 const loadDeliverySettings = unstable_cache(
   async () => {

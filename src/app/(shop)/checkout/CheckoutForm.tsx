@@ -10,6 +10,7 @@ import { TextArea, TextInput } from '@/components/ui/Field'
 import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import { useBasket, visitIds, rememberPostcode } from '@/lib/basket/store'
+import { OfferStrip } from '@/components/offer/OfferStrip'
 import { isQaVisit, readConsent, sessionFbclid, touchForOrder, track } from '@/lib/tracking/browser'
 import { TRACKING } from '@/config/tracking'
 import { useHydrated } from '@/lib/basket/use-hydrated'
@@ -359,27 +360,31 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           <Field label="Delivery notes" optional help="Parking, steps, a tight turn on the stairs: anything that helps the drivers." helpId={`${id}-notes-help`} id={`${id}-notes`}>
             <TextArea id={`${id}-notes`} value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} aria-describedby={`${id}-notes-help`} />
           </Field>
-          <details className="group" open={code !== ''}>
-            <summary className="cursor-pointer list-none text-[15px] font-semibold text-velvet [&::-webkit-details-marker]:hidden">Have an offer code?</summary>
-            <div className="flex gap-2 pt-3">
-              <label htmlFor={`${id}-code`} className="sr-only">
-                Offer code
-              </label>
-              <TextInput id={`${id}-code`} value={codeInput} onChange={(e) => setCodeInput(e.target.value)} autoCapitalize="characters" spellCheck={false} className="min-w-0 flex-1 uppercase" />
-              <button type="button" onClick={() => setCode(codeInput.trim().toUpperCase())} className="min-h-[54px] shrink-0 rounded-[var(--radius-field)] border-[1.5px] border-velvet px-5 font-semibold text-velvet">
-                Apply
-              </button>
-            </div>
-            {code && shown && (
-              <p role="status" className={cn('pt-2 text-[15px]', shown.codeValid ? 'text-ink' : 'font-semibold text-error')}>
-                {shown.codeValid
-                  ? shown.discountAmount > 0
-                    ? `${code} applied: ${formatPrice(shown.discountAmount)} off.`
-                    : `${code} is valid, but doesn’t apply to the pieces in your basket.`
-                  : `We don’t recognise ${code}. Please check it.`}
-              </p>
-            )}
-          </details>
+          {shown?.adOffer && shown.discountAmount > 0 && code === '' ? (
+            <OfferStrip amount={shown.discountAmount} atCheckout />
+          ) : (
+            <details className="group" open={code !== ''}>
+              <summary className="cursor-pointer list-none text-[15px] font-semibold text-velvet [&::-webkit-details-marker]:hidden">Have an offer code?</summary>
+              <div className="flex gap-2 pt-3">
+                <label htmlFor={`${id}-code`} className="sr-only">
+                  Offer code
+                </label>
+                <TextInput id={`${id}-code`} value={codeInput} onChange={(e) => setCodeInput(e.target.value)} autoCapitalize="characters" spellCheck={false} className="min-w-0 flex-1 uppercase" />
+                <button type="button" onClick={() => setCode(codeInput.trim().toUpperCase())} className="min-h-[54px] shrink-0 rounded-[var(--radius-field)] border-[1.5px] border-velvet px-5 font-semibold text-velvet">
+                  Apply
+                </button>
+              </div>
+              {code && shown && (
+                <p role="status" className={cn('pt-2 text-[15px]', shown.codeValid ? 'text-ink' : 'font-semibold text-error')}>
+                  {shown.codeValid
+                    ? shown.discountAmount > 0
+                      ? `${code} applied: ${formatPrice(shown.discountAmount)} off.`
+                      : `${code} is valid, but doesn’t apply to the pieces in your basket.`
+                    : `We don’t recognise ${code}. Please check it.`}
+                </p>
+              )}
+            </details>
+          )}
           <Check
             id={`${id}-remind`}
             checked={reminder}
@@ -423,7 +428,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </Link>
         <dl className="flex flex-col gap-1.5 border-t border-line pt-3 text-[15px]">
           <Row label="Items" value={formatPrice(shown ? shown.itemsSubtotal : subtotal)} />
-          {shown && shown.discountAmount > 0 && <Row label={`Offer${shown.promotionCode ? ` (${shown.promotionCode})` : ''}`} value={`−${formatPrice(shown.discountAmount)}`} />}
+          {shown && shown.discountAmount > 0 && <Row label={shown.promotionCode ? `Offer (${shown.promotionCode})` : shown.adOffer ? 'Your offer' : 'Offer'} value={`−${formatPrice(shown.discountAmount)}`} />}
           <Row label="Delivery to UK Mainland" value="Free" accent />
           {lines.map((l) => (
             <Row key={l.key} label={l.detail ? `${l.label} (${l.detail})` : l.label} value={formatPrice(l.amount)} />

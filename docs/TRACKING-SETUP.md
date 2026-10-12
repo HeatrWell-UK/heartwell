@@ -52,4 +52,16 @@ Admin → Tracking then shows a tick for each one (never the values).
 1. **Dry run** (now): check Admin → Tracking → Recent events after browsing staging with cookies accepted.
 2. **Test**, on staging: set the mode to **Test**. Server events and test-order Purchases appear in Events Manager → **Test events**; GA4 purchases go to Google's checker. Nothing counts.
 3. **At go-live** (Phase 19, on heartwellfurniture.co.uk with `NEXT_PUBLIC_APP_ENV=production`): stay on **Test** and browse the live site through Events Manager's test link. Each event should show from both **Browser** and **Server**, deduplicated. Then switch to **Live**.
-4. **In your ads**: use the URL parameters the admin's **Ad links** page gives you (Phase 15), so every sale shows its campaign and ad in the admin.
+4. **In your ads**: use a link from the admin's **Ad links** page as the website address, and paste the URL parameters from the same page into every ad, so every sale shows its campaign and ad in the admin and ad visitors get the ad offer.
+
+## The catalogue (for catalogue ads)
+
+The feed is built and waiting: **Admin → Ad links** shows its address (`https://heartwellfurniture.co.uk/feeds/meta-catalogue.xml` once live), how many items it holds, which colours are left out for want of a photo, and when Meta last fetched it.
+
+1. In **Commerce Manager** (business.facebook.com/commerce), create a catalogue for Heartwell (type: e-commerce, products uploaded by you).
+2. **Data sources → Data feed → scheduled feed**: paste the feed address, repeat **hourly**, currency GBP.
+3. **Connect the dataset (Pixel)** to the catalogue, so Meta matches views, baskets and purchases to items. The IDs already match: each item's ID is the colourway ID the Pixel sends.
+4. **Sets**: make product sets from the labels (range, made to order, price band, offer tier, type; listed on Ad links), e.g. "Corner sofas" or "Offer high".
+5. Check **Issues** in Commerce Manager after the first fetch; the admin's Status page turns green once Meta fetches the feed.
+
+Do this on the live domain (Phase 19), so the catalogue's links point at heartwellfurniture.co.uk.

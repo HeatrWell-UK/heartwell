@@ -512,6 +512,33 @@ export type Database = {
           },
         ]
       }
+      feed_fetches: {
+        Row: {
+          agent: string
+          feed: string
+          fetch_count: number
+          first_fetched_at: string
+          last_fetched_at: string
+          last_items: number
+        }
+        Insert: {
+          agent: string
+          feed: string
+          fetch_count?: number
+          first_fetched_at?: string
+          last_fetched_at?: string
+          last_items?: number
+        }
+        Update: {
+          agent?: string
+          feed?: string
+          fetch_count?: number
+          first_fetched_at?: string
+          last_fetched_at?: string
+          last_items?: number
+        }
+        Relationships: []
+      }
       job_runs: {
         Row: {
           detail: Json | null
@@ -1588,6 +1615,7 @@ export type Database = {
           offer_tier_standard: number
           orderflow_enabled: boolean
           paid_offer_days: number
+          paid_offer_enabled: boolean
           preferred_date_max_days: number
           preferred_date_min_days: number
           purchase_hold_minutes: number
@@ -1613,6 +1641,7 @@ export type Database = {
           offer_tier_standard?: number
           orderflow_enabled?: boolean
           paid_offer_days?: number
+          paid_offer_enabled?: boolean
           preferred_date_max_days?: number
           preferred_date_min_days?: number
           purchase_hold_minutes?: number
@@ -1638,6 +1667,7 @@ export type Database = {
           offer_tier_standard?: number
           orderflow_enabled?: boolean
           paid_offer_days?: number
+          paid_offer_enabled?: boolean
           preferred_date_max_days?: number
           preferred_date_min_days?: number
           purchase_hold_minutes?: number
@@ -1968,6 +1998,10 @@ export type Database = {
         Returns: Json
       }
       random_code: { Args: { p_length: number }; Returns: string }
+      record_feed_fetch: {
+        Args: { p_agent: string; p_feed: string; p_items: number }
+        Returns: undefined
+      }
       refresh_product_review_stats: {
         Args: { p_product_id: string }
         Returns: undefined

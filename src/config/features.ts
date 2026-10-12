@@ -7,4 +7,6 @@ export const FEATURES = {
   checkout: true,
   /** Ordering fabric samples (Phase 13). */
   samples: true,
+  /** The Google Merchant Center feed at /feeds/google-merchant.xml (built in Phase 15, off until Google Shopping is wanted). */
+  googleFeed: false,
 } as const
