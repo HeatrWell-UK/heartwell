@@ -37,7 +37,9 @@ export function VisitUs({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' })
       <ul className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-stone p-5 text-[16px] leading-relaxed">
         <li className="flex items-start gap-3">
           <MapPinIcon aria-hidden="true" size={24} className="mt-0.5 shrink-0 text-velvet" />
-          <address className="font-semibold not-italic">{addressLine(a)}</address>
+          <address className="font-semibold not-italic">
+            {a.street}, {a.locality}, <span className="whitespace-nowrap">{a.postcode}</span>
+          </address>
         </li>
         <li className="flex items-start gap-3">
           <ClockIcon aria-hidden="true" size={24} className="mt-0.5 shrink-0 text-velvet" />

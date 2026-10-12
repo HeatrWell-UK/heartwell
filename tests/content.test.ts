@@ -123,3 +123,21 @@ describe('structured data', () => {
     expect(JSON.stringify(org)).not.toMatch(/undefined|null/)
   })
 })
+
+describe('order confirmation email', () => {
+  it('states the change-of-mind rule, with the made-to-order exemption when it applies', async () => {
+    const { returnsLine } = await import('@/lib/email/order-emails')
+    expect(returnsLine(false)).toBe(`Ready-made pieces can be returned within ${POLICIES.changeOfMindDays} days of delivery if you change your mind. Faults are always covered.`)
+    expect(returnsLine(true)).toMatch(/^Your order includes a made-to-order piece, made for you, so it can’t be returned for a change of mind\./)
+  })
+
+  it('says who we are and where, with links to the policies', async () => {
+    const { emailFooter, emailFooterText } = await import('@/lib/email/layout')
+    for (const footer of [emailFooter(), emailFooterText()]) {
+      expect(footer).toContain('Heartwell')
+      expect(footer).toContain('/delivery-and-returns')
+      expect(footer).toContain('/terms')
+      if (CONTACT.visitAddress) expect(footer).toContain(CONTACT.visitAddress.postcode)
+    }
+  })
+})

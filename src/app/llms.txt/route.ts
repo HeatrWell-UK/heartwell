@@ -8,7 +8,7 @@ import { POLICIES, PROMISES } from '@/config/promises'
 import { SITE_URL } from '@/config/site'
 import { allFaqItems, faqGroups } from '@/content/faq'
 import { GUIDES } from '@/content/guides'
-import { getCategories } from '@/lib/catalogue/listing'
+import { getCategories, sentenceCase } from '@/lib/catalogue/listing'
 import { categoryHref } from '@/lib/catalogue/tree'
 import { getDeliveryInfo } from '@/lib/product/load'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
@@ -37,7 +37,7 @@ export async function GET() {
     '',
     '## Shop',
     '',
-    ...tree.filter((c) => !c.parentId).flatMap((d) => [`- [${d.name}](${url(categoryHref(tree, d))})`, ...tree.filter((c) => c.parentId === d.id).map((c) => `  - [${c.name}](${url(categoryHref(tree, c))})`)]),
+    ...tree.filter((c) => !c.parentId).flatMap((d) => [`- [${sentenceCase(d.name)}](${url(categoryHref(tree, d))})`, ...tree.filter((c) => c.parentId === d.id).map((c) => `  - [${sentenceCase(c.name)}](${url(categoryHref(tree, c))})`)]),
     `- [Ranges](${url('/ranges')})`,
     `- [Fabrics](${url('/fabrics')}): the fabric library for made-to-order sofas`,
     `- [Fabric samples](${url('/fabric-samples')})`,
