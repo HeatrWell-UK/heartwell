@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL } from '@/config/site'
 import { CONTACT } from '@/config/contact'
+import { GUIDES } from '@/content/guides'
 import { getCategories, getListing, rangesFrom } from '@/lib/catalogue/listing'
 import { categoryHref } from '@/lib/catalogue/tree'
 
@@ -22,5 +23,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: url('/reviews'), changeFrequency: 'weekly', priority: 0.5 },
     { url: url('/contact'), changeFrequency: 'yearly', priority: 0.4 },
     ...(CONTACT.visitAddress ? [{ url: url('/visit-us'), changeFrequency: 'monthly' as const, priority: 0.5 }] : []),
+    { url: url('/about'), changeFrequency: 'yearly', priority: 0.4 },
+    { url: url('/faq'), changeFrequency: 'monthly', priority: 0.5 },
+    { url: url('/delivery-and-returns'), changeFrequency: 'monthly', priority: 0.5 },
+    { url: url('/will-it-fit'), changeFrequency: 'yearly', priority: 0.4 },
+    { url: url('/care-guide'), changeFrequency: 'yearly', priority: 0.3 },
+    { url: url('/guides'), changeFrequency: 'monthly', priority: 0.4 },
+    ...GUIDES.map((g) => ({ url: url(`/guides/${g.slug}`), lastModified: g.updated, changeFrequency: 'yearly' as const, priority: 0.4 })),
+    { url: url('/terms'), changeFrequency: 'yearly', priority: 0.2 },
+    { url: url('/privacy'), changeFrequency: 'yearly', priority: 0.2 },
+    { url: url('/cookies'), changeFrequency: 'yearly', priority: 0.2 },
   ]
 }

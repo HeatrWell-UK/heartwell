@@ -6,11 +6,14 @@ import { PopularNow, pickPopular } from '@/components/home/PopularNow'
 import { FabricStory } from '@/components/home/FabricStory'
 import { FirstTime } from '@/components/home/FirstTime'
 import { VisitUs } from '@/components/home/VisitUs'
+import { CONTACT } from '@/config/contact'
 import { HomeFaq } from '@/components/home/HomeFaq'
 import { getCategories, getFabricLibrary, getListing } from '@/lib/catalogue/listing'
 import { categoryHref } from '@/lib/catalogue/tree'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { getDeliveryInfo } from '@/lib/product/load'
+import { jsonLdString, organizationJsonLd } from '@/lib/product/seo'
+import { SITE_URL } from '@/config/site'
 
 // Rebuilt at most every five minutes, so the delivery dates and featured sofas stay current.
 export const revalidate = 300
@@ -27,6 +30,7 @@ export default async function HomePage() {
 
   return (
     <div className="pb-14 lg:pb-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(organizationJsonLd(SITE_URL)) }} />
       <Hero />
       <PromiseTiles />
       <HowOrderingWorks />
@@ -34,10 +38,14 @@ export default async function HomePage() {
       <PopularNow products={pickPopular(listing)} allHref={sofas ? categoryHref(tree, sofas) : '/search'} allLabel={`Shop all ${listing.length} pieces`} />
       <FabricStory collections={fabrics} />
       <FirstTime />
-      {/* Shown once the address is set (Phase 16). */}
-      <div className="mx-auto max-w-[1200px] px-4 pt-12 empty:hidden lg:px-6 lg:pt-20">
-        <VisitUs />
-      </div>
+      {/* Shown only while there’s an address to visit (src/config/contact.ts). */}
+      {CONTACT.visitAddress && (
+        <div className="mx-auto max-w-[1200px] px-4 pt-12 lg:px-6 lg:pt-20">
+          <div className="max-w-[46rem]">
+            <VisitUs />
+          </div>
+        </div>
+      )}
       <HomeFaq delivery={delivery} fabricCount={fabricCount} />
     </div>
   )

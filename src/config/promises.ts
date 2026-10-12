@@ -39,6 +39,26 @@ export const PROMISES = {
   },
 } as const
 
+/**
+ * The figures behind Delivery & returns, the FAQ and the terms. Prices for
+ * delivery extras live in shop_settings; these are the rules around them.
+ * Change one here and every page that states it changes with it.
+ */
+export const POLICIES = {
+  /** Days from delivery to cancel a ready-made piece for any reason (Consumer Contracts Regulations). */
+  changeOfMindDays: 14,
+  /** Days to refund once a cancelled piece is back with us. */
+  refundDays: 14,
+  /** Working days after ordering to change or cancel a made-to-order piece, before it's made. */
+  madeToOrderChangeWorkingDays: 2,
+  /** Hours after delivery to tell us about transit damage, with photos. */
+  damageReportHours: 24,
+  /** Charged when a booked delivery is missed and the trip has to be made again. */
+  missedDeliveryCharge: 50,
+  /** Frame and springs guarantee, in years. */
+  guaranteeYears: 1,
+} as const
+
 /** The one sentence in the bar at the top of every page. */
 export const ANNOUNCEMENT = 'Free UK Mainland delivery. Pay nothing until it arrives.'
 

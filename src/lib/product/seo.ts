@@ -2,7 +2,8 @@
 // reviews exist, never invented ones), a share image and a plain description.
 
 import { BRAND } from '@/config/brand'
-import { PROMISES } from '@/config/promises'
+import { CONTACT } from '@/config/contact'
+import { POLICIES, PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
 import { fromPrice, unitPrice } from '@/lib/catalogue/pricing'
 import { productHref } from './helpers'
@@ -45,9 +46,42 @@ export function jsonLdString(data: unknown): string {
   return JSON.stringify(data).replace(/</g, '\\u003c')
 }
 
-export function productJsonLd(p: ProductPageData, siteUrl: string) {
+/** Free delivery in Great Britain, in the shop's working-day window. */
+function shippingDetails(delivery: { minDays: number; maxDays: number } | null) {
+  return {
+    '@type': 'OfferShippingDetails',
+    shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'GBP' },
+    shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'GB' },
+    ...(delivery
+      ? {
+          deliveryTime: {
+            '@type': 'ShippingDeliveryTime',
+            handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+            transitTime: { '@type': 'QuantitativeValue', minValue: delivery.minDays, maxValue: delivery.maxDays, unitCode: 'DAY' },
+          },
+        }
+      : {}),
+  }
+}
+
+/** Ready-made: 14 days to change your mind, return at the customer's cost. Made to order: exempt. */
+export function returnPolicy(madeToOrder: boolean) {
+  return madeToOrder
+    ? { '@type': 'MerchantReturnPolicy', applicableCountry: 'GB', returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted' }
+    : {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'GB',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: POLICIES.changeOfMindDays,
+        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+      }
+}
+
+export function productJsonLd(p: ProductPageData, siteUrl: string, delivery: { minDays: number; maxDays: number } | null = null) {
   const url = `${siteUrl}/products/${p.slug}`
   const availability = p.madeToOrder ? 'https://schema.org/MadeToOrder' : 'https://schema.org/InStock'
+  const shipping = shippingDetails(delivery)
+  const returns = returnPolicy(p.madeToOrder)
   const images = [...p.variants.map((v) => v.image), ...p.gallery].filter((x): x is string => Boolean(x))
   return {
     '@context': 'https://schema.org',
@@ -87,6 +121,8 @@ export function productJsonLd(p: ProductPageData, siteUrl: string) {
         availability,
         itemCondition: 'https://schema.org/NewCondition',
         seller: { '@type': 'Organization', name: BRAND.name },
+        shippingDetails: shipping,
+        hasMerchantReturnPolicy: returns,
       },
     })),
   }
@@ -97,5 +133,32 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[], siteUr
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: items.map((item, i) => ({ '@type': 'ListItem', position: i + 1, name: item.name, item: `${siteUrl}${item.path}` })),
+  }
+}
+
+/** Who runs the shop, for search engines: name, logo, contact, address and profiles (each only once set). */
+export function organizationJsonLd(siteUrl: string) {
+  const a = CONTACT.visitAddress
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${siteUrl}/#organization`,
+    name: BRAND.name,
+    ...(CONTACT.trading.companyName ? { legalName: CONTACT.trading.companyName } : {}),
+    url: siteUrl,
+    logo: `${siteUrl}/brand/hw-logo.webp`,
+    description: BRAND.shortDescription,
+    email: CONTACT.email,
+    ...(CONTACT.phoneE164 ? { telephone: CONTACT.phoneE164 } : {}),
+    ...(a ? { address: { '@type': 'PostalAddress', streetAddress: a.street, addressLocality: a.locality, postalCode: a.postcode, addressCountry: 'GB' } } : {}),
+    ...(CONTACT.socials.length ? { sameAs: CONTACT.socials.map((s) => s.url) } : {}),
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      email: CONTACT.email,
+      ...(CONTACT.phoneE164 ? { telephone: CONTACT.phoneE164 } : {}),
+      areaServed: 'GB',
+      availableLanguage: 'en-GB',
+    },
   }
 }

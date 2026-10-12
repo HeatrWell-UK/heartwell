@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Accordion } from '@/components/ui/Accordion'
 import { CARE } from '@/config/care'
 import { PROMISES } from '@/config/promises'
@@ -59,17 +60,25 @@ export function ProductDetails({ product: p, delivery }: { product: ProductPageD
           <p>{PROMISES.payment.long}</p>
           <p>{p.madeToOrder ? 'Made to order for you, so it can’t be returned for a change of mind. Faults are always covered.' : PROMISES.returns.long}</p>
           <p>{PROMISES.guarantee.long}</p>
+          <p>
+            <Link href="/delivery-and-returns">All the details on delivery and returns</Link>
+          </p>
         </>
       ),
     },
     {
       title: 'Care',
       content: (
-        <ul className="flex list-disc flex-col gap-2 pl-5">
-          {CARE[p.coverKind].map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
+        <>
+          <ul className="flex list-disc flex-col gap-2 pl-5">
+            {CARE[p.coverKind].map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+          <p>
+            <Link href="/care-guide">The full care guide</Link>
+          </p>
+        </>
       ),
     },
   ]
