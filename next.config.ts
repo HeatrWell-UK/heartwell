@@ -1,6 +1,22 @@
+import { execFileSync } from 'node:child_process'
 import type { NextConfig } from 'next'
 
 const isProd = process.env.NODE_ENV === 'production'
+
+/**
+ * The commit being built, shown on the Status page and /api/health. A host's
+ * own variable when it sets one (Vercel's build has no .git folder), else
+ * git itself (Hostinger), else "local". Display only: nothing depends on it.
+ */
+function buildCommit(): string {
+  const fromHost = process.env.GIT_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA
+  if (fromHost) return fromHost.slice(0, 7)
+  try {
+    return execFileSync('git', ['rev-parse', '--short=7', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || 'local'
+  } catch {
+    return 'local'
+  }
+}
 const indexable = process.env.SITE_INDEXABLE === 'true' && process.env.NEXT_PUBLIC_APP_ENV === 'production'
 
 /**
@@ -37,6 +53,10 @@ const adminCsp = csp.replace("connect-src 'self'", "connect-src 'self' https://a
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  env: { HW_BUILD_COMMIT: buildCommit() },
+  // Hostinger adds `output: 'standalone'` itself before building, so it isn't
+  // set here (Vercel doesn't need it). Keep this file exporting a plain object:
+  // Hostinger can't add it to a config that is a function.
   // Not experimental.inlineCss: tried in Phase 18, but Next 16.3 also copies the
   // stylesheet twice into each page's React payload: the home page went from
   // 18 KB to 57 KB gzipped to save one 13 KB request (docs/QA-REPORT.md).

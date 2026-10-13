@@ -14,5 +14,5 @@ export const INTEGRATIONS = {
   metaTracking: has('NEXT_PUBLIC_META_PIXEL_ID', 'META_CAPI_ACCESS_TOKEN'),
 } as const
 
-/** The deployed commit, for display only. Hosts set different variables. */
-export const BUILD_COMMIT = (process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GIT_COMMIT_SHA ?? 'local').slice(0, 7)
+/** The deployed commit, for display only: worked out once at build time in next.config.ts. */
+export const BUILD_COMMIT = process.env.HW_BUILD_COMMIT || 'local'
