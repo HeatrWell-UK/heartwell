@@ -37,5 +37,17 @@ export function parseConsent(raw: string | null | undefined): Consent {
   return { marketing: m[2] === '1', analytics: m[3] === '1', statistics: m[4] === '1', at: Number(m[5]) }
 }
 
+/**
+ * A few bytes of script for <head>, run before anything paints: when a
+ * current choice is stored it marks <html data-consent="set">, and CSS hides
+ * the cookie banner the server drew for everyone. So the banner shows at
+ * first paint for new visitors (rather than after the page's JavaScript) and
+ * never flashes for people who have already answered.
+ */
+export function consentFlagScript(cookieName: string): string {
+  const name = cookieName.replace(/[^a-z0-9-]/gi, '')
+  return `try{if(/(?:^|;\\s*)${name}=${CONSENT_VERSION}\\.m[01]a[01]s[01]\\.\\d{9,11}(?:;|$)/.test(document.cookie))document.documentElement.dataset.consent='set'}catch(e){}`
+}
+
 /** What an order records: whether the customer had accepted marketing cookies. */
 export const consentForOrder = (c: Consent): 'granted' | 'denied' | 'unknown' => (c.at === null ? 'unknown' : c.marketing ? 'granted' : 'denied')

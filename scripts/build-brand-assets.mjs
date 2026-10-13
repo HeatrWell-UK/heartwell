@@ -76,6 +76,15 @@ await webp('hw-wordmark-reversed.svg', 420, out('public/brand/hw-wordmark-revers
 await webp('hw-logo.svg', 600, out('public/brand/hw-logo.webp'))
 await webp('hw-logo-reversed.svg', 600, out('public/brand/hw-logo-reversed.webp'))
 
+// The same at exactly 1x, 2x and 3x the size they're shown (header lockup at
+// 31px tall, footer logo 190px wide), for srcset in src/components/brand/Logo.tsx,
+// so a phone downloads only what its screen needs.
+for (const suffix of ['', '-reversed']) {
+  for (const [name, base] of [['hw-mark', 44], ['hw-wordmark', 128], ['hw-logo', 190]]) {
+    for (const x of [1, 2, 3]) await webp(`${name}${suffix}.svg`, base * x, out('public/brand', `${name}${suffix}-${base * x}.webp`))
+  }
+}
+
 // Icons. Next.js serves src/app/icon.png, apple-icon.png and favicon.ico itself.
 await fs.writeFile(out('src/app/icon.png'), await iconSquare(512, { radius: 112 }))
 await fs.writeFile(out('src/app/apple-icon.png'), await iconSquare(180))

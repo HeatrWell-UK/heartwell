@@ -36,12 +36,13 @@ export function SavedView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, key])
 
-  if (!hydrated || (cards === null && saved.items.length > 0)) return <div aria-busy="true" />
+  // Screen-tall while loading and when empty, so the footer never jumps into view.
+  if (!hydrated || (cards === null && saved.items.length > 0)) return <div className="min-h-svh" aria-busy="true" />
 
   const shown = (cards ?? []).filter((c) => saved.isSaved(c.slug))
   if (shown.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-4">
+      <div className="flex min-h-svh flex-col items-start gap-4">
         <p className="text-[17px] text-slate">Nothing saved yet. Tap the heart on any sofa to keep it here, on this phone.</p>
         <ButtonLink href="/sofas">Shop sofas</ButtonLink>
       </div>

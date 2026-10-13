@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { safeNextPath } from '@/lib/http/origin'
+import { clientIp, rateLimit } from '@/lib/http/rate-limit'
 
 export interface SignInState {
   error: string | null
@@ -20,6 +21,11 @@ export async function signIn(_prev: SignInState, formData: FormData): Promise<Si
 
   if (!email || !password) return { error: 'Enter your email address and password.', email }
   if (!SUPABASE_CONFIGURED) return { error: 'Signing in isn’t available right now. Please try again later.', email }
+  // Slows password guessing: per device and per account. Supabase only sees
+  // the server's address, so its own per-address limit can't tell guessers apart.
+  if (!rateLimit(`login:${await clientIp()}`, 10, 15 * 60_000) || !rateLimit(`login-email:${email}`, 10, 15 * 60_000)) {
+    return { error: 'Too many attempts. Please wait 15 minutes and try again.', email }
+  }
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })

@@ -1,10 +1,12 @@
 import 'server-only'
 import { createPublicClient } from '@/lib/supabase/public'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { fabricLabel } from '@/lib/product/helpers'
 
 // Orders as the customer's own pages read them: through the database's
-// order_for_confirmation and track_order, which the public key may call
-// (an order's ID is unguessable; tracking needs the reference and postcode).
+// order_for_confirmation, which the public key may call (an order's ID is
+// unguessable), and track_order, which only the server key may call, so a
+// reference + postcode guess always goes through the website's rate limit.
 
 export interface CustomerOrder {
   id: string
@@ -82,7 +84,7 @@ export interface TrackedOrder {
 }
 
 export async function trackOrder(reference: string, postcode: string): Promise<TrackedOrder | null> {
-  const { data, error } = await createPublicClient().rpc('track_order', { p_reference: reference, p_postcode: postcode })
+  const { data, error } = await createAdminClient().rpc('track_order', { p_reference: reference, p_postcode: postcode })
   if (error) throw new Error(`Track: ${error.message}`)
   if (!data) return null
   const o = data as Raw

@@ -5,8 +5,12 @@ import { BRAND, BRAND_COLOURS } from '@/config/brand'
 import { META_DESCRIPTION } from '@/config/promises'
 import { METADATA_BASE } from '@/config/site'
 import { SITE_INDEXABLE } from '@/config/env'
+import { preconnect } from 'react-dom'
+import { CONSENT_COOKIE } from '@/config/tracking'
+import { consentFlagScript } from '@/lib/tracking/consent'
 
-const besley = Besley({ subsets: ['latin'], variable: '--font-besley', display: 'swap' })
+// Headings and prices use Besley at 700 only (docs/DESIGN.md), so only that weight is downloaded.
+const besley = Besley({ subsets: ['latin'], weight: '700', variable: '--font-besley', display: 'swap' })
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-figtree', display: 'swap' })
 
 export const metadata: Metadata = {
@@ -34,8 +38,14 @@ export const viewport: Viewport = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Photos come from Cloudinary: open that connection while the page is still arriving.
+  preconnect('https://res.cloudinary.com')
   return (
-    <html lang="en-GB" className={`${besley.variable} ${figtree.variable}`}>
+    // suppressHydrationWarning: the head script below may add data-consent to <html> before React starts.
+    <html lang="en-GB" className={`${besley.variable} ${figtree.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: consentFlagScript(CONSENT_COOKIE) }} />
+      </head>
       <body className="flex min-h-svh flex-col bg-white">
         <a
           href="#main"

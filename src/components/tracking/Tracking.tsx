@@ -69,12 +69,6 @@ export function Tracking({ mode }: { mode: TrackingMode }) {
   const consent = parseConsent(raw || null)
   const pathname = usePathname()
   const [settingsOpen, setSettingsOpen] = useState(false)
-  // The banner waits until the browser is in charge, so the server never renders it.
-  const hydrated = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  )
 
   useEffect(() => {
     const open = () => setSettingsOpen(true)
@@ -131,9 +125,11 @@ export function Tracking({ mode }: { mode: TrackingMode }) {
   }, [pathname, consent.marketing])
 
   const askable = APP_ENV !== 'production' || Boolean(TRACKING.metaPixelId || TRACKING.ga4Id)
+  // The server draws the banner for everyone, so it's there at first paint; a
+  // stored choice hides it before then (consentFlagScript) and removes it here.
   return (
     <>
-      {hydrated && askable && consent.at === null && !isPrivatePath(pathname) && !settingsOpen && <ConsentBanner onChoose={() => setSettingsOpen(true)} />}
+      {askable && consent.at === null && !isPrivatePath(pathname) && !settingsOpen && <ConsentBanner onChoose={() => setSettingsOpen(true)} />}
       {/* Remounted each time it opens, so it starts from the saved choice. */}
       <ConsentSettings key={settingsOpen ? 'open' : 'closed'} open={settingsOpen} onClose={() => setSettingsOpen(false)} current={consent} />
     </>
