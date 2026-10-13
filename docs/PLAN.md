@@ -165,7 +165,7 @@ Jobs: conversion sending (every 5 min), OrderFlow re-send (every 15 min), review
 ### 3.9 Test traffic and "it's obvious when something breaks"
 
 - Tracking runs only when **both** the host is a production host **and** `APP_ENV=production`.
-- Orders have an `is_test` flag. It is set automatically before go-live, for QA links (`?qa=1`) and for orders matching test patterns; the owner can also set it from the admin. Test orders never send conversions, never reach OrderFlow and are left out of reports.
+- Orders have an `is_test` flag. It is set automatically before go-live, for QA links (`?qa=1`) and for orders matching test patterns; the owner can also set it from the admin. Test orders never send conversions and are left out of reports. They reach OrderFlow only marked `TEST HW-…`: sent by hand, or automatically while **Send test orders too** is on (for trying the flow before launch; switched off at go-live, and the Health card turns amber if it isn't).
 - **Improvement:** an "Exclude this device" switch in the admin stops your own phone's browsing from counting as customer activity.
 - **Improvement:** an admin **Health** card shows the last accepted Meta event, the last email sent, the last run of every scheduled job, OrderFlow push errors and the last time Meta fetched the catalogue feed, each green, amber or red with a plain-English reason. The health check emails you when something turns red, and a free external monitor (UptimeRobot, decision D8) alerts your phone if the site or the email/tracking checks go down. That covers the case where email itself is what broke.
 
@@ -796,7 +796,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 19 — Go-live
 
 - **Goal:** Heartwell is live.
-- **Does:** production settings (`NEXT_PUBLIC_APP_ENV=production`: the site leaves pre-launch mode, so test orders are cleared or kept flagged first); DNS steps (exact, by account); heartwellsofa.co.uk redirect with email untouched (verified before and after); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
+- **Does:** production settings (`NEXT_PUBLIC_APP_ENV=production`: the site leaves pre-launch mode, so test orders are cleared or kept flagged first); DNS steps (exact, by account); heartwellsofa.co.uk redirect with email untouched (verified before and after); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); OrderFlow's **Send test orders too** switched off and the `TEST HW-…` orders deleted in OrderFlow; final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
 - **Prepare:** item 22.
 - **Prompt:**
   ```

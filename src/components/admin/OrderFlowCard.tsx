@@ -4,10 +4,12 @@ import { ActButton } from '@/components/admin/ActButton'
 import { Card } from '@/components/admin/Fields'
 import { dualTime } from '@/lib/admin/orders'
 import { pushVerdict } from '@/lib/admin/orderflow'
-import { checkOrderFlowReplies, sendToOrderFlow, setOrderFlow } from '@/app/admin/(panel)/settings/orderflow-actions'
+import { checkOrderFlowReplies, sendToOrderFlow, setOrderFlow, setOrderFlowTests } from '@/app/admin/(panel)/settings/orderflow-actions'
 
 export interface OrderFlowState {
   enabled: boolean
+  /** Test orders go automatically too (marked TEST). */
+  send_tests?: boolean
   configured: boolean
   recent: {
     id: number
@@ -31,12 +33,13 @@ const TONE = { ok: 'text-emerald-700', bad: 'text-red-700', wait: 'text-amber-70
 /** Settings → OrderFlow: is it connected, is it on, what did it say, and a test. */
 export function OrderFlowCard({ state }: { state: OrderFlowState }) {
   const status = !state.configured ? 'Not connected' : state.enabled ? 'On' : 'Ready, switched off'
+  const sendsTests = state.send_tests === true
   return (
     <Card
       title="OrderFlow"
       intro="Every real order goes to OrderFlow when it’s placed and whenever its status changes, with its items, total, postcode and delivery day, never the customer’s name, phone, email or address. Anything OrderFlow misses is sent again within 15 minutes."
     >
-      <dl className="grid gap-3 text-sm sm:grid-cols-2">
+      <dl className="grid gap-3 text-sm sm:grid-cols-3">
         <div className="rounded-lg bg-zinc-50 p-3 ring-1 ring-zinc-200">
           <dt className="text-zinc-500">Status</dt>
           <dd className="text-lg font-bold text-zinc-900">{status}</dd>
@@ -45,7 +48,15 @@ export function OrderFlowCard({ state }: { state: OrderFlowState }) {
           <dt className="text-zinc-500">Address and key in Supabase Vault</dt>
           <dd className="text-lg font-bold text-zinc-900">{state.configured ? 'Both set' : 'Not yet'}</dd>
         </div>
+        <div className="rounded-lg bg-zinc-50 p-3 ring-1 ring-zinc-200">
+          <dt className="text-zinc-500">Test orders</dt>
+          <dd className="text-lg font-bold text-zinc-900">{sendsTests ? 'Sent too, marked TEST' : 'Kept here'}</dd>
+        </div>
       </dl>
+      <p className="text-sm text-zinc-600">
+        Before launch every order is a test order, so with test orders kept here nothing reaches OrderFlow on its own. Send them too while you try it
+        out (each arrives as “TEST HW-…”; delete it there afterwards), and switch that off at go-live.
+      </p>
       {!state.configured && (
         <p className="text-sm text-zinc-600">
           To connect it, add <span className="font-mono">orderflow_ingest_url</span> and <span className="font-mono">orderflow_ingest_key</span> as secrets in
@@ -66,6 +77,18 @@ export function OrderFlowCard({ state }: { state: OrderFlowState }) {
             label={state.enabled ? 'Switch off' : 'Switch on'}
             tone={state.enabled ? 'plain' : 'primary'}
             confirm={state.enabled ? 'Stop sending orders to OrderFlow?' : 'Start sending every real order to OrderFlow?'}
+          />
+        )}
+        {(state.configured || sendsTests) && (
+          <ActButton
+            act={setOrderFlowTests.bind(null, !sendsTests)}
+            label={sendsTests ? 'Keep test orders here' : 'Send test orders too'}
+            tone="plain"
+            confirm={
+              sendsTests
+                ? 'Stop sending test orders to OrderFlow? Real orders still go.'
+                : 'Send test orders to OrderFlow too, marked TEST, when they’re placed and whenever their status changes? Delete them there afterwards.'
+            }
           />
         )}
         {state.recent.length > 0 && <ActButton act={checkOrderFlowReplies} label="Check for replies" />}

@@ -53,6 +53,16 @@ describe('OrderFlow on the Health card', () => {
     expect(levelOf({ ...data, orderflow: { ...data.orderflow, enabled: false } }, 'orderflow')!.summary).toMatch(/^Ready but switched off/)
   })
 
+  it('is amber when test orders still go once live, and fine before launch', () => {
+    const d = { ...data, settings: { ...data.settings, orderflow_send_tests: true } }
+    const live = levelOf(d, 'orderflow')!
+    expect(live.level).toBe('warn')
+    expect(live.summary).toContain('test orders still go')
+    const before = buildStatusChecks({ ...ctx, appEnv: 'staging' }, d, null, feedSummary(d), Date.parse('2026-10-13T10:00:00Z')).find((c) => c.key === 'orderflow')!
+    expect(before.level).toBe('ok')
+    expect(before.summary).toContain('test orders included')
+  })
+
   it('reads the catalogue feed from the same snapshot', () => {
     expect(levelOf(data, 'catalogue_feed')).toMatchObject({ level: 'ok' })
     expect(feedSummary({ ...data, feed: null })).toEqual({ lastFetched: null, items: 0 })

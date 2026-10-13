@@ -47,6 +47,11 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 13 October 2026 — OrderFlow: the first order arrived, and test orders can now go automatically
+- **What happened:** the owner switched OrderFlow on and ordered a sofa (HW-100101), but nothing arrived. Before launch every order is a test order, and test orders were never sent automatically. That was by design, but it left nothing to try before launch.
+- **The link works:** HW-100101 was sent by hand, marked TEST. OrderFlow replied 200 "created" (its order 1), and the reply is recorded in the admin.
+- **New switch:** Settings → OrderFlow → **Send test orders too** (`shop_settings.orderflow_send_tests`, off by default; migration `orderflow_test_orders`). While it's on, test orders go when they're placed and at every status change, as `TEST HW-…`, and they're re-sent if missed. The Status page turns amber if it's still on once the shop is live. Order-page wording and `docs/ORDERFLOW.md` updated; a test was added.
+
 ### 13 October 2026 — Recovery: the main database was deleted, heartwell-prod takes over
 - **What happened:** the owner deleted the heartwell-staging Supabase project by accident. Supabase can't restore deleted projects. It held only test data (test orders, leads, logs) and the imported catalogue; nothing real was lost.
 - **heartwell-prod is now the one database.** It already had every migration (schema identical), settings, HEARTSOFA, the admins allowlist, the OrderFlow secrets and the scheduled jobs. Added: the scheduled jobs' site address, the category introductions (migration `category_copy` re-run, fetched from the repository with a checksum), and a **demo catalogue** (owner: "use placeholders and dummy data for now"; the sister shop's catalogue is no longer used).

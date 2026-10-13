@@ -1614,6 +1614,7 @@ export type Database = {
           offer_tier_mid: number
           offer_tier_standard: number
           orderflow_enabled: boolean
+          orderflow_send_tests: boolean
           paid_offer_days: number
           paid_offer_enabled: boolean
           preferred_date_max_days: number
@@ -1640,6 +1641,7 @@ export type Database = {
           offer_tier_mid?: number
           offer_tier_standard?: number
           orderflow_enabled?: boolean
+          orderflow_send_tests?: boolean
           paid_offer_days?: number
           paid_offer_enabled?: boolean
           preferred_date_max_days?: number
@@ -1666,6 +1668,7 @@ export type Database = {
           offer_tier_mid?: number
           offer_tier_standard?: number
           orderflow_enabled?: boolean
+          orderflow_send_tests?: boolean
           paid_offer_days?: number
           paid_offer_enabled?: boolean
           preferred_date_max_days?: number

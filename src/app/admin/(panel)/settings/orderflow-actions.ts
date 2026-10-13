@@ -1,7 +1,8 @@
 'use server'
 
-// OrderFlow from the admin: switch automatic sending on or off, send one
-// order by hand (a test order goes marked TEST), and read OrderFlow's replies.
+// OrderFlow from the admin: switch automatic sending on or off (and whether
+// test orders go too), send one order by hand (a test order goes marked TEST),
+// and read OrderFlow's replies.
 // The address and key live in Supabase Vault and never pass through here.
 
 import { revalidatePath } from 'next/cache'
@@ -40,6 +41,20 @@ export async function setOrderFlow(on: boolean): Promise<Result> {
   if (error) return { ok: false, message: `Couldn’t change it: ${error.message}` }
   revalidatePath('/admin/settings')
   return { ok: true, message: on ? 'On: every real order now goes to OrderFlow when it’s placed and whenever its status changes.' : 'Off: orders stay here only.' }
+}
+
+/** Whether test orders (every order before launch) also go automatically, marked TEST. */
+export async function setOrderFlowTests(on: boolean): Promise<Result> {
+  if (await adminGuard()) return SIGN_IN
+  const { error } = await (await createClient()).from('shop_settings').update({ orderflow_send_tests: on === true }).eq('id', true)
+  if (error) return { ok: false, message: `Couldn’t change it: ${error.message}` }
+  revalidatePath('/admin/settings')
+  return {
+    ok: true,
+    message: on
+      ? 'Test orders now go to OrderFlow too, marked TEST, when they’re placed and whenever their status changes.'
+      : 'Test orders now stay here. You can still send one by hand from its order page.',
+  }
 }
 
 /** Sends one order now, waits a moment for OrderFlow's reply and says what it was. */

@@ -279,10 +279,13 @@ export function buildStatusChecks(
   // OrderFlow
   const of = data.orderflow
   const failed = of.failed_24h ?? 0
+  // Sending test orders too is for trying OrderFlow before launch, not for a live shop.
+  const sendsTests = data.settings?.orderflow_send_tests === true
+  const testsWhileLive = of.enabled && sendsTests && ctx.appEnv === 'production'
   checks.push({
     key: 'orderflow',
     title: 'OrderFlow',
-    level: !of.enabled ? 'warn' : !of.configured || failed > 0 ? 'error' : 'ok',
+    level: !of.enabled ? 'warn' : !of.configured || failed > 0 ? 'error' : testsWhileLive ? 'warn' : 'ok',
     summary: !of.enabled
       ? of.configured
         ? 'Ready but switched off: orders stay here only. Send a test order, then switch it on in Settings.'
@@ -291,7 +294,9 @@ export function buildStatusChecks(
         ? 'Switched on, but OrderFlow’s address or key is missing from Supabase Vault, so no orders are sent.'
         : failed > 0
           ? `${failed} ${failed === 1 ? 'order' : 'orders'} not accepted in the last 24 hours${of.last_error ? `: ${of.last_error}` : ''}. Each is tried again every 15 minutes.`
-          : `On. Last accepted ${when(of.last_ok ?? null)}.`,
+          : testsWhileLive
+            ? 'On, but test orders still go too (marked TEST). Switch test orders off in Settings → OrderFlow now the shop is live.'
+            : `On${sendsTests ? ', test orders included (marked TEST)' : ''}. Last accepted ${when(of.last_ok ?? null)}.`,
   })
 
   return checks

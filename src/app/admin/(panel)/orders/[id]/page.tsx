@@ -289,7 +289,9 @@ export default async function OrderPage({ params, searchParams }: Props) {
           </ul>
         ) : (
           <p className="text-sm text-zinc-600">
-            {order.is_test ? 'Test orders aren’t sent to OrderFlow automatically.' : 'Not sent yet. Real orders go automatically once OrderFlow is switched on in Settings.'}
+            {order.is_test
+              ? 'Not sent. Test orders go automatically only when “Send test orders too” is on in Settings → OrderFlow.'
+              : 'Not sent yet. Real orders go automatically once OrderFlow is switched on in Settings.'}
           </p>
         )}
         <ActButton
@@ -420,7 +422,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
           <form action={setTestFlag} className="flex flex-col gap-2">
             <input type="hidden" name="id" value={order.id} />
             <input type="hidden" name="isTest" value={order.is_test ? 'false' : 'true'} />
-            <p className="text-sm text-zinc-600">{order.is_test ? 'This is a test order. It never counts in reports, tracking or OrderFlow.' : 'Mark as a test if this isn’t a real customer order.'}</p>
+            <p className="text-sm text-zinc-600">{order.is_test ? 'This is a test order. It never counts in reports or tracking, and reaches OrderFlow only marked TEST.' : 'Mark as a test if this isn’t a real customer order.'}</p>
             {!order.is_test && (
               <>
                 <label htmlFor="test-reason" className="sr-only">
