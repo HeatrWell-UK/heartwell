@@ -755,7 +755,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 
 - **Changed 13 October 2026:** the owner has their own product photos and will supply every product detail themselves, so the AI photo pilot and run (old 17A and 17B) and the rewrite of imported titles and descriptions (old 17C) are no longer needed. The sister shop's catalogue is no longer used at all. Until this phase the shop runs on a clearly marked demo catalogue (`supabase/seed/demo-catalogue.json`: "Sample" products, `DEMO-` SKUs, a "Photo coming soon" placeholder).
 - **Goal:** the shop shows Heartwell's real products, with the owner's photos and words, and nothing from the demo.
-- **Builds:** an import from the owner's folder and a filled-in spreadsheet (`docs/catalogue-template.csv`: one row per colourway with range, product, size, back style, colour, SKU, price, sizes in cm, material, made to order, offer tier, description and highlights); photos checked, renamed and uploaded to Cloudinary (`heartwell/products/`) in square and 4:5 crops; ranges, products, colourways and the fabric library through the same `import_catalogue` path; descriptions, highlights and SEO text from the owner's details; the demo products, fabrics and placeholder removed; the Meta feed and sitemap showing the real items. If any photos need a cleaner background, Cloudinary's background tools are offered per photo, never applied to all.
+- **Builds:** an import from the owner's folder and a filled-in spreadsheet (`docs/catalogue-template.csv`: one row per colourway with range, product, size, back style, colour, SKU, price, sizes in cm, material, made to order, offer tier, description and highlights); photos checked, renamed and uploaded to Cloudinary (`heartwell/products/`) in square and 4:5 crops; ranges, products, colourways and the fabric library through the same `import_catalogue` path; descriptions, highlights and SEO text from the owner's details; the demo products, fabrics and placeholder removed; the home page's hero photo (still the design-stage room scene) replaced with one of the owner's; the Meta feed and sitemap showing the real items; PageSpeed Insights re-checked with the real photos. If any photos need a cleaner background, Cloudinary's background tools are offered per photo, never applied to all.
 - **Prepare:** the photo folder (path on this PC) and the spreadsheet filled in; what the "leather" pieces are (D9).
 - **Prompt:**
   ```
@@ -776,13 +776,20 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** the in-app browser checklist I give you (about 10 minutes).
 - **Done means:** all targets met; no open issues rated high.
+- **As built (13 October 2026).** Full findings in `docs/QA-REPORT.md`.
+  - **Security:** one high finding fixed: visitors could read `reviews.order_id`, which opens an order's confirmation page with the customer's details. Visitors now read only the columns the shop shows (migration `visitor_columns`); back-office and supplier names are admin-only; signed-in accounts that aren't admins read none of those tables; `track_order` needs the server key, so guesses go through the website's rate limit; sign-in rate limited. Headers, secrets (code, build, whole git history) and the advisors checked. Owner: switch off Supabase sign-ups; later, legacy keys and leaked-password protection (Pro).
+  - **Sister-shop leak audit:** whole git history, every live page and every visitor-readable table: clean. The hero photo's alt text no longer names a range. One old import file left in Cloudinary for the owner to delete.
+  - **Speed:** Cloudinary preconnect, Besley 700 only, logos at 1x/2x/3x, the cookie banner drawn by the server (hidden before paint for people who have answered), no footer jump on basket, checkout and saved (checkout had a 0.28 shift). `experimental.inlineCss` tried and rejected (it copies the CSS three times into each page). Google's PageSpeed Insights, mobile: product 98, home 96, category 90; accessibility and best practices 100.
+  - **Accessibility (WCAG 2.2 AA):** links in text underlined; gallery dots are 24 px buttons (no swipe needed); fixed bars reserve room and scroll padding (focus never hidden). Lighthouse accessibility 100 on every page measured.
+  - **British English:** every visible word on 50 pages plus emails and admin text: clean.
+  - **Order flow:** checked end to end in the database and rolled back (prices, extras, HEARTSOFA, confirm, island postcode and wrong-price refusals, test orders never sent as real purchases); HW-100101 went through the live site into OrderFlow the same day.
 
 ---
 
 ### Phase 18B — Move to Hostinger
 
 - **Goal:** the shop runs on the hosting account before any ad money or real order touches it.
-- **Does:** creates one Hostinger Node.js app on `main` (section 8.3); copies environment variables (still pre-launch); points the database's scheduled jobs at the new address; checks forwarded-header origins, pg_cron jobs and SMTP from Hostinger; full checkout test on Hostinger's temporary address, ready for Phase 19. Vercel stays as a fallback. (Changed 13 October 2026: one site and one database, so there's no staging app and no catalogue copy.)
+- **Does:** creates one Hostinger Node.js app on `main` (section 8.3); copies environment variables (still pre-launch); points the database's scheduled jobs at the new address; checks forwarded-header origins (and that Hostinger's proxy overwrites `x-forwarded-for`, which the rate limits trust; QA report), pg_cron jobs and SMTP from Hostinger; full checkout test on Hostinger's temporary address, ready for Phase 19. Vercel stays as a fallback. (Changed 13 October 2026: one site and one database, so there's no staging app and no catalogue copy.)
 - **Prepare:** item 3 in section 9.
 - **Prompt:**
   ```

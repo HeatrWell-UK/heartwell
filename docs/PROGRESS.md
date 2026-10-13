@@ -6,13 +6,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Recovered after the main Supabase project was deleted by accident (13 October 2026): heartwell-prod is now the one database, with a demo catalogue until the owner's own products and photos arrive (Phase 17A). Phase 17 (OrderFlow, monitoring, Monday digest) is live. One site, one database, no approval step. |
+| **Current phase** | Phase 18 (quality pass) done and live, 13 October 2026: findings and fixes in `docs/QA-REPORT.md`. heartwell-prod is the one database, with a demo catalogue until the owner's own products and photos arrive (Phase 17A). One site, one database, no approval step. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **The site** | https://heartwellfurniture.vercel.app (branch `main`, pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Moves to Hostinger in Phase 18B and to heartwellfurniture.co.uk at go-live (Phase 19). |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwellfurniture.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 18: quality pass (now), and Phase 17A: your catalogue, whenever your photos and spreadsheet are ready. Then 18B (Hostinger) and 19 (go-live). |
-| **Next prompt** | `Phase 18 — Quality pass. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then run Phase 18.` · when ready: `Phase 17A — My catalogue. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A. My photos and details are in: <folder path>.` |
+| **Next phase** | Phase 18B: move to Hostinger. Phase 17A (your catalogue) whenever your photos and spreadsheet are ready; it can come before or after 18B. Then 19 (go-live). |
+| **Next prompt** | `Phase 18B — Move to Hostinger. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 18B. I'm logged into hPanel on the hosting account and ready to follow your steps.` · when ready: `Phase 17A — My catalogue. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A. My photos and details are in: <folder path>.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -46,6 +46,16 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 13 October 2026 — Phase 18: quality pass
+- **Report:** `docs/QA-REPORT.md` (security, leaks, speed, accessibility, English, order flow, the in-app browser checklist, owner actions).
+- **Security (fixed):** visitors could read the order ID on approved reviews, and an order's ID opens its confirmation page with the customer's details (high; no reviews were published, so nothing was exposed). Visitors now read only the columns the shop shows; back-office and supplier names are admin-only; signed-in accounts that aren't admins read none of those tables; `track_order` needs the server key; sign-in is rate limited (migration `visitor_columns`, applied). New rule in CLAUDE.md: visitor columns are granted one by one.
+- **Found for the owner:** Supabase still allows anyone to sign up (switch it off); an old import file with the sister shop's catalogue data is still in Cloudinary (delete it). Before go-live: disable the legacy API keys; leaked-password protection comes with Pro.
+- **Leaks:** whole git history (623 files), every live page and every visitor-readable table: clean.
+- **Speed:** preconnect, one heading-font weight, right-sized logos, the cookie banner drawn by the server, no footer jump on basket/checkout/saved. `inlineCss` tried and rejected. Google's PageSpeed Insights (mobile): product 98, home 96, category 90.
+- **Accessibility:** underlined links in text, tappable gallery dots, fixed bars never hide focus. Lighthouse accessibility 100 everywhere measured.
+- **English and order flow:** clean; the order flow checked end to end in the database and rolled back.
+- **Checked:** types, lint, 440 tests, build; live on heartwellfurniture.vercel.app.
 
 ### 13 October 2026 — OrderFlow: the first order arrived, and test orders can now go automatically
 - **What happened:** the owner switched OrderFlow on and ordered a sofa (HW-100101), but nothing arrived. Before launch every order is a test order, and test orders were never sent automatically. That was by design, but it left nothing to try before launch.
