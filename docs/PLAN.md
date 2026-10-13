@@ -108,7 +108,7 @@ Not carried over: next-pwa / service worker (it broke the sister's image loading
 | Environment | Where | Data | Tracking | Who sees it |
 | --- | --- | --- | --- | --- |
 | Local | My machine | The one database | Off | Me |
-| **The site** | Branch `main`. Vercel (heartwellfurniture.vercel.app) while we build; one Hostinger Node.js app from Phase 18B; heartwellfurniture.co.uk from go-live | The one Supabase project (`jfacgarejzvpuitiuvrk`) | Off until go-live, then on (production host only) | Anyone with the link, `noindex` until go-live; everyone after |
+| **The site** | Branch `main`. Vercel (heartwellfurniture.vercel.app) while we build; one Hostinger Node.js app from Phase 18B; heartwellfurniture.co.uk from go-live | The one Supabase project (heartwell-prod, `oeakyeibdczedgvncomk`) | Off until go-live, then on (production host only) | Anyone with the link, `noindex` until go-live; everyone after |
 
 Until go-live the site runs in **pre-launch mode** (`NEXT_PUBLIC_APP_ENV=staging`): hidden from search engines, every order a test order, customer emails redirected to the owner's test inbox, no tracking. The owner checks each phase on the real site; nothing there counts until Phase 19 switches the site to production.
 
@@ -116,7 +116,7 @@ One Hostinger Node.js app is used; the second slot stays free.
 
 ### 3.3 Database
 
-- **One Supabase project** in London (eu-west-2): `jfacgarejzvpuitiuvrk` (named heartwell-staging until the owner renames it; changed 13 October 2026, the empty heartwell-prod project is retired). Test orders are flagged `is_test` and never count.
+- **One Supabase project** in London (eu-west-2): **heartwell-prod**, `oeakyeibdczedgvncomk` (changed 13 October 2026; the former heartwell-staging project was deleted by accident the same day, and its data, all test data, is gone). Test orders are flagged `is_test` and never count.
 - **All schema changes are migration files in `supabase/migrations/`**, applied to both. Never edited in the dashboard.
 - **Money rules stay in Postgres:** `place_order`, `confirm_order`, `order_for_confirmation`, `track_order`, `place_manual_order`, `update_order_details`, `request_swatches`, the offer calculator, review stats.
 - **Improvement:** delivery prices, the preferred-date window and offer tier amounts move into a `shop_settings` table that both the database functions and the website read. The sister shop keeps them in two places (TypeScript and SQL) and relies on a mismatch error to notice drift. With one table, the owner can change a price in the admin and it changes everywhere.
@@ -313,6 +313,8 @@ Almost every visitor arrives from a Facebook or Instagram ad, inside the app's o
 ---
 
 ## 6. Catalogue: database, import and new product photos
+
+**Changed 13 October 2026:** the imported catalogue (6.2) and the AI photo plan (6.3) are history. The shop runs on a clearly marked demo catalogue until the owner's own products, details and photos arrive (Phase 17A). The sister shop's catalogue is no longer used.
 
 ### 6.1 Database setup (Phase 4)
 
@@ -749,47 +751,18 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 
 ---
 
-### Phase 17A — Product photos: pilot (was Phase 6)
+### Phase 17A — Your catalogue: your products, details and photos (replaces the old 17A–17C)
 
-- **Goal:** lock the photo recipe so every range comes out in the same room.
-- **Moved (4 October 2026):** after the site is built, at the owner's request.
-- **Update (3 October 2026):** the direction was already tested in the design phase (AI room scenes won, see 6.3). This phase is now the pipeline and prompt-tuning step.
-- **Builds:** the photo pipeline script; the room prompt tightened and tested on about 10 pieces covering every shape (corner, U-shape, 3+2, recliner, armchair, footstool, light and dark fabrics); the admin **Photos** page (original vs result, seed, regenerate, approve); a credit-usage readout from Cloudinary.
-- **Prepare:** item 23 (Lily originals), so the pilot can include that range.
+- **Changed 13 October 2026:** the owner has their own product photos and will supply every product detail themselves, so the AI photo pilot and run (old 17A and 17B) and the rewrite of imported titles and descriptions (old 17C) are no longer needed. The sister shop's catalogue is no longer used at all. Until this phase the shop runs on a clearly marked demo catalogue (`supabase/seed/demo-catalogue.json`: "Sample" products, `DEMO-` SKUs, a "Photo coming soon" placeholder).
+- **Goal:** the shop shows Heartwell's real products, with the owner's photos and words, and nothing from the demo.
+- **Builds:** an import from the owner's folder and a filled-in spreadsheet (`docs/catalogue-template.csv`: one row per colourway with range, product, size, back style, colour, SKU, price, sizes in cm, material, made to order, offer tier, description and highlights); photos checked, renamed and uploaded to Cloudinary (`heartwell/products/`) in square and 4:5 crops; ranges, products, colourways and the fabric library through the same `import_catalogue` path; descriptions, highlights and SEO text from the owner's details; the demo products, fabrics and placeholder removed; the Meta feed and sitemap showing the real items. If any photos need a cleaner background, Cloudinary's background tools are offered per photo, never applied to all.
+- **Prepare:** the photo folder (path on this PC) and the spreadsheet filled in; what the "leather" pieces are (D9).
 - **Prompt:**
   ```
-  Phase 17A — Photo pilot. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A.
+  Phase 17A — My catalogue. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A. My photos and details are in: <folder path>.
   ```
-- **Phone test:** open Admin → Photos, compare the versions, and reply with your choice and any changes (warmer, lighter floor, a different backdrop colour…).
-- **Done means:** you've chosen the direction; the cost per image is confirmed from Cloudinary usage.
-
----
-
-### Phase 17B — Product photos: full run and approval (was Phase 7)
-
-- **Goal:** every live variant shows an approved Heartwell photo.
-- **Builds:** the batch run in the chosen direction; new permanent assets in square and 4:5 crops; approve / regenerate / reject in Admin → Photos; approved photos linked to variants, products, ranges and categories.
-- **Prepare:** 20–30 minutes on your phone to approve photos.
-- **Prompt:**
-  ```
-  Phase 17B — Photo run. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17B. Direction chosen in Phase 17A: <A / B / mix, plus any notes>.
-  ```
-- **Phone test:** approve the batch in Admin → Photos; regenerate any you don't like.
-- **Done means:** every active variant has an approved photo; the originals are untouched; credits stay within budget.
-
----
-
-### Phase 17C — Catalogue content: titles, descriptions and SEO
-
-- **Goal:** every product, range and category in Heartwell's own words, ready for launch.
-- **Builds:** the restyled title format (range names kept, D4); **new descriptions, highlights and SEO titles and descriptions for 64 products, 16 ranges and every category**, written in Heartwell's voice with delivery wording from `src/config/promises.ts`; the leather wording settled (D9); everything editable in the admin. Updated in place, so product URLs and IDs don't change.
-- **Prepare:** item 8 (what the "leather" recliners are).
-- **Prompt:**
-  ```
-  Phase 17C — Catalogue content. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17C. The "Leather" recliners are: <genuine / bonded / PU / not sure>. Title style: <any preferences>.
-  ```
-- **Phone test:** open five products of different shapes: title, description and highlights read well and match the photos and specifications.
-- **Done means:** no empty descriptions; the leak scan finds no sister text; every page has its own SEO title and description.
+- **Phone test:** open five products of different shapes: photos, title, price, sizes and description are right; check out one as a test.
+- **Done means:** no demo rows left; every live colourway has the owner's photo; the Meta feed lists only real products.
 
 ---
 

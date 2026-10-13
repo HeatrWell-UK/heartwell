@@ -144,3 +144,18 @@ describe('Monday digest', () => {
     expect(email.text).not.toContain('Where confirmed orders came from')
   })
 })
+
+describe('server key', () => {
+  const at = Date.parse('2026-10-13T10:00:00Z')
+  const keyCheck = (works: boolean | null) => buildStatusChecks({ ...ctx, secretKeyWorks: works }, data, null, feedSummary(data), at).find((c) => c.key === 'server_key')!
+
+  it('is red when the key is set but belongs to another database', () => {
+    expect(keyCheck(false)).toMatchObject({ level: 'error' })
+    expect(keyCheck(false).summary).toContain('doesn’t open this database')
+  })
+
+  it('is green when it works, or when it hasn’t been tried', () => {
+    expect(keyCheck(true).level).toBe('ok')
+    expect(keyCheck(null).level).toBe('ok')
+  })
+})

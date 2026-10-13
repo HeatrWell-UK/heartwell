@@ -34,7 +34,8 @@ Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Main
 ## Code and platform
 - Next.js 16 (App Router), React 19, TypeScript strict, Tailwind v4, Supabase, Cloudinary (custom loader), Nodemailer via Hostinger SMTP.
 - Hosting: one Vercel project (team "Heartwell", Hobby, lhr1, production deploys from `main`, preview deployments off) while we build, with `NEXT_PUBLIC_APP_ENV=staging` (pre-launch) until go-live; one Hostinger Node.js app from Phase 18B, before ads or real orders. Keep the code portable: no Vercel crons, no `VERCEL_*` variables in logic, no Vercel-only features; scheduled jobs run from Supabase pg_cron; behind the proxy, build origins from forwarded headers (`externalOrigin`).
-- One Supabase project: `jfacgarejzvpuitiuvrk` (it was named heartwell-staging; the owner renames it "heartwell"). Schema changes only as files in `supabase/migrations/`, named after the version the project records.
+- One Supabase project: **heartwell-prod**, `oeakyeibdczedgvncomk` (the old heartwell-staging project was deleted on 13 October 2026). Schema changes only as files in `supabase/migrations/`, named after the version the project records. Never touch any other Supabase project.
+- The catalogue is a demo (`supabase/seed/demo-catalogue.json`: "Sample" products, `DEMO-` SKUs, a placeholder photo) until the owner's own products, details and photos replace it (Phase 17A). Nothing from the sister shop's catalogue is used any more.
 - Customer-facing UI follows `docs/DESIGN.md` and must not resemble the sister shop (no warm cream, no amber accent, no Fraunces or Geist, no heavy motion). CSS-only motion. Phone-first; built for the Facebook and Instagram in-app browsers.
 - The admin keeps the sister shop's admin design, with Heartwell branding.
 - British English everywhere: sofa, wardrobe, basket, £, UK dates (3 October 2026, 03/10/2026).

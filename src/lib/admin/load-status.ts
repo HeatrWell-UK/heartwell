@@ -2,7 +2,7 @@ import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { buildStatusChecks, feedSummary, type AdminStatusData } from './status'
-import { statusContext } from './status-context'
+import { checkedStatusContext } from './status-context'
 
 /** Everything the Home and Status pages show, from the database's one status snapshot. */
 export async function loadStatus() {
@@ -20,6 +20,6 @@ export async function loadStatus() {
     }
   }
 
-  const checks = buildStatusChecks(statusContext(), data, dbError, feedSummary(data))
+  const checks = buildStatusChecks(await checkedStatusContext(), data, dbError, feedSummary(data))
   return { data, checks }
 }

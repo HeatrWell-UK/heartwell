@@ -1,0 +1,1055 @@
+{
+  "version": 1,
+  "product_types": [
+    {
+      "slug": "sofa",
+      "name": "Sofa",
+      "name_plural": "Sofas",
+      "spec_fields": [
+        {
+          "key": "shape",
+          "label": "Shape",
+          "kind": "text"
+        },
+        {
+          "key": "seats",
+          "label": "Seats",
+          "kind": "number"
+        },
+        {
+          "key": "material",
+          "label": "Material",
+          "kind": "text"
+        },
+        {
+          "key": "reclining",
+          "label": "Reclining",
+          "kind": "text"
+        },
+        {
+          "key": "arms",
+          "label": "Arms",
+          "kind": "text"
+        },
+        {
+          "key": "feet",
+          "label": "Feet",
+          "kind": "text"
+        },
+        {
+          "key": "back_cushions",
+          "label": "Back cushions",
+          "kind": "text"
+        },
+        {
+          "key": "seat_cushions",
+          "label": "Seat cushions",
+          "kind": "text"
+        },
+        {
+          "key": "cushions_included",
+          "label": "All cushions included",
+          "kind": "boolean"
+        },
+        {
+          "key": "deep_buttoned_arms",
+          "label": "Deep buttoned arms",
+          "kind": "boolean"
+        },
+        {
+          "key": "usb_ports",
+          "label": "USB ports",
+          "kind": "boolean"
+        },
+        {
+          "key": "cup_holders",
+          "label": "Cup holders",
+          "kind": "boolean"
+        },
+        {
+          "key": "storage",
+          "label": "Storage",
+          "kind": "boolean"
+        },
+        {
+          "key": "led_lights",
+          "label": "LED lights",
+          "kind": "boolean"
+        },
+        {
+          "key": "pieces",
+          "label": "Pieces",
+          "kind": "pieces"
+        }
+      ],
+      "filters": [
+        "shape",
+        "seats",
+        "width",
+        "material",
+        "colour",
+        "reclining",
+        "made_to_order",
+        "price"
+      ],
+      "material_kinds": [
+        "fabric",
+        "other"
+      ],
+      "removal_unit": "seat",
+      "google_product_category": "Furniture > Sofas",
+      "meta_product_category": "Furniture > Sofas",
+      "sort": 1
+    },
+    {
+      "slug": "armchair",
+      "name": "Armchair",
+      "name_plural": "Armchairs",
+      "spec_fields": [
+        {
+          "key": "shape",
+          "label": "Shape",
+          "kind": "text"
+        },
+        {
+          "key": "seats",
+          "label": "Seats",
+          "kind": "number"
+        },
+        {
+          "key": "material",
+          "label": "Material",
+          "kind": "text"
+        },
+        {
+          "key": "reclining",
+          "label": "Reclining",
+          "kind": "text"
+        },
+        {
+          "key": "arms",
+          "label": "Arms",
+          "kind": "text"
+        },
+        {
+          "key": "feet",
+          "label": "Feet",
+          "kind": "text"
+        },
+        {
+          "key": "back_cushions",
+          "label": "Back cushions",
+          "kind": "text"
+        },
+        {
+          "key": "seat_cushions",
+          "label": "Seat cushions",
+          "kind": "text"
+        },
+        {
+          "key": "cushions_included",
+          "label": "All cushions included",
+          "kind": "boolean"
+        },
+        {
+          "key": "deep_buttoned_arms",
+          "label": "Deep buttoned arms",
+          "kind": "boolean"
+        },
+        {
+          "key": "usb_ports",
+          "label": "USB ports",
+          "kind": "boolean"
+        },
+        {
+          "key": "cup_holders",
+          "label": "Cup holders",
+          "kind": "boolean"
+        },
+        {
+          "key": "storage",
+          "label": "Storage",
+          "kind": "boolean"
+        },
+        {
+          "key": "led_lights",
+          "label": "LED lights",
+          "kind": "boolean"
+        },
+        {
+          "key": "pieces",
+          "label": "Pieces",
+          "kind": "pieces"
+        }
+      ],
+      "filters": [
+        "material",
+        "colour",
+        "reclining",
+        "made_to_order",
+        "price"
+      ],
+      "material_kinds": [
+        "fabric",
+        "other"
+      ],
+      "removal_unit": "seat",
+      "google_product_category": "Furniture > Chairs > Arm Chairs, Recliners & Sleeper Chairs",
+      "meta_product_category": "Furniture > Chairs > Arm Chairs, Recliners & Sleeper Chairs",
+      "sort": 2
+    },
+    {
+      "slug": "footstool",
+      "name": "Footstool",
+      "name_plural": "Footstools",
+      "spec_fields": [
+        {
+          "key": "material",
+          "label": "Material",
+          "kind": "text"
+        },
+        {
+          "key": "feet",
+          "label": "Feet",
+          "kind": "text"
+        }
+      ],
+      "filters": [
+        "material",
+        "colour",
+        "made_to_order",
+        "price"
+      ],
+      "material_kinds": [
+        "fabric",
+        "other"
+      ],
+      "removal_unit": "item",
+      "google_product_category": "Furniture > Ottomans",
+      "meta_product_category": "Furniture > Ottomans",
+      "sort": 3
+    }
+  ],
+  "categories": [
+    {
+      "slug": "sofas",
+      "name": "Sofas",
+      "parent_slug": null,
+      "image_url": null,
+      "sort": 1
+    },
+    {
+      "slug": "corner-sofas",
+      "name": "Corner Sofas",
+      "parent_slug": "sofas",
+      "image_url": null,
+      "sort": 1
+    },
+    {
+      "slug": "u-shaped-sofas",
+      "name": "U-Shaped Sofas",
+      "parent_slug": "sofas",
+      "image_url": null,
+      "sort": 2
+    },
+    {
+      "slug": "3-2-sofa-sets",
+      "name": "3+2 Sofa Sets",
+      "parent_slug": "sofas",
+      "image_url": null,
+      "sort": 3
+    },
+    {
+      "slug": "fabric-sofas",
+      "name": "Fabric Sofas",
+      "parent_slug": "sofas",
+      "image_url": null,
+      "sort": 4
+    },
+    {
+      "slug": "leather-sofas",
+      "name": "Leather Sofas",
+      "parent_slug": "sofas",
+      "image_url": null,
+      "sort": 5
+    },
+    {
+      "slug": "recliners",
+      "name": "Recliners",
+      "parent_slug": "sofas",
+      "image_url": null,
+      "sort": 6
+    },
+    {
+      "slug": "electric-recliners",
+      "name": "Electric Recliners",
+      "parent_slug": "recliners",
+      "image_url": null,
+      "sort": 1
+    },
+    {
+      "slug": "armchairs-and-footstools",
+      "name": "Armchairs & Footstools",
+      "parent_slug": "sofas",
+      "image_url": null,
+      "sort": 7
+    }
+  ],
+  "ranges": [
+    {
+      "slug": "sample-velvet",
+      "name": "Sample Velvet",
+      "axis1_name": "Size",
+      "axis2_name": "Back style",
+      "sort": 1
+    },
+    {
+      "slug": "sample-recliner",
+      "name": "Sample Recliner",
+      "axis1_name": "Size",
+      "axis2_name": null,
+      "sort": 2
+    },
+    {
+      "slug": "sample-chenille",
+      "name": "Sample Chenille",
+      "axis1_name": "Size",
+      "axis2_name": null,
+      "sort": 3
+    }
+  ],
+  "material_collections": [
+    {
+      "slug": "sample-velvet",
+      "name": "Sample Velvet",
+      "kind": "fabric",
+      "supplier": null,
+      "supplier_handle": null,
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "slug": "sample-chenille",
+      "name": "Sample Chenille",
+      "kind": "fabric",
+      "supplier": null,
+      "supplier_handle": null,
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "slug": "sample-leather-look",
+      "name": "Sample Leather-look",
+      "kind": "other",
+      "supplier": null,
+      "supplier_handle": null,
+      "sort": 3,
+      "is_active": true
+    }
+  ],
+  "materials": [
+    {
+      "collection": "sample-velvet",
+      "code": "SV01",
+      "name": "Grey",
+      "supplier_title": null,
+      "hex": "#8A8A8E",
+      "image_url": null,
+      "sort": 1,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-velvet",
+      "code": "SV02",
+      "name": "Navy",
+      "supplier_title": null,
+      "hex": "#22304F",
+      "image_url": null,
+      "sort": 2,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-velvet",
+      "code": "SV03",
+      "name": "Emerald",
+      "supplier_title": null,
+      "hex": "#1F5C4A",
+      "image_url": null,
+      "sort": 3,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-velvet",
+      "code": "SV04",
+      "name": "Blush",
+      "supplier_title": null,
+      "hex": "#D9A9A3",
+      "image_url": null,
+      "sort": 4,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-velvet",
+      "code": "SV05",
+      "name": "Mustard",
+      "supplier_title": null,
+      "hex": "#C9962E",
+      "image_url": null,
+      "sort": 5,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-velvet",
+      "code": "SV06",
+      "name": "Charcoal",
+      "supplier_title": null,
+      "hex": "#3B3B3F",
+      "image_url": null,
+      "sort": 6,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-chenille",
+      "code": "SC01",
+      "name": "Cream",
+      "supplier_title": null,
+      "hex": "#E8E0D0",
+      "image_url": null,
+      "sort": 1,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-chenille",
+      "code": "SC02",
+      "name": "Stone",
+      "supplier_title": null,
+      "hex": "#B9AE9C",
+      "image_url": null,
+      "sort": 2,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-chenille",
+      "code": "SC03",
+      "name": "Silver",
+      "supplier_title": null,
+      "hex": "#A9ABAE",
+      "image_url": null,
+      "sort": 3,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-chenille",
+      "code": "SC04",
+      "name": "Mocha",
+      "supplier_title": null,
+      "hex": "#6F5646",
+      "image_url": null,
+      "sort": 4,
+      "is_active": true,
+      "is_swatchable": true
+    },
+    {
+      "collection": "sample-leather-look",
+      "code": "SL01",
+      "name": "Black",
+      "supplier_title": null,
+      "hex": "#1E1C1C",
+      "image_url": null,
+      "sort": 1,
+      "is_active": true,
+      "is_swatchable": false
+    },
+    {
+      "collection": "sample-leather-look",
+      "code": "SL02",
+      "name": "Brown",
+      "supplier_title": null,
+      "hex": "#5A3A28",
+      "image_url": null,
+      "sort": 2,
+      "is_active": true,
+      "is_swatchable": false
+    },
+    {
+      "collection": "sample-leather-look",
+      "code": "SL03",
+      "name": "Grey",
+      "supplier_title": null,
+      "hex": "#6E6E70",
+      "image_url": null,
+      "sort": 3,
+      "is_active": true,
+      "is_swatchable": false
+    }
+  ],
+  "products": [
+    {
+      "range": "sample-velvet",
+      "axis2_value": "High Back",
+      "origin": "uk",
+      "made_to_order": true,
+      "is_featured": true,
+      "is_active": true,
+      "side_a_cm": null,
+      "side_b_cm": null,
+      "gallery_images": [],
+      "slug": "sample-velvet-3-seater-high-back",
+      "title": "Sample Velvet 3 Seater High Back",
+      "product_type": "sofa",
+      "primary_category": "fabric-sofas",
+      "categories": [
+        "fabric-sofas"
+      ],
+      "axis1_value": "3 Seater",
+      "base_price": 549,
+      "width_cm": 205,
+      "depth_cm": 95,
+      "height_cm": 92,
+      "specifications": {
+        "shape": "straight",
+        "seats": 3,
+        "material": "Velvet",
+        "feet": "Black wood",
+        "cushions_included": true
+      },
+      "sort": 100,
+      "offer_tier": "STANDARD"
+    },
+    {
+      "range": "sample-velvet",
+      "axis2_value": "Scatter Back",
+      "origin": "uk",
+      "made_to_order": true,
+      "is_featured": false,
+      "is_active": true,
+      "side_a_cm": null,
+      "side_b_cm": null,
+      "gallery_images": [],
+      "slug": "sample-velvet-3-seater-scatter-back",
+      "title": "Sample Velvet 3 Seater Scatter Back",
+      "product_type": "sofa",
+      "primary_category": "fabric-sofas",
+      "categories": [
+        "fabric-sofas"
+      ],
+      "axis1_value": "3 Seater",
+      "base_price": 569,
+      "width_cm": 205,
+      "depth_cm": 95,
+      "height_cm": 88,
+      "specifications": {
+        "shape": "straight",
+        "seats": 3,
+        "material": "Velvet",
+        "feet": "Black wood",
+        "cushions_included": true
+      },
+      "sort": 110,
+      "offer_tier": "STANDARD"
+    },
+    {
+      "range": "sample-velvet",
+      "axis2_value": "High Back",
+      "origin": "uk",
+      "made_to_order": true,
+      "is_featured": false,
+      "is_active": true,
+      "side_a_cm": null,
+      "side_b_cm": null,
+      "gallery_images": [],
+      "slug": "sample-velvet-3-2-set-high-back",
+      "title": "Sample Velvet 3+2 Set High Back",
+      "product_type": "sofa",
+      "primary_category": "3-2-sofa-sets",
+      "categories": [
+        "3-2-sofa-sets",
+        "fabric-sofas"
+      ],
+      "axis1_value": "3+2 Set",
+      "base_price": 899,
+      "width_cm": 205,
+      "depth_cm": 95,
+      "height_cm": 92,
+      "dimensions_note": "The 2 seater is 165 cm wide.",
+      "specifications": {
+        "shape": "set",
+        "seats": 5,
+        "material": "Velvet",
+        "feet": "Black wood",
+        "cushions_included": true,
+        "pieces": [
+          {
+            "name": "3 seater",
+            "width_cm": 205
+          },
+          {
+            "name": "2 seater",
+            "width_cm": 165
+          }
+        ]
+      },
+      "sort": 200,
+      "offer_tier": "MID"
+    },
+    {
+      "range": "sample-velvet",
+      "axis2_value": "High Back",
+      "origin": "uk",
+      "made_to_order": true,
+      "is_featured": true,
+      "is_active": true,
+      "side_a_cm": 240,
+      "side_b_cm": 200,
+      "gallery_images": [],
+      "slug": "sample-velvet-corner-high-back",
+      "title": "Sample Velvet Corner Sofa High Back",
+      "product_type": "sofa",
+      "primary_category": "corner-sofas",
+      "categories": [
+        "corner-sofas",
+        "fabric-sofas"
+      ],
+      "axis1_value": "Corner",
+      "base_price": 799,
+      "width_cm": 240,
+      "depth_cm": 95,
+      "height_cm": 92,
+      "specifications": {
+        "shape": "corner",
+        "seats": 5,
+        "material": "Velvet",
+        "feet": "Black wood",
+        "cushions_included": true
+      },
+      "sort": 300,
+      "offer_tier": "MID"
+    },
+    {
+      "range": "sample-velvet",
+      "axis2_value": "High Back",
+      "origin": "uk",
+      "made_to_order": true,
+      "is_featured": false,
+      "is_active": true,
+      "side_a_cm": 180,
+      "side_b_cm": 180,
+      "gallery_images": [],
+      "slug": "sample-velvet-u-shape-high-back",
+      "title": "Sample Velvet U-Shape High Back",
+      "product_type": "sofa",
+      "primary_category": "u-shaped-sofas",
+      "categories": [
+        "u-shaped-sofas",
+        "corner-sofas",
+        "fabric-sofas"
+      ],
+      "axis1_value": "U-Shape",
+      "base_price": 1099,
+      "width_cm": 300,
+      "depth_cm": 95,
+      "height_cm": 92,
+      "specifications": {
+        "shape": "u-shape",
+        "seats": 7,
+        "material": "Velvet",
+        "feet": "Black wood",
+        "cushions_included": true
+      },
+      "sort": 400,
+      "offer_tier": "HIGH"
+    },
+    {
+      "range": "sample-recliner",
+      "axis2_value": null,
+      "origin": "imported",
+      "made_to_order": false,
+      "is_featured": false,
+      "is_active": true,
+      "side_a_cm": null,
+      "side_b_cm": null,
+      "gallery_images": [],
+      "slug": "sample-recliner-3-seater-electric",
+      "title": "Sample Recliner 3 Seater Electric",
+      "product_type": "sofa",
+      "primary_category": "electric-recliners",
+      "categories": [
+        "electric-recliners",
+        "recliners",
+        "leather-sofas"
+      ],
+      "axis1_value": "3 Seater",
+      "base_price": 949,
+      "width_cm": 200,
+      "depth_cm": 98,
+      "height_cm": 100,
+      "specifications": {
+        "shape": "straight",
+        "seats": 3,
+        "material": "Leather-look",
+        "reclining": "Electric"
+      },
+      "sort": 500,
+      "offer_tier": "HIGH"
+    },
+    {
+      "range": "sample-recliner",
+      "axis2_value": null,
+      "origin": "imported",
+      "made_to_order": false,
+      "is_featured": false,
+      "is_active": true,
+      "side_a_cm": null,
+      "side_b_cm": null,
+      "gallery_images": [],
+      "slug": "sample-recliner-armchair",
+      "title": "Sample Recliner Armchair",
+      "product_type": "armchair",
+      "primary_category": "armchairs-and-footstools",
+      "categories": [
+        "armchairs-and-footstools",
+        "recliners",
+        "leather-sofas"
+      ],
+      "axis1_value": "Armchair",
+      "base_price": 349,
+      "width_cm": 95,
+      "depth_cm": 98,
+      "height_cm": 100,
+      "specifications": {
+        "shape": "armchair",
+        "seats": 1,
+        "material": "Leather-look",
+        "reclining": "Manual"
+      },
+      "sort": 510,
+      "offer_tier": "STANDARD"
+    },
+    {
+      "range": "sample-chenille",
+      "axis2_value": null,
+      "origin": "uk",
+      "made_to_order": true,
+      "is_featured": false,
+      "is_active": true,
+      "side_a_cm": null,
+      "side_b_cm": null,
+      "gallery_images": [],
+      "slug": "sample-chenille-2-seater",
+      "title": "Sample Chenille 2 Seater",
+      "product_type": "sofa",
+      "primary_category": "fabric-sofas",
+      "categories": [
+        "fabric-sofas"
+      ],
+      "axis1_value": "2 Seater",
+      "base_price": 449,
+      "width_cm": 165,
+      "depth_cm": 92,
+      "height_cm": 88,
+      "specifications": {
+        "shape": "straight",
+        "seats": 2,
+        "material": "Chenille",
+        "feet": "Oak",
+        "cushions_included": true
+      },
+      "sort": 600,
+      "offer_tier": "STANDARD"
+    },
+    {
+      "range": "sample-chenille",
+      "axis2_value": null,
+      "origin": "uk",
+      "made_to_order": true,
+      "is_featured": false,
+      "is_active": true,
+      "side_a_cm": null,
+      "side_b_cm": null,
+      "gallery_images": [],
+      "slug": "sample-chenille-footstool",
+      "title": "Sample Chenille Footstool",
+      "product_type": "footstool",
+      "primary_category": "armchairs-and-footstools",
+      "categories": [
+        "armchairs-and-footstools",
+        "fabric-sofas"
+      ],
+      "axis1_value": "Footstool",
+      "base_price": 149,
+      "width_cm": 80,
+      "depth_cm": 60,
+      "height_cm": 42,
+      "specifications": {
+        "material": "Chenille",
+        "feet": "Oak"
+      },
+      "sort": 610,
+      "offer_tier": "EXCLUDED"
+    }
+  ],
+  "variants": [
+    {
+      "product": "sample-velvet-3-seater-high-back",
+      "sku": "DEMO-V3SHB-GRY",
+      "colour_name": "Grey",
+      "colour_hex": "#8A8A8E",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-seater-high-back",
+      "sku": "DEMO-V3SHB-NVY",
+      "colour_name": "Navy",
+      "colour_hex": "#22304F",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-seater-high-back",
+      "sku": "DEMO-V3SHB-EMR",
+      "colour_name": "Emerald",
+      "colour_hex": "#1F5C4A",
+      "material_label": "Velvet",
+      "price_adjustment": 20,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 3,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-seater-scatter-back",
+      "sku": "DEMO-V3SSB-GRY",
+      "colour_name": "Grey",
+      "colour_hex": "#8A8A8E",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-seater-scatter-back",
+      "sku": "DEMO-V3SSB-NVY",
+      "colour_name": "Navy",
+      "colour_hex": "#22304F",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-seater-scatter-back",
+      "sku": "DEMO-V3SSB-EMR",
+      "colour_name": "Emerald",
+      "colour_hex": "#1F5C4A",
+      "material_label": "Velvet",
+      "price_adjustment": 20,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 3,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-2-set-high-back",
+      "sku": "DEMO-V32SHB-GRY",
+      "colour_name": "Grey",
+      "colour_hex": "#8A8A8E",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-2-set-high-back",
+      "sku": "DEMO-V32SHB-NVY",
+      "colour_name": "Navy",
+      "colour_hex": "#22304F",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-3-2-set-high-back",
+      "sku": "DEMO-V32SHB-EMR",
+      "colour_name": "Emerald",
+      "colour_hex": "#1F5C4A",
+      "material_label": "Velvet",
+      "price_adjustment": 20,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 3,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-corner-high-back",
+      "sku": "DEMO-VCHB-GRY",
+      "colour_name": "Grey",
+      "colour_hex": "#8A8A8E",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-corner-high-back",
+      "sku": "DEMO-VCHB-NVY",
+      "colour_name": "Navy",
+      "colour_hex": "#22304F",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-corner-high-back",
+      "sku": "DEMO-VCHB-EMR",
+      "colour_name": "Emerald",
+      "colour_hex": "#1F5C4A",
+      "material_label": "Velvet",
+      "price_adjustment": 20,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 3,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-u-shape-high-back",
+      "sku": "DEMO-VUSHB-GRY",
+      "colour_name": "Grey",
+      "colour_hex": "#8A8A8E",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-u-shape-high-back",
+      "sku": "DEMO-VUSHB-NVY",
+      "colour_name": "Navy",
+      "colour_hex": "#22304F",
+      "material_label": "Velvet",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-velvet-u-shape-high-back",
+      "sku": "DEMO-VUSHB-EMR",
+      "colour_name": "Emerald",
+      "colour_hex": "#1F5C4A",
+      "material_label": "Velvet",
+      "price_adjustment": 20,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 3,
+      "is_active": true
+    },
+    {
+      "product": "sample-recliner-3-seater-electric",
+      "sku": "DEMO-R3SE-BLK",
+      "colour_name": "Black",
+      "colour_hex": "#1E1C1C",
+      "material_label": "Leather-look",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-recliner-3-seater-electric",
+      "sku": "DEMO-R3SE-BRN",
+      "colour_name": "Brown",
+      "colour_hex": "#5A3A28",
+      "material_label": "Leather-look",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-recliner-armchair",
+      "sku": "DEMO-RA-BLK",
+      "colour_name": "Black",
+      "colour_hex": "#1E1C1C",
+      "material_label": "Leather-look",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-recliner-armchair",
+      "sku": "DEMO-RA-BRN",
+      "colour_name": "Brown",
+      "colour_hex": "#5A3A28",
+      "material_label": "Leather-look",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-chenille-2-seater",
+      "sku": "DEMO-C2S-CRM",
+      "colour_name": "Cream",
+      "colour_hex": "#E8E0D0",
+      "material_label": "Chenille",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-chenille-2-seater",
+      "sku": "DEMO-C2S-STN",
+      "colour_name": "Stone",
+      "colour_hex": "#B9AE9C",
+      "material_label": "Chenille",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    },
+    {
+      "product": "sample-chenille-footstool",
+      "sku": "DEMO-CF-CRM",
+      "colour_name": "Cream",
+      "colour_hex": "#E8E0D0",
+      "material_label": "Chenille",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 1,
+      "is_active": true
+    },
+    {
+      "product": "sample-chenille-footstool",
+      "sku": "DEMO-CF-STN",
+      "colour_name": "Stone",
+      "colour_hex": "#B9AE9C",
+      "material_label": "Chenille",
+      "price_adjustment": 0,
+      "image_url": "https://res.cloudinary.com/iv3tp2iq/image/upload/v1791879772/heartwell/placeholders/photo-coming-soon.png",
+      "sort": 2,
+      "is_active": true
+    }
+  ]
+}

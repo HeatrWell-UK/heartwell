@@ -45,6 +45,8 @@ export interface StatusContext {
   commit: string
   supabaseConfigured: boolean
   secretKeyConfigured: boolean
+  /** The key was tried against the database: false when it belongs to another project. Unknown (null/undefined) when not tried. */
+  secretKeyWorks?: boolean | null
   smtpConfigured: boolean
   addressLookupConfigured: boolean
   photoUploadsConfigured: boolean
@@ -125,10 +127,12 @@ export function buildStatusChecks(
   checks.push({
     key: 'server_key',
     title: 'Server key',
-    level: ctx.secretKeyConfigured ? 'ok' : 'error',
-    summary: ctx.secretKeyConfigured
-      ? 'Set. The checkout can place orders.'
-      : 'Not set. The checkout can’t place orders until SUPABASE_SECRET_KEY is added in the hosting settings.',
+    level: ctx.secretKeyConfigured && ctx.secretKeyWorks !== false ? 'ok' : 'error',
+    summary: !ctx.secretKeyConfigured
+      ? 'Not set. The checkout can’t place orders until SUPABASE_SECRET_KEY is added in the hosting settings.'
+      : ctx.secretKeyWorks === false
+        ? 'Set, but it doesn’t open this database (it may belong to another Supabase project). Copy the secret key from Supabase → Project Settings → API Keys into SUPABASE_SECRET_KEY.'
+        : 'Set. The checkout can place orders.',
   })
 
   // Catalogue

@@ -6,13 +6,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 17 (OrderFlow, monitoring and the Monday digest) is live on the site (13 October 2026). The project now runs as one site and one database with no approval step (owner, 13 October 2026). OrderFlow is ready and switched off until its address and key are in the one project's Vault. |
+| **Current phase** | Recovered after the main Supabase project was deleted by accident (13 October 2026): heartwell-prod is now the one database, with a demo catalogue until the owner's own products and photos arrive (Phase 17A). Phase 17 (OrderFlow, monitoring, Monday digest) is live. One site, one database, no approval step. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **The site** | https://heartwellfurniture.vercel.app (branch `main`, pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Moves to Hostinger in Phase 18B and to heartwellfurniture.co.uk at go-live (Phase 19). |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwellfurniture.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 17A: product photo pilot. Order from here: 17A–17C (photos and catalogue words), 18, 18B, 19. |
-| **Next prompt** | `Phase 17A — Photo pilot. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A.` |
+| **Next phase** | Phase 18: quality pass (now), and Phase 17A: your catalogue, whenever your photos and spreadsheet are ready. Then 18B (Hostinger) and 19 (go-live). |
+| **Next prompt** | `Phase 18 — Quality pass. Read CLAUDE.md, docs/PLAN.md, docs/DESIGN.md and docs/PROGRESS.md, then run Phase 18.` · when ready: `Phase 17A — My catalogue. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A. My photos and details are in: <folder path>.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -24,7 +24,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - "Visit us": Heartwell's own address, Unit 4, Blacker Street, Burnley BB10 2AF (postcode to confirm), 9am to 5pm, by appointment booked a day ahead (owner, 12 October 2026; opening days to confirm). Set in `src/config/contact.ts`.
 - **Never mention the sister shop** on the Heartwell site (the owner chose to keep them separate).
 - Heartwell's Cloudinary (connected via MCP): Free plan, 25 credits/month (about 3.6 used by 4 Oct 2026). Folders: `heartwell/brand`, `heartwell/samples` (design photos), `heartwell/source/{variants,gallery,categories,fabrics}` (the 162 imported originals, tag `heartwell-source`, never edited), `heartwell/import` (the catalogue payload file, tag `heartwell-import`, catalogue data only; safe to delete). Uploads are signed with the `sign-upload` tool; the account's default preset makes them `overwrite: true`.
-- Catalogue (Phase 5): imported into the one database (`jfacgarejzvpuitiuvrk`). How to re-run: README "Catalogue". The Lily range's 23 original photos are missing from the source library (404); the owner is asked for originals (PLAN section 9, item 23).
+- Catalogue: a **demo** (9 "Sample" products, 23 colourways with `DEMO-` SKUs, 13 sample fabrics, a "Photo coming soon" placeholder at `heartwell/placeholders/photo-coming-soon` in Cloudinary), built by `scripts/catalogue/build-demo.mjs` into `supabase/seed/demo-catalogue.json`. The owner's own products, details and photos replace it in Phase 17A (`docs/catalogue-template.csv`, guide in `docs/CATALOGUE-TEMPLATE.md`). The sister shop's catalogue (Phase 5 import, `reference/`) is no longer used.
 - The Supabase account connected via MCP had no projects as of 3 Oct 2026.
 - Logo concept: `reference/Logo-Concept.jpeg` (brown/cream heart-shaped sofa, "Heartwell / SOFA").
 - Sister repo cloned read-only at `../sister-uksofashop-readonly` (from a zip of master on 3 Oct 2026; no git history).
@@ -32,8 +32,8 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Vercel: team **Heartwell** (slug `heartwell`, `team_ROWTCazIeGNQ0zVEY4xIvRLg`, Hobby, login heartwellsofa@gmail.com), project **heartwell** (`prj_kXuZGVcI3xbw2inPEgTKNE6XUpq5`, Next.js, Node 24, functions in `lhr1`, preview toolbar off, Vercel Authentication off). Vercel deploys straight from the GitHub repo (owner's decision); the build runs the leak check first (`prebuild`).
 - Vercel: one deployment, production from `main`; preview deployments off and other deployment addresses behind Vercel's login (13 October 2026). Environment variables: `NEXT_PUBLIC_APP_ENV=staging` (pre-launch) until go-live; `NEXT_PUBLIC_SUPPORT_EMAIL`; `NEXT_PUBLIC_SITE_URL` = heartwellfurniture.vercel.app; `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` (Production and Preview, owner). No `SITE_INDEXABLE` anywhere.
 - Leak check: banned values live in `reference/leak-terms.txt` (local only). After changing it or the catalogue, run `npm run leaks:fingerprints` and commit `scripts/sister-fingerprints.json`, which holds hashes only.
-- Supabase: organisation "Heartwellsofa" (free plan, owner's choice for now; D2 recommends Pro before launch). **One project** in London: `jfacgarejzvpuitiuvrk` (named heartwell-staging; the owner renames it "heartwell"). It holds everything: catalogue, admin login, settings, scheduled jobs (`private.app_config.site_url` = the site). The empty `heartwell-prod` (`oeakyeibdczedgvncomk`) is retired: the owner deletes it once its two OrderFlow secrets are re-added to the main project. Free projects pause after a week without use.
-- Database rules: every schema change is a file in `supabase/migrations/`, applied to the one project and named after the version it records (the MCP tool records its own time). Security definer functions live in the unexposed `private` schema behind thin `public` wrappers, so Supabase's security advisor stays empty: keep it that way.
+- Supabase: organisation "Heartwellsofa" (free plan, owner's choice for now; D2 recommends Pro before launch). **One project**: **heartwell-prod** `oeakyeibdczedgvncomk` (London). The former heartwell-staging project (`jfacgarejzvpuitiuvrk`) was deleted by accident on 13 October 2026 and can't be recovered; it held only test data. heartwell-prod holds the schema (all migrations), settings, the HEARTSOFA code, the admins allowlist, the two OrderFlow secrets in Vault, the scheduled jobs (`private.app_config.site_url` = heartwellfurniture.vercel.app) and the demo catalogue. Free projects pause after a week without use.
+- Database rules: every schema change is a file in `supabase/migrations/`, applied to heartwell-prod and named after the version it records (the MCP tool records its own time). Security definer functions live in the unexposed `private` schema behind thin `public` wrappers, so Supabase's security advisor stays empty: keep it that way.
 - Pushing from this PC: Git Credential Manager holds two GitHub accounts (heartwellsofa, Muzan787), so a background push must name one: `git -c credential.username=heartwellsofa push`.
 - Connectors: Supabase, Vercel and GitHub were reconnected to the Heartwell accounts by the owner on 6 Oct 2026. If the Supabase connector ever lists a project called "Onium", it's signed into the wrong account: never touch that project.
 - Phone and WhatsApp: 07848 477056 (`src/config/contact.ts`). Shop notifications go to enquiries@heartwellsofa.co.uk (the default) with a copy to heartwellsofa@gmail.com (`SHOP_NOTIFY_COPY`, read from the owner's "heartwellsofa3gmail.com", assumed to mean @gmail.com). Outside production, customer emails go to heartwellsofa@gmail.com (`EMAIL_TEST_INBOX`).
@@ -46,6 +46,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 13 October 2026 — Recovery: the main database was deleted, heartwell-prod takes over
+- **What happened:** the owner deleted the heartwell-staging Supabase project by accident. Supabase can't restore deleted projects. It held only test data (test orders, leads, logs) and the imported catalogue; nothing real was lost.
+- **heartwell-prod is now the one database.** It already had every migration (schema identical), settings, HEARTSOFA, the admins allowlist, the OrderFlow secrets and the scheduled jobs. Added: the scheduled jobs' site address, the category introductions (migration `category_copy` re-run, fetched from the repository with a checksum), and a **demo catalogue** (owner: "use placeholders and dummy data for now"; the sister shop's catalogue is no longer used).
+- **Vercel** now points at heartwell-prod (address and publishable key, both public values). The secret key has to be the owner's: until it's replaced, checkout, saved leads and email logging can't work, and the Status page now says so (the server key is tried against the database, not just checked for being set; tested).
+- **Owner's catalogue:** the AI photo phases (old 17A–17C) are replaced by one phase, **17A — Your catalogue**, from the owner's photo folder and a spreadsheet (`docs/catalogue-template.csv`, guide `docs/CATALOGUE-TEMPLATE.md`).
+- Docs (CLAUDE.md, PLAN sections 3.2, 3.3, 6 and 17A, README, ORDERFLOW) and memory updated.
 
 ### 13 October 2026 — One site, one database, no approval step
 - **Owner's decision:** no staging and no approving. One Supabase project, one Vercel deployment; the owner checks things on the real site and trusts the work. Every phase now ends with what I did, what I need, what to check and what's next.

@@ -9,7 +9,7 @@ import { EMAIL, SMTP_CONFIGURED } from '@/config/email'
 import { APP_ENV } from '@/config/env'
 import { sendEmail } from '@/lib/email/send'
 import { buildStatusChecks, feedSummary, type AdminStatusData } from '@/lib/admin/status'
-import { statusContext } from '@/lib/admin/status-context'
+import { checkedStatusContext } from '@/lib/admin/status-context'
 import { alertEmail, problemsFrom, type AlertNotice } from '@/lib/monitoring/alerts'
 import { digestEmail, type DigestData } from '@/lib/reports/digest'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -78,7 +78,7 @@ async function healthCheck(db: SupabaseClient<Database>, ticket: string): Promis
   const snapshot = await db.rpc('health_snapshot', { p_ticket: ticket })
   if (snapshot.error) throw new Error(snapshot.error.message)
   const data = snapshot.data as unknown as AdminStatusData
-  const problems = problemsFrom(buildStatusChecks(statusContext(), data, null, feedSummary(data)))
+  const problems = problemsFrom(buildStatusChecks(await checkedStatusContext(), data, null, feedSummary(data)))
   const report = await db.rpc('health_report', { p_ticket: ticket, p_problems: problems as unknown as Json })
   if (report.error) throw new Error(report.error.message)
   const { notify, resolved } = report.data as unknown as { notify: AlertNotice[]; resolved: { key: string; title: string }[] }

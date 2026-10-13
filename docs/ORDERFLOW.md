@@ -13,7 +13,7 @@ Heartwell sends its orders to OrderFlow from inside its own database: no website
 ## Your steps
 
 1. Get a **fresh key** from OrderFlow. (The one pasted into our chat on 13 October 2026 has been in a chat transcript; a new one costs nothing.)
-2. In Supabase, open the one project (`jfacgarejzvpuitiuvrk`, named heartwell-staging until you rename it "heartwell") → **Project Settings** → **Vault** → **Add new secret**, twice:
+2. In Supabase, open the one project, **heartwell-prod** → **Project Settings** → **Vault** → **Add new secret**, twice (done on 13 October 2026):
    - Name `orderflow_ingest_url`, value: OrderFlow's address (`https://<their project>.supabase.co/functions/v1/ingest-order`).
    - Name `orderflow_ingest_key`, value: the key (`ofw_live_…`).
 3. Before go-live every order is a test order, so nothing is sent automatically yet; only orders you send by hand, marked TEST.
