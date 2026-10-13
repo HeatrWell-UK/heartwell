@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useBottomCover } from '@/lib/ui/bottom-cover'
 import { Price } from '@/components/ui/Price'
 import { cn } from '@/lib/cn'
 
@@ -11,6 +12,9 @@ import { cn } from '@/lib/cn'
  */
 export function StickyBuyBar({ price, onAdd, watch }: { price: number; onAdd: () => void; watch: RefObject<HTMLElement | null> }) {
   const [shown, setShown] = useState(false)
+  const bar = useRef<HTMLDivElement>(null)
+  // Room at the end of the page while it's up, so it never covers the footer or a focused link.
+  useBottomCover('buy-bar', bar, shown)
 
   useEffect(() => {
     const target = watch.current
@@ -24,7 +28,7 @@ export function StickyBuyBar({ price, onAdd, watch }: { price: number; onAdd: ()
 
   return (
     <div
-      data-sticky-bar={shown ? 'shown' : 'hidden'}
+      ref={bar}
       inert={!shown}
       className={cn(
         'fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/97 px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 transition-transform duration-200 lg:hidden',

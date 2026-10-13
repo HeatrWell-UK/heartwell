@@ -37,6 +37,9 @@ const adminCsp = csp.replace("connect-src 'self'", "connect-src 'self' https://a
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // Not experimental.inlineCss: tried in Phase 18, but Next 16.3 also copies the
+  // stylesheet twice into each page's React payload: the home page went from
+  // 18 KB to 57 KB gzipped to save one 13 KB request (docs/QA-REPORT.md).
   images: {
     loader: 'custom',
     loaderFile: './src/lib/cloudinary-loader.ts',

@@ -210,11 +210,13 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
     errorRef.current?.focus()
   }
 
-  if (!hydrated) return <div className="min-h-[60vh]" aria-busy="true" />
+  // A screen-tall space while the basket is read from the device, and for an
+  // empty basket, so the footer never jumps into view (no layout shift).
+  if (!hydrated) return <div className="min-h-svh" aria-busy="true" />
 
   if (basket.lines.length === 0) {
     return (
-      <div className="flex flex-col items-start gap-4">
+      <div className="flex min-h-svh flex-col items-start gap-4">
         <p className="text-[17px] text-slate">Your basket is empty.</p>
         <ButtonLink href="/sofas">Shop sofas</ButtonLink>
       </div>

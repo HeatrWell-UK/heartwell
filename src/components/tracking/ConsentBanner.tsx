@@ -4,7 +4,8 @@
 // exactly the same (equal weight, as the UK rules expect), with "Choose" for
 // anyone who wants to pick. It sits at the bottom and never blocks the page.
 
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
+import { useBottomCover } from '@/lib/ui/bottom-cover'
 import Link from 'next/link'
 import { Sheet } from '@/components/ui/Sheet'
 import { buttonClasses } from '@/components/ui/Button'
@@ -16,9 +17,14 @@ const NONE = { marketing: false, analytics: false, statistics: true }
 
 export function ConsentBanner({ onChoose }: { onChoose: () => void }) {
   const id = useId()
+  const ref = useRef<HTMLElement>(null)
+  useBottomCover('consent', ref, true)
   return (
     <section
+      ref={ref}
       aria-labelledby={`${id}-title`}
+      // Hidden before the first paint when a choice is already stored (see consentFlagScript).
+      data-consent-banner=""
       className="fixed inset-x-0 bottom-0 z-[60] border-t border-line bg-white px-4 pb-[calc(16px+env(safe-area-inset-bottom))] pt-4 shadow-[var(--shadow-overlay)] print:hidden"
     >
       <div className="mx-auto flex max-w-[1200px] flex-col gap-3 lg:flex-row lg:items-center lg:gap-8">
@@ -28,7 +34,7 @@ export function ConsentBanner({ onChoose }: { onChoose: () => void }) {
           </h2>
           <p className="text-[15px] leading-snug text-slate">
             May we use cookies to see how the site is used and to measure our Facebook and Instagram ads? Your basket works either way.{' '}
-            <Link href="/cookies" className="font-semibold">
+            <Link href="/cookies" className="font-semibold underline underline-offset-2">
               More about cookies
             </Link>
           </p>

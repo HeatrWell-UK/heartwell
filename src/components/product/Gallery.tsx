@@ -127,10 +127,23 @@ export function Gallery({
         )}
       </div>
 
+      {/* The dots are buttons too (24px targets), so every photo is one tap away without swiping. */}
       {images.length > 1 && (
-        <div aria-hidden="true" className="flex justify-center gap-1.5 pt-3">
+        <div className="flex justify-center pt-1.5">
           {images.map((img, i) => (
-            <span key={img.src} className={cn('h-1.5 rounded-full transition-[width] duration-200', i === index ? 'w-5 bg-velvet' : 'w-1.5 bg-[#DCCFD0]')} />
+            <button
+              key={img.src}
+              type="button"
+              aria-label={`Photo ${i + 1} of ${images.length}`}
+              aria-current={i === index ? 'true' : undefined}
+              onClick={() => {
+                setShowRest(true)
+                go(i)
+              }}
+              className="flex h-6 min-w-6 items-center justify-center px-[3px]"
+            >
+              <span className={cn('h-1.5 rounded-full transition-[width] duration-200', i === index ? 'w-5 bg-velvet' : 'w-1.5 bg-[#DCCFD0]')} />
+            </button>
           ))}
         </div>
       )}

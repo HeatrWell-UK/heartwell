@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
-import { effectiveMode, isPrivatePath, liveAllowed } from '@/config/tracking'
-import { consentForOrder, NO_CHOICE, parseConsent, serialiseConsent } from '@/lib/tracking/consent'
+import { CONSENT_COOKIE, effectiveMode, isPrivatePath, liveAllowed } from '@/config/tracking'
+import { consentFlagScript, consentForOrder, NO_CHOICE, parseConsent, serialiseConsent } from '@/lib/tracking/consent'
 import { metaEvent, metaUserData, tooOldForMeta } from '@/lib/tracking/meta-event'
 import { anonymousClientId, ga4ClientIdFromCookie, ga4Purchase } from '@/lib/tracking/ga4-event'
 import { redactedLocation } from '@/lib/tracking/redact'
@@ -29,6 +29,21 @@ describe('consent', () => {
     expect(consentForOrder(NO_CHOICE)).toBe('unknown')
     expect(consentForOrder(parseConsent('1.m1a0s1.1760000000'))).toBe('granted')
     expect(consentForOrder(parseConsent('1.m0a1s1.1760000000'))).toBe('denied')
+  })
+
+  it('hides the banner before first paint only when parseConsent would find a choice', () => {
+    // Runs the <head> script against a stand-in document, as the browser would.
+    const flagged = (cookie: string) => {
+      const doc = { cookie, documentElement: { dataset: {} as Record<string, string> } }
+      new Function('document', consentFlagScript(CONSENT_COOKIE))(doc)
+      return doc.documentElement.dataset.consent === 'set'
+    }
+    for (const cookie of ['hw-consent=1.m1a0s1.1760000000', 'a=1; hw-consent=1.m0a0s1.1760000000; b=2', `x=y; hw-consent=${serialiseConsent({ marketing: false, analytics: true, statistics: false })}`]) {
+      expect(flagged(cookie)).toBe(true)
+    }
+    for (const cookie of ['', 'hw-consent=0.m1a1s1.1760000000', 'hw-consent=rubbish', 'not-hw-consent=1.m1a0s1.1760000000', 'hw-consent=1.m1a0s1.1760000000x']) {
+      expect(flagged(cookie)).toBe(false)
+    }
   })
 })
 

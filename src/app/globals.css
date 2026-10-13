@@ -151,11 +151,16 @@
 /* The page doesn't scroll behind an open sheet. */
 html:has(dialog.hw-sheet[open]) { overflow: hidden; }
 
-/* Room at the bottom for the product page's sticky buy bar, so it never covers the footer. */
-html:has([data-sticky-bar='shown']) body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
-@media (min-width: 1024px) {
-  html:has([data-sticky-bar='shown']) body { padding-bottom: 0; }
-}
+/*
+ * Room for whatever is fixed to the bottom of the screen (the cookie question,
+ * the product page's buy bar): src/lib/ui/bottom-cover.ts sets the height. The
+ * footer stays reachable, and a focused link or field is never scrolled under it.
+ */
+html { scroll-padding-bottom: var(--hw-cover-bottom, 0px); }
+body { padding-bottom: var(--hw-cover-bottom, 0px); }
+
+/* A stored cookie choice hides the server-drawn banner before the first paint (consentFlagScript). */
+html[data-consent='set'] [data-consent-banner] { display: none; }
 
 /* Long-form text: policies, guides, About (src/components/content/ContentPage.tsx). */
 @layer components {
@@ -167,6 +172,8 @@ html:has([data-sticky-bar='shown']) body { padding-bottom: calc(76px + env(safe-
   .hw-prose ol { list-style: decimal; }
   .hw-prose li::marker { color: var(--color-velvet); }
   .hw-prose strong { font-weight: 600; color: var(--color-ink); }
+  /* Links in running text are underlined, not just coloured (WCAG 1.4.1). */
+  .hw-prose a { text-decoration-line: underline; text-decoration-thickness: 1px; }
   .hw-prose table { width: 100%; border-collapse: collapse; font-size: 15px; }
   .hw-prose th, .hw-prose td { padding: 0.625rem 0.5rem 0.625rem 0; border-bottom: 1px solid var(--color-line); text-align: left; vertical-align: top; }
   .hw-prose th { font-weight: 600; color: var(--color-ink); }

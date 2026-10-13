@@ -7,6 +7,12 @@ import { cn } from '@/lib/cn'
  * large uses. Sizes keep each file's aspect ratio (mark 670:475, wordmark 1150:215).
  */
 
+/** 1x, 2x and 3x renders made for each use (scripts/build-brand-assets.mjs), so phones fetch only what they need. */
+const densities = (name: string, base: number) => ({
+  src: `/brand/${name}-${base}.webp`,
+  srcSet: [1, 2, 3].map((x) => `/brand/${name}-${base * x}.webp ${x}x`).join(', '),
+})
+
 /** Mark + wordmark side by side: header (light) and footer (reversed). */
 export function LogoLockup({ reversed = false, height = 31, className }: { reversed?: boolean; height?: number; className?: string }) {
   const markWidth = Math.round((height * 670) / 475)
@@ -15,8 +21,8 @@ export function LogoLockup({ reversed = false, height = 31, className }: { rever
   const suffix = reversed ? '-reversed' : ''
   return (
     <span className={cn('inline-flex items-center gap-2', className)}>
-      <img src={`/brand/hw-mark${suffix}.webp`} alt="" width={markWidth} height={height} className="block" />
-      <img src={`/brand/hw-wordmark${suffix}.webp`} alt="Heartwell" width={wordWidth} height={wordHeight} className="block" />
+      <img {...densities(`hw-mark${suffix}`, 44)} alt="" width={markWidth} height={height} className="block" />
+      <img {...densities(`hw-wordmark${suffix}`, 128)} alt="Heartwell" width={wordWidth} height={wordHeight} className="block" />
     </span>
   )
 }
@@ -40,7 +46,7 @@ export function LogoStacked({
   const height = Math.round((width * 790) / 1150)
   return (
     <img
-      src={`/brand/hw-logo${reversed ? '-reversed' : ''}.webp`}
+      {...densities(`hw-logo${reversed ? '-reversed' : ''}`, 190)}
       alt="Heartwell Sofa"
       width={width}
       height={height}

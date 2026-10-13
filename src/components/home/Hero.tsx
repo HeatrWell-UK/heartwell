@@ -3,6 +3,7 @@ import { ButtonLink, buttonClasses } from '@/components/ui/Button'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 
+// The design-stage room photo, until the owner's own photos arrive (Phase 17A).
 const HERO_IMAGE =
   'https://res.cloudinary.com/iv3tp2iq/image/upload/v1791033930/heartwell/samples/malibu-high-back-5-seater-corner-oatmeal-room.jpg'
 
@@ -17,7 +18,7 @@ export function Hero() {
       <div className="relative aspect-[358/420] w-full overflow-hidden bg-stone [border-radius:50%_50%_24px_24px/28%_28%_24px_24px] lg:order-2">
         <Image
           src={HERO_IMAGE}
-          alt="Malibu corner sofa in oatmeal in a bright living room with white panelled walls"
+          alt="A corner sofa in oatmeal in a bright living room with white panelled walls"
           fill
           priority
           fetchPriority="high"
