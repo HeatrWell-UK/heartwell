@@ -60,9 +60,9 @@ describe('when anything may be sent', () => {
   })
 
   it('knows the live domain and the private pages', () => {
-    expect(liveAllowed('heartwellfurniture.co.uk', 'production')).toBe(true)
-    expect(liveAllowed('www.heartwellfurniture.co.uk:443', 'production')).toBe(true)
-    expect(liveAllowed('heartwellfurniture.co.uk', 'staging')).toBe(false)
+    expect(liveAllowed('heartwellsofa.co.uk', 'production')).toBe(true)
+    expect(liveAllowed('www.heartwellsofa.co.uk:443', 'production')).toBe(true)
+    expect(liveAllowed('heartwellsofa.co.uk', 'staging')).toBe(false)
     expect(liveAllowed('heartwell-staging.vercel.app', 'production')).toBe(false)
     for (const p of ['/order/abc', '/confirm-order/abc', '/track-order', '/review/x', '/newsletter/confirm', '/admin/tracking', '/login']) expect(isPrivatePath(p), p).toBe(true)
     for (const p of ['/', '/products/ashton', '/checkout', '/sofas']) expect(isPrivatePath(p), p).toBe(false)

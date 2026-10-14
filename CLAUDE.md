@@ -1,10 +1,10 @@
 # Heartwell — rules for every session
 
-Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Mainland households. It runs the sister shop's business (UK Sofa Shop) with a new face. **Start every session by reading `docs/PLAN.md` and `docs/PROGRESS.md`**, then continue from the progress log.
+Heartwell (heartwellsofa.co.uk) is a new online furniture brand for UK Mainland households. It runs the sister shop's business (UK Sofa Shop) with a new face. **Start every session by reading `docs/PLAN.md` and `docs/PROGRESS.md`**, then continue from the progress log.
 
 ## Workflow
 - One phase per prompt, in the order in `docs/PLAN.md`. If a phase is too big, split it and update the plan.
-- **One site, one database, no approval step** (owner, 13 October 2026). There is no staging. Work on a local phase branch, verify (types, lint, tests, build), merge into `main` and push `main` only: it deploys to the one site (heartwellfurniture.vercel.app now, heartwellfurniture.co.uk from go-live). Never push other branches; preview deployments are off.
+- **One site, one database, no approval step** (owner, 13 October 2026). There is no staging. Work on a local phase branch, verify (types, lint, tests, build), merge into `main` and push `main` only: it deploys to the one site (heartwellfurniture.vercel.app now, heartwellsofa.co.uk from go-live). Never push other branches; preview deployments are off.
 - Until go-live the site runs in **pre-launch mode** (`NEXT_PUBLIC_APP_ENV=staging`): hidden from search engines, every order a test order, customer emails to the test inbox, no tracking. That's what makes the owner's checks on the real site safe.
 - The owner trusts the work and doesn't approve phases. End every phase with, in this order: **what I did**, **what I need from the owner**, **what to check** (a short phone list, on the real site), **what's next** (the next prompt). Update `docs/PROGRESS.md`.
 - Don't demo or screenshot for the sake of it. Always suggest a better way when there is one.

@@ -3,6 +3,7 @@
 // here, so a new cookie can't go unmentioned.
 
 import { CONSENT_MAX_AGE } from '@/lib/tracking/consent'
+import { LIVE_DOMAIN } from '@/config/site'
 
 export type StorageKind = 'cookie' | 'local storage' | 'session storage'
 
@@ -60,7 +61,7 @@ export const STORAGE_GROUPS: StorageGroup[] = [
   {
     id: 'analytics',
     title: 'Google Analytics',
-    intro: 'Only if you accept them, and only on heartwellfurniture.co.uk.',
+    intro: `Only if you accept them, and only on ${LIVE_DOMAIN}.`,
     items: [
       { name: '_ga', kind: 'cookie', purpose: 'Google Analytics: tells visits apart.', lasts: 'Up to 2 years' },
       { name: '_ga_…', kind: 'cookie', purpose: 'Google Analytics: keeps track of a visit.', lasts: 'Up to 2 years' },
@@ -69,7 +70,7 @@ export const STORAGE_GROUPS: StorageGroup[] = [
   {
     id: 'marketing',
     title: 'Facebook and Instagram adverts',
-    intro: 'Meta’s Pixel, only if you accept it, and only on heartwellfurniture.co.uk. It tells Meta which adverts lead to visits and orders.',
+    intro: `Meta’s Pixel, only if you accept it, and only on ${LIVE_DOMAIN}. It tells Meta which adverts lead to visits and orders.`,
     items: [
       { name: '_fbp', kind: 'cookie', purpose: 'Meta: tells visits from this browser apart.', lasts: '3 months' },
       { name: '_fbc', kind: 'cookie', purpose: 'Meta: the advert you clicked, if you came from one.', lasts: '3 months' },

@@ -18,8 +18,9 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 ## Known facts (so nobody has to ask again)
 
 - Hosting account: Hostinger **Business Web Hosting**, 2 Node.js app slots free (the other 3 are used/in preview). The site takes one (Phase 18B); one stays free.
-- Domains (owner, 15 October 2026): **heartwellsofa.co.uk** is on the owner's separate Hostinger account (Hostinger DNS, parking page, Hostinger email; its email must keep working). **heartwellfurniture.co.uk** wasn't registered: the owner claims it as the hosting plan's free domain in the hosting account and it becomes the main address; heartwellsofa.co.uk 301-redirects to it. heartwell.co.uk is taken (since 2008).
-- Customer email: enquiries@heartwellsofa.co.uk today; moving to **enquiries@heartwellfurniture.co.uk** (the hosting plan's free mailbox) with the move to Hostinger. One setting (`NEXT_PUBLIC_SUPPORT_EMAIL`) plus that mailbox's password.
+- Domain (owner, 15 October 2026): **heartwellsofa.co.uk is the main address** (already owned, matches the logo, keeps the email; .co.uk wasn't free with the plan, heartwell.co.uk is taken). It stays in the owner's **domains** Hostinger account; the site runs in the **hosting** account and the domain is connected to it by changing only its web records. `LIVE_DOMAIN` in `src/config/site.ts` is the one place the code names it (real tracking runs only there). heartwellfurniture.co.uk isn't owned; it can be bought and redirected later.
+- **heartwellsofa.co.uk email records, never to change** (recorded 15 October 2026): MX `mx1.hostinger.com` (5) and `mx2.hostinger.com` (10); TXT `v=spf1 include:_spf.mail.hostinger.com ~all`; CNAME `hostingermail-a._domainkey`, `-b`, `-c` → `hostingermail-a/b/c.dkim.mail.hostinger.com`; TXT `_dmarc` `v=DMARC1; p=none`; CNAME `autodiscover` and `autoconfig` → `autodiscover/autoconfig.mail.hostinger.com`. Web records before the move: A `@` 2.57.91.91 (Hostinger parking), CNAME `www` → heartwellsofa.co.uk.
+- Customer email: enquiries@heartwellsofa.co.uk (one setting, `NEXT_PUBLIC_SUPPORT_EMAIL`).
 - OrderFlow: the **same** OrderFlow as the sister shop, with its own key; Heartwell orders are tagged (HW- references). Pushed from the database (`orderflow` schema) once `orderflow_ingest_url` and `orderflow_ingest_key` are in Supabase Vault and it’s switched on in Admin → Settings; set-up and the reply OrderFlow asked for in `docs/ORDERFLOW.md`. Monitoring, alerts, the Monday digest and UptimeRobot steps: `docs/MONITORING.md`.
 - "Visit us": Heartwell's own address, Unit 4, Blacker Street, Burnley BB10 2AF (postcode to confirm), 9am to 5pm, by appointment booked a day ahead (owner, 12 October 2026; opening days to confirm). Set in `src/config/contact.ts`.
 - **Never mention the sister shop** on the Heartwell site (the owner chose to keep them separate).
@@ -46,6 +47,11 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 15 October 2026 — Phase 18B: the domain is heartwellsofa.co.uk
+- **Owner:** the hosting plan's free domain doesn't cover .co.uk, so the site uses **heartwellsofa.co.uk**, already owned in the other Hostinger account, with its existing email.
+- **Code:** `LIVE_DOMAIN` (`src/config/site.ts`) is the live domain everywhere: the default site address, the only hosts where real tracking may run, the Cookies page and the admin's tracking note. `www.` moves to the bare domain (`canonicalHostRedirect`, tested). Tests and guides updated.
+- **Plan:** the Node.js app is built on Hostinger's temporary address first; once it works, the domain is connected by changing only its web records in the domains account. The email records above were recorded to check against afterwards.
 
 ### 15 October 2026 — Phase 17A: the owner's catalogue
 - **Owner:** uploaded all their photos to Cloudinary (148 files in `heartwell/Product Images/`) and asked for the catalogue to be settled before go-live. Phase 18B (Hostinger) is paused at the owner's hPanel steps; the code for it is ready (13 October).

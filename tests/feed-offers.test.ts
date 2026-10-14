@@ -6,7 +6,7 @@ import { buildStatusChecks, type AdminStatusData, type StatusContext } from '@/l
 import { pricingPayload } from '@/lib/checkout/order'
 import { tagsFrom } from '@/lib/tracking/browser'
 
-const SITE = 'https://heartwellfurniture.co.uk'
+const SITE = 'https://heartwellsofa.co.uk'
 const AMOUNTS: TierAmounts = { HIGH: 50, MID: 30, STANDARD: 20 }
 const CLOUD = 'https://res.cloudinary.com/demo/image/upload/v1/heartwell'
 
