@@ -9,7 +9,7 @@ When you're ready, say so and we'll go through this together, screen by screen (
 | What | How |
 | --- | --- |
 | Cookie question | A bar at the bottom with equal **Reject all** / **Accept all**, and **Choose what to allow**. "Cookie settings" in the footer reopens it. |
-| Meta Pixel | Loads only on heartwellfurniture.co.uk with `NEXT_PUBLIC_APP_ENV=production`, after **Accept**, never on order, confirmation, tracking, review or newsletter pages. |
+| Meta Pixel | Loads only on heartwellsofa.co.uk with `NEXT_PUBLIC_APP_ENV=production`, after **Accept**, never on order, confirmation, tracking, review or newsletter pages. |
 | Conversions API (server) | A copy of every browser event with the same event ID (Meta counts it once), for visitors who accepted. |
 | Events | PageView, ViewContent (each colour viewed), AddToCart, InitiateCheckout, Contact (WhatsApp or phone tap), Lead (samples, basket reminder), OrderPlaced (custom). |
 | Purchase | From the server only, when the customer **confirms**, once per order, 30 minutes later (Send now / Hold / Don't send in Admin → Tracking). Value = the database's total including delivery extras. OrderDelivered follows on delivery. |
@@ -26,11 +26,11 @@ When you're ready, say so and we'll go through this together, screen by screen (
 2. A **dataset** (Pixel) in Events Manager. Its ID is the Pixel ID.
 3. A **Conversions API access token** for that dataset (Events Manager → the dataset → Settings → Conversions API → Generate access token).
 4. A **test event code** (Events Manager → the dataset → Test events), for checking before going live.
-5. Later, at go-live: **domain verification** for heartwellfurniture.co.uk (one DNS record, Phase 19).
+5. Later, at go-live: **domain verification** for heartwellsofa.co.uk (one DNS record, Phase 19).
 
 **Google** (analytics.google.com):
 
-1. A **GA4 property** for Heartwell (UK, GBP) with a **web data stream** for heartwellfurniture.co.uk. Its **Measurement ID** starts G-.
+1. A **GA4 property** for Heartwell (UK, GBP) with a **web data stream** for heartwellsofa.co.uk. Its **Measurement ID** starts G-.
 2. A **Measurement Protocol API secret** on that stream.
 
 ## Where each value goes
@@ -51,12 +51,12 @@ Admin → Tracking then shows a tick for each one (never the values).
 
 1. **Dry run** (now): check Admin → Tracking → Recent events after browsing the site with cookies accepted.
 2. **Test**, before go-live: set the mode to **Test**. Server events and test-order Purchases appear in Events Manager → **Test events**; GA4 purchases go to Google's checker. Nothing counts.
-3. **At go-live** (Phase 19, on heartwellfurniture.co.uk with `NEXT_PUBLIC_APP_ENV=production`): stay on **Test** and browse the live site through Events Manager's test link. Each event should show from both **Browser** and **Server**, deduplicated. Then switch to **Live**.
+3. **At go-live** (Phase 19, on heartwellsofa.co.uk with `NEXT_PUBLIC_APP_ENV=production`): stay on **Test** and browse the live site through Events Manager's test link. Each event should show from both **Browser** and **Server**, deduplicated. Then switch to **Live**.
 4. **In your ads**: use a link from the admin's **Ad links** page as the website address, and paste the URL parameters from the same page into every ad, so every sale shows its campaign and ad in the admin and ad visitors get the ad offer.
 
 ## The catalogue (for catalogue ads)
 
-The feed is built and waiting: **Admin → Ad links** shows its address (`https://heartwellfurniture.co.uk/feeds/meta-catalogue.xml` once live), how many items it holds, which colours are left out for want of a photo, and when Meta last fetched it.
+The feed is built and waiting: **Admin → Ad links** shows its address (`https://heartwellsofa.co.uk/feeds/meta-catalogue.xml` once live), how many items it holds, which colours are left out for want of a photo, and when Meta last fetched it.
 
 1. In **Commerce Manager** (business.facebook.com/commerce), create a catalogue for Heartwell (type: e-commerce, products uploaded by you).
 2. **Data sources → Data feed → scheduled feed**: paste the feed address, repeat **hourly**, currency GBP.
@@ -64,4 +64,4 @@ The feed is built and waiting: **Admin → Ad links** shows its address (`https:
 4. **Sets**: make product sets from the labels (range, made to order, price band, offer tier, type; listed on Ad links), e.g. "Corner sofas" or "Offer high".
 5. Check **Issues** in Commerce Manager after the first fetch; the admin's Status page turns green once Meta fetches the feed.
 
-Do this on the live domain (Phase 19), so the catalogue's links point at heartwellfurniture.co.uk.
+Do this on the live domain (Phase 19), so the catalogue's links point at heartwellsofa.co.uk.

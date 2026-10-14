@@ -7,7 +7,7 @@ import { comparison, digestEmail, weekLabel, type DigestData } from '@/lib/repor
 
 const ctx: StatusContext = {
   appEnv: 'production',
-  siteUrl: 'https://heartwellfurniture.co.uk',
+  siteUrl: 'https://heartwellsofa.co.uk',
   indexable: true,
   commit: 'abc1234',
   supabaseConfigured: true,
@@ -89,7 +89,7 @@ describe('alerts', () => {
 
   it('writes one email for what broke and what was fixed', () => {
     const email = alertEmail([{ key: 'email', title: 'Email', summary: '3 emails failed in the last 24 hours.', since: '2026-10-13T08:00:00Z' }], [{ key: 'orderflow', title: 'OrderFlow' }], {
-      statusUrl: 'https://heartwellfurniture.co.uk/admin/status',
+      statusUrl: 'https://heartwellsofa.co.uk/admin/status',
       appEnv: 'production',
     })
     expect(email.subject).toBe('Heartwell needs attention: Email')
@@ -137,7 +137,7 @@ describe('Monday digest', () => {
   })
 
   it('leads with confirmed orders and their value, and shows where they came from', () => {
-    const email = digestEmail(digest, { adminUrl: 'https://heartwellfurniture.co.uk/admin', appEnv: 'production' })
+    const email = digestEmail(digest, { adminUrl: 'https://heartwellsofa.co.uk/admin', appEnv: 'production' })
     expect(email.subject).toBe('Last week at Heartwell: 3 orders confirmed, £2,147')
     expect(email.text).toContain('3 confirmed, £2,147: up from 1 the week before.')
     expect(email.text).toContain('- Meta ads / Autumn <corners> / Grey corner video: 2, £1,448')

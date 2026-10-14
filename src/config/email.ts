@@ -1,5 +1,5 @@
 // Who order emails come from and go to. Addresses are settings, so moving the
-// shop's email to heartwellfurniture.co.uk later is a change of settings only.
+// shop's email to another domain later is a change of settings only.
 // Server only: read where emails are sent.
 
 import 'server-only'

@@ -24,8 +24,8 @@ Real orders only: test orders, staff devices and `?qa=1` visits are left out.
 ## UptimeRobot (decision D8): your steps, at go-live
 
 1. Create a free account at uptimerobot.com and install its phone app.
-2. **Add New Monitor** → type **HTTP(s)**, name "Heartwell site", URL `https://heartwellfurniture.co.uk/api/health`, every 5 minutes. It goes red if the site or its database stops answering.
-3. **Add New Monitor** → type **HTTP(s)**, name "Heartwell checks", URL `https://heartwellfurniture.co.uk/api/health/checks`, every 5 minutes. It goes red (HTTP 503) when anything on the Health card is red, or when the hourly check has stopped for over two hours. It only says how many checks are red, never which.
+2. **Add New Monitor** → type **HTTP(s)**, name "Heartwell site", URL `https://heartwellsofa.co.uk/api/health`, every 5 minutes. It goes red if the site or its database stops answering.
+3. **Add New Monitor** → type **HTTP(s)**, name "Heartwell checks", URL `https://heartwellsofa.co.uk/api/health/checks`, every 5 minutes. It goes red (HTTP 503) when anything on the Health card is red, or when the hourly check has stopped for over two hours. It only says how many checks are red, never which.
 4. Under **Alert contacts**, add your email and the phone app, and tick both monitors.
 
 When "Heartwell checks" goes red, open Admin → Status to see why.

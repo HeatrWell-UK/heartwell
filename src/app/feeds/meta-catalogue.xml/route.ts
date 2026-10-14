@@ -1,4 +1,4 @@
-// Meta's catalogue feed: https://heartwellfurniture.co.uk/feeds/meta-catalogue.xml
+// Meta's catalogue feed: https://heartwellsofa.co.uk/feeds/meta-catalogue.xml
 // Commerce Manager fetches it on a schedule (hourly). Built from the cached
 // catalogue on every request rather than cached whole, so each fetch is
 // noted for the admin ("Meta last fetched it at …").

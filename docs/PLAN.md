@@ -2,7 +2,7 @@
 
 Version 1.1 · 4 October 2026 · Status: **approved by the owner on 3 October 2026**. Updated 4 October 2026: the site is hosted on Vercel while it's being built and moves to Hostinger before ads and real orders (owner's decision, section 8); the preview is open to anyone with the link, with no password; the GitHub repository is public until launch and Vercel deploys straight from it (owner's decisions).
 
-Heartwell (heartwellfurniture.co.uk) is a new online furniture brand for UK Mainland households. It runs the same business as its sister shop, UK Sofa Shop: the same products, prices, back office, delivery partner and order flow. It gets a completely new customer-facing design, its own name, contact details and accounts. It launches with the sister shop's 64 sofas and is built so dining sets, coffee tables, wardrobes and beds can be added routinely later.
+Heartwell (heartwellsofa.co.uk) is a new online furniture brand for UK Mainland households. It runs the same business as its sister shop, UK Sofa Shop: the same products, prices, back office, delivery partner and order flow. It gets a completely new customer-facing design, its own name, contact details and accounts. It launches with the sister shop's 64 sofas and is built so dining sets, coffee tables, wardrobes and beds can be added routinely later.
 
 This document is the single plan for the whole project. Every build session starts by reading `CLAUDE.md`, this plan and `docs/PROGRESS.md`.
 
@@ -31,7 +31,7 @@ This document is the single plan for the whole project. Every build session star
 
 - **One phase per prompt.** Each phase below has the exact prompt to send. If a phase turns out too big, I split it and update this plan.
 - **Order:** Step 1 study (done) → Step 2 this plan (needs your approval) → Step 3 design (needs your approval) → build phases. No application code is written before the plan and the design are approved.
-- **One site** (changed 13 October 2026, your decision). Every phase goes straight onto the one site (heartwellfurniture.vercel.app while we build, Hostinger from Phase 18B, heartwellfurniture.co.uk from go-live). Until go-live it's in pre-launch mode: hidden from search engines, every order a test, customer emails to you, no tracking. There's no staging copy and no approval step: you trust the work.
+- **One site** (changed 13 October 2026, your decision). Every phase goes straight onto the one site (heartwellfurniture.vercel.app while we build, Hostinger from Phase 18B, heartwellsofa.co.uk from go-live). Until go-live it's in pre-launch mode: hidden from search engines, every order a test, customer emails to you, no tracking. There's no staging copy and no approval step: you trust the work.
 - **At the end of every build phase** I tell you what I did, what I need from you, what to check on the site (a short phone list) and what's next (the next prompt), and update `docs/PROGRESS.md`.
 - **I don't demo for the sake of it.** I verify that builds, type checks and tests pass; I don't send screenshots of everything.
 - **Suggestions.** Wherever I see a better way than the sister shop, I say so and explain why. You decide.
@@ -108,7 +108,7 @@ Not carried over: next-pwa / service worker (it broke the sister's image loading
 | Environment | Where | Data | Tracking | Who sees it |
 | --- | --- | --- | --- | --- |
 | Local | My machine | The one database | Off | Me |
-| **The site** | Branch `main`. Vercel (heartwellfurniture.vercel.app) while we build; one Hostinger Node.js app from Phase 18B; heartwellfurniture.co.uk from go-live | The one Supabase project (heartwell-prod, `oeakyeibdczedgvncomk`) | Off until go-live, then on (production host only) | Anyone with the link, `noindex` until go-live; everyone after |
+| **The site** | Branch `main`. Vercel (heartwellfurniture.vercel.app) while we build; one Hostinger Node.js app from Phase 18B; heartwellsofa.co.uk (connected in 18B, live from go-live) | The one Supabase project (heartwell-prod, `oeakyeibdczedgvncomk`) | Off until go-live, then on (production host only) | Anyone with the link, `noindex` until go-live; everyone after |
 
 Until go-live the site runs in **pre-launch mode** (`NEXT_PUBLIC_APP_ENV=staging`): hidden from search engines, every order a test order, customer emails redirected to the owner's test inbox, no tracking. The owner checks each phase on the real site; nothing there counts until Phase 19 switches the site to production.
 
@@ -151,7 +151,7 @@ Jobs: conversion sending (every 5 min), OrderFlow re-send (every 15 min), review
 
 ### 3.7 Email
 
-- Sent through Hostinger SMTP, logged in as `enquiries@heartwellsofa.co.uk` and shown as `orders@heartwellsofa.co.uk` (an alias you create), with replies to `enquiries@`. The address and the email domain are **one setting each**, so moving email to heartwellfurniture.co.uk later is a one-line change.
+- Sent through Hostinger SMTP, logged in as `enquiries@heartwellsofa.co.uk` and shown as `orders@heartwellsofa.co.uk` (an alias you create), with replies to `enquiries@`. The address and the email domain are **one setting each**, so moving email to another domain later is a one-line change.
 - Every send is written to `email_log` (type, status, error). Repeated failures raise an alert (3.9).
 - Before go-live the site never emails real customers: every customer email is redirected to your test inbox.
 
@@ -393,7 +393,7 @@ You described WhatsApp clicks and sample requests as "leads". In Meta's terms a 
 
 ### 7.5 Meta catalogue
 
-- Feed: `https://heartwellfurniture.co.uk/feeds/meta-catalogue.xml`, generated from the database.
+- Feed: `https://heartwellsofa.co.uk/feeds/meta-catalogue.xml`, generated from the database.
 - One item per variant: **ID = variant ID, the same ID the Pixel and CAPI send**; `item_group_id` = product; title, description, price, availability, condition, brand (Heartwell), link (product URL with `?variant=` and the catalogue UTMs), image and extra images (the new photos), colour, material, size, Google product category (Furniture > Sofas), product type, shipping (GB, £0), and custom labels (range, made to order, price band, offer tier) for product sets.
 - Validated in tests. The admin health card shows when Meta last fetched it.
 - Your steps in Commerce Manager (Phase 15): create the catalogue, add the scheduled feed (hourly), connect the Pixel/dataset, create product sets by category and label.
@@ -406,7 +406,7 @@ You described WhatsApp clicks and sample requests as "leads". In Meta's terms a 
 
 ### 7.7 Domain verification
 
-In Phase 19 you add one TXT record for heartwellfurniture.co.uk (in the **domains** account) from Meta Business settings → Brand safety → Domains. I give you the exact values on the day.
+In Phase 19 you add one TXT record for heartwellsofa.co.uk (in the **domains** account) from Meta Business settings → Brand safety → Domains. I give you the exact values on the day.
 
 ### 7.8 GA4
 
@@ -442,10 +442,11 @@ heartwellfurniture.vercel.app (recorded in `docs/PROGRESS.md`). Open to anyone w
 
 ### 8.4 Domains (changed 15 October 2026)
 
-- **heartwellfurniture.co.uk** is the main address. It wasn't registered yet (checked 15 October; heartwell.co.uk has been taken since 2008), so the owner claims it as the hosting plan's free domain in the **hosting** account. Its DNS lives there, the Node.js app is created on it directly (no temporary address, no later domain swap), and SSL is issued automatically. `www.` redirects to the bare domain in the app itself (`canonicalHostRedirect`).
-- **Email:** `enquiries@heartwellfurniture.co.uk`, the plan's free mailbox in the hosting account. The site switches to it with one setting (`NEXT_PUBLIC_SUPPORT_EMAIL`) plus that mailbox's password (`SMTP_PASSWORD`). The old `enquiries@heartwellsofa.co.uk` mailbox keeps working.
-- **heartwellsofa.co.uk** (the owner's other Hostinger account) keeps its **email records exactly as they are** (MX `mx1/mx2.hostinger.com`, SPF, DMARC, checked 15 October). Its website gets a permanent (301) redirect to https://heartwellfurniture.co.uk through hPanel → Domains → Manage → DNS / Nameservers → Redirects, which changes only the web records. Email is tested before and after.
-- Meta domain verification: one TXT record on heartwellfurniture.co.uk (Phase 19).
+- **heartwellsofa.co.uk is the main address** (owner, 15 October 2026: already owned, matches the logo, keeps the existing email; heartwellfurniture.co.uk wasn’t free with the plan and heartwell.co.uk has been taken since 2008). It stays in the owner’s **domains** account with its Hostinger email; the site runs in the **hosting** account.
+- **Connecting them:** the Node.js app is first built on Hostinger’s temporary address, then the domain is connected to it. In the domains account only the **web** records change (`@` and `www`, plus a TXT record if Hostinger asks to verify ownership); the **email** records stay exactly as they are (MX `mx1/mx2.hostinger.com`, SPF `include:_spf.mail.hostinger.com`, DKIM, DMARC; recorded 15 October). Email is tested before and after. SSL is issued in the hosting account. `www.` redirects to the bare domain in the app (`canonicalHostRedirect`).
+- **Email:** `enquiries@heartwellsofa.co.uk` stays the shop’s address (one setting, `NEXT_PUBLIC_SUPPORT_EMAIL`).
+- **Later:** heartwellfurniture.co.uk can be bought any time and pointed at the site with a 301 redirect if the range grows beyond sofas.
+- Meta domain verification: one TXT record on heartwellsofa.co.uk (Phase 19).
 
 ---
 
@@ -677,7 +678,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 - **Phone test:** with Meta test mode on staging, browse, add to basket, check out, tap WhatsApp and confirm an order. In Events Manager → Test events, each event appears from both browser and server (deduplicated), and Purchase appears once after you confirm.
 - **Done means:** every funnel event deduplicates; Purchase arrives exactly once; the Tracking page is green.
 - **As built (8 October 2026), before any Meta or Google account exists (owner's choice: build the full flow now, connect later):**
-  - Tracking has three modes in Admin → Tracking: **dry run** (default: every event built and shown, nothing sent), **test** (Meta's Test events tab and GA4's validator only) and **live**. Live only ever happens on heartwellfurniture.co.uk with `NEXT_PUBLIC_APP_ENV=production`; elsewhere live falls back to test or dry run. Missing IDs mean dry run, so no dummy secrets are needed. The owner's later steps are in `docs/TRACKING-SETUP.md`.
+  - Tracking has three modes in Admin → Tracking: **dry run** (default: every event built and shown, nothing sent), **test** (Meta's Test events tab and GA4's validator only) and **live**. Live only ever happens on the live domain (`LIVE_DOMAIN`, heartwellsofa.co.uk since 15 October 2026) with `NEXT_PUBLIC_APP_ENV=production`; elsewhere live falls back to test or dry run. Missing IDs mean dry run, so no dummy secrets are needed. The owner's later steps are in `docs/TRACKING-SETUP.md`.
   - **Consent:** bottom banner, equal Reject all / Accept all, per-choice settings (our own visit statistics on by default under the statistics exemption; Google Analytics and Meta off until accepted), "Cookie settings" in the footer; one first-party cookie read by browser and server; asked again after six months or when the wording changes.
   - **Browser:** the Pixel loads only live, after consent, never on order/confirm/track/review/newsletter pages; GA4 in Consent Mode with redacted addresses. Events share one ID with the server copy (`/api/track`, only with consent): ViewContent per colourway, AddToCart, InitiateCheckout, Contact (WhatsApp and phone taps), Lead (samples, basket reminder), OrderPlaced (custom) with advanced matching.
   - **Server:** Purchase (Meta and GA4) and OrderDelivered go only through the conversion outbox, which the database fills on confirmation and delivery. A ticketed job runs every 5 minutes when work is due. Automatic after a 30-minute hold (D1) or manual. Send now, Hold and Don't send buttons. Retries back off. Meta's reply is stored. Cancelled and test orders never count. Hashed details; IP, browser and Meta cookies only with consent (D10); never order IDs, references or private links. GA4 revenue for customers without consent uses an anonymous ID.
@@ -805,13 +806,13 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 19 — Go-live
 
 - **Goal:** Heartwell is live.
-- **Does:** production settings (`NEXT_PUBLIC_APP_ENV=production`: the site leaves pre-launch mode, so test orders are cleared or kept flagged first); DNS steps (exact, by account); heartwellsofa.co.uk redirect with email untouched (verified before and after); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); OrderFlow's **Send test orders too** switched off and the `TEST HW-…` orders deleted in OrderFlow; final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
+- **Does:** production settings (`NEXT_PUBLIC_APP_ENV=production`: the site leaves pre-launch mode, so test orders are cleared or kept flagged first); DNS checks (the domain was connected in 18B, email untouched); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); OrderFlow's **Send test orders too** switched off and the `TEST HW-…` orders deleted in OrderFlow; final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
 - **Prepare:** item 22.
 - **Prompt:**
   ```
   Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.
   ```
-- **Phone test:** visit heartwellfurniture.co.uk and heartwellsofa.co.uk (which redirects); send and receive an email on enquiries@; place and confirm one real low-risk order (then cancel it as test).
+- **Phone test:** visit heartwellsofa.co.uk and www.heartwellsofa.co.uk (which redirects); send and receive an email on enquiries@; place and confirm one real low-risk order (then cancel it as test).
 - **Done means:** the site is live, email still works, the first order flows end to end, and Meta shows live events.
 
 ---
@@ -854,7 +855,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 | Vercel Hobby is for non-commercial use | Used only while we build, in pre-launch mode and `noindex`; the move to Hostinger (Phase 18B) comes before ads or real orders. |
 | Public repository until launch | Anyone can read the code and docs (including that Heartwell and the sister shop are related), and anything pushed stays in forks and caches even after the repo goes private. The leak and credential check runs before every commit, in CI and before every build; customer data never enters the repo; secrets live only in the host's environment variables. Made private in Phase 19. |
 | In-app browser quirks | Phone-first testing in both apps every phase; no pop-ups, sign-ins or downloads. |
-| Email from heartwellsofa.co.uk while the site is heartwellfurniture.co.uk | SPF, DKIM and DMARC checked on heartwellsofa.co.uk; one setting to move email to the main domain later (recommended once it's set up). |
+| Email deliverability | SPF, DKIM and DMARC checked on heartwellsofa.co.uk (site and email now share the domain). |
 | AI photos misrepresenting a product | Mandatory human approval; the furniture itself must be unchanged. |
 | Duplicate content with the sister shop | Rewritten text, new photos, optional new range names (D4). |
 | A new ad account's spend limits and learning phase | Purchase sent promptly (D1); Contact and Lead events available as interim optimisation signals. |

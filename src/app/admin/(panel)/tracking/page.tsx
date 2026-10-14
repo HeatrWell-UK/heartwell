@@ -8,6 +8,7 @@ import { StaffDeviceToggle, TrackingSettingsForm } from '@/components/admin/Trac
 import { loadTracking } from '@/lib/admin/load-tracking'
 import { dualTime } from '@/lib/admin/orders'
 import { effectiveMode, liveAllowed, type TrackingMode } from '@/config/tracking'
+import { LIVE_DOMAIN } from '@/config/site'
 import { SITE_URL } from '@/config/site'
 import { GA4_SETUP, META_SETUP, TRACKING_SETUP } from '@/lib/tracking/server'
 import { formatPrice } from '@/lib/format'
@@ -62,7 +63,7 @@ export default async function TrackingPage() {
       {!siteIsLive && (
         <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
           <WarningIcon aria-hidden="true" size={20} className="mt-0.5 shrink-0" />
-          This site isn’t the live shop (heartwellfurniture.co.uk with APP_ENV=production), so nothing from here is ever sent as a real event. Test mode and dry runs work as normal.
+          This site isn’t the live shop ({LIVE_DOMAIN} with APP_ENV=production), so nothing from here is ever sent as a real event. Test mode and dry runs work as normal.
         </p>
       )}
 

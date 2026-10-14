@@ -7,6 +7,7 @@
 // that happens is a Meta *test* event or a dry run the admin can inspect.
 
 import { APP_ENV } from './env'
+import { LIVE_DOMAIN } from './site'
 
 export const TRACKING = {
   /** Meta Pixel (dataset) ID, e.g. 123456789012345. Public by design. */
@@ -14,7 +15,7 @@ export const TRACKING = {
   /** GA4 Measurement ID, e.g. G-ABC123XYZ. Public by design. */
   ga4Id: (process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID ?? '').trim() || null,
   /** The only hostnames that may send real events. */
-  productionHosts: ['heartwellfurniture.co.uk', 'www.heartwellfurniture.co.uk'] as readonly string[],
+  productionHosts: [LIVE_DOMAIN, `www.${LIVE_DOMAIN}`] as readonly string[],
 }
 
 /** Dry run: build and log, send nothing. Test: Meta's Test events and GA4's validator only. Live: real events. */

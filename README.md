@@ -1,6 +1,6 @@
 # Heartwell
 
-The storefront and admin for [heartwellfurniture.co.uk](https://heartwellfurniture.co.uk): sofas made to order, free UK Mainland delivery, paid for on delivery.
+The storefront and admin for [heartwellsofa.co.uk](https://heartwellsofa.co.uk): sofas made to order, free UK Mainland delivery, paid for on delivery.
 
 Start with [`CLAUDE.md`](CLAUDE.md) (rules), [`docs/PLAN.md`](docs/PLAN.md) (phases), [`docs/DESIGN.md`](docs/DESIGN.md) (design system) and [`docs/PROGRESS.md`](docs/PROGRESS.md) (what's done).
 
@@ -59,7 +59,7 @@ The first catalogue (Phase 5) was imported from the sister shop's files in the l
 
 ## Deploying
 
-One site, built from `main` (no staging, no preview deployments): https://heartwellfurniture.vercel.app, on Hostinger from Phase 18B and at heartwellfurniture.co.uk from go-live. Until go-live it runs in pre-launch mode (`NEXT_PUBLIC_APP_ENV=staging`: noindex, every order a test, customer emails to the owner, no tracking). Only `main` is pushed.
+One site, built from `main` (no staging, no preview deployments): https://heartwellfurniture.vercel.app, on Hostinger from Phase 18B and at heartwellsofa.co.uk from go-live. Until go-live it runs in pre-launch mode (`NEXT_PUBLIC_APP_ENV=staging`: noindex, every order a test, customer emails to the owner, no tracking). Only `main` is pushed.
 
 `npm run build` runs the leak and credential check first (`prebuild`), so a leak fails the build and never deploys. GitHub Actions (`.github/workflows/ci.yml`) also runs lint, types, tests and the build on every push and pull request.
 
