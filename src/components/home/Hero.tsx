@@ -3,9 +3,8 @@ import { ButtonLink, buttonClasses } from '@/components/ui/Button'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 
-// The design-stage room photo, until the owner's own photos arrive (Phase 17A).
-const HERO_IMAGE =
-  'https://res.cloudinary.com/iv3tp2iq/image/upload/v1791033930/heartwell/samples/malibu-high-back-5-seater-corner-oatmeal-room.jpg'
+// The owner's own hero photo (Cloudinary, heartwell/Product Images/Elements).
+const HERO_IMAGE = 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792009391/Main-Hero-Background-Image.jpg'
 
 /**
  * The home hero: a photo in the heart frame (an arched top with a centre
@@ -18,12 +17,12 @@ export function Hero() {
       <div className="relative aspect-[358/420] w-full overflow-hidden bg-stone [border-radius:50%_50%_24px_24px/28%_28%_24px_24px] lg:order-2">
         <Image
           src={HERO_IMAGE}
-          alt="A corner sofa in oatmeal in a bright living room with white panelled walls"
+          alt="A grey sofa with cream cushions under a red velvet arch, on a herringbone wood floor"
           fill
           priority
           fetchPriority="high"
           sizes="(min-width: 1024px) 560px, calc(100vw - 32px)"
-          className="object-cover [object-position:50%_72%]"
+          className="object-cover"
         />
         <svg aria-hidden="true" viewBox="0 0 58 30" className="absolute left-1/2 top-[-1px] w-[16%] -translate-x-1/2">
           <path d="M0 0H58L29 30Z" fill="#FFFFFF" />

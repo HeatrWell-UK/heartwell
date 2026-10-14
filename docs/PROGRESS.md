@@ -6,12 +6,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 18 (quality pass) done and live, 13 October 2026: findings and fixes in `docs/QA-REPORT.md`. heartwell-prod is the one database, with a demo catalogue until the owner's own products and photos arrive (Phase 17A). One site, one database, no approval step. |
+| **Current phase** | Phase 17A (the owner's catalogue) live, 15 October 2026: 63 pieces on sale with the owner's photos and Heartwell's words; 14 new pieces hidden until the owner's price list arrives. Phase 18 (quality pass) done 13 October (`docs/QA-REPORT.md`). Phase 18B (Hostinger) waits on the owner's hPanel steps. One site, one database, no approval step. |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **The site** | https://heartwellfurniture.vercel.app (branch `main`, pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Moves to Hostinger in Phase 18B and to heartwellfurniture.co.uk at go-live (Phase 19). |
 | **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
 | **Admin** | https://heartwellfurniture.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 18B: move to Hostinger. Phase 17A (your catalogue) whenever your photos and spreadsheet are ready; it can come before or after 18B. Then 19 (go-live). |
+| **Next phase** | The owner's price list (prices for all pieces, and sizes for the 14 new ones), then Phase 18B: move to Hostinger, then 19 (go-live). |
 | **Next prompt** | `Phase 18B — Move to Hostinger. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 18B. I'm logged into hPanel on the hosting account and ready to follow your steps.` · when ready: `Phase 17A — My catalogue. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A. My photos and details are in: <folder path>.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
@@ -24,7 +24,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - "Visit us": Heartwell's own address, Unit 4, Blacker Street, Burnley BB10 2AF (postcode to confirm), 9am to 5pm, by appointment booked a day ahead (owner, 12 October 2026; opening days to confirm). Set in `src/config/contact.ts`.
 - **Never mention the sister shop** on the Heartwell site (the owner chose to keep them separate).
 - Heartwell's Cloudinary (connected via MCP): Free plan, 25 credits/month (about 3.6 used by 4 Oct 2026). Folders: `heartwell/brand`, `heartwell/samples` (design photos), `heartwell/source/{variants,gallery,categories,fabrics}` (the 162 imported originals, tag `heartwell-source`, never edited), `heartwell/import` (the catalogue payload file, tag `heartwell-import`, catalogue data only; safe to delete). Uploads are signed with the `sign-upload` tool; the account's default preset makes them `overwrite: true`.
-- Catalogue: a **demo** (9 "Sample" products, 23 colourways with `DEMO-` SKUs, 13 sample fabrics, a "Photo coming soon" placeholder at `heartwell/placeholders/photo-coming-soon` in Cloudinary), built by `scripts/catalogue/build-demo.mjs` into `supabase/seed/demo-catalogue.json`. The owner's own products, details and photos replace it in Phase 17A (`docs/catalogue-template.csv`, guide in `docs/CATALOGUE-TEMPLATE.md`). The sister shop's catalogue (Phase 5 import, `reference/`) is no longer used.
+- Catalogue (Phase 17A, 15 October 2026): **63 pieces on sale** in 16 ranges, **14 new pieces hidden** until the owner sends prices and sizes (Lily ×4, Michigan Electric Recliner ×4, Rio Chesterfield 2/3/3+2/4 seater, Verona cuddle chair, Verona corner set), 123 colourways, 70 fabrics. Products, prices, sizes and SKUs come from `reference/catalogue` (owner: "same products, my photos"); photos are the owner's (Cloudinary `heartwell/Product Images/<range>`, 148 files, uploaded 14 October); words are Heartwell's (`scripts/catalogue/catalogue-copy.mjs`). Rebuild: `node scripts/catalogue/build-import.mjs` then `node scripts/catalogue/build-catalogue.mjs` (photo list in `reference/.import/owner-photos.txt`). The payload reaches the database the Phase 5 way: an unguessable raw file in Cloudinary, fetched with `pg_net`, md5-checked, imported with `import_catalogue`, then the file deleted. Owner's naming: the old "Lily" range is **Sims** (SKUs unchanged); the beige bolster sofas are **Lily**. Bishop isn't sold. One demo piece (`sample-velvet-3-seater-high-back`) stays hidden only because test order HW-100101 uses it; it goes when test orders are cleared at go-live.
 - The Supabase account connected via MCP had no projects as of 3 Oct 2026.
 - Logo concept: `reference/Logo-Concept.jpeg` (brown/cream heart-shaped sofa, "Heartwell / SOFA").
 - Sister repo cloned read-only at `../sister-uksofashop-readonly` (from a zip of master on 3 Oct 2026; no git history).
@@ -46,6 +46,15 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 15 October 2026 — Phase 17A: the owner's catalogue
+- **Owner:** uploaded all their photos to Cloudinary (148 files in `heartwell/Product Images/`) and asked for the catalogue to be settled before go-live. Phase 18B (Hostinger) is paused at the owner's hPanel steps; the code for it is ready (13 October).
+- **Built:** the same 63 products (sizes, prices, colours, SKUs) with the owner's photos, matched by file name (101 of 105 colourways exactly, the rest by hand; all 44 extra photos placed on the product they show); Heartwell's own description and highlights for every product, written per range from the facts and the photos; category photos from the owner's Categories folder; the home page's hero is now the owner's photo. Rio Chesterfield has one style, so its back-style choice is gone. Bishop isn't sold (no photo from the owner).
+- **Owner's answers (15 October):** the channel-stitched sofas (photos named "Lily", in the Sims folder) are **Sims**; the beige bolster sofas are **Lily**. The owner will send a price list; sizes and specifications for the new pieces were to be researched online, but the listings found describe different models under the same names, so they're left for the owner's supplier sheet rather than guessed.
+- **Hidden until priced (14):** Lily 2, 3, 3+2 and 5 seater corner; Michigan Electric Recliner 2, 3, 3+2 and corner (black and grey); Rio Chesterfield 2, 3, 3+2 and 4 seater; Verona cuddle chair; Verona 5 seater corner + cuddle chair + footstool set. New SKUs were made up for them (e.g. `MI3-BK`, `LL2-BG`) and for the new Sims Silver colour (`LHB5C-SV`, on sale): the warehouse may use others.
+- **Not used:** two dimension drawings whose file names suggest they came from other websites (one shows a "Bishop" U-shape); the extra home-page photos (Home 2–4) and two spare category photos, kept for later.
+- **Demo:** removed, except one hidden piece used by test order HW-100101.
+- **Checked:** live listing and product pages show the new catalogue; hidden pieces answer 404; every colourway and category has a photo.
 
 ### 13 October 2026 — Phase 18: quality pass
 - **Report:** `docs/QA-REPORT.md` (security, leaks, speed, accessibility, English, order flow, the in-app browser checklist, owner actions).
