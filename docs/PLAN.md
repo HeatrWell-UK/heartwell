@@ -763,6 +763,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** open five products of different shapes: photos, title, price, sizes and description are right; check out one as a test.
 - **Done means:** no demo rows left; every live colourway has the owner's photo; the Meta feed lists only real products.
+- **As built (15 October 2026).** The owner uploaded 148 photos to Cloudinary (`heartwell/Product Images/<range>`) instead of a spreadsheet, chose "same products, my photos" for the facts, and will send a price list. `scripts/catalogue/build-catalogue.mjs` takes the cleaned products from `build-import.mjs`, matches each colourway to the owner's photo by file name, places extra photos only on the product they show, applies the owner's naming (old "Lily" range → **Sims**, beige bolster sofas → **Lily**), drops Bishop, adds the 14 new pieces hidden, and writes each product's words from `catalogue-copy.mjs` (Heartwell's own, per range, from facts and photos). Imported the Phase 5 way (unguessable Cloudinary file, `pg_net`, md5 check, `import_catalogue`, file deleted). 63 pieces on sale, 14 hidden until priced; the one demo piece left is hidden and tied to test order HW-100101. The hero is the owner's photo. Sizes for the new pieces weren't found reliably online (other models share the names), so they come with the owner's price list.
 
 ---
 
