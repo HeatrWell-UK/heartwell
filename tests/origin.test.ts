@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { externalOrigin, safeNextPath } from '@/lib/http/origin'
+import { canonicalHostRedirect, externalOrigin, safeNextPath } from '@/lib/http/origin'
 
 describe('safeNextPath', () => {
   it('keeps same-site paths', () => {
@@ -27,5 +27,22 @@ describe('externalOrigin', () => {
     expect(externalOrigin(headers({ 'x-forwarded-host': 'evil.example', 'x-forwarded-proto': 'https' }))).toBe(
       'https://heartwellfurniture.co.uk',
     )
+  })
+})
+
+describe('canonicalHostRedirect', () => {
+  const headers = (h: Record<string, string>) => new Headers(h)
+
+  it('moves www. to the same page on the bare domain', () => {
+    expect(canonicalHostRedirect(headers({ host: 'www.heartwellfurniture.co.uk' }), '/sofas/corner-sofas?sort=price')).toBe(
+      'https://heartwellfurniture.co.uk/sofas/corner-sofas?sort=price',
+    )
+    expect(canonicalHostRedirect(headers({ 'x-forwarded-host': 'WWW.heartwellfurniture.co.uk' }), '/')).toBe('https://heartwellfurniture.co.uk/')
+  })
+
+  it('leaves every other host alone', () => {
+    for (const host of ['heartwellfurniture.co.uk', 'heartwellfurniture.vercel.app', 'localhost:3000', 'www.evil.example', 'www.heartwellsofa.co.uk']) {
+      expect(canonicalHostRedirect(headers({ host }), '/')).toBeNull()
+    }
   })
 })

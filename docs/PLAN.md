@@ -440,11 +440,12 @@ heartwellfurniture.vercel.app (recorded in `docs/PROGRESS.md`). Open to anyone w
 - A full checkout test on Hostinger's temporary address. Vercel stays as a fallback until the live domain has run on Hostinger for a week; then the Vercel project is deleted.
 - **If you'd rather stay on Vercel:** the Pro plan ($20 a month) allows commercial use, and the code runs unchanged on either.
 
-### 8.4 Domains (exact steps in Phase 19)
+### 8.4 Domains (changed 15 October 2026)
 
-- **heartwellfurniture.co.uk** (domains account → DNS zone): point the root and `www` to the production app's address shown in the **hosting** account; SSL is issued in the hosting account.
-- **heartwellsofa.co.uk** keeps its **email records exactly as they are** (MX, SPF, DKIM, DMARC). Only its web records change, so it 301-redirects to heartwellfurniture.co.uk. Before touching anything, I'll have you screenshot or export its current DNS zone, and we test sending and receiving email before and after.
-- Meta domain verification: one TXT record on heartwellfurniture.co.uk.
+- **heartwellfurniture.co.uk** is the main address. It wasn't registered yet (checked 15 October; heartwell.co.uk has been taken since 2008), so the owner claims it as the hosting plan's free domain in the **hosting** account. Its DNS lives there, the Node.js app is created on it directly (no temporary address, no later domain swap), and SSL is issued automatically. `www.` redirects to the bare domain in the app itself (`canonicalHostRedirect`).
+- **Email:** `enquiries@heartwellfurniture.co.uk`, the plan's free mailbox in the hosting account. The site switches to it with one setting (`NEXT_PUBLIC_SUPPORT_EMAIL`) plus that mailbox's password (`SMTP_PASSWORD`). The old `enquiries@heartwellsofa.co.uk` mailbox keeps working.
+- **heartwellsofa.co.uk** (the owner's other Hostinger account) keeps its **email records exactly as they are** (MX `mx1/mx2.hostinger.com`, SPF, DMARC, checked 15 October). Its website gets a permanent (301) redirect to https://heartwellfurniture.co.uk through hPanel → Domains → Manage → DNS / Nameservers → Redirects, which changes only the web records. Email is tested before and after.
+- Meta domain verification: one TXT record on heartwellfurniture.co.uk (Phase 19).
 
 ---
 

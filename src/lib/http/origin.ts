@@ -26,6 +26,17 @@ export function externalOrigin(headers: Headers, fallbackOrigin?: string): strin
   return fallbackOrigin && isOurHost(new URL(fallbackOrigin).host) ? fallbackOrigin : SITE_URL
 }
 
+/**
+ * Where to send a visitor who arrived on www. of the site's own domain: the
+ * same page without www (one address for links, cookies and the basket).
+ * Null for every other host, so Vercel and local addresses are left alone.
+ */
+export function canonicalHostRedirect(headers: Headers, pathAndQuery: string): string | null {
+  const host = (headers.get('x-forwarded-host') ?? headers.get('host') ?? '').split(',')[0]?.trim().toLowerCase() ?? ''
+  if (SITE_HOST.startsWith('www.') || host !== `www.${SITE_HOST}`) return null
+  return `${SITE_URL}${pathAndQuery.startsWith('/') ? pathAndQuery : `/${pathAndQuery}`}`
+}
+
 /** A same-site path to return to after signing in, or the fallback. Never another site. */
 export function safeNextPath(value: unknown, fallback = '/admin'): string {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback
