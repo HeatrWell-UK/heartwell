@@ -18,8 +18,8 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 ## Known facts (so nobody has to ask again)
 
 - Hosting account: Hostinger **Business Web Hosting**, 2 Node.js app slots free (the other 3 are used/in preview). The site takes one (Phase 18B); one stays free.
-- Domains (heartwellfurniture.co.uk, heartwellsofa.co.uk) are on the owner's separate Hostinger account. heartwellsofa.co.uk email must keep working.
-- Customer email: enquiries@heartwellsofa.co.uk (one setting).
+- Domains (owner, 15 October 2026): **heartwellsofa.co.uk** is on the owner's separate Hostinger account (Hostinger DNS, parking page, Hostinger email; its email must keep working). **heartwellfurniture.co.uk** wasn't registered: the owner claims it as the hosting plan's free domain in the hosting account and it becomes the main address; heartwellsofa.co.uk 301-redirects to it. heartwell.co.uk is taken (since 2008).
+- Customer email: enquiries@heartwellsofa.co.uk today; moving to **enquiries@heartwellfurniture.co.uk** (the hosting plan's free mailbox) with the move to Hostinger. One setting (`NEXT_PUBLIC_SUPPORT_EMAIL`) plus that mailbox's password.
 - OrderFlow: the **same** OrderFlow as the sister shop, with its own key; Heartwell orders are tagged (HW- references). Pushed from the database (`orderflow` schema) once `orderflow_ingest_url` and `orderflow_ingest_key` are in Supabase Vault and it’s switched on in Admin → Settings; set-up and the reply OrderFlow asked for in `docs/ORDERFLOW.md`. Monitoring, alerts, the Monday digest and UptimeRobot steps: `docs/MONITORING.md`.
 - "Visit us": Heartwell's own address, Unit 4, Blacker Street, Burnley BB10 2AF (postcode to confirm), 9am to 5pm, by appointment booked a day ahead (owner, 12 October 2026; opening days to confirm). Set in `src/config/contact.ts`.
 - **Never mention the sister shop** on the Heartwell site (the owner chose to keep them separate).
