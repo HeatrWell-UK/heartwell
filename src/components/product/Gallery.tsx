@@ -127,9 +127,34 @@ export function Gallery({
         )}
       </div>
 
+      {/* Desktops: every photo as a thumbnail, loaded once the main photo has had the connection to itself. */}
+      {images.length > 1 && (
+        <ul className="hidden gap-3 pt-3 lg:flex lg:flex-wrap" aria-label="Choose a photo">
+          {images.map((img, i) => (
+            <li key={img.src}>
+              <button
+                type="button"
+                aria-label={`Photo ${i + 1} of ${images.length}`}
+                aria-current={i === index ? 'true' : undefined}
+                onClick={() => {
+                  setShowRest(true)
+                  go(i)
+                }}
+                className={cn(
+                  'relative block size-[76px] overflow-hidden rounded-[12px] bg-stone',
+                  i === index ? 'ring-2 ring-velvet ring-offset-2' : 'opacity-80 hover:opacity-100',
+                )}
+              >
+                {(i === 0 || showRest) && <Image src={img.src} alt="" width={76} height={76} className="size-full object-cover" />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
       {/* The dots are buttons too (24px targets), so every photo is one tap away without swiping. */}
       {images.length > 1 && (
-        <div className="flex justify-center pt-1.5">
+        <div className="flex justify-center pt-1.5 lg:hidden">
           {images.map((img, i) => (
             <button
               key={img.src}

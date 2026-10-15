@@ -5,14 +5,13 @@ import { PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
 import type { DeliveryInfo, ProductPageData } from '@/lib/product/types'
 
-/** About (once written in Phase 17C), specifications, delivery and returns, care. */
+/** Description, specifications, delivery and returns, care (under "About …" on the product page). */
 export function ProductDetails({ product: p, delivery }: { product: ProductPageData; delivery: DeliveryInfo }) {
-  const noun = p.typeName.toLowerCase()
   const items = [
     ...(p.description
       ? [
           {
-            title: `About this ${noun}`,
+            title: 'Description',
             open: true,
             content: (
               <>

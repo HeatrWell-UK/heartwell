@@ -9,12 +9,15 @@ export function WillItFit({
   height,
   inSections,
   askHref,
+  className = 'bg-stone',
 }: {
   depth: number | null
   height: number | null
   /** Corners, U-shapes and sets arrive in pieces. */
   inSections: boolean
   askHref: string
+  /** The form's ground: stone on its own, white inside a stone panel. */
+  className?: string
 }) {
   const id = useId()
   const [value, setValue] = useState('')
@@ -25,7 +28,7 @@ export function WillItFit({
 
   return (
     <form
-      className="flex flex-col gap-2.5 rounded-[var(--radius-card)] bg-stone p-4"
+      className={`flex flex-col gap-2.5 rounded-[14px] p-4 ${className}`}
       onSubmit={(e) => {
         e.preventDefault()
         setOutcome(checkFit(Number(value), { depth_cm: depth, height_cm: height }))

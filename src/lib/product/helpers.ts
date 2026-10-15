@@ -56,6 +56,8 @@ function priceIn(s: SiblingView, colourName: string | null): number {
 
 export interface OptionLink {
   label: string
+  /** The product the link opens. */
+  slug: string
   href: string
   current: boolean
   price?: number
@@ -75,6 +77,7 @@ export function sizeOptions(siblings: SiblingView[], currentSlug: string, colour
       siblings.find((s) => s.axis1Value === size && s.axis2Value === current.axis2Value) ?? siblings.find((s) => s.axis1Value === size)!
     return {
       label: size,
+      slug: target.slug,
       href: hrefToSibling(target, colourName, fabricCode),
       current: target.slug === currentSlug,
       price: priceIn(target, colourName),
@@ -88,7 +91,7 @@ export function backOptions(siblings: SiblingView[], currentSlug: string, colour
   if (!current?.axis2Value) return []
   const sameSize = siblings.filter((s) => s.axis1Value === current.axis1Value && s.axis2Value)
   if (sameSize.length < 2) return []
-  return sameSize.map((s) => ({ label: s.axis2Value!, href: hrefToSibling(s, colourName, fabricCode), current: s.slug === currentSlug }))
+  return sameSize.map((s) => ({ label: s.axis2Value!, slug: s.slug, href: hrefToSibling(s, colourName, fabricCode), current: s.slug === currentSlug }))
 }
 
 // Will it fit through the door? -------------------------------------------------

@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
-import { ProductPurchase, type PurchaseProduct } from '@/components/product/ProductPurchase'
+import { ProductPurchase, type PurchaseProduct, type SizePlans } from '@/components/product/ProductPurchase'
 import { PostcodeCheck } from '@/components/product/PostcodeCheck'
 import { PromiseRows } from '@/components/product/PromiseRows'
-import { Measurements } from '@/components/product/Measurements'
-import { WillItFit } from '@/components/product/WillItFit'
+import { FitPanel } from '@/components/product/FitPanel'
 import { ProductDetails } from '@/components/product/ProductDetails'
 import { Reviews } from '@/components/product/Reviews'
 import { Videos } from '@/components/product/Videos'
@@ -14,7 +13,7 @@ import { CONTACT, whatsAppHref } from '@/config/contact'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { SITE_URL } from '@/config/site'
 import { getDeliveryInfo, getProductPage } from '@/lib/product/load'
-import { getCategories } from '@/lib/catalogue/listing'
+import { getCategories, getListing, sentenceCase } from '@/lib/catalogue/listing'
 import { categoryHref, trail } from '@/lib/catalogue/tree'
 import { pickFabric, pickVariant } from '@/lib/product/helpers'
 import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
@@ -31,8 +30,8 @@ const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v
 
 /** Only what the interactive part needs, so the page sends the browser no more than that. */
 function purchaseProps(p: ProductPageData): PurchaseProduct {
-  const { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier } = p
-  return { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier }
+  const { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value } = p
+  return { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value }
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
@@ -59,7 +58,14 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function ProductPage({ params, searchParams }: Props) {
   const { slug } = await params
-  const [product, delivery, query, tree, offers] = await Promise.all([getProductPage(slug), getDeliveryInfo(), searchParams, getCategories(), getOfferSettings()])
+  const [product, delivery, query, tree, offers, listing] = await Promise.all([
+    getProductPage(slug),
+    getDeliveryInfo(),
+    searchParams,
+    getCategories(),
+    getOfferSettings(),
+    getListing(),
+  ])
   if (!product) notFound()
 
   const variant = pickVariant(product.variants, first(query.variant))
@@ -79,7 +85,15 @@ export default async function ProductPage({ params, searchParams }: Props) {
   )
 
   const categoryNode = product.category ? tree.find((c) => c.slug === product.category?.slug) : undefined
-  const crumbs = categoryNode ? trail(tree, categoryNode).map((c) => ({ name: c.name, href: categoryHref(tree, c) })) : []
+  const crumbs = categoryNode ? trail(tree, categoryNode).map((c) => ({ name: sentenceCase(c.name), href: categoryHref(tree, c) })) : []
+
+  // Each size's top view, from the listing (already cached), for the size cards.
+  const plans: SizePlans = Object.fromEntries(
+    product.siblings.map((s) => {
+      const listed = listing.find((l) => l.slug === s.slug)
+      return [s.slug, { plan: listed?.plan ?? null, seats: listed?.seats ?? null }]
+    }),
+  )
 
   return (
     <article className="pb-14">
@@ -94,31 +108,32 @@ export default async function ProductPage({ params, searchParams }: Props) {
       />
       <Breadcrumbs items={crumbs} />
 
-      <ProductPurchase product={purchaseProps(product)} initialVariantId={variant?.id ?? null} initialFabric={fabric} offer={{ amount: tierAmount(product.offerTier, offers.amounts), code: offers.code }}>
+      <ProductPurchase
+        product={purchaseProps(product)}
+        initialVariantId={variant?.id ?? null}
+        initialFabric={fabric}
+        offer={{ amount: tierAmount(product.offerTier, offers.amounts), code: offers.code }}
+        plans={plans}
+      >
         <PostcodeCheck windowLabel={delivery.windowLabel} />
         <PromiseRows madeToOrder={product.madeToOrder} />
       </ProductPurchase>
 
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 pt-8 lg:px-6 lg:pt-14">
-        <div className="flex flex-col gap-8 px-4 lg:grid lg:grid-cols-2 lg:gap-12 lg:px-0">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-12 pt-10 lg:gap-20 lg:px-6 lg:pt-20">
+        <FitPanel
+          shape={product.shape}
+          noun={noun}
+          dimensions={product.dimensions}
+          pieces={product.pieces}
+          note={product.dimensionsNote}
+          askHref={askHref}
+        />
+        <div className="flex flex-col gap-12 px-4 lg:grid lg:grid-cols-[6fr_5fr] lg:gap-16 lg:px-0">
           <div className="flex flex-col gap-4">
-            <Measurements
-              shape={product.shape}
-              noun={noun}
-              dimensions={product.dimensions}
-              pieces={product.pieces}
-              note={product.dimensionsNote}
-              askHref={askHref}
-            />
-            <WillItFit
-              depth={product.dimensions.depth_cm}
-              height={product.dimensions.height_cm}
-              inSections={product.shape === 'corner' || product.shape === 'u-shape' || product.shape === 'set'}
-              askHref={askHref}
-            />
-          </div>
-          <div className="flex flex-col gap-8">
+            <h2 className="text-[28px] leading-tight lg:text-[36px]">About {name}</h2>
             <ProductDetails product={product} delivery={delivery} />
+          </div>
+          <div className="flex flex-col gap-10">
             <Videos videos={product.videos} title={product.title} />
             <Reviews reviews={product.reviews} stats={product.reviewStats} name={name} ask={ask} />
           </div>

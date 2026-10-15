@@ -157,12 +157,9 @@ export function Measurements({
   if (h) figures.push({ label: 'Height', value: `${h} cm` })
 
   return (
-    <section aria-labelledby="measurements" className="flex flex-col gap-3.5">
-      <h2 id="measurements" className="text-2xl">
-        Measurements
-      </h2>
+    <div className="flex flex-col">
       {layout ? (
-        <div className="rounded-[var(--radius-card)] border border-line bg-white p-4">
+        <div className="rounded-[14px] bg-white p-4">
           <svg viewBox="0 0 340 220" width="100%" role="img" aria-label={describe(layout, noun)} className="mx-auto block max-w-md">
             <Drawing layout={layout} />
           </svg>
@@ -193,10 +190,10 @@ export function Measurements({
           {note && <p className="mt-3 text-sm text-slate">{note}</p>}
         </div>
       ) : (
-        <p className="rounded-[var(--radius-card)] border border-dashed border-field p-4 text-[15px] text-slate">
+        <p className="rounded-[14px] bg-white p-4 text-[15px] text-slate">
           We’re confirming the measurements for this piece. <a href={askHref}>Ask us</a> and we’ll send them to you.
         </p>
       )}
-    </section>
+    </div>
   )
 }

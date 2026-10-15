@@ -20,12 +20,33 @@ import { SaveButton } from './SaveButton'
 import { FabricSheet, FabricSwatch, type ChosenFabric } from './FabricSheet'
 import { AddedSheet, type AddedItem } from './AddedSheet'
 import { StickyBuyBar } from './StickyBuyBar'
-import { OfferStrip } from '@/components/offer/OfferStrip'
+import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
+import { ScalePlan } from '@/components/catalogue/ScalePlan'
+import { planFrame, sizeLabel } from '@/lib/catalogue/range-sizes'
+import { homeSwatches } from '@/lib/home/picks'
+import type { Layout } from '@/lib/product/measurements'
 
 export type PurchaseProduct = Pick<
   ProductPageData,
-  'id' | 'slug' | 'title' | 'typeName' | 'basePrice' | 'madeToOrder' | 'madeInUk' | 'variants' | 'siblings' | 'fabrics' | 'gallery' | 'range' | 'offerTier'
+  | 'id'
+  | 'slug'
+  | 'title'
+  | 'typeName'
+  | 'basePrice'
+  | 'madeToOrder'
+  | 'madeInUk'
+  | 'variants'
+  | 'siblings'
+  | 'fabrics'
+  | 'gallery'
+  | 'range'
+  | 'offerTier'
+  | 'axis1Value'
+  | 'axis2Value'
 >
+
+/** A size's top view and seats, keyed by the product's slug, for the size cards. */
+export type SizePlans = Record<string, { plan: Layout | null; seats: number | null }>
 
 /**
  * Everything on the product page that changes with the customer's choices:
@@ -37,11 +58,13 @@ export function ProductPurchase({
   initialVariantId,
   initialFabric,
   offer,
+  plans,
   children,
 }: {
   product: PurchaseProduct
   initialVariantId: string | null
   initialFabric: ChosenFabric | null
+  plans: SizePlans
   /** What an ad visitor’s offer takes off this piece, and the code to use elsewhere. */
   offer: { amount: number; code: string | null }
   children: ReactNode
@@ -92,6 +115,18 @@ export function ProductPurchase({
   const colourName = fabric ? null : (variant?.colourName ?? null)
   const sizes = sizeOptions(p.siblings, p.slug, colourName, fabric?.fabric.code ?? null)
   const backs = backOptions(p.siblings, p.slug, colourName, fabric?.fabric.code ?? null)
+  // Each size's top view, all to one scale (the same drawings as the range page).
+  const frame = planFrame(sizes.map((s) => plans[s.slug]?.plan ?? null))
+
+  // The ad-visitor offer, while it's live, comes off what's paid on delivery.
+  const offerEnds = useOfferEnds()
+  const offerOff = offerEnds ? Math.min(offer.amount, price) : 0
+
+  const sizeText = p.axis1Value ? [p.axis1Value, p.axis2Value].filter((v): v is string => Boolean(v)).map(sizeLabel) : []
+  const heading =
+    p.range && sizeText.length > 0
+      ? { name: p.range.name, detail: sizeText.map((t, i) => (i ? t.charAt(0).toLowerCase() + t.slice(1) : t)).join(', ') }
+      : { name: p.title, detail: null }
 
   const addToBasket = () => {
     if (!variant) return
@@ -121,20 +156,39 @@ export function ProductPurchase({
         </div>
 
         <div className="flex flex-col px-4 pt-4 lg:px-0 lg:pt-0">
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             {(p.madeToOrder || p.madeInUk) && (
               <div className="flex flex-wrap gap-2">
                 {p.madeToOrder && <Badge>Made to order</Badge>}
                 {p.madeInUk && <Badge>Made in the UK</Badge>}
               </div>
             )}
-            <h1 className="text-[30px] leading-[1.12] lg:text-[40px]">{p.title}</h1>
-            <p className="flex items-baseline gap-3">
-              <Price amount={price} className="text-[32px] leading-none" />
+            {/* "Salone" over "5 seater corner": the same name and size the tiles use; the full title is still the heading's text. */}
+            <h1 className="flex flex-col gap-1.5">
+              <span className="text-[40px] leading-none lg:text-[52px]">{heading.name}</span>
+              {heading.detail && <span className="font-sans text-[17px] leading-snug tracking-normal text-slate">{heading.detail}</span>}
+            </h1>
+            <p className="flex items-baseline gap-3 pt-1">
+              <Price amount={price} className="text-[34px] leading-none" />
               <span className="text-[15px] font-semibold text-velvet">Free delivery</span>
             </p>
-            <p className="text-[15px] text-slate">Pay nothing today. Pay the driver when it arrives.</p>
-            <OfferStrip amount={Math.min(offer.amount, price)} noun={noun} code={offer.code} className="mt-1" />
+            {/* What's paid when: the shop's whole promise, in two lines. */}
+            <dl className="flex flex-col rounded-[14px] border border-line px-3.5 text-[15px]">
+              <div className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2.5">
+                <dt>Pay today</dt>
+                <dd className="font-display text-[20px] leading-none text-velvet">£0</dd>
+              </div>
+              <div className="flex flex-col gap-0.5 py-2.5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <dt>Pay on delivery</dt>
+                  <dd className="font-display text-[20px] leading-none">{formatPrice(price - offerOff)}</dd>
+                </div>
+                <p className="text-[13px] leading-snug text-slate">
+                  Cash or bank transfer to the driver, once it&rsquo;s in your room{offerOff > 0 ? `, with your ${formatPrice(offerOff)} off` : ''}.
+                </p>
+              </div>
+            </dl>
+            <OfferStrip amount={Math.min(offer.amount, price)} noun={noun} code={offer.code} />
           </div>
 
           {p.variants.length > 0 && (
@@ -187,13 +241,10 @@ export function ProductPurchase({
                     className="flex min-h-12 items-center gap-3 self-start rounded-full border border-line bg-white py-1.5 pl-2 pr-4 text-[15px] font-semibold text-velvet"
                   >
                     <span aria-hidden="true" className="flex">
-                      {p.fabrics
-                        .slice(0, 3)
-                        .map((c) => c.fabrics[Math.floor(c.fabrics.length / 2)])
-                        .filter((f) => f !== undefined)
-                        .map((f, i) => (
-                          <span key={f.id} className="pinked block size-[26px]" style={{ backgroundColor: f.hex ?? '#F5F1EF', marginLeft: i ? -8 : 0 }} />
-                        ))}
+                      {/* Light, middle and dark, never green, pink or orange (the owner's rule for the shop's own pages). */}
+                      {homeSwatches(p.fabrics, 3).map((f, i) => (
+                        <span key={f.code} className="pinked block size-[26px]" style={{ backgroundColor: f.hex, marginLeft: i ? -8 : 0 }} />
+                      ))}
                     </span>
                     {fabric ? 'Change fabric' : `Or choose from ${fabricCount} fabrics`}
                   </button>
@@ -206,21 +257,31 @@ export function ProductPurchase({
             <nav aria-label={p.range?.axis1Name ?? 'Size'} className="flex flex-col gap-3 pt-6">
               <span className="text-[15px] font-semibold">{p.range?.axis1Name ?? 'Size'}</span>
               <ul className="grid grid-cols-2 gap-2">
-                {sizes.map((s) => (
-                  <li key={s.label}>
-                    <Link
-                      href={s.href}
-                      aria-current={s.current ? 'page' : undefined}
-                      className={cn(
-                        'flex min-h-[60px] flex-col justify-center rounded-2xl px-3 py-2 text-ink no-underline',
-                        s.current ? 'border-2 border-velvet bg-gold-tint' : 'border border-line bg-white hover:border-velvet',
-                      )}
-                    >
-                      <span className="text-[15px] font-semibold leading-tight">{s.label}</span>
-                      {s.price !== undefined && <span className="text-sm leading-tight text-slate">{formatPrice(s.current ? price : s.price)}</span>}
-                    </Link>
-                  </li>
-                ))}
+                {sizes.map((s) => {
+                  const drawing = plans[s.slug]
+                  return (
+                    <li key={s.label}>
+                      <Link
+                        href={s.href}
+                        aria-current={s.current ? 'page' : undefined}
+                        className={cn(
+                          'flex h-full min-h-[64px] items-center gap-3 rounded-2xl px-3 py-2 text-ink no-underline',
+                          s.current ? 'border-2 border-velvet bg-gold-tint' : 'border border-line bg-white hover:border-velvet',
+                        )}
+                      >
+                        {frame && (
+                          <span className="flex w-12 shrink-0 items-end self-stretch py-1">
+                            {drawing?.plan && <ScalePlan layout={drawing.plan} frame={frame} seats={drawing.seats} />}
+                          </span>
+                        )}
+                        <span className="flex min-w-0 flex-col">
+                          <span className="text-[15px] font-semibold leading-tight">{sizeLabel(s.label)}</span>
+                          {s.price !== undefined && <span className="text-sm leading-tight text-slate">{formatPrice(s.current ? price : s.price)}</span>}
+                        </span>
+                      </Link>
+                    </li>
+                  )
+                })}
               </ul>
             </nav>
           )}
@@ -239,7 +300,7 @@ export function ProductPurchase({
                         b.current ? 'bg-velvet text-white hover:text-white' : 'text-velvet',
                       )}
                     >
-                      {b.label}
+                      {sizeLabel(b.label)}
                     </Link>
                   </li>
                 ))}

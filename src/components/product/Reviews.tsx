@@ -12,7 +12,7 @@ import type { ReviewView } from '@/lib/product/types'
 export function Reviews({ reviews, stats, name, ask }: { reviews: ReviewView[]; stats: { count: number; average: number } | null; name: string; ask: ReactNode }) {
   return (
     <section aria-labelledby="reviews" className="flex flex-col gap-3">
-      <h2 id="reviews" className="text-2xl">
+      <h2 id="reviews" className="text-[28px] leading-tight lg:text-[36px]">
         Reviews
       </h2>
       {reviews.length === 0 || !stats ? (
