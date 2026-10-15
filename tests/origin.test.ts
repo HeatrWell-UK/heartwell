@@ -35,10 +35,11 @@ describe('visitorAddress', () => {
   it('reads from the right, so an address the visitor typed is never trusted', () => {
     // Vercel: the header is replaced with the visitor's address.
     expect(visitorAddress('1.1.1.1', null, 0)).toBe('1.1.1.1')
-    // Hostinger: visitor, then its CDN edge and one more hop.
-    expect(visitorAddress('1.1.1.1, 10.0.0.1, 10.0.0.2', '10.0.0.2', 2)).toBe('1.1.1.1')
-    // A made-up entry (shown twice by Hostinger) changes nothing.
-    expect(visitorAddress('6.6.6.6, 6.6.6.6, 1.1.1.1, 10.0.0.1, 10.0.0.2', '10.0.0.2', 2)).toBe('1.1.1.1')
+    // Hostinger (measured): the visitor is last; a made-up header only adds entries in front.
+    expect(visitorAddress('10.0.0.1, 10.0.0.2, 1.1.1.1', '1.1.1.1', 0)).toBe('1.1.1.1')
+    expect(visitorAddress('6.6.6.6, 6.6.6.6, 10.0.0.1, 10.0.0.2, 1.1.1.1', '1.1.1.1', 0)).toBe('1.1.1.1')
+    // A host with its own proxies after the visitor sets TRUSTED_PROXIES.
+    expect(visitorAddress('6.6.6.6, 1.1.1.1, 10.0.0.1, 10.0.0.2', null, 2)).toBe('1.1.1.1')
   })
 
   it('falls back sensibly when the header is short or missing', () => {
