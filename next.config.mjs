@@ -1,5 +1,4 @@
 import { execFileSync } from 'node:child_process'
-import type { NextConfig } from 'next'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -8,7 +7,7 @@ const isProd = process.env.NODE_ENV === 'production'
  * own variable when it sets one (Vercel's build has no .git folder), else
  * git itself (Hostinger), else "local". Display only: nothing depends on it.
  */
-function buildCommit(): string {
+function buildCommit() {
   const fromHost = process.env.GIT_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA
   if (fromHost) return fromHost.slice(0, 7)
   try {
@@ -50,13 +49,16 @@ const csp = [
 // The admin also uploads photos straight to Cloudinary (signed by the server).
 const adminCsp = csp.replace("connect-src 'self'", "connect-src 'self' https://api.cloudinary.com")
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   env: { HW_BUILD_COMMIT: buildCommit() },
   // Hostinger adds `output: 'standalone'` itself before building, so it isn't
-  // set here (Vercel doesn't need it). Keep this file exporting a plain object:
-  // Hostinger can't add it to a config that is a function.
+  // set here (Vercel doesn't need it). Keep this file plain JavaScript exporting
+  // a plain object: Hostinger wraps it, and a TypeScript config can't be loaded
+  // through that wrapper on Hostinger, where Next.js falls back to its
+  // WebAssembly compiler (old glibc).
   // Not experimental.inlineCss: tried in Phase 18, but Next 16.3 also copies the
   // stylesheet twice into each page's React payload: the home page went from
   // 18 KB to 57 KB gzipped to save one 13 KB request (docs/QA-REPORT.md).
