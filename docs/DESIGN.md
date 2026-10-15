@@ -1,6 +1,6 @@
 # Heartwell — Design system
 
-Status: **revision 3, being built** (Phase 18C, from 15 October 2026; done: the home page and the shop's frame (R1), category, range, search and saved pages (R2); the product page, checkout and content pages follow in R3–R5, `docs/PLAN.md`). Revision 2 was approved on 3 October 2026.
+Status: **revision 3, being built** (Phase 18C, from 15 October 2026; done: the home page and the shop's frame (R1), category, range, search and saved pages (R2), the product page (R3); the basket, checkout and content pages follow in R4–R5, `docs/PLAN.md`). Revision 2 was approved on 3 October 2026.
 Revision 2 preview: https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y · source: `design/canvas/project/*.dc.html` · logo files: `design/logo/` · logo build scripts: `design/logo-work/`
 
 Direction name: **Red Velvet and Gold**, revision 3: **the velvet alcove**. Deep velvet red for every action, metallic gold for the finishing touches, white and soft stone behind everything. Phone first, built for the Facebook and Instagram in-app browsers.
@@ -109,6 +109,16 @@ The header gains a row of categories on desktops (with Ranges, and All sofas fro
 - **Range cards** (home, ranges page, other ranges): photo, name in Gloock, sizes, made to order, from-price, colours. They size themselves with a container query: narrow cards (two across a phone) stack the price under the name, wider ones set it beside.
 - **Search**: a large rounded field with the magnifier inside; with no results, "Browse by shape" (the rail) and popular searches. Search also reads each range's introduction, so "velvet" or "chesterfield" find the right ranges.
 - **Saved**: tiles to match; an empty state with a gold-tint heart.
+
+## The product page (revision 3, part R3)
+
+- **Gallery**: square photos to swipe on phones (dots below), sticky beside the buy box on desktops with a row of thumbnails under the photo.
+- **Heading**: "Made to order" and "Made in the UK" pills, then the **range's name in Gloock** (40 px phones, 52 px desktops) over the size in Figtree ("Salone" / "5 seater corner"); the full title is still the heading's text.
+- **Price and the receipt**: the price with "Free delivery", then a small receipt with what's paid when: **Pay today £0** (in velvet) and **Pay on delivery £699**, "cash or bank transfer to the driver, once it's in your room". While an ad visitor's offer is live it comes off the "on delivery" line. The same two lines as the "Added to your basket" sheet, so the promise reads the same all the way to checkout. Paying on delivery is no longer repeated in the promise rows below.
+- **Size cards**: each size with its top view drawn to the range's shared scale (the range page's drawings, small), its name in sentence case and its price. Back styles stay a segmented control, in sentence case.
+- **Fabric button**: three pinked swatches, light, middle and dark, picked by the same rule as the home page (never green, pink or orange).
+- **Will it fit?** (the page's panel, `.hw-panel`): the top view drawn to scale with every measurement on white, the door check beside it, a line on sections (or two separate sofas for a 3+2), and "How to measure up".
+- **About {range}**: the description (open), specifications, delivery and returns, care; reviews (the honest empty state until real ones arrive) beside it on desktops; then "You might also like".
 
 ## Components (as drawn in the revision 2 preview)
 

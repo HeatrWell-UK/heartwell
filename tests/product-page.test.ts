@@ -78,6 +78,8 @@ describe('size and back style links', () => {
       ['Corner', '/products/r-corner-scatter?variant=r-corner-scatter-0', false],
     ])
     expect(sizes.map((s) => s.price)).toEqual([499, 599, 749])
+    // Each card knows the product it opens, so it can draw that size's plan.
+    expect(sizes.map((s) => s.slug)).toEqual(['r-2-high', 'r-3-high', 'r-corner-scatter'])
   })
 
   it('carries a chosen fabric to made-to-order pieces', () => {

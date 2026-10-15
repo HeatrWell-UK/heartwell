@@ -31,7 +31,7 @@ export function RelatedRail({ title, products }: { title: string; products: Prod
   if (products.length === 0) return null
   return (
     <section aria-labelledby="related" className="flex flex-col gap-3.5">
-      <h2 id="related" className="px-4 text-2xl lg:px-0">
+      <h2 id="related" className="px-4 text-[28px] leading-tight lg:px-0 lg:text-[36px]">
         {title}
       </h2>
       <ul className="no-scrollbar flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible lg:px-0">

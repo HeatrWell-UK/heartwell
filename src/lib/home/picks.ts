@@ -56,8 +56,11 @@ const distance = (a: string, b: string) => {
   return Math.hypot(x[0]! - y[0]!, x[1]! - y[1]!, x[2]! - y[2]!)
 }
 
+/** Just what picking swatches needs, so the product page's fabric collections work too. */
+type SwatchSource = Pick<FabricCollection, 'name'> & { fabrics: Pick<FabricCollection['fabrics'][number], 'code' | 'name' | 'hex'>[] }
+
 /** Up to `count` distinct showcase colours across the collections, light to dark, spread evenly. */
-export function homeSwatches(collections: FabricCollection[], count = 16): HomeSwatch[] {
+export function homeSwatches(collections: SwatchSource[], count = 16): HomeSwatch[] {
   const pool: HomeSwatch[] = []
   for (const c of collections) {
     for (const f of c.fabrics) {
