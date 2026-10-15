@@ -17,6 +17,7 @@ import { useHydrated } from '@/lib/basket/use-hydrated'
 import { deliveryLines, floorName, quoteDelivery, type DeliverySettings } from '@/lib/delivery/pricing'
 import { isUkPhone } from '@/lib/checkout/phone'
 import type { PlainError } from '@/lib/checkout/order'
+import { PayRows } from '@/components/checkout/PayRows'
 import { refreshBasket } from '../basket/actions'
 import { placeOrder, quoteCheckout, saveBasketReminder, type CheckoutQuote } from './actions'
 import { AddressStep, type AddressValue } from './AddressStep'
@@ -225,8 +226,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
 
   const err = (k: FieldKey) => fieldErrors[k]
   const describedBy = (k: FieldKey, help?: string) => [help, err(k) ? `${id}-${k}-error` : null].filter(Boolean).join(' ') || undefined
-  const sectionClass = 'flex flex-col gap-4 rounded-[var(--radius-card)] border border-line p-4 lg:p-6'
-  const legendClass = 'font-display text-[22px]'
+  const sectionClass = 'flex flex-col gap-4 rounded-[var(--radius-card)] border border-line bg-white p-4 lg:p-6'
 
   return (
     <form
@@ -248,7 +248,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </div>
 
         <fieldset className={sectionClass}>
-          <legend className={cn(legendClass, 'float-left w-full')}>1. Your details</legend>
+          <Legend n={1}>Your details</Legend>
           <Field label="Full name" id={`${id}-name`} error={err('name')} errorId={`${id}-name-error`}>
             <TextInput id={`${id}-name`} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!err('name') || undefined} aria-describedby={describedBy('name')} />
           </Field>
@@ -289,7 +289,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </fieldset>
 
         <fieldset className={sectionClass}>
-          <legend className={cn(legendClass, 'float-left w-full')}>2. Delivery address</legend>
+          <Legend n={2}>Delivery address</Legend>
           <AddressStep
             value={address}
             onChange={(v) => {
@@ -303,7 +303,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </fieldset>
 
         <fieldset className={sectionClass} disabled={!canOrderHere && address.outcome.kind === 'quote'}>
-          <legend className={cn(legendClass, 'float-left w-full')}>3. Delivery</legend>
+          <Legend n={3}>Delivery</Legend>
           <p className="text-[15px] text-slate">
             Free to the ground floor anywhere on UK Mainland. Most orders arrive {windowLabel}; we ring to book the day.
           </p>
@@ -358,7 +358,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </fieldset>
 
         <fieldset className={sectionClass}>
-          <legend className={cn(legendClass, 'float-left w-full')}>4. Anything else?</legend>
+          <Legend n={4}>Anything else?</Legend>
           <Field label="Delivery notes" optional help="Parking, steps, a tight turn on the stairs: anything that helps the drivers." helpId={`${id}-notes-help`} id={`${id}-notes`}>
             <TextArea id={`${id}-notes`} value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} aria-describedby={`${id}-notes-help`} />
           </Field>
@@ -404,14 +404,14 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </fieldset>
       </div>
 
-      <section aria-labelledby={`${id}-summary`} className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-stone p-4 lg:sticky lg:top-6 lg:p-6">
-        <h2 id={`${id}-summary`} className="text-[22px]">
+      <section aria-labelledby={`${id}-summary`} className="hw-panel flex flex-col gap-4 px-5 py-6 lg:sticky lg:top-6 lg:px-7 lg:py-7">
+        <h2 id={`${id}-summary`} className="text-[26px] leading-tight">
           Your order
         </h2>
         <ul className="flex flex-col gap-3">
           {basket.lines.map((l) => (
             <li key={l.id} className="flex gap-3">
-              <span className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-white">
+              <span className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-white ring-1 ring-line">
                 {l.view.image && <Image src={l.view.image} alt="" width={64} height={64} className="size-full object-cover" />}
               </span>
               <span className="flex min-w-0 flex-1 flex-col text-[15px] leading-snug">
@@ -421,7 +421,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
                 </span>
                 <span className="text-sm text-slate">{l.view.option}</span>
               </span>
-              <span className="shrink-0 text-[15px] font-semibold">{formatPrice(l.view.unitPrice * l.quantity)}</span>
+              <span className="shrink-0 font-display text-[17px]">{formatPrice(l.view.unitPrice * l.quantity)}</span>
             </li>
           ))}
         </ul>
@@ -435,10 +435,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           {lines.map((l) => (
             <Row key={l.key} label={l.detail ? `${l.label} (${l.detail})` : l.label} value={formatPrice(l.amount)} />
           ))}
-          <div className="mt-1 border-t border-line pt-2">
-            <Row label="To pay today" value="£0" />
-            <Row label="To pay on delivery" value={formatPrice(total)} strong />
-          </div>
+          <PayRows total={total} className="mt-1" />
         </dl>
         <p className="text-sm text-slate" aria-live="polite">
           {quoteIsCurrent ? 'Cash or bank transfer to the driver, once it’s in your room.' : quoteError ? quoteError.message : 'Checking the latest prices…'}
@@ -520,9 +517,24 @@ function Check({ id, checked, onChange, label, hint }: { id: string; checked: bo
   )
 }
 
-function Row({ label, value, strong, accent }: { label: string; value: string; strong?: boolean; accent?: boolean }) {
+/** A section's heading: its number in gold (the same numbers as How paying works) and its name. */
+function Legend({ n, children }: { n: number; children: React.ReactNode }) {
   return (
-    <div className={cn('flex justify-between gap-3', strong && 'text-[17px] font-semibold')}>
+    <legend className="float-left flex w-full items-center gap-3 font-display text-[22px] leading-tight lg:text-[24px]">
+      <span aria-hidden="true" className="bg-gold-sheen flex size-8 shrink-0 items-center justify-center rounded-full text-[16px] text-wine">
+        {n}
+      </span>
+      <span>
+        <span className="sr-only">Step {n}: </span>
+        {children}
+      </span>
+    </legend>
+  )
+}
+
+function Row({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className="flex justify-between gap-3">
       <dt>{label}</dt>
       <dd className={cn('shrink-0', accent && 'font-semibold text-velvet')}>{value}</dd>
     </div>

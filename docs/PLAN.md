@@ -814,12 +814,12 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 | R1 | Home page, header (desktop category row), footer, the display face everywhere | ✅ 15 October 2026 |
 | R2 | Category pages, ranges (list and each range), search, saved: tiles, filters, range pages that open with the range's own room and draw every size to scale | ✅ 15 October 2026 |
 | R3 | Product page: gallery, buy box, fabric picker, measurements, sticky bar, added sheet | ✅ 16 October 2026 |
-| R4 | Basket, checkout, order, confirm and track pages, and the emails' look | Next |
-| R5 | Content pages (About, Visit us, Delivery and returns, FAQ, guides, fabrics, samples, policies), 404 and error pages; DESIGN.md finished | |
+| R4 | Basket, checkout, order, confirm and track pages, and the emails' look | ✅ 16 October 2026 |
+| R5 | Content pages (About, Visit us, Delivery and returns, FAQ, guides, fabrics, samples, policies), 404 and error pages; DESIGN.md finished | Next |
 
 - **Prompt (next part):**
   ```
-  Phase 18C R4 — Redesign the basket, checkout and order pages. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/DESIGN.md, then build R4.
+  Phase 18C R5 — Redesign the content pages. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/DESIGN.md, then build R5.
   ```
 - **Phone test (each part):** the pages it covers, on the real site, in Safari and inside Instagram.
 - **Done means:** every customer page follows revision 3; PageSpeed and accessibility stay where Phase 18 left them.

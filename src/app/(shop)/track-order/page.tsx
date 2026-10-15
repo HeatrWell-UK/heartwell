@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function TrackOrderPage() {
   return (
-    <div className="mx-auto flex max-w-[40rem] flex-col gap-5 px-4 pb-16 pt-6 lg:pt-10">
-      <h1 className="text-[32px] leading-tight lg:text-[40px]">Track my order</h1>
+    <div className="mx-auto flex max-w-[42rem] flex-col gap-5 px-4 pb-16 pt-6 lg:pb-24 lg:pt-12">
+      <h1 className="text-[34px] leading-[1.08] lg:text-[52px]">Track my order</h1>
       <p className="text-[17px] text-slate">Enter the reference from your order email and the postcode we’re delivering to.</p>
       <TrackForm />
     </div>

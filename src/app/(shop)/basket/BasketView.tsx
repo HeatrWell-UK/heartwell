@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { MinusIcon, PlusIcon, TrashIcon, InfoIcon } from '@phosphor-icons/react'
+import { BasketIcon, MinusIcon, PlusIcon, TrashIcon, InfoIcon } from '@phosphor-icons/react'
 import { Badge } from '@/components/ui/Badge'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { Price } from '@/components/ui/Price'
@@ -15,7 +15,14 @@ import { MAX_QUANTITY } from '@/lib/basket/model'
 import { productHref } from '@/lib/product/helpers'
 import { basketOfferAmount, type TierAmounts } from '@/lib/offers/paid'
 import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
+import { PayRows } from '@/components/checkout/PayRows'
 import { refreshBasket } from './actions'
+
+const NEXT = [
+  'Place your order. No card, no account and nothing to pay.',
+  'Confirm it with one tap, and we ring to book your delivery day.',
+  'Pay the driver once it’s in your room.',
+]
 
 export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmounts; offerCode: string | null }) {
   const basket = useBasket()
@@ -46,9 +53,14 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
 
   if (basket.lines.length === 0) {
     return (
-      <div className="flex min-h-svh flex-col items-start gap-4">
+      <div className="flex min-h-svh flex-col items-start gap-5">
         {removed > 0 && <RemovedNotice count={removed} />}
-        <p className="text-[17px] text-slate">Your basket is empty.</p>
+        <span aria-hidden="true" className="flex size-14 items-center justify-center rounded-full bg-gold-tint text-velvet">
+          <BasketIcon size={28} />
+        </span>
+        <p className="max-w-[32rem] text-[17px] leading-relaxed text-slate">
+          Your basket is empty. Whatever you add stays here on this phone, and there&rsquo;s nothing to pay until it&rsquo;s delivered.
+        </p>
         <ButtonLink href="/sofas">Shop sofas</ButtonLink>
       </div>
     )
@@ -104,7 +116,7 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
                       <PlusIcon aria-hidden="true" size={18} weight="bold" />
                     </button>
                   </div>
-                  <Price amount={line.view.unitPrice * line.quantity} className="text-lg" />
+                  <Price amount={line.view.unitPrice * line.quantity} className="text-[20px]" />
                 </div>
                 <button
                   type="button"
@@ -123,54 +135,66 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
         </Link>
       </div>
 
-      <section aria-labelledby="summary" className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-stone p-5 lg:sticky lg:top-6">
-        <h2 id="summary" className="text-[22px]">
-          Summary
-        </h2>
-        <OfferStrip amount={offer} code={offerCode} />
-        <dl className="flex flex-col gap-2 text-[15px]">
-          <div className="flex justify-between">
-            <dt>
-              {basket.count} {basket.count === 1 ? 'item' : 'items'}
-            </dt>
-            <dd>{formatPrice(basket.subtotal)}</dd>
-          </div>
-          {offer > 0 && (
+      <div className="flex flex-col gap-6 lg:sticky lg:top-6">
+        <section aria-labelledby="summary" className="hw-panel flex flex-col gap-4 px-5 py-6 lg:px-7 lg:py-7">
+          <h2 id="summary" className="text-[26px] leading-tight">
+            Summary
+          </h2>
+          <OfferStrip amount={offer} code={offerCode} />
+          <dl className="flex flex-col gap-2 text-[15px]">
             <div className="flex justify-between">
-              <dt>Your offer</dt>
-              <dd>−{formatPrice(offer)}</dd>
+              <dt>
+                {basket.count} {basket.count === 1 ? 'item' : 'items'}
+              </dt>
+              <dd>{formatPrice(basket.subtotal)}</dd>
             </div>
-          )}
-          <div className="flex justify-between">
-            <dt>Delivery to UK Mainland</dt>
-            <dd className="font-semibold text-velvet">Free</dd>
-          </div>
-          <div className="flex justify-between border-t border-line pt-2">
-            <dt>To pay today</dt>
-            <dd className="font-semibold">£0</dd>
-          </div>
-          <div className="flex justify-between text-[17px] font-semibold">
-            <dt>To pay on delivery</dt>
-            <dd>{formatPrice(toPay)}</dd>
-          </div>
-        </dl>
-        <p className="text-sm leading-snug text-slate">
-          Upstairs delivery, assembly and taking your old sofa away can be added at checkout. You pay the driver in cash or by bank transfer
-          once it’s in your room.
-        </p>
-        {FEATURES.checkout ? (
-          <ButtonLink href="/checkout" block>
-            Go to checkout
-          </ButtonLink>
-        ) : (
-          <>
-            <Button block disabled>
+            {offer > 0 && (
+              <div className="flex justify-between">
+                <dt>Your offer</dt>
+                <dd>−{formatPrice(offer)}</dd>
+              </div>
+            )}
+            <div className="flex justify-between">
+              <dt>Delivery to UK Mainland</dt>
+              <dd className="font-semibold text-velvet">Free</dd>
+            </div>
+            <PayRows total={toPay} className="mt-1" />
+          </dl>
+          <p className="text-sm leading-snug text-slate">
+            Cash or bank transfer to the driver, once it&rsquo;s in your room. Upstairs delivery, assembly and taking your old sofa away can be
+            added at checkout.
+          </p>
+          {FEATURES.checkout ? (
+            <ButtonLink href="/checkout" block>
               Go to checkout
-            </Button>
-            <p className="text-sm text-slate">Checkout is switched on in the next build phase.</p>
-          </>
-        )}
-      </section>
+            </ButtonLink>
+          ) : (
+            <>
+              <Button block disabled>
+                Go to checkout
+              </Button>
+              <p className="text-sm text-slate">Checkout is switched on in the next build phase.</p>
+            </>
+          )}
+        </section>
+
+        {/* What happens after the button, so nobody wonders whether they're about to pay. */}
+        <section aria-labelledby="next-steps" className="flex flex-col gap-3 px-1">
+          <h2 id="next-steps" className="text-[20px] leading-tight">
+            What happens next
+          </h2>
+          <ol className="flex flex-col gap-3">
+            {NEXT.map((step, i) => (
+              <li key={step} className="flex items-start gap-3 text-[15px] leading-snug">
+                <span aria-hidden="true" className="bg-gold-sheen flex size-7 shrink-0 items-center justify-center rounded-full font-display text-[14px] text-wine">
+                  {i + 1}
+                </span>
+                <span className="pt-1">{step}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
     </div>
   )
 }

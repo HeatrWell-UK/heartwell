@@ -1,6 +1,8 @@
-// The look every Heartwell email shares: a wine header with the gold name, a
-// white card on stone, Arial body text and pill buttons. Plain, table-based
-// HTML with inline styles, so it reads well in Gmail, Outlook and phone apps.
+// The look every Heartwell email shares: a wine header with the gold logo (a
+// PNG, public/brand/hw-email-header.png, whose alt text is set in the gold
+// serif for mail apps that block images), a white card on stone, Arial body
+// text and pill buttons. Plain, table-based HTML with inline styles, so it
+// reads well in Gmail, Outlook and phone apps.
 
 import { CONTACT } from '@/config/contact'
 import { SITE_URL } from '@/config/site'
@@ -26,7 +28,7 @@ export function layout(title: string, body: string, preheader: string): string {
 <span style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</span>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.stone}"><tr><td align="center" style="padding:16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:16px;overflow:hidden">
-<tr><td style="background:${C.wine};padding:18px 24px;border-bottom:3px solid #B58A2F"><span style="font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:bold;color:${C.gold}">Heartwell</span></td></tr>
+<tr><td style="background:${C.wine};padding:16px 24px;border-bottom:3px solid #B58A2F"><a href="${escapeHtml(SITE_URL)}" style="text-decoration:none"><img src="${escapeHtml(`${SITE_URL}/brand/hw-email-header.png`)}" width="230" height="40" alt="Heartwell" style="display:block;border:0;outline:none;font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:bold;color:${C.gold}"></a></td></tr>
 <tr><td style="padding:24px;${FONT};font-size:16px;line-height:1.5;color:${C.ink}">${body}</td></tr>
 <tr><td style="padding:14px 24px 18px;border-top:1px solid ${C.line};${FONT};font-size:12px;line-height:1.5;color:${C.slate}">${emailFooter()}</td></tr>
 </table></td></tr></table></body></html>`

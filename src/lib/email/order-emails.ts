@@ -75,7 +75,7 @@ ${line('Items', money(o.itemsSubtotal))}
 ${o.discountAmount > 0 ? line(`Offer${o.promotionCode ? ` (${escapeHtml(o.promotionCode)})` : ''}`, `−${money(o.discountAmount)}`) : ''}
 ${line('Delivery to UK Mainland', 'Free')}
 ${extras}
-${line('To pay today', '£0')}
+${line('To pay today', `<span style="color:${C.velvet};font-weight:bold">£0</span>`)}
 ${line('To pay on delivery', money(o.totalAmount), true)}</table>`
 }
 

@@ -175,12 +175,12 @@ export function ProductPurchase({
             {/* What's paid when: the shop's whole promise, in two lines. */}
             <dl className="flex flex-col rounded-[14px] border border-line px-3.5 text-[15px]">
               <div className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2.5">
-                <dt>Pay today</dt>
+                <dt>To pay today</dt>
                 <dd className="font-display text-[20px] leading-none text-velvet">£0</dd>
               </div>
               <div className="flex flex-col gap-0.5 py-2.5">
                 <div className="flex items-baseline justify-between gap-3">
-                  <dt>Pay on delivery</dt>
+                  <dt>To pay on delivery</dt>
                   <dd className="font-display text-[20px] leading-none">{formatPrice(price - offerOff)}</dd>
                 </div>
                 <p className="text-[13px] leading-snug text-slate">
