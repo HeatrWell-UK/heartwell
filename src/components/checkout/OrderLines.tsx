@@ -1,5 +1,6 @@
 import { formatPrice } from '@/lib/format'
 import type { CustomerOrder } from '@/lib/checkout/read'
+import { PayRows } from './PayRows'
 
 /** An order's lines and totals, as the customer sees them after ordering. */
 export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'itemsSubtotal' | 'discountAmount' | 'extras' | 'totalAmount'> }) {
@@ -15,7 +16,7 @@ export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'it
               </span>
               {i.option && <span className="text-sm text-slate">{i.option}</span>}
             </span>
-            <span className="shrink-0">{formatPrice(i.unitPrice * i.quantity)}</span>
+            <span className="shrink-0 font-display text-[17px]">{formatPrice(i.unitPrice * i.quantity)}</span>
           </li>
         ))}
       </ul>
@@ -40,10 +41,7 @@ export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'it
             <dd>{formatPrice(e.amount)}</dd>
           </div>
         ))}
-        <div className="flex justify-between border-t border-line pt-2 text-[17px] font-semibold">
-          <dt>To pay on delivery</dt>
-          <dd>{formatPrice(order.totalAmount)}</dd>
-        </div>
+        <PayRows total={order.totalAmount} className="mt-1" />
       </dl>
     </div>
   )

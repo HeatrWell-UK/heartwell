@@ -3,6 +3,8 @@ import { notFound, redirect } from 'next/navigation'
 import { after } from 'next/server'
 import { CheckCircleIcon } from '@phosphor-icons/react/ssr'
 import { OrderLines } from '@/components/checkout/OrderLines'
+import { OrderJourney } from '@/components/checkout/OrderJourney'
+import { orderJourney } from '@/lib/checkout/journey'
 import { CONTACT, phoneHref } from '@/config/contact'
 import { orderForCustomer } from '@/lib/checkout/read'
 import { createPublicClient } from '@/lib/supabase/public'
@@ -39,6 +41,7 @@ export default async function ConfirmOrderPage({ params, searchParams }: { param
   const [order, query] = await Promise.all([params.then((p) => orderForCustomer(p.id)), searchParams])
   if (!order) notFound()
   const tel = phoneHref()
+  const journey = orderJourney(order.status)
 
   if (order.status === 'cancelled') {
     return (
@@ -61,6 +64,7 @@ export default async function ConfirmOrderPage({ params, searchParams }: { param
             Nothing to pay until it’s in your room.
           </span>
         </p>
+        {journey && <OrderJourney steps={journey} />}
         <Summary order={order} />
       </Shell>
     )
@@ -96,8 +100,8 @@ export default async function ConfirmOrderPage({ params, searchParams }: { param
 
 function Shell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mx-auto flex max-w-[40rem] flex-col gap-5 px-4 pb-16 pt-6 lg:pt-10">
-      <h1 className="text-[30px] leading-tight">{title}</h1>
+    <div className="mx-auto flex max-w-[42rem] flex-col gap-6 px-4 pb-16 pt-6 lg:pb-24 lg:pt-12">
+      <h1 className="text-[34px] leading-[1.08] lg:text-[44px]">{title}</h1>
       {children}
     </div>
   )
@@ -105,7 +109,7 @@ function Shell({ title, children }: { title: string; children: React.ReactNode }
 
 function Summary({ order }: { order: NonNullable<Awaited<ReturnType<typeof orderForCustomer>>> }) {
   return (
-    <section aria-label="Your order" className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-line p-5">
+    <section aria-label="Your order" className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-line p-5 lg:p-6">
       <OrderLines order={order} />
       <p className="text-[15px]">
         <span className="font-semibold">{order.customerName}</span>

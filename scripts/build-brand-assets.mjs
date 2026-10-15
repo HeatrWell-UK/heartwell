@@ -111,4 +111,26 @@ await sharp(shareBg)
   .jpeg({ quality: 86 })
   .toFile(out('src/app/opengraph-image.jpg'))
 
+// Email header: the gold mark and wordmark side by side on a solid wine ground
+// (email apps can't show SVG or WebP, and a solid ground survives dark mode).
+// Drawn at 2x for phone screens; src/lib/email/layout.ts shows it 230 x 40.
+{
+  const H = 80
+  const mark = await render(logo('hw-mark-reversed.svg'), Math.round((H * 670) / 475))
+  const wordH = Math.round(H * 0.77)
+  const word = await render(logo('hw-wordmark-reversed.svg'), Math.round((wordH * 1150) / 215))
+  const [m, w] = [await sharp(mark).metadata(), await sharp(word).metadata()]
+  const gap = 16
+  const width = 460
+  const left = Math.round((width - (m.width + gap + w.width)) / 2)
+  const bg = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${H}"><rect width="${width}" height="${H}" fill="${WINE}"/></svg>`)
+  await sharp(bg)
+    .composite([
+      { input: mark, left, top: Math.round((H - m.height) / 2) },
+      { input: word, left: left + m.width + gap, top: Math.round((H - w.height) / 2) },
+    ])
+    .png({ compressionLevel: 9 })
+    .toFile(out('public/brand/hw-email-header.png'))
+}
+
 console.log('Brand assets built.')

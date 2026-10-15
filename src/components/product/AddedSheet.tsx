@@ -6,6 +6,7 @@ import { Sheet } from '@/components/ui/Sheet'
 import { FEATURES } from '@/config/features'
 import { formatPrice } from '@/lib/format'
 import { useBasket } from '@/lib/basket/store'
+import { PayRows } from '@/components/checkout/PayRows'
 
 export interface AddedItem {
   title: string
@@ -43,14 +44,7 @@ export function AddedSheet({ item, onClose }: { item: AddedItem | null; onClose:
               <dt>Delivery to UK Mainland</dt>
               <dd className="font-semibold text-velvet">Free</dd>
             </div>
-            <div className="flex justify-between">
-              <dt>To pay today</dt>
-              <dd className="font-semibold">£0</dd>
-            </div>
-            <div className="flex justify-between text-base font-semibold">
-              <dt>To pay on delivery</dt>
-              <dd>{formatPrice(basket.subtotal)}</dd>
-            </div>
+            <PayRows total={basket.subtotal} className="mt-1" />
           </dl>
 
           {FEATURES.checkout ? (

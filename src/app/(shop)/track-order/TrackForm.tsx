@@ -1,20 +1,13 @@
 'use client'
 
 import { useActionState, useId } from 'react'
-import { CheckIcon } from '@phosphor-icons/react'
 import { TextInput } from '@/components/ui/Field'
 import { formatPrice, ukDate } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
-import { cn } from '@/lib/cn'
+import { OrderJourney } from '@/components/checkout/OrderJourney'
+import { orderJourney } from '@/lib/checkout/journey'
 import { track, type TrackState } from './actions'
 
-const STEPS = [
-  { key: 'createdAt', label: 'Order placed' },
-  { key: 'confirmedAt', label: 'Confirmed by you' },
-  { key: 'processingAt', label: 'Being prepared' },
-  { key: 'shippedAt', label: 'On its way' },
-  { key: 'deliveredAt', label: 'Delivered' },
-] as const
 
 export function TrackForm() {
   const id = useId()
@@ -57,34 +50,21 @@ export function TrackForm() {
 
 function Tracked({ order }: { order: Extract<TrackState, { status: 'found' }>['order'] }) {
   const cancelled = order.status === 'cancelled'
+  const journey = orderJourney(order.status, order)
   return (
-    <section aria-labelledby="tracked" className="flex flex-col gap-4 rounded-[var(--radius-card)] bg-stone p-5">
-      <h2 id="tracked" className="text-[22px]">
+    <section aria-labelledby="tracked" className="hw-panel flex flex-col gap-5 px-5 py-6 lg:px-8 lg:py-8">
+      <h2 id="tracked" className="text-[26px] leading-tight lg:text-[30px]">
         {order.reference}
       </h2>
       {cancelled ? (
         <p className="font-semibold">This order was cancelled{order.cancelledAt ? ` on ${ukDate(new Date(order.cancelledAt), { weekday: false, year: true })}` : ''}.</p>
       ) : (
-        <ol className="flex flex-col gap-3">
-          {STEPS.map((s) => {
-            const at = order[s.key]
-            return (
-              <li key={s.key} className="flex items-center gap-3">
-                <span aria-hidden="true" className={cn('flex size-7 shrink-0 items-center justify-center rounded-full', at ? 'bg-velvet text-white' : 'border-2 border-field bg-white')}>
-                  {at && <CheckIcon size={14} weight="bold" />}
-                </span>
-                <span className={cn('text-[15px]', at ? 'font-semibold' : 'text-slate')}>
-                  {s.label}
-                  {at ? <span className="font-normal text-slate">, {ukDate(new Date(at), { weekday: false })}</span> : <span className="sr-only"> (not yet)</span>}
-                </span>
-              </li>
-            )
-          })}
-        </ol>
+        journey && <OrderJourney steps={journey} />
       )}
       {order.preferredDate && !cancelled && <p className="text-[15px]">Preferred day: {formatDeliveryDate(order.preferredDate)}</p>}
-      <p className="text-[15px]">
-        To pay on delivery: <strong className="font-semibold">{formatPrice(order.totalAmount)}</strong>
+      <p className="flex items-baseline justify-between gap-3 border-t border-line pt-3">
+        <span className="text-[17px] font-semibold">To pay on delivery</span>
+        <span className="font-display text-[26px] leading-none">{formatPrice(order.totalAmount)}</span>
       </p>
     </section>
   )
