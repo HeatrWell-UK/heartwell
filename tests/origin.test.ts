@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { canonicalHostRedirect, externalOrigin, safeNextPath } from '@/lib/http/origin'
+import { visitorAddress } from '@/lib/http/visitor'
 
 describe('safeNextPath', () => {
   it('keeps same-site paths', () => {
@@ -27,6 +28,23 @@ describe('externalOrigin', () => {
     expect(externalOrigin(headers({ 'x-forwarded-host': 'evil.example', 'x-forwarded-proto': 'https' }))).toBe(
       'https://heartwellsofa.co.uk',
     )
+  })
+})
+
+describe('visitorAddress', () => {
+  it('reads from the right, so an address the visitor typed is never trusted', () => {
+    // Vercel: the header is replaced with the visitor's address.
+    expect(visitorAddress('1.1.1.1', null, 0)).toBe('1.1.1.1')
+    // Hostinger: visitor, then its CDN edge and one more hop.
+    expect(visitorAddress('1.1.1.1, 10.0.0.1, 10.0.0.2', '10.0.0.2', 2)).toBe('1.1.1.1')
+    // A made-up entry (shown twice by Hostinger) changes nothing.
+    expect(visitorAddress('6.6.6.6, 6.6.6.6, 1.1.1.1, 10.0.0.1, 10.0.0.2', '10.0.0.2', 2)).toBe('1.1.1.1')
+  })
+
+  it('falls back sensibly when the header is short or missing', () => {
+    expect(visitorAddress('1.1.1.1', null, 2)).toBe('1.1.1.1')
+    expect(visitorAddress(null, '2.2.2.2', 2)).toBe('2.2.2.2')
+    expect(visitorAddress('', null)).toBe('unknown')
   })
 })
 

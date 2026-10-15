@@ -3,6 +3,7 @@ import { APP_ENV } from '@/config/env'
 import { BUILD_COMMIT } from '@/config/integrations'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { createPublicClient } from '@/lib/supabase/public'
+import { TRUSTED_PROXIES, visitorAddress } from '@/lib/http/visitor'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,19 +27,28 @@ async function pingDatabase(): Promise<DatabaseState> {
 export async function GET(request: Request) {
   const database = await pingDatabase()
   const ok = database !== 'error'
-  // How the host's proxy passes the visitor's address on, as counts and
-  // positions only (never the addresses). Sending a made-up x-forwarded-for
-  // shows whether the proxy replaces it (still 1 hop) or appends to it (2),
-  // which decides how the rate limits find the real address
-  // (src/lib/http/rate-limit.ts).
-  const hops = (request.headers.get('x-forwarded-for') ?? '')
+  // How the host's proxies pass the visitor's address on, as counts and
+  // positions only (never the addresses), to check TRUSTED_PROXIES
+  // (src/lib/http/visitor.ts). Add ?ip=<your own address> and it also says
+  // where that address sits, counted from the right (0 = last), and whether
+  // the shop reads it as you.
+  const forwardedFor = request.headers.get('x-forwarded-for')
+  const hops = (forwardedFor ?? '')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
   const realIp = request.headers.get('x-real-ip')?.trim()
+  const probe = new URL(request.url).searchParams.get('ip')?.trim()
   const proxy = {
     forwardedHops: hops.length,
     realIp: !realIp ? 'absent' : realIp === hops.at(-1) ? 'last' : realIp === hops[0] ? 'first' : 'other',
+    trustedProxies: TRUSTED_PROXIES,
+    ...(probe
+      ? {
+          yourPositionFromRight: hops.includes(probe) ? hops.length - 1 - hops.lastIndexOf(probe) : null,
+          readAsYou: visitorAddress(forwardedFor, realIp ?? null) === probe,
+        }
+      : {}),
   }
   return NextResponse.json(
     { ok, env: APP_ENV, commit: BUILD_COMMIT, database, proxy, time: new Date().toISOString() },
