@@ -14,6 +14,7 @@ import {
 import { normaliseQuery, searchCatalogue } from '@/lib/catalogue/search'
 import { homeRanges, homeSwatches, isShowcaseColour } from '@/lib/home/picks'
 import type { RangeSummary } from '@/lib/catalogue/listing'
+import { planExtent, planFrame, planSummary, rangeSizes, sizeLabel, SET_GAP_CM } from '@/lib/catalogue/range-sizes'
 import type { ListingProduct } from '@/lib/catalogue/listing-types'
 
 const node = (id: string, slug: string, parentId: string | null, sort = 1): CategoryNode => ({
@@ -44,6 +45,7 @@ const product = (slug: string, extra: Partial<ListingProduct> = {}): ListingProd
   typeFilters: SOFA_FILTERS,
   rangeSlug: null,
   rangeName: null,
+  rangeDescription: null,
   rangeSort: 999,
   sort: 1,
   featured: false,
@@ -51,6 +53,7 @@ const product = (slug: string, extra: Partial<ListingProduct> = {}): ListingProd
   madeInUk: false,
   price: 500,
   widthCm: 200,
+  plan: null,
   shape: 'straight',
   seats: 3,
   material: 'Fabric',
@@ -189,12 +192,21 @@ describe('search', () => {
     expect(r.products.map((p) => p.slug)).toEqual(['verona-corner'])
     expect(searchCatalogue(list, 'the sofa', names)).toEqual({ products: [], partial: false, terms: [] })
   })
+
+  it('reads the range’s own words too, so "velvet" finds the velvet range', () => {
+    const withWords = [
+      ...list,
+      product('ashton-3', { title: 'Ashton 3 Seater', rangeName: 'Ashton', rangeDescription: 'Ashton is plush velvet with deep-buttoned arms.' }),
+    ]
+    expect(searchCatalogue(withWords, 'velvet', names).products.map((p) => p.slug)).toEqual(['ashton-3'])
+  })
 })
 
 describe('home page ranges', () => {
   const range = (slug: string, featured: boolean, image: string | null = 'https://example.test/r.png'): RangeSummary => ({
     slug,
     name: slug.toUpperCase(),
+    description: null,
     products: [product(`${slug}1`, { rangeSlug: slug, featured })],
     price: 500,
     image,
@@ -240,5 +252,57 @@ describe('single-option filters', () => {
     expect(facetsFor(some, {}).some((f) => f.key === 'made_to_order')).toBe(true)
     const all = [product('a', { madeToOrder: true }), product('b', { madeToOrder: true })]
     expect(facetsFor(all, {}).some((f) => f.key === 'made_to_order')).toBe(false)
+  })
+})
+
+describe('a range page’s sizes', () => {
+  const straight = (w: number, d: number | null = 95) => ({ kind: 'straight' as const, w, d })
+  const verona = [
+    product('v-hb-2', { sort: 2, axis1Value: '2 Seater', axis2Value: 'High Back', price: 369, plan: straight(168, 99) }),
+    product('v-sb-2', { sort: 3, axis1Value: '2 Seater', axis2Value: 'Scattered Back', price: 349, plan: straight(168, 94) }),
+    product('v-sb-arm', { sort: 1, axis1Value: 'Armchair', axis2Value: 'Scattered Back', price: 249, plan: straight(115, 94) }),
+    product('v-hb-arm', { sort: 0, axis1Value: 'Armchair', axis2Value: 'High Back', price: 279, plan: straight(115, 99) }),
+    product('v-hb-u', { sort: 4, axis1Value: 'Armed U-Shape', axis2Value: 'High Back', price: 899, plan: { kind: 'u', back: 300, left: 240, right: 180, d: 95 } }),
+  ]
+
+  it('lists each size once, in the range’s order, with its back styles always in the same order', () => {
+    const sizes = rangeSizes(verona)
+    expect(sizes.map((s) => s.label)).toEqual(['Armchair', '2 seater', 'Armed U-shape'])
+    expect(sizes[0]!.options.map((o) => [o.style, o.slug, o.price])).toEqual([
+      ['High back', 'v-hb-arm', 279],
+      ['Scattered back', 'v-sb-arm', 249],
+    ])
+    expect(sizes[2]!.options).toEqual([{ style: 'High back', slug: 'v-hb-u', price: 899, from: false }])
+  })
+
+  it('leaves the style off in a range with only one', () => {
+    const one = rangeSizes([product('s2', { axis1Value: '2 Seater', axis2Value: null }), product('s3', { axis1Value: '3 Seater' })])
+    expect(one.map((s) => s.options[0]!.style)).toEqual([null, null])
+  })
+
+  it('draws every size in one frame, so they share a scale', () => {
+    const set = { kind: 'set' as const, pieces: [{ label: '3 Seater', w: 198, d: 99 }, { label: '2 Seater', w: 168, d: null }] }
+    expect(planExtent(set)).toEqual({ w: 198 + 168 + SET_GAP_CM, d: 99 })
+    expect(planExtent({ kind: 'corner', top: 240, left: 190, d: null })).toEqual({ w: 240, d: 190 })
+    expect(planFrame([straight(115), null, set])).toEqual({ w: 198 + 168 + SET_GAP_CM, d: 99 })
+    expect(planFrame([null])).toBeNull()
+  })
+
+  it('says the measurement people compare first', () => {
+    expect(planSummary(straight(198))).toBe('198 cm wide')
+    expect(planSummary({ kind: 'corner', top: 240, left: 240, d: 95 })).toBe('240 cm each way')
+    expect(planSummary({ kind: 'corner', top: 240, left: 190, d: 95 })).toBe('240 × 190 cm')
+    expect(planSummary({ kind: 'u', back: 300, left: 180, right: 180, d: 95 })).toBe('300 cm wide, sides 180 cm')
+    expect(planSummary({ kind: 'set', pieces: [{ label: '3', w: 198, d: 99 }, { label: '2', w: 168, d: 99 }] })).toBe('198 cm and 168 cm wide')
+  })
+
+  it('writes sizes in sentence case, keeping the letter in U-shape and L-shape', () => {
+    expect(['3 Seater', 'Armed U-Shape', 'L-Shape', '4 Seater Corner 2c1', 'High Back'].map(sizeLabel)).toEqual([
+      '3 seater',
+      'Armed U-shape',
+      'L-shape',
+      '4 seater corner 2c1',
+      'High back',
+    ])
   })
 })

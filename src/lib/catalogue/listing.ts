@@ -5,6 +5,8 @@ import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { fromPrice } from './pricing'
 import { categoryHref, childrenOf, type CategoryNode } from './tree'
 import type { ListingProduct } from './listing-types'
+import type { Piece } from './clean'
+import { measurementLayout } from '@/lib/product/measurements'
 
 /** Cache tag the admin revalidates when the catalogue changes (Phase 12). */
 export const CATALOGUE_TAG = 'catalogue'
@@ -48,9 +50,9 @@ export const getListing = unstable_cache(
     const { data, error } = await createPublicClient()
       .from('products')
       .select(
-        `slug, title, base_price, made_to_order, origin, is_featured, sort, width_cm, axis1_value, axis2_value, specifications,
+        `slug, title, base_price, made_to_order, origin, is_featured, sort, width_cm, depth_cm, side_a_cm, side_b_cm, axis1_value, axis2_value, specifications,
          type:product_types(slug, name, filters),
-         range:ranges(slug, name, sort),
+         range:ranges(slug, name, sort, description),
          product_categories(category_id),
          variants:product_variants(sku, colour_name, colour_hex, price_adjustment, image_url, sort)`,
       )
@@ -70,6 +72,7 @@ export const getListing = unstable_cache(
         typeFilters: Array.isArray(type?.filters) ? (type.filters as string[]) : [],
         rangeSlug: range?.slug ?? null,
         rangeName: range?.name ?? null,
+        rangeDescription: range?.description?.trim() || null,
         rangeSort: range?.sort ?? 999,
         sort: p.sort,
         featured: p.is_featured,
@@ -77,6 +80,11 @@ export const getListing = unstable_cache(
         madeInUk: p.origin === 'uk',
         price: fromPrice(p.base_price, variants.map((v) => v.price_adjustment)),
         widthCm: p.width_cm,
+        plan: measurementLayout(
+          typeof specs.shape === 'string' ? specs.shape : null,
+          { width_cm: p.width_cm, depth_cm: p.depth_cm, height_cm: null, side_a_cm: p.side_a_cm, side_b_cm: p.side_b_cm },
+          Array.isArray(specs.pieces) ? (specs.pieces as Piece[]) : [],
+        ),
         shape: typeof specs.shape === 'string' ? specs.shape : null,
         seats: typeof specs.seats === 'number' ? specs.seats : null,
         material: typeof specs.material === 'string' ? specs.material : null,
@@ -90,7 +98,7 @@ export const getListing = unstable_cache(
       }
     })
   },
-  ['listing-v1'],
+  ['listing-v2'],
   { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
 )
 
@@ -149,6 +157,8 @@ export const getFabricLibrary = unstable_cache(
 export interface RangeSummary {
   slug: string
   name: string
+  /** The range's introduction, or null. */
+  description: string | null
   products: ListingProduct[]
   price: number
   image: string | null
@@ -174,6 +184,7 @@ export function rangesFrom(listing: ListingProduct[]): RangeSummary[] {
       return {
         slug: cover.rangeSlug!,
         name: cover.rangeName!,
+        description: cover.rangeDescription,
         products: sorted,
         price: Math.min(...sorted.map((p) => p.price)),
         image: cover.image,

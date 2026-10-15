@@ -6,13 +6,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 18C (redesign, revision 3) part R1 done, 15 October 2026: the new home page, header, footer and display face are live. Phase 18B done the same day: the shop runs on Hostinger at **https://heartwellsofa.co.uk**, still in pre-launch mode. Phase 17A (the owner's catalogue) live: 63 pieces on sale, 14 new pieces hidden until the price list arrives. |
+| **Current phase** | Phase 18C (redesign, revision 3) parts R1 and R2 done, 15 October 2026: the new home page, header, footer and display face, then the category, range, search and saved pages, are live. Phase 18B done the same day: the shop runs on Hostinger at **https://heartwellsofa.co.uk**, still in pre-launch mode. Phase 17A (the owner's catalogue) live: 63 pieces on sale, 14 new pieces hidden until the price list arrives. |
 | **Design** | Revision 3, "the velvet alcove" (owner asked for a full redesign on 15 October 2026), built in parts R1–R5 (`docs/PLAN.md`, Phase 18C). Spec in `docs/DESIGN.md`. Revision 2 (approved 3 October) · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **The site** | https://heartwellsofa.co.uk on Hostinger (hosting account, Node.js web app, auto-deploys from `main`; pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Vercel (heartwellfurniture.vercel.app) still builds from `main` as a fallback for a week after go-live, then it's deleted. |
 | **Live site** | Not yet: go-live is Phase 19 (switch pre-launch off, tracking, Search Console). |
 | **Admin** | https://heartwellsofa.co.uk/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 18C R2 (category, range and search pages), then R3–R5. The owner's price list (prices for all pieces, sizes for the 14 new ones) can come in at any point; then Phase 19: go-live. |
-| **Next prompt** | `Phase 18C R2 — Redesign the category, range and search pages. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/DESIGN.md, then build R2.` When the price list is sent: it goes in this chat as it is. Go-live: `Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.` |
+| **Next phase** | Phase 18C R3 (the product page), then R4–R5. The owner's price list (prices for all pieces, sizes for the 14 new ones) can come in at any point; then Phase 19: go-live. |
+| **Next prompt** | `Phase 18C R3 — Redesign the product page. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/DESIGN.md, then build R3.` When the price list is sent: it goes in this chat as it is. Go-live: `Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -47,6 +47,15 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 15 October 2026 — Phase 18C R2: category, range, search and saved pages
+- **Range pages** open with the range's room photo and its own introduction, then draw **every size to scale**: each size's top view in real centimetres inside one frame shared by the range, on a common baseline, with the measurement people compare first ("198 cm wide", "240 × 190 cm") and a link per back style with its price. Then "Will it fit?" and four other ranges. The plans come from each product's measurements (`measurementLayout`, now part of the listing as `plan`); sets draw both pieces.
+- **Range words:** migration `range_copy` stores each range's introduction (the intros the product descriptions already start from, `scripts/catalogue/catalogue-copy.mjs`) in `ranges.description`, filling empty ones only. 18 of 19 ranges have one (the hidden demo range doesn't). Search reads them too, so "velvet" finds Ashton and "chesterfield" finds Rio and Windsor.
+- **Category pages:** sentence-case names, "31 sofas, from £479", the category's plan drawn large on desktops; on phones the introduction moves to "About …" at the bottom, a shape rail (centred on the page you're on) moves between shapes, and the filter and sort bar stays pinned while the grid scrolls. The desktop header row underlines the page you're on.
+- **Tiles:** the range name in Gloock over the size, said once ("Ashton" / "3+2 seater, high back"); sizes in sentence case ("Armed U-shape"). Range cards are shared by the home page, the ranges page and "other ranges", and stack on narrow cards (container query).
+- **Search and saved:** a larger search field, "Browse by shape" and popular searches when nothing matches; saved tiles to match and a friendlier empty state.
+- **Tests:** range sizes (order, back styles, frame, measurement wording, sentence case) and search over range words.
+- **Checked:** `npm run verify` with `NEXT_TEST_WASM=1`; on a phone-sized and a desktop screen: Verona's range page, corner, U-shaped, armchairs and electric recliner pages, filtering from the pinned bar, the ranges page, search with and without results, saved, and the home page's range cards.
 
 ### 15 October 2026 — Phase 18C R1: the redesign starts with the home page ("the velvet alcove")
 - **Owner:** "redesign this whole website and make it look good for UK customers … start with the homepage, you decide what's best and amaze me." Planned as Phase 18C in five parts (R1 home and frame, R2 listings, R3 product, R4 basket to tracking, R5 content pages), before go-live. Red velvet and gold and the logo stay (owner's taste); no green, pink or orange on the shop's own pages.

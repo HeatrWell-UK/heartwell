@@ -1,5 +1,7 @@
 // One product as category pages, search and the home page see it.
 
+import type { Layout } from '@/lib/product/measurements'
+
 export interface ListingProduct {
   slug: string
   title: string
@@ -9,6 +11,8 @@ export interface ListingProduct {
   typeFilters: string[]
   rangeSlug: string | null
   rangeName: string | null
+  /** The range's introduction (ranges.description), for its range page. */
+  rangeDescription: string | null
   rangeSort: number
   sort: number
   featured: boolean
@@ -16,6 +20,8 @@ export interface ListingProduct {
   madeInUk: boolean
   price: number
   widthCm: number | null
+  /** Its top view in centimetres, for drawings to scale; null when the measurements aren't known. */
+  plan: Layout | null
   shape: string | null
   seats: number | null
   material: string | null

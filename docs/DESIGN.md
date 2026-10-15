@@ -1,6 +1,6 @@
 # Heartwell — Design system
 
-Status: **revision 3, being built** (Phase 18C, from 15 October 2026; the home page and the shop's frame are done, the other pages follow in parts R2–R5, `docs/PLAN.md`). Revision 2 was approved on 3 October 2026.
+Status: **revision 3, being built** (Phase 18C, from 15 October 2026; done: the home page and the shop's frame (R1), category, range, search and saved pages (R2); the product page, checkout and content pages follow in R3–R5, `docs/PLAN.md`). Revision 2 was approved on 3 October 2026.
 Revision 2 preview: https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y · source: `design/canvas/project/*.dc.html` · logo files: `design/logo/` · logo build scripts: `design/logo-work/`
 
 Direction name: **Red Velvet and Gold**, revision 3: **the velvet alcove**. Deep velvet red for every action, metallic gold for the finishing touches, white and soft stone behind everything. Phone first, built for the Facebook and Instagram in-app browsers.
@@ -100,6 +100,15 @@ Each one stands for something, and each is used sparingly.
 7. **Questions people ask**: heading beside the answers on desktops.
 
 The header gains a row of categories on desktops (with Ranges, and All sofas from 1280 px); the footer puts the logo and contact details, the link columns and the newsletter side by side on desktops.
+
+## Category, range, search and saved pages (revision 3, part R2)
+
+- **Product tiles** (category pages, search): the photo with one label (electric, reclining or made to order) and the save heart; then the **range's name in Gloock** with the size underneath, said once ("Ashton" over "3+2 seater, high back", never the size twice); the price it starts from and the colours. Sizes are written in sentence case with commas ("Armed U-shape", "4 seater corner 2c1, high back").
+- **Category pages**: the name in sentence case, "31 sofas, from £479", and on desktops the introduction with the category's top-view plan drawn large beside it. On phones the introduction moves to "About …" at the bottom so the sofas come first, the **shape rail** (every category with its plan, the current one in gold tint, centred on load) lets people hop between shapes, and the filter and sort bar stays pinned to the top while the grid scrolls (the Filter button turns gold when filters are on). Desktops use the header's category row instead of the rail; it underlines the page you're on.
+- **Range pages** (the bold moment of R2): the range's room photo and its own introduction (`ranges.description`, migration `range_copy`), sizes, back styles, the from-price and colours, "Choose a size" and "Ask about …" on WhatsApp. Then **every size drawn to scale**: one card per size with its top view (`ScalePlan`) in real centimetres inside one frame shared by the whole range, standing on a common baseline, so a 2 seater and a 5 seater corner can be compared at a glance; under each, the measurement people compare first ("198 cm wide", "240 × 190 cm", "198 cm and 168 cm wide") and a row per back style with its price. Plans are velvet lines on white over stone, dashed seams for the back cushions, arms and seats. Then "Will it fit?" and other ranges.
+- **Range cards** (home, ranges page, other ranges): photo, name in Gloock, sizes, made to order, from-price, colours. They size themselves with a container query: narrow cards (two across a phone) stack the price under the name, wider ones set it beside.
+- **Search**: a large rounded field with the magnifier inside; with no results, "Browse by shape" (the rail) and popular searches. Search also reads each range's introduction, so "velvet" or "chesterfield" find the right ranges.
+- **Saved**: tiles to match; an empty state with a gold-tint heart.
 
 ## Components (as drawn in the revision 2 preview)
 
