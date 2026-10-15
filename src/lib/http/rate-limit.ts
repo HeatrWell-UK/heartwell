@@ -1,5 +1,6 @@
 import 'server-only'
 import { headers } from 'next/headers'
+import { visitorAddress } from './visitor'
 
 // A simple in-memory limiter. On Hostinger the shop runs as one long-lived
 // process, so it's effective; on Vercel each instance keeps its own count,
@@ -19,8 +20,8 @@ export function rateLimit(key: string, limit: number, windowMs: number): boolean
   return bucket.count <= limit
 }
 
-/** The visitor's address as the proxy reports it, for rate limiting only (never stored or sent anywhere). */
+/** The visitor's address as the host's proxies report it (src/lib/http/visitor.ts). */
 export async function clientIp(): Promise<string> {
   const h = await headers()
-  return h.get('x-forwarded-for')?.split(',')[0]?.trim() || h.get('x-real-ip') || 'unknown'
+  return visitorAddress(h.get('x-forwarded-for'), h.get('x-real-ip'))
 }
