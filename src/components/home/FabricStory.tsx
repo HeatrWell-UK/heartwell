@@ -4,49 +4,65 @@ import Link from 'next/link'
 import { FEATURES } from '@/config/features'
 import { SAMPLES } from '@/config/samples'
 import type { FabricCollection } from '@/lib/catalogue/listing'
+import { homeSwatches } from '@/lib/home/picks'
 
 /**
- * "Your sofa, in your fabric": the wine section with a row of pinked swatches
- * (colours only, no photos to load) and the way into the fabric library.
+ * "Your sofa, in your fabric": the wine section with a card of pinked swatches,
+ * named the way the fabric picker names them (colours only, nothing to load).
+ * Phones read heading, swatches, then the actions; desktops put the swatches
+ * beside the words.
  */
 export function FabricStory({ collections }: { collections: FabricCollection[] }) {
   const total = collections.reduce((n, c) => n + c.fabrics.length, 0)
-  if (total === 0) return null
-  // Twelve colours spread across the collections, so the row shows the range.
-  const all = collections.flatMap((c) => c.fabrics.filter((f) => f.hex))
-  const step = Math.max(1, Math.floor(all.length / 12))
-  const swatches = all.filter((_, i) => i % step === 0).slice(0, 12)
-  const names = collections.slice(0, 3).map((c) => c.name.toLowerCase())
+  // Full rows only: up to 16 on phones (4 across), up to 12 on desktops (6 across), spread light to dark.
+  const swatches = homeSwatches(collections, 16)
+  const phone = Math.floor(swatches.length / 4) * 4
+  if (total === 0 || phone === 0) return null
+  const desktop = phone < 6 ? phone : Math.min(12, Math.floor(phone / 6) * 6)
+  const onDesktop = new Set(Array.from({ length: desktop }, (_, i) => Math.round((i * (phone - 1)) / Math.max(1, desktop - 1))))
 
   return (
-    <section aria-labelledby="fabrics" className="mt-12 bg-wine text-white lg:mt-20">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 py-12 lg:grid lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-6 lg:py-16">
-        <div className="flex flex-col gap-4">
-          <h2 id="fabrics" className="text-gold-sheen text-[30px] leading-tight lg:text-[38px]">
+    <section aria-labelledby="fabrics" className="mt-14 bg-wine text-white lg:mt-24">
+      <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-14 lg:grid-cols-[5fr_6fr] lg:grid-rows-[auto_1fr] lg:gap-x-16 lg:gap-y-6 lg:px-6 lg:py-20">
+        <div className="flex flex-col gap-5 lg:col-start-1 lg:row-start-1">
+          <h2 id="fabrics" className="text-gold-lit text-[32px] leading-[1.1] lg:text-[46px]">
             Your sofa, in your fabric
           </h2>
           <p className="text-[17px] leading-relaxed text-on-wine">
-            Our fabric sofas are made to order in the UK. Pick the shape and size, then choose from {total} fabrics: {names.join(', ')} and more.
+            Our fabric sofas are made to order in the UK. Choose the shape and size, then any of our {total} fabrics in {collections.length}{' '}
+            collections: {new Intl.ListFormat('en-GB').format(collections.map((c) => c.name))}.
           </p>
-          {FEATURES.samples && (
-            <p className="flex items-start gap-3 rounded-2xl bg-white/8 p-4 text-[15px] text-on-wine">
-              <ScissorsIcon aria-hidden="true" size={24} className="shrink-0 text-gold-pale" />
-              <span>
-                Not sure? <Link href={SAMPLES.href} className="font-semibold text-on-wine underline">Order fabric samples</Link>, {SAMPLES.fee} for the set. We take the {SAMPLES.fee} off when you buy your sofa.
-              </span>
-            </p>
-          )}
-          <ButtonLink href="/fabrics" variant="gold" block className="lg:w-auto lg:self-start lg:px-10">
-            Browse the fabrics
-          </ButtonLink>
         </div>
-        <ul className="grid grid-cols-6 gap-2 lg:gap-3" aria-label="Some of our fabric colours">
-          {swatches.map((f) => (
-            <li key={f.code} title={f.name} className="pinked aspect-square" style={{ backgroundColor: f.hex! }}>
-              <span className="sr-only">{f.name}</span>
+
+        <ul
+          className="grid grid-cols-4 gap-x-3 gap-y-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:grid-cols-6 lg:gap-x-4 lg:gap-y-5 lg:self-center"
+          aria-label="Some of our fabric colours"
+        >
+          {swatches.slice(0, phone).map((f, i) => (
+            <li key={f.code} className={`flex flex-col items-center gap-2 ${onDesktop.has(i) ? '' : 'lg:hidden'}`}>
+              <span aria-hidden="true" className="pinked block aspect-square w-full" style={{ backgroundColor: f.hex }} />
+              <span className="text-center text-[13px] leading-tight text-on-wine-muted">{f.name}</span>
             </li>
           ))}
         </ul>
+
+        <div className="flex flex-col gap-6 lg:col-start-1 lg:row-start-2">
+          {FEATURES.samples && (
+            <p className="flex items-start gap-3 border-t border-white/15 pt-5 text-[15px] leading-relaxed text-on-wine">
+              <ScissorsIcon aria-hidden="true" size={24} className="shrink-0 text-gold-pale" />
+              <span>
+                Want to feel them first?{' '}
+                <Link href={SAMPLES.href} className="font-semibold text-on-wine-link underline hover:text-white">
+                  Order fabric samples
+                </Link>
+                , {SAMPLES.fee} for the set, taken off your sofa when you buy.
+              </span>
+            </p>
+          )}
+          <ButtonLink href="/fabrics" variant="gold" block className="sm:w-auto sm:self-start sm:px-10">
+            See all {total} fabrics
+          </ButtonLink>
+        </div>
       </div>
     </section>
   )

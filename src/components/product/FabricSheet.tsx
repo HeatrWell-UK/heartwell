@@ -57,7 +57,7 @@ export function FabricSheet({
 
         {collections.map((c) => (
           <fieldset key={c.slug} className="flex flex-col gap-3">
-            <legend className="mb-3 flex items-baseline gap-2 font-display text-lg font-bold">
+            <legend className="mb-3 flex items-baseline gap-2 font-display text-lg">
               {c.name}
               {c.surcharge > 0 && <span className="font-sans text-sm font-semibold text-slate">+{formatPrice(c.surcharge)}</span>}
             </legend>

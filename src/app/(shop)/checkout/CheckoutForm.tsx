@@ -226,7 +226,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const err = (k: FieldKey) => fieldErrors[k]
   const describedBy = (k: FieldKey, help?: string) => [help, err(k) ? `${id}-${k}-error` : null].filter(Boolean).join(' ') || undefined
   const sectionClass = 'flex flex-col gap-4 rounded-[var(--radius-card)] border border-line p-4 lg:p-6'
-  const legendClass = 'font-display text-[22px] font-bold'
+  const legendClass = 'font-display text-[22px]'
 
   return (
     <form

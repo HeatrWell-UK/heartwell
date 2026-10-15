@@ -21,7 +21,7 @@ export default function GuidesPage() {
           <li key={g.slug}>
             <Link href={`/guides/${g.slug}`} className="group flex items-center justify-between gap-4 py-5 text-ink no-underline">
               <span className="flex flex-col gap-1">
-                <span className="font-display text-[22px] font-bold leading-tight group-hover:text-velvet">{g.title}</span>
+                <span className="font-display text-[22px] leading-tight group-hover:text-velvet">{g.title}</span>
                 <span className="text-[15px] leading-snug text-slate">{g.summary}</span>
               </span>
               <CaretRightIcon aria-hidden="true" size={20} className="shrink-0 text-velvet" />

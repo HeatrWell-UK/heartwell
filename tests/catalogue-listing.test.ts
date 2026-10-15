@@ -12,7 +12,8 @@ import {
   toggleFilter,
 } from '@/lib/catalogue/filters'
 import { normaliseQuery, searchCatalogue } from '@/lib/catalogue/search'
-import { pickPopular } from '@/components/home/PopularNow'
+import { homeRanges, homeSwatches, isShowcaseColour } from '@/lib/home/picks'
+import type { RangeSummary } from '@/lib/catalogue/listing'
 import type { ListingProduct } from '@/lib/catalogue/listing-types'
 
 const node = (id: string, slug: string, parentId: string | null, sort = 1): CategoryNode => ({
@@ -190,16 +191,46 @@ describe('search', () => {
   })
 })
 
-describe('popular right now', () => {
-  it('picks featured pieces with photos, one per range', () => {
-    const list = [
-      product('a1', { rangeSlug: 'a', featured: true }),
-      product('a2', { rangeSlug: 'a', featured: true }),
-      product('b1', { rangeSlug: 'b', featured: true, image: null }),
-      product('c1', { rangeSlug: 'c' }),
-      product('d1', { rangeSlug: 'd', featured: true }),
-    ]
-    expect(pickPopular(list, 3).map((p) => p.slug)).toEqual(['a1', 'd1', 'c1'])
+describe('home page ranges', () => {
+  const range = (slug: string, featured: boolean, image: string | null = 'https://example.test/r.png'): RangeSummary => ({
+    slug,
+    name: slug.toUpperCase(),
+    products: [product(`${slug}1`, { rangeSlug: slug, featured })],
+    price: 500,
+    image,
+    imageAlt: '',
+    madeToOrder: false,
+    colours: [],
+  })
+
+  it('shows photographed ranges, the ones with featured pieces first, in catalogue order', () => {
+    const ranges = [range('a', false), range('b', true, null), range('c', true), range('d', false), range('e', true)]
+    expect(homeRanges(ranges, 3).map((r) => r.slug)).toEqual(['c', 'e', 'a'])
+  })
+})
+
+describe('home page swatches', () => {
+  const collection = (name: string, fabrics: [string, string][]) => ({
+    slug: name.toLowerCase(),
+    name,
+    surcharge: 0,
+    fabrics: fabrics.map(([n, hex], i) => ({ id: `${name}${i}`, code: `${name}${i}`, name: n, hex, image: null, swatchable: true })),
+  })
+
+  it('leaves out greens, pinks and oranges, the owner’s rule for the shop’s own pages', () => {
+    for (const hex of ['#012724', '#047379', '#66B6CC', '#DA6E8A', '#D8B7BF', '#E07E49', '#825018']) expect(isShowcaseColour(hex)).toBe(false)
+    for (const hex of ['#D2C9B6', '#855F48', '#133A68', '#83030F', '#281A32', '#050505', '#949190']) expect(isShowcaseColour(hex)).toBe(true)
+  })
+
+  it('keeps one of each name and near-identical colour, light to dark, spread evenly', () => {
+    const picks = homeSwatches(
+      [
+        collection('Chenille', [['Cream', '#D2C9B6'], ['Black', '#292524'], ['Pink', '#D8B7BF']]),
+        collection('Velvet', [['Cream', '#BBB7B2'], ['Ink', '#2A2626'], ['Mink', '#836551']]),
+      ],
+      4,
+    )
+    expect(picks.map((p) => p.name)).toEqual(['Cream', 'Mink', 'Black'])
   })
 })
 

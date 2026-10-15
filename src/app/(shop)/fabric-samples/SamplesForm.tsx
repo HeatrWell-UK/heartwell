@@ -98,7 +98,7 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
         )}
         {collections.map((c) => (
           <fieldset key={c.slug} className="flex flex-col gap-3">
-            <legend className="mb-3 font-display text-lg font-bold">{c.name}</legend>
+            <legend className="mb-3 font-display text-lg">{c.name}</legend>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-2 gap-y-3">
               {c.fabrics.map((f) => {
                 const on = chosen.includes(f.id)

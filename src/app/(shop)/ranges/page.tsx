@@ -43,7 +43,7 @@ export default async function RangesPage() {
                   </span>
                 )}
               </span>
-              <span className="font-display text-xl font-bold leading-tight">{r.name}</span>
+              <span className="font-display text-xl leading-tight">{r.name}</span>
               <span className="text-[13px] text-slate">
                 {r.products.length} {r.products.length === 1 ? 'piece' : 'pieces'}
                 {r.madeToOrder ? ' · made to order' : ''}

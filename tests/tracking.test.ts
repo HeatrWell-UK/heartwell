@@ -213,21 +213,25 @@ describe('conversions from the outbox', () => {
     }
   }
 
+  // processConversion reads the real clock, and Meta refuses events over 7 days old: these orders were confirmed an hour ago.
+  const recent = (over: Partial<NonNullable<OutboxRow['order']>> = {}) =>
+    row({}, order({ created_at: new Date(Date.now() - 2 * 3600_000).toISOString(), confirmed_at: new Date(Date.now() - 3600_000).toISOString(), ...over }))
+
   it('sends nothing in a dry run, but keeps what it built', async () => {
     const s = sender(true, { configured: false, testable: false })
-    const r = await processConversion(row(), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: s })
+    const r = await processConversion(recent(), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: s })
     expect(r).toMatchObject({ status: 'skipped', log: { mode: 'dry_run', status: 'logged' } })
     expect(s.calls).toEqual([])
   })
 
   it('sends test events (closed, never counted) and real ones only for real orders on the live site', async () => {
     const t = sender(true)
-    expect(await processConversion(row({}, order({ is_test: true })), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: t })).toMatchObject({ status: 'skipped', skip_reason: 'sent as a test event' })
-    expect(await processConversion(row(), { setting: 'live', liveAllowed: false, siteUrl: 'https://example.test', send: t })).toMatchObject({ status: 'skipped' })
-    expect(await processConversion(row(), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: t })).toMatchObject({ status: 'sent', response: { events_received: 1 } })
+    expect(await processConversion(recent({ is_test: true }), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: t })).toMatchObject({ status: 'skipped', skip_reason: 'sent as a test event' })
+    expect(await processConversion(recent(), { setting: 'live', liveAllowed: false, siteUrl: 'https://example.test', send: t })).toMatchObject({ status: 'skipped' })
+    expect(await processConversion(recent(), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: t })).toMatchObject({ status: 'sent', response: { events_received: 1 } })
     expect(t.calls).toEqual(['meta:test', 'meta:test', 'meta:live'])
     const f = sender(false)
-    expect(await processConversion(row(), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: f })).toMatchObject({ status: 'failed', log: { status: 'failed' } })
+    expect(await processConversion(recent(), { setting: 'live', liveAllowed: true, siteUrl: 'https://example.test', send: f })).toMatchObject({ status: 'failed', log: { status: 'failed' } })
   })
 })
 

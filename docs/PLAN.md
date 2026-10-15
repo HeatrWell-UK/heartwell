@@ -502,7 +502,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 
 ## 11. The phases
 
-**Order (updated 4 October 2026):** 1–5, 8–17, 17A–17C, 18, 18B, 19. The whole site is built on the imported catalogue first; photos and catalogue words come once it's finished.
+**Order (updated 15 October 2026):** 1–5, 8–17, 17A, 18, 18B, 18C (redesign, R1–R5), 19. The whole site is built on the imported catalogue first; photos and catalogue words come once it's finished.
 
 Each phase gives the goal, what gets built, what to prepare, **the exact prompt**, how to test on your phone and what "done" means. Text in `<angle brackets>` is filled in by you.
 
@@ -801,6 +801,28 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 - **Phone test:** open the Hostinger address; place and confirm a test order; the admin Health card is green.
 - **Done means:** the Hostinger app redeploys on push and behaves exactly as the site did on Vercel.
 - **As built (15 October 2026).** The site runs on Hostinger at https://heartwellsofa.co.uk (the owner chose the domain already owned; it stays in the domains account with its email, and only its web records point at the hosting account). GitHub through the HeatrWell-UK organisation (the hosting account's GitHub user has read access; Hostinger's app installed for `heartwell` only). Builds use webpack and a plain-JavaScript `next.config.mjs`, because Hostinger's old glibc forces Next.js onto its WebAssembly compiler. Visitor addresses are read from the right of `x-forwarded-for` (measured; a made-up header could fool the old reading). Scheduled jobs call the new address; a health check run by hand came back clean. Vercel stays as a fallback. Details in `docs/PROGRESS.md`.
+
+---
+
+### Phase 18C — Redesign, revision 3 ("the velvet alcove"), in five parts
+
+- **Added 15 October 2026.** The owner asked for the whole site to be redesigned for UK customers, starting with the home page ("you decide what's best and amaze me"). It runs while the price list is awaited, before go-live. Direction and rules: `docs/DESIGN.md` (revision 3). Each part is one prompt, live on the site when done.
+- **Idea:** every photo the owner took stands the furniture in the same panelled room with a velvet-red alcove and a gold rim. The site takes its shapes from that room (the alcove, the wall panels, the gold) instead of inventing decoration. Red velvet and gold stay; the logo stays; the display face becomes Gloock, which matches the logo's wordmark.
+
+| Part | What it covers | Status |
+| --- | --- | --- |
+| R1 | Home page, header (desktop category row), footer, the display face everywhere | ✅ 15 October 2026 |
+| R2 | Category pages, ranges (list and each range), search, saved: tiles, filters, range pages that open with the range's own room | Next |
+| R3 | Product page: gallery, buy box, fabric picker, measurements, sticky bar, added sheet | |
+| R4 | Basket, checkout, order, confirm and track pages, and the emails' look | |
+| R5 | Content pages (About, Visit us, Delivery and returns, FAQ, guides, fabrics, samples, policies), 404 and error pages; DESIGN.md finished | |
+
+- **Prompt (next part):**
+  ```
+  Phase 18C R2 — Redesign the category, range and search pages. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/DESIGN.md, then build R2.
+  ```
+- **Phone test (each part):** the pages it covers, on the real site, in Safari and inside Instagram.
+- **Done means:** every customer page follows revision 3; PageSpeed and accessibility stay where Phase 18 left them.
 
 ---
 
