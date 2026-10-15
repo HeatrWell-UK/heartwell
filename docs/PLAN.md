@@ -826,7 +826,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Phase 19 — Go-live
 
 - **Goal:** Heartwell is live.
-- **Does:** production settings (`NEXT_PUBLIC_APP_ENV=production`: the site leaves pre-launch mode, so test orders are cleared or kept flagged first); DNS checks (the domain was connected in 18B, email untouched); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); OrderFlow's **Send test orders too** switched off and the `TEST HW-…` orders deleted in OrderFlow; final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
+- **Does:** production settings (`NEXT_PUBLIC_APP_ENV=production`: the site leaves pre-launch mode, so test orders are cleared or kept flagged first); DNS checks (the domain was connected in 18B, email untouched); SSL; Meta domain verification; catalogue feed switched to the live URL; Google Search Console and sitemap; Google Business Profile steps for the Visit us address; tracking switched live (test code removed); the Facebook Page's website link, the pinned announcement and the Page's link in the site's footer and Organization data (`docs/FACEBOOK-PAGE.md`); OrderFlow's **Send test orders too** switched off and the `TEST HW-…` orders deleted in OrderFlow; final smoke test; `SITE_INDEXABLE=true` on the live domain; the GitHub repository made private (Hostinger keeps deploying through its GitHub connection); launch checklist and rollback plan.
 - **Prepare:** item 22.
 - **Prompt:**
   ```
