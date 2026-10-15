@@ -6,13 +6,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 18C (redesign, revision 3) parts R1–R4 done, 15–16 October 2026: the new home page, header, footer and display face, the category, range, search and saved pages, the product page, and the basket, checkout and order pages are live. Phase 18B done the same day: the shop runs on Hostinger at **https://heartwellsofa.co.uk**, still in pre-launch mode. Phase 17A (the owner's catalogue) live: 63 pieces on sale, 14 new pieces hidden until the price list arrives. |
-| **Design** | Revision 3, "the velvet alcove" (owner asked for a full redesign on 15 October 2026), built in parts R1–R5 (`docs/PLAN.md`, Phase 18C). Spec in `docs/DESIGN.md`. Revision 2 (approved 3 October) · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
+| **Current phase** | Phase 18C (redesign, revision 3) done, 15–16 October 2026: every customer page is in the new design (home and frame, listings and ranges, product page, basket to tracking, content pages and errors). Phase 18B done the same day: the shop runs on Hostinger at **https://heartwellsofa.co.uk**, still in pre-launch mode. Phase 17A (the owner's catalogue) live: 63 pieces on sale, 14 new pieces hidden until the price list arrives. |
+| **Design** | Revision 3, "the velvet alcove" (owner asked for a full redesign on 15 October 2026), built in parts R1–R5 (`docs/PLAN.md`, Phase 18C), all live. Spec in `docs/DESIGN.md`. Revision 2 (approved 3 October) · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **The site** | https://heartwellsofa.co.uk on Hostinger (hosting account, Node.js web app, auto-deploys from `main`; pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Vercel (heartwellfurniture.vercel.app) still builds from `main` as a fallback for a week after go-live, then it's deleted. |
 | **Live site** | Not yet: go-live is Phase 19 (switch pre-launch off, tracking, Search Console). |
 | **Admin** | https://heartwellsofa.co.uk/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | Phase 18C R5 (content pages), the last part of the redesign. The owner's price list (prices for all pieces, sizes for the 14 new ones) can come in at any point; then Phase 19: go-live. |
-| **Next prompt** | `Phase 18C R5 — Redesign the content pages. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/DESIGN.md, then build R5.` When the price list is sent: it goes in this chat as it is. Go-live: `Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.` |
+| **Next phase** | The owner's price list (prices for all pieces, sizes for the 14 new ones), then Phase 19: go-live. |
+| **Next prompt** | When the price list is sent: it goes in this chat as it is. Go-live: `Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -47,6 +47,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 16 October 2026 — Phase 18C R5: content pages, page not found and errors (the redesign is complete)
+- **The content frame** (About, Delivery and returns, questions and answers, guides, care, will it fit, the policies): bigger headings, an optional figure under the introduction, and "On this page" that folds away on phones and stays beside the text on desktops. Real step lists use the gold numbers; notes have a gold rule.
+- **About** opens with the owner's room photo; **Visit us** sets the address and booking beside the map with the showroom; **Delivery and returns** opens with the delivery area and the three facts people look for. The map is now one component (`BritainMap`), also on the home page.
+- **Our fabrics** opens on the velvet band of the home page's fabric section, with "Order samples" in gold. Guides, reviews, contact and samples share the heading scale; the reviews empty state sits on a wall panel.
+- **Page not found and errors**: an empty alcove drawn in gold line, then search, the shapes, home and contact. The search box is shared with the search page.
+- **R4 finished first:** live checkout priced a test basket correctly (no order placed; the basket was emptied again).
+- **Checked:** `npm run verify` with `NEXT_TEST_WASM=1`; About, Visit us, Fabrics, Delivery and returns and page not found on a phone-sized screen, Delivery and returns on a desktop (the list stays beside the text). The local dev server showed two headers on a not-found page under the shop's routes; a local production build and the live site show one.
 
 ### 16 October 2026 — Phase 18C R4: basket, checkout and order pages
 - **One receipt everywhere:** a shared `PayRows` (To pay today £0 in velvet, To pay on delivery large) ends every summary: the product page and its added sheet, basket, checkout, order and confirm pages, Track my order and the order emails. The product page now uses the same wording ("To pay today", "To pay on delivery").

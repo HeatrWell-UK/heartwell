@@ -1,0 +1,23 @@
+<!doctype html><meta charset="utf-8">
+<!-- Heartwell profile picture (WhatsApp, Facebook, Instagram), 1080 x 1080, shown as a circle.
+     Render: chrome --headless=new --hide-scrollbars --force-device-scale-factor=1 --window-size=1080,1080 --virtual-time-budget=4000 --screenshot=out.png "file:///.../profile.html#mark"  (#full for the version with the name) -->
+<style>
+  html,body{margin:0;width:1080px;height:1080px;overflow:hidden}
+  .pp{position:relative;width:1080px;height:1080px;
+    background:radial-gradient(circle at 50% 44%, #62152A 0%, #4A0D17 52%, #380912 100%)}
+  .ring{position:absolute;inset:34px;border-radius:50%;padding:7px;
+    background:linear-gradient(135deg,#94701F 0%,#E9CC7B 30%,#B58A2F 52%,#F2DC9C 74%,#9E7626 100%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+  .pp img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+  .full img{width:820px}
+  .mark img{width:800px}
+  .noring .ring{display:none}
+</style>
+<div class="pp" id="pp"><div class="ring"></div><img id="logo"></div>
+<script>
+  const v = location.hash.slice(1) || 'full';
+  const pp = document.getElementById('pp');
+  pp.classList.add(v.startsWith('mark') ? 'mark' : 'full');
+  if (v.endsWith('-noring')) pp.classList.add('noring');
+  document.getElementById('logo').src = v.startsWith('mark') ? '../logo/hw-mark-reversed.svg' : '../logo/hw-logo-reversed.svg';
+</script>

@@ -28,13 +28,13 @@ export function VisitUs({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' })
   const tel = phoneHref()
   return (
     <section aria-labelledby="visit-us" className="flex flex-col gap-4">
-      <Heading id="visit-us" className={headingLevel === 'h1' ? 'text-[34px] leading-tight lg:text-[48px]' : 'text-[28px] leading-tight lg:text-[34px]'}>
+      <Heading id="visit-us" className={headingLevel === 'h1' ? 'text-[38px] leading-[1.06] lg:text-[56px]' : 'text-[28px] leading-tight lg:text-[34px]'}>
         Visit us
       </Heading>
       <p className="text-[17px] leading-relaxed text-slate">
         See the sofas and feel the fabrics in person, in {a.locality}. Visits are by appointment, so someone is there to show you round.
       </p>
-      <ul className="flex flex-col gap-3 rounded-[var(--radius-card)] bg-stone p-5 text-[16px] leading-relaxed">
+      <ul className="hw-panel flex flex-col gap-3 px-5 py-5 text-[16px] leading-relaxed">
         <li className="flex items-start gap-3">
           <MapPinIcon aria-hidden="true" size={24} className="mt-0.5 shrink-0 text-velvet" />
           <address className="font-semibold not-italic">

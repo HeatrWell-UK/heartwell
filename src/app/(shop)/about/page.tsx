@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { ContentPage } from '@/components/content/ContentPage'
 import { CONTACT, visitBookingText } from '@/config/contact'
 import { BRAND } from '@/config/brand'
 import { POLICIES, PROMISES } from '@/config/promises'
+
+const ROOM = 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792009382/Home-Page-Furniture-Background-Image-3.avif'
 
 export const metadata: Metadata = {
   title: 'About Heartwell',
@@ -17,6 +20,20 @@ export default function AboutPage() {
     <ContentPage
       title="About Heartwell"
       intro={<p>{BRAND.shortDescription}</p>}
+      figure={
+        // The owner's photo of the room every piece is photographed in (heartwell/Product Images/Elements).
+        <div className="relative -mx-4 aspect-[4/3] overflow-hidden bg-alcove sm:mx-0 sm:rounded-[var(--radius-panel)]">
+          <Image
+            src={ROOM}
+            alt="A beige corner sofa in a red velvet alcove, in a panelled room with a herringbone oak floor"
+            fill
+            loading="eager"
+            fetchPriority="high"
+            sizes="(min-width: 768px) 736px, 100vw"
+            className="object-cover"
+          />
+        </div>
+      }
     >
       <h2 id="why">Why you pay on delivery</h2>
       <p>
@@ -25,7 +42,7 @@ export default function AboutPage() {
       </p>
 
       <h2 id="how">How it works</h2>
-      <ol>
+      <ol className="hw-steps">
         <li>Choose your sofa online or on WhatsApp. It takes a couple of minutes, and there’s no account to set up.</li>
         <li>Tap Confirm on the link we send you, and we ring or WhatsApp to book your delivery day.</li>
         <li>We bring it to your room, free to UK Mainland addresses. You check it, then you pay.</li>

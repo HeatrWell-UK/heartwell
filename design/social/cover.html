@@ -1,0 +1,20 @@
+<!doctype html><meta charset="utf-8">
+<!-- Heartwell Facebook cover, 1640 x 924. The room is home-hero-wide widened with Cloudinary generative fill (the URL below; made once, checked by eye).
+     Render: chrome --headless=new --hide-scrollbars --force-device-scale-factor=1 --window-size=1640,924 --virtual-time-budget=8000 --screenshot=out.png "file:///.../cover.html"  (#guide shows the desktop crop) -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&display=block" rel="stylesheet">
+<style>
+  /* 1640 x 924: phones show all of it (16:9); desktops show the middle 1640 x 624 (rows 150-774). */
+  html,body{margin:0;width:1640px;height:924px;overflow:hidden;background:#5A181A}
+  .room{position:absolute;left:-50px;top:-44.4px;width:1740px;height:1140px;background:url(https://res.cloudinary.com/iv3tp2iq/image/upload/c_lpad,w_2900,h_1900,b_gen_fill/q_95/home-hero-wide.jpg) 0 0/100% 100% no-repeat}
+  h1{position:absolute;left:820px;top:372px;transform:translate(-50%,-50%);margin:0;
+    font:400 49px/1.1 Gloock,serif;text-align:center;white-space:nowrap;letter-spacing:-0.005em;
+    filter:drop-shadow(0 2px 7px rgb(30 4 8 / .6))}
+  h1 span{display:block;background-image:linear-gradient(100deg,#D6B260 0%,#F6E3A8 42%,#DDB968 68%,#F2DC9C 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .guide .band{position:absolute;left:0;right:0;top:150px;height:624px;outline:3px dashed #0ff}
+</style>
+<div class="room"></div>
+<h1><span>Choose it today.</span><span>Pay when it&rsquo;s home.</span></h1>
+<div class="band"></div>
+<script>if (location.hash === '#guide') document.body.classList.add('guide')</script>

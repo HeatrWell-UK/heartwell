@@ -6,13 +6,7 @@ import { PostcodeCheck } from '@/components/product/PostcodeCheck'
 import { PROMISES } from '@/config/promises'
 import { CONTACT, visitBookingText, visitHoursText } from '@/config/contact'
 import { appleMapsHref, directionsHref } from './VisitUs'
-import { BRITAIN } from './britain-outline'
-
-const pct = (n: number, of: number) => `${((n / of) * 100).toFixed(2)}%`
-const [, , MAP_W, MAP_H] = BRITAIN.viewBox.split(' ').map(Number) as [number, number, number, number]
-
-/** A heart, like the logo's, centred on 0,0. */
-const HEART = 'M0 -2.6C-1.6 -6.4 -7.6 -6.2 -7.6 -1.4C-7.6 2.6 -2.4 5.6 0 7.6C2.4 5.6 7.6 2.6 7.6 -1.4C7.6 -6.2 1.6 -6.4 0 -2.6Z'
+import { BritainMap } from '@/components/content/BritainMap'
 
 /**
  * Where we deliver free, drawn: mainland Britain with the Burnley showroom
@@ -36,37 +30,7 @@ export function DeliveryMap({ windowLabel }: { windowLabel: string | null }) {
         </p>
       </div>
 
-      <figure className="relative mx-auto w-[64%] max-w-[300px] lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-full lg:max-w-[330px] lg:self-center">
-        <svg viewBox={BRITAIN.viewBox} className="block h-auto w-full overflow-visible" role="img" aria-labelledby="delivery-map-caption">
-          <defs>
-            <linearGradient id="map-heart-gold" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#94701F" />
-              <stop offset="0.4" stopColor="#E9CC7B" />
-              <stop offset="0.7" stopColor="#B58A2F" />
-              <stop offset="1" stopColor="#F2DC9C" />
-            </linearGradient>
-          </defs>
-          <path d={BRITAIN.path} fill="#F5F1EF" stroke="#8E1B2E" strokeWidth="1.25" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-          {a && (
-            <g transform={`translate(${BRITAIN.burnley.x} ${BRITAIN.burnley.y})`}>
-              <circle r="11" fill="#8E1B2E" opacity="0.12" />
-              <path d={HEART} fill="url(#map-heart-gold)" stroke="#4A0D17" strokeWidth="0.8" vectorEffect="non-scaling-stroke" />
-            </g>
-          )}
-        </svg>
-        {a && (
-          <span
-            aria-hidden="true"
-            className="absolute whitespace-nowrap rounded-full bg-white px-2.5 py-1 text-[13px] font-semibold leading-none text-velvet ring-1 ring-line"
-            style={{ left: pct(BRITAIN.burnley.x, MAP_W), top: pct(BRITAIN.burnley.y, MAP_H), transform: 'translate(16px, -50%)' }}
-          >
-            {a.locality} showroom
-          </span>
-        )}
-        <figcaption id="delivery-map-caption" className="sr-only">
-          Map of mainland Great Britain, where delivery is free{a ? `, with our showroom in ${a.locality} marked` : ''}.
-        </figcaption>
-      </figure>
+      <BritainMap className="mx-auto w-[64%] max-w-[300px] lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-full lg:max-w-[330px] lg:self-center" />
 
       <div className="flex flex-col gap-8 lg:col-start-2 lg:row-start-2">
         {windowLabel && <PostcodeCheck windowLabel={windowLabel} className="" />}

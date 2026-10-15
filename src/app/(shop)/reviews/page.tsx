@@ -37,9 +37,9 @@ export default async function ReviewsPage() {
   const reviews = await getReviews()
   const average = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0
   return (
-    <div className="mx-auto flex max-w-[52rem] flex-col gap-8 px-4 pb-16 pt-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[52rem] flex-col gap-8 px-4 pb-16 pt-6 lg:pb-24 lg:pt-12">
       <header className="flex flex-col gap-3">
-        <h1 className="text-[32px] leading-tight lg:text-[44px]">Reviews</h1>
+        <h1 className="text-[38px] leading-[1.06] lg:text-[56px]">Reviews</h1>
         <p className="text-[17px] leading-relaxed text-slate">
           Only from people who bought from us: each review comes from a private link we send a few days after delivery, and we publish them good or bad.
         </p>
@@ -51,8 +51,11 @@ export default async function ReviewsPage() {
         )}
       </header>
       {reviews.length === 0 ? (
-        <div className="flex flex-col gap-3 rounded-[var(--radius-card)] border border-dashed border-field p-5">
-          <p className="font-semibold">No reviews yet</p>
+        <div className="hw-panel flex flex-col items-start gap-3 px-5 py-6 lg:px-8 lg:py-8">
+          <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-full bg-white text-velvet">
+            <SealCheckIcon size={26} />
+          </span>
+          <p className="font-display text-[24px] leading-tight">No reviews yet</p>
           <p className="text-[15px] leading-relaxed text-slate">
             Heartwell is new, so the first reviews will come from our first customers. We’ll never show reviews from anywhere else, or invent any.
           </p>
