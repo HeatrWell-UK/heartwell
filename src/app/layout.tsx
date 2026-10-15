@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Besley, Figtree } from 'next/font/google'
+import { Gloock, Figtree } from 'next/font/google'
 import './globals.css'
 import { BRAND, BRAND_COLOURS } from '@/config/brand'
 import { META_DESCRIPTION } from '@/config/promises'
@@ -9,8 +9,9 @@ import { preconnect } from 'react-dom'
 import { CONSENT_COOKIE } from '@/config/tracking'
 import { consentFlagScript } from '@/lib/tracking/consent'
 
-// Headings and prices use Besley at 700 only (docs/DESIGN.md), so only that weight is downloaded.
-const besley = Besley({ subsets: ['latin'], weight: '700', variable: '--font-besley', display: 'swap' })
+// Headings and prices use Gloock (docs/DESIGN.md): a high-contrast serif close to the logo's
+// wordmark. It has one weight, so one small file is downloaded.
+const gloock = Gloock({ subsets: ['latin'], weight: '400', variable: '--font-gloock', display: 'swap' })
 const figtree = Figtree({ subsets: ['latin'], variable: '--font-figtree', display: 'swap' })
 
 export const metadata: Metadata = {
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   preconnect('https://res.cloudinary.com')
   return (
     // suppressHydrationWarning: the head script below may add data-consent to <html> before React starts.
-    <html lang="en-GB" className={`${besley.variable} ${figtree.variable}`} suppressHydrationWarning>
+    <html lang="en-GB" className={`${gloock.variable} ${figtree.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: consentFlagScript(CONSENT_COOKIE) }} />
       </head>

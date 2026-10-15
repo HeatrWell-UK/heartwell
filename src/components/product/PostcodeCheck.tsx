@@ -13,7 +13,7 @@ import { postcodeOutcome, type PostcodeOutcome } from '@/lib/product/helpers'
  */
 const noSubscription = () => () => {}
 
-export function PostcodeCheck({ windowLabel }: { windowLabel: string }) {
+export function PostcodeCheck({ windowLabel, className = 'mt-6' }: { windowLabel: string; className?: string }) {
   const id = useId()
   // The postcode checked last time on this device, read once storage is available.
   const remembered = useSyncExternalStore(noSubscription, recallPostcode, () => '')
@@ -33,7 +33,7 @@ export function PostcodeCheck({ windowLabel }: { windowLabel: string }) {
   }
 
   return (
-    <section aria-labelledby={`${id}-label`} className="mt-6 flex flex-col gap-3 rounded-[var(--radius-card)] bg-stone px-4 py-[18px]">
+    <section aria-labelledby={`${id}-label`} className={`${className} flex flex-col gap-3 rounded-[var(--radius-card)] bg-stone px-4 py-[18px]`}>
       <form
         className="flex flex-col gap-3"
         onSubmit={(e) => {

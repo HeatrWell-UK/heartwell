@@ -28,7 +28,7 @@ export function AddedSheet({ item, onClose }: { item: AddedItem | null; onClose:
             <div className="flex min-w-0 flex-col gap-0.5">
               <span className="font-semibold leading-snug">{item.title}</span>
               <span className="text-sm text-slate">{item.option}</span>
-              <span className="pt-0.5 font-display text-lg font-bold">{formatPrice(item.price)}</span>
+              <span className="pt-0.5 font-display text-lg">{formatPrice(item.price)}</span>
             </div>
           </div>
 

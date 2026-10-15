@@ -17,37 +17,41 @@ export function Footer({ shop }: { shop: NavSection[] }) {
   const year = new Date().getFullYear()
   return (
     <footer className="bg-wine text-white">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-8 pt-10 lg:px-6">
-        <LogoStacked reversed width={190} />
-
-        <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
-          {/* Shape categories and the department link; fabric and leather are in the menu. */}
-          <FooterColumn
-            title="Shop"
-            links={[...(shop[0]?.links ?? []).filter((l) => !/fabric|leather/.test(l.href)), BROWSE_LINKS[0]!]}
-          />
-          <FooterColumn title="Help" links={HELP_LINKS} />
-          <FooterColumn title="Heartwell" links={ABOUT_LINKS} />
-        </div>
-
-        <div className="grid gap-8 sm:grid-cols-2">
-          <div className="flex flex-col gap-2">
-            <span className="text-[15px] font-bold">Talk to us</span>
-            {CONTACT.phoneDisplay && tel && (
-              <TelLink href={tel} className={linkClass}>
-                {CONTACT.phoneDisplay}
-              </TelLink>
-            )}
-            <a href={`mailto:${CONTACT.email}`} className={linkClass}>
-              {CONTACT.email}
-            </a>
-            {a && (
-              <Link href="/visit-us" className={linkClass}>
-                {a.street}, {a.locality} {a.postcode} <span className="text-on-wine-muted">(visits by appointment)</span>
-              </Link>
-            )}
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-8 pt-10 lg:gap-12 lg:px-6 lg:pt-16">
+        <div className="grid gap-8 lg:grid-cols-[4fr_7fr_4fr] lg:gap-12">
+          <div className="flex flex-col gap-8">
+            <LogoStacked reversed width={190} />
+            <div className="flex flex-col gap-2">
+              <span className="text-[15px] font-bold">Talk to us</span>
+              {CONTACT.phoneDisplay && tel && (
+                <TelLink href={tel} className={linkClass}>
+                  {CONTACT.phoneDisplay}
+                </TelLink>
+              )}
+              <a href={`mailto:${CONTACT.email}`} className={linkClass}>
+                {CONTACT.email}
+              </a>
+              {a && (
+                <Link href="/visit-us" className={linkClass}>
+                  {a.street}, {a.locality} {a.postcode} <span className="text-on-wine-muted">(visits by appointment)</span>
+                </Link>
+              )}
+            </div>
           </div>
-          <NewsletterSignup />
+
+          <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:pt-1">
+            {/* Shape categories and the department link; fabric and leather are in the menu. */}
+            <FooterColumn
+              title="Shop"
+              links={[...(shop[0]?.links ?? []).filter((l) => !/fabric|leather/.test(l.href)), BROWSE_LINKS[0]!]}
+            />
+            <FooterColumn title="Help" links={HELP_LINKS} />
+            <FooterColumn title="Heartwell" links={ABOUT_LINKS} />
+          </div>
+
+          <div className="lg:pt-1">
+            <NewsletterSignup />
+          </div>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-white/15 pt-5">

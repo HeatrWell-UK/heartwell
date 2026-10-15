@@ -43,7 +43,7 @@ export default async function FabricSamplesPage({ searchParams }: { searchParams
           ['They arrive by post', `Then, if you order your sofa, the ${SAMPLES.fee} comes off the price.`],
         ].map(([title, body], i) => (
           <li key={title} className="flex gap-3 rounded-[var(--radius-card)] bg-stone p-4">
-            <span aria-hidden="true" className="bg-gold-sheen flex size-10 shrink-0 items-center justify-center rounded-full font-display text-[19px] font-bold text-wine">
+            <span aria-hidden="true" className="bg-gold-sheen flex size-10 shrink-0 items-center justify-center rounded-full font-display text-[19px] text-wine">
               {i + 1}
             </span>
             <span className="flex flex-col gap-1">

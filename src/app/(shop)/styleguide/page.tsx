@@ -63,11 +63,11 @@ export default function StyleGuidePage() {
       </Section>
 
       <Section title="Type">
-        <p className="text-[36px] leading-tight font-display">Besley for headings</p>
+        <p className="text-[36px] leading-tight font-display">Gloock for headings</p>
         <p className="text-[28px] leading-tight font-display">Velvet corner sofa</p>
         <p className="text-[17px]">Figtree for reading: 17px body on phones, never smaller than 15px for anything a customer must read.</p>
         <p className="text-[15px] text-slate">Secondary text in slate. {formatLongDate(sample)}, {formatShortDate(sample)}.</p>
-        <p className="text-gold-sheen font-display text-[28px] font-bold">Gold text, large sizes only</p>
+        <p className="text-gold-sheen font-display text-[28px]">Gold text, large sizes only</p>
       </Section>
 
       <Section title="Prices">

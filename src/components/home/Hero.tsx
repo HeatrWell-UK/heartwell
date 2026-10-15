@@ -1,49 +1,61 @@
-import Image from 'next/image'
+import { getImageProps } from 'next/image'
 import { ButtonLink, buttonClasses } from '@/components/ui/Button'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
-
-// The owner's own hero photo (Cloudinary, heartwell/Product Images/Elements).
-const HERO_IMAGE = 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792009391/Main-Hero-Background-Image.jpg'
+import { PROMISES } from '@/config/promises'
 
 /**
- * The home hero: a photo in the heart frame (an arched top with a centre
- * notch, echoing the logo's heart-backed sofa), the promise in one line, and
- * one main action. The frame is used here only.
+ * The owner's hero photo (Cloudinary, heartwell/Product Images/Elements): a sofa
+ * in the velvet alcove every product is photographed in. Phones show the
+ * square original; wider screens show the same room widened to 2:1 with
+ * Cloudinary's generative fill (`home-hero-wide`, made once and stored, so it
+ * is never generated again).
+ *
+ * The headline is set inside the photo's alcove and the button stands on the
+ * floor. Their positions in globals.css (.hw-hero) are measured from these two
+ * photos: a different photo needs its alcove measured again.
  */
-export function Hero() {
-  return (
-    <section className="mx-auto grid max-w-[1200px] gap-6 px-4 pt-4 lg:grid-cols-2 lg:items-center lg:gap-12 lg:px-6 lg:pt-10">
-      <div className="relative aspect-[358/420] w-full overflow-hidden bg-stone [border-radius:50%_50%_24px_24px/28%_28%_24px_24px] lg:order-2">
-        <Image
-          src={HERO_IMAGE}
-          alt="A grey sofa with cream cushions under a red velvet arch, on a herringbone wood floor"
-          fill
-          priority
-          fetchPriority="high"
-          sizes="(min-width: 1024px) 560px, calc(100vw - 32px)"
-          className="object-cover"
-        />
-        <svg aria-hidden="true" viewBox="0 0 58 30" className="absolute left-1/2 top-[-1px] w-[16%] -translate-x-1/2">
-          <path d="M0 0H58L29 30Z" fill="#FFFFFF" />
-        </svg>
-      </div>
+const SQUARE = { src: 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792009391/Main-Hero-Background-Image.jpg', width: 1254, height: 1254 }
+const WIDE = { src: 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792082949/home-hero-wide.jpg', width: 2508, height: 1254 }
+const ALT = 'A grey sofa with cream cushions in a red velvet alcove, in a panelled room with a herringbone oak floor'
 
-      <div className="flex flex-col gap-4 lg:order-1">
-        <h1 className="text-[36px] leading-[1.1] lg:text-[52px] lg:leading-[1.08]">Choose it today. Pay when it&rsquo;s home.</h1>
-        <p className="text-[17px] leading-relaxed text-slate lg:text-lg">
-          Free delivery across UK Mainland, usually within 2 to 4 working days. You pay the driver in cash or by bank transfer once
-          your sofa is in the room.
-        </p>
-        <div className="flex flex-col gap-3 pt-1 sm:flex-row">
-          <ButtonLink href="/sofas" block className="sm:w-auto sm:min-w-56">
+export function Hero() {
+  // The photo is cropped to the frame (object-fit: cover), so each source is shown wider than the screen.
+  const common = { alt: ALT, loading: 'eager', fetchPriority: 'high' } as const
+  const { props: wide } = getImageProps({ ...common, ...WIDE, sizes: '(min-width: 1024px) min(100vw, 1920px), 150vw' })
+  const { props: square } = getImageProps({ ...common, ...SQUARE, sizes: '115vw' })
+
+  return (
+    <section aria-labelledby="hero-title">
+      <div className="hw-hero">
+        <picture>
+          <source media="(min-width: 640px)" srcSet={wide.srcSet} sizes={wide.sizes} />
+          {/* eslint-disable-next-line jsx-a11y/alt-text -- the art-directed <picture> from Next's docs; alt is in the props */}
+          <img {...square} />
+        </picture>
+        <h1 id="hero-title" className="hw-hero-title">
+          <span className="text-gold-lit block">Choose it today.</span> <span className="text-gold-lit block">Pay when it&rsquo;s home.</span>
+        </h1>
+        <div className="hw-hero-floor">
+          <ButtonLink href="/sofas" className="px-9 shadow-[0_10px_24px_-10px_rgb(40_8_14/0.7)]">
             Shop sofas
           </ButtonLink>
-          <WhatsAppButton message="Hi Heartwell, I have a question about your sofas." context="home" className={buttonClasses({ variant: 'secondary', block: true, className: 'sm:w-auto' })}>
-            <WhatsAppGlyph />
-            Ask us on WhatsApp
-          </WhatsAppButton>
         </div>
+      </div>
+
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-4 px-4 pt-5 lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:px-6 lg:pt-7">
+        <p className="max-w-[40rem] text-[17px] leading-relaxed text-slate lg:text-lg">
+          {PROMISES.delivery.short}, usually in {PROMISES.delivery.timingShort}. You pay the driver in cash or by bank transfer once it&rsquo;s in
+          your room.
+        </p>
+        <WhatsAppButton
+          message="Hi Heartwell, I have a question about your sofas."
+          context="home"
+          className={buttonClasses({ variant: 'secondary', block: true, className: 'shrink-0 sm:w-auto sm:self-start lg:self-auto' })}
+        >
+          <WhatsAppGlyph />
+          Ask us on WhatsApp
+        </WhatsAppButton>
       </div>
     </section>
   )

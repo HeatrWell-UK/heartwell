@@ -6,13 +6,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 18B done, 15 October 2026: the shop runs on Hostinger at **https://heartwellsofa.co.uk**, still in pre-launch mode. Phase 17A (the owner's catalogue) live: 63 pieces on sale, 14 new pieces hidden until the price list arrives. Phase 18 (quality pass) done 13 October (`docs/QA-REPORT.md`). |
-| **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
+| **Current phase** | Phase 18C (redesign, revision 3) part R1 done, 15 October 2026: the new home page, header, footer and display face are live. Phase 18B done the same day: the shop runs on Hostinger at **https://heartwellsofa.co.uk**, still in pre-launch mode. Phase 17A (the owner's catalogue) live: 63 pieces on sale, 14 new pieces hidden until the price list arrives. |
+| **Design** | Revision 3, "the velvet alcove" (owner asked for a full redesign on 15 October 2026), built in parts R1–R5 (`docs/PLAN.md`, Phase 18C). Spec in `docs/DESIGN.md`. Revision 2 (approved 3 October) · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
 | **The site** | https://heartwellsofa.co.uk on Hostinger (hosting account, Node.js web app, auto-deploys from `main`; pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Vercel (heartwellfurniture.vercel.app) still builds from `main` as a fallback for a week after go-live, then it's deleted. |
 | **Live site** | Not yet: go-live is Phase 19 (switch pre-launch off, tracking, Search Console). |
 | **Admin** | https://heartwellsofa.co.uk/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | The owner's price list (prices for all pieces, sizes for the 14 new ones), then Phase 19: go-live. |
-| **Next prompt** | When the price list is sent: it goes in this chat as it is. Then: `Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.` |
+| **Next phase** | Phase 18C R2 (category, range and search pages), then R3–R5. The owner's price list (prices for all pieces, sizes for the 14 new ones) can come in at any point; then Phase 19: go-live. |
+| **Next prompt** | `Phase 18C R2 — Redesign the category, range and search pages. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/DESIGN.md, then build R2.` When the price list is sent: it goes in this chat as it is. Go-live: `Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -47,6 +47,16 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 15 October 2026 — Phase 18C R1: the redesign starts with the home page ("the velvet alcove")
+- **Owner:** "redesign this whole website and make it look good for UK customers … start with the homepage, you decide what's best and amaze me." Planned as Phase 18C in five parts (R1 home and frame, R2 listings, R3 product, R4 basket to tracking, R5 content pages), before go-live. Red velvet and gold and the logo stay (owner's taste); no green, pink or orange on the shop's own pages.
+- **The idea:** every photo the owner took stands the furniture in the same panelled room with a velvet alcove and a gold rim, so the site takes its shapes from that room. Spec: `docs/DESIGN.md`, revision 3.
+- **Hero:** the owner's photo with "Choose it today. Pay when it's home." lit in gold inside the photo's own alcove and "Shop sofas" standing on the oak floor. Positions measured from the photo and sized in container units, so it's identical at every width. Phones show the square original; tablets and desktops show the same room widened to 2:1 with Cloudinary's generative fill, made once and stored as `home-hero-wide` (in `heartwell/Product Images/Elements`; never generated on the fly).
+- **Display face:** Gloock replaces Besley everywhere (it matches the logo's wordmark; one weight, never faked bold).
+- **Home sections:** how paying works on a panelled stone panel with a gold thread between the steps (replaces the promise tiles, "How ordering works" and "Buying from us for the first time?"); shop by shape with the owner's category photos, the top-view plans and counts; our ranges (featured first; a row to swipe on phones); the fabric swatch card on velvet (named swatches, full rows, no greens, pinks or oranges); free delivery across mainland Britain with a drawn map of the free-delivery area (mainland and Anglesey, `scripts/build-britain-outline.mjs`), the Burnley showroom marked, the postcode check and how to visit; questions people ask.
+- **Frame:** desktop header gains a row of categories and Ranges (All sofas from 1280 px); the footer sits in one band on desktops.
+- **Tests:** home picks tested (ranges order, swatch colours); the cookies-page guard now reads the CSS classes from `globals.css` instead of a fixed list; two tracking tests had started failing on 15 October because their fixed order date became "more than 7 days old" for Meta: they now use an order confirmed an hour ago.
+- **Checked:** `npm run verify` with `NEXT_TEST_WASM=1` (lint, types, 446 tests, leak check, WebAssembly build); the home page at 375, 768 and 1440 px; the product and category pages with the new face; the production build serves the right photo to each screen size.
 
 ### 15 October 2026 — Phase 18B: the shop runs on Hostinger at heartwellsofa.co.uk
 - **Hosting account:** one Node.js web app (Business plan), connected to GitHub through the HeatrWell-UK organisation (the hosting account's GitHub user has read access to `heartwell`; Hostinger's GitHub app is installed on the organisation for that repository only). Auto-deploys on every push to `main`. Node 24, Next.js preset; Hostinger adds standalone output itself. Nine environment variables (pre-launch), its own Supabase secret key named `hostinger`.

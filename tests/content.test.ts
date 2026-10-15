@@ -36,8 +36,8 @@ describe('cookies page', () => {
       if (file.includes(`${join('content', 'cookies.ts')}`)) continue
       for (const m of readFileSync(file, 'utf8').matchAll(/['"`](hw-[a-z0-9-]+)['"`]/g)) used.add(m[1]!)
     }
-    // Not storage: CSS classes.
-    for (const cssClass of ['hw-sheet', 'hw-prose']) used.delete(cssClass)
+    // Not storage: the CSS classes globals.css defines (hw-sheet, hw-prose, hw-hero…).
+    for (const m of readFileSync(join(SRC, 'app', 'globals.css'), 'utf8').matchAll(/\.(hw-[a-z0-9-]+)/g)) used.delete(m[1]!)
     expect([...used].filter((k) => !LISTED_NAMES.includes(k))).toEqual([])
   })
 
