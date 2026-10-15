@@ -1,6 +1,6 @@
 # Heartwell — Design system
 
-Status: **revision 3, being built** (Phase 18C, from 15 October 2026; done: the home page and the shop's frame (R1), category, range, search and saved pages (R2), the product page (R3), basket, checkout and order pages (R4); the content pages follow in R5, `docs/PLAN.md`). Revision 2 was approved on 3 October 2026.
+Status: **revision 3, live on every customer page** (Phase 18C, 15–16 October 2026, in five parts: the home page and the shop's frame (R1); category, range, search and saved pages (R2); the product page (R3); basket, checkout and order pages (R4); content pages, page not found and errors (R5)). Revision 2 was approved on 3 October 2026. The admin keeps the sister shop's admin design with Heartwell branding (CLAUDE.md), so it shares only the display face.
 Revision 2 preview: https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y · source: `design/canvas/project/*.dc.html` · logo files: `design/logo/` · logo build scripts: `design/logo-work/`
 
 Direction name: **Red Velvet and Gold**, revision 3: **the velvet alcove**. Deep velvet red for every action, metallic gold for the finishing touches, white and soft stone behind everything. Phone first, built for the Facebook and Instagram in-app browsers.
@@ -127,6 +127,19 @@ The header gains a row of categories on desktops (with Ranges, and All sofas fro
 - **Checkout**: "No card and nothing to pay today" under the heading; the four sections (your details, delivery address, delivery, anything else) on white cards, each headed by its **gold number** and a Gloock title; "Your order" on the wall panel, sticky on desktops.
 - **The order journey** (`OrderJourney`, from `orderJourney(status, dates)`): five steps (order placed, confirmed by you, being prepared, on its way, delivered) joined by a thread, done ones ticked in velvet with their day, the next one in gold with what happens there in a line, the rest outlined. On the order page after checkout ("Thank you, Ann", the gold tick, "One more step: confirm your order" on the panel), on the confirm page once confirmed, and on Track my order with real dates.
 - **Emails**: the header is the real logo (gold mark and wordmark on wine, `public/brand/hw-email-header.png`, 230 × 40, alt text in the gold serif when images are blocked); "To pay today £0" in velvet.
+
+## Content pages (revision 3, part R5)
+
+- **The frame** (`ContentPage`: About, Delivery and returns, Questions and answers, guides, care, will it fit, terms, privacy, cookies): the title at 38/56 px, the introduction, the date the wording last changed, an optional figure, then the text in a 46 rem column. Long pages get **On this page**: a list to fold away on phones and a list that stays beside the text on desktops (after the text in reading order, placed on the left by the grid). Section headings 28/34 px; real sequences use the gold numbers (`ol.hw-steps`); notes have a gold rule down the side.
+- **About** opens with the owner's room photo (full width on phones). **Visit us** puts the address, hours and booking on a wall panel beside the map with the showroom marked. **Delivery and returns** opens with a panel of the map (the delivery area alone, `showroom={false}`) and the three facts people look for: free to the room of your choice, usually 2–4 working days with this week's dates, Northern Ireland and the islands by arrangement.
+- **The map** is one component (`BritainMap`) for the home page, Visit us and Delivery and returns.
+- **Our fabrics** opens on the velvet ground of the home page's fabric section (gold title, "Order samples" as the gold button), with the full library below, every colour on sale shown.
+- **Guides, reviews, contact and fabric samples**: the same heading scale; the reviews empty state on a wall panel.
+- **Page not found and errors**: the alcove with nothing in it, drawn in gold line (`EmptyAlcove`), then a way on: search, the shapes, home and contact (not found), or try again (errors).
+
+## The system in one breath
+
+White and stone grounds; velvet for every action; wine for the one dark band a page may have; gold as a gradient on numbers, rims and lettering on velvet, never behind small text. Gloock for names, headings and prices, Figtree for everything people read and tap. Shapes from the owner's room: the alcove (the home hero, the empty alcove), the wall panel (`.hw-panel`, one or two a page), the gold thread and numbers for real sequences, top-view plans drawn to scale for sizes. One bold moment a page; everything else quiet.
 
 ## Components (as drawn in the revision 2 preview)
 

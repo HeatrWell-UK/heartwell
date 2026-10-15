@@ -18,10 +18,10 @@ export default function ContactPage() {
   const tel = phoneHref()
   const a = CONTACT.visitAddress
   return (
-    <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-16 pt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-14 lg:px-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[1200px] flex-col gap-10 px-4 pb-16 pt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-16 lg:px-6 lg:pb-24 lg:pt-12">
       <div className="flex flex-col gap-5">
         <header className="flex flex-col gap-3">
-          <h1 className="text-[32px] leading-tight lg:text-[44px]">Contact us</h1>
+          <h1 className="text-[38px] leading-[1.06] lg:text-[56px]">Contact us</h1>
           <p className="text-[17px] leading-relaxed text-slate">Questions about a sofa, a fabric, delivery or your order? WhatsApp is quickest, or send us a message below.</p>
         </header>
         <div className="flex flex-col gap-3">
@@ -41,7 +41,7 @@ export default function ContactPage() {
           </a>
         </div>
         {a && (
-          <section aria-labelledby="visit" className="flex flex-col gap-1.5 rounded-[var(--radius-card)] bg-stone p-5 text-[16px] leading-relaxed">
+          <section aria-labelledby="visit" className="hw-panel flex flex-col gap-1.5 px-5 py-5 text-[16px] leading-relaxed">
             <h2 id="visit" className="flex items-center gap-2 font-sans text-[17px] font-bold tracking-normal">
               <MapPinIcon aria-hidden="true" size={22} className="text-velvet" />
               Visit us
@@ -59,7 +59,7 @@ export default function ContactPage() {
         )}
       </div>
       <section aria-labelledby="form-title" className="flex flex-col gap-4">
-        <h2 id="form-title" className="text-2xl">
+        <h2 id="form-title" className="text-[28px] leading-tight lg:text-[34px]">
           Send us a message
         </h2>
         <ContactForm />

@@ -38,7 +38,7 @@ function Block({ block }: { block: GuideBlock }) {
     )
   if ('steps' in block)
     return (
-      <ol>
+      <ol className="hw-steps">
         {block.steps.map((item) => (
           <li key={item}>{item}</li>
         ))}

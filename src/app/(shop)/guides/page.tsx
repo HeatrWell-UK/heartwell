@@ -11,17 +11,17 @@ export const metadata: Metadata = {
 
 export default function GuidesPage() {
   return (
-    <div className="mx-auto flex max-w-[46rem] flex-col gap-6 px-4 pb-16 pt-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[46rem] flex-col gap-8 px-4 pb-16 pt-6 lg:pb-24 lg:pt-12">
       <header className="flex flex-col gap-3">
-        <h1 className="text-[34px] leading-[1.1] lg:text-[48px]">Guides</h1>
-        <p className="text-[17px] leading-relaxed text-slate lg:text-[18px]">Straight answers to the things worth knowing before you buy a sofa online.</p>
+        <h1 className="text-[38px] leading-[1.06] lg:text-[56px]">Guides</h1>
+        <p className="text-[17px] leading-relaxed text-slate lg:text-[19px]">Straight answers to the things worth knowing before you buy a sofa online.</p>
       </header>
       <ul className="flex flex-col divide-y divide-line border-y border-line">
         {GUIDES.map((g) => (
           <li key={g.slug}>
             <Link href={`/guides/${g.slug}`} className="group flex items-center justify-between gap-4 py-5 text-ink no-underline">
               <span className="flex flex-col gap-1">
-                <span className="font-display text-[22px] leading-tight group-hover:text-velvet">{g.title}</span>
+                <span className="font-display text-[24px] leading-tight group-hover:text-velvet lg:text-[28px]">{g.title}</span>
                 <span className="text-[15px] leading-snug text-slate">{g.summary}</span>
               </span>
               <CaretRightIcon aria-hidden="true" size={20} className="shrink-0 text-velvet" />

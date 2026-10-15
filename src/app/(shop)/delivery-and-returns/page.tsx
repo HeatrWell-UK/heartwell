@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ContentPage, Note } from '@/components/content/ContentPage'
+import { BritainMap } from '@/components/content/BritainMap'
 import { CONTACT } from '@/config/contact'
 import { POLICIES, PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
@@ -40,6 +41,22 @@ export default async function DeliveryAndReturnsPage() {
       intro={<p>Free delivery to UK Mainland addresses, nothing to pay until your furniture is in your room, and plain rules if anything goes wrong.</p>}
       updated="2026-10-12"
       contents={CONTENTS}
+      figure={
+        <div className="hw-panel flex items-center gap-5 px-5 py-6 sm:gap-8 sm:px-8">
+          <BritainMap className="w-[34%] max-w-[150px] shrink-0" showroom={false} />
+          <ul className="flex flex-col gap-3 text-[15px] leading-snug sm:text-base">
+            <li>
+              <strong className="font-semibold">{PROMISES.delivery.short}</strong>, into the room of your choice on the ground floor.
+            </li>
+            <li>
+              <strong className="font-semibold">Usually {PROMISES.delivery.timingShort}</strong>{settings ? `: order today and most arrive ${settings.windowLabel}.` : '.'}
+            </li>
+            <li>
+              <strong className="font-semibold">Northern Ireland and the islands</strong> by arrangement: <a href="#elsewhere">see below</a>.
+            </li>
+          </ul>
+        </div>
+      }
     >
       <h2 id="delivery">Getting it to you</h2>
       <p>{PROMISES.delivery.long} There’s no minimum order.</p>

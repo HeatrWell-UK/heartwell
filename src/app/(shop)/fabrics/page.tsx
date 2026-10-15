@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { WhenNear } from '@/components/ui/WhenNear'
+import { ButtonLink } from '@/components/ui/Button'
 import { FEATURES } from '@/config/features'
 import { SAMPLES } from '@/config/samples'
 import { formatPrice } from '@/lib/format'
@@ -19,28 +20,34 @@ export default async function FabricsPage() {
   const collections = await getFabricLibrary()
   const total = collections.reduce((n, c) => n + c.fabrics.length, 0)
   return (
-    <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-16 pt-6 lg:px-6 lg:pt-10">
-      <header className="flex max-w-[46rem] flex-col gap-3">
-        <h1 className="text-[32px] leading-tight lg:text-[44px]">Our fabrics</h1>
-        <p className="text-[17px] leading-relaxed text-slate">
-          Our made-to-order sofas can be made in any of these {total} fabrics. Choose the sofa first, then tap “Or choose from {total} fabrics” on
-          its page. Colours on screens vary a little{FEATURES.samples ? ', so order samples if you’d like to see them in your room.' : '.'}
-        </p>
-        {FEATURES.samples && (
-          <Link href={SAMPLES.href} className="self-start text-[15px] font-semibold">
-            Order fabric samples, {SAMPLES.fee} for the set
-          </Link>
-        )}
-        <Link href="/sofas?mto=yes" className="self-start text-[15px] font-semibold">
-          See the sofas you can have in these fabrics
-        </Link>
-        <Link href="/guides/choosing-a-sofa-fabric" className="self-start text-[15px] font-semibold">
-          How to choose a fabric
-        </Link>
+    <div className="pb-16 lg:pb-24">
+      {/* The same velvet ground as the fabric section on the home page. */}
+      <header className="bg-wine text-white">
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 py-10 lg:px-6 lg:py-16">
+          <h1 className="text-gold-lit text-[38px] leading-[1.06] lg:text-[56px]">Our fabrics</h1>
+          <p className="max-w-[44rem] text-[17px] leading-relaxed text-on-wine lg:text-lg">
+            Our made-to-order sofas can be made in any of these {total} fabrics. Choose the sofa first, then tap “Or choose from {total} fabrics”
+            on its page. Colours on screens vary a little{FEATURES.samples ? ', so order samples if you’d like to see them in your room.' : '.'}
+          </p>
+          <div className="flex flex-col gap-4 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8">
+            {FEATURES.samples && (
+              <ButtonLink href={SAMPLES.href} variant="gold" block className="sm:w-auto sm:px-8">
+                Order samples, {SAMPLES.fee} for the set
+              </ButtonLink>
+            )}
+            <Link href="/sofas?mto=yes" className="text-[15px] font-semibold text-on-wine-link underline hover:text-white">
+              See the sofas you can have in these fabrics
+            </Link>
+            <Link href="/guides/choosing-a-sofa-fabric" className="text-[15px] font-semibold text-on-wine-link underline hover:text-white">
+              How to choose a fabric
+            </Link>
+          </div>
+        </div>
       </header>
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-4 pt-10 lg:px-6 lg:pt-14">
       {collections.map((c, ci) => (
         <section key={c.slug} aria-labelledby={`c-${c.slug}`} className="flex flex-col gap-4">
-          <h2 id={`c-${c.slug}`} className="flex items-baseline gap-3 text-2xl">
+          <h2 id={`c-${c.slug}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[28px] leading-tight lg:text-[34px]">
             {c.name}
             <span className="font-sans text-[15px] font-normal text-slate">
               {c.fabrics.length} colours{c.surcharge > 0 ? `, +${formatPrice(c.surcharge)}` : ''}
@@ -66,6 +73,7 @@ export default async function FabricsPage() {
           </ul>
         </section>
       ))}
+      </div>
     </div>
   )
 }

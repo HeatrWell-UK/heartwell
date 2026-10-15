@@ -7,7 +7,7 @@ export default async function NewsletterConfirmPage({ searchParams }: { searchPa
   const { token } = await searchParams
   return (
     <div className="mx-auto flex max-w-[36rem] flex-col gap-5 px-4 pb-16 pt-8 lg:pt-14">
-      <h1 className="text-[32px] leading-tight">Confirm your emails</h1>
+      <h1 className="text-[34px] leading-[1.08] lg:text-[44px]">Confirm your emails</h1>
       {token ? (
         <>
           <p className="text-[17px] leading-relaxed text-slate">Tap below to get emails from Heartwell about new sofas, fabrics and offers. You can stop them any time.</p>

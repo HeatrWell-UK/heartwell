@@ -28,9 +28,9 @@ export default async function FabricSamplesPage({ searchParams }: { searchParams
   const initialIds = collections.flatMap((c) => c.fabrics).filter((f) => wanted.includes(f.code.toUpperCase())).map((f) => f.id)
 
   return (
-    <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-16 pt-6 lg:px-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-16 pt-6 lg:px-6 lg:pb-24 lg:pt-12">
       <header className="flex max-w-[46rem] flex-col gap-3">
-        <h1 className="text-[32px] leading-tight lg:text-[44px]">Fabric samples</h1>
+        <h1 className="text-[38px] leading-[1.06] lg:text-[56px]">Fabric samples</h1>
         <p className="text-[17px] leading-relaxed text-slate">
           See and feel our fabrics at home before you choose. Pick up to {limit} and we’ll post you a sample of each: {SAMPLES.fee} for the set, and we take
           the {SAMPLES.fee} off your sofa when you buy.

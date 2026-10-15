@@ -6,6 +6,7 @@ import { BRAND } from '@/config/brand'
 import { CONTACT, visitBookingText, visitHoursText } from '@/config/contact'
 import { SITE_URL } from '@/config/site'
 import { jsonLdString } from '@/lib/product/seo'
+import { BritainMap } from '@/components/content/BritainMap'
 
 // The page exists only while there's an address (src/config/contact.ts); without one it's a 404, never a placeholder.
 const a = CONTACT.visitAddress
@@ -36,10 +37,13 @@ export default function VisitUsPage() {
     paymentAccepted: 'Cash, Bank transfer',
   }
   return (
-    <div className="mx-auto flex max-w-[46rem] flex-col gap-8 px-4 pb-16 pt-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-4 pb-16 pt-6 lg:gap-16 lg:px-6 lg:pb-24 lg:pt-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(business) }} />
-      <VisitUs headingLevel="h1" />
-      <section aria-labelledby="before" className="hw-prose">
+      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,46rem)_minmax(0,1fr)] lg:items-center lg:gap-16">
+        <VisitUs headingLevel="h1" />
+        <BritainMap className="mx-auto w-[60%] max-w-[280px] lg:w-full lg:max-w-[300px]" />
+      </div>
+      <section aria-labelledby="before" className="hw-prose max-w-[46rem]">
         <h2 id="before">Before you come</h2>
         <ul>
           <li>Tell us which sofas you’d like to see when you book, and we’ll tell you what we can show you.</li>
