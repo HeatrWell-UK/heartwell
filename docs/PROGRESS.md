@@ -54,6 +54,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - **Our fabrics** opens on the velvet band of the home page's fabric section, with "Order samples" in gold. Guides, reviews, contact and samples share the heading scale; the reviews empty state sits on a wall panel.
 - **Page not found and errors**: an empty alcove drawn in gold line, then search, the shapes, home and contact. The search box is shared with the search page.
 - **R4 finished first:** live checkout priced a test basket correctly (no order placed; the basket was emptied again).
+- **Fixed after release:** on phones the page-not-found page could be scrolled sideways (its row of shapes widened the page); the row now scrolls inside the screen.
 - **Checked:** `npm run verify` with `NEXT_TEST_WASM=1`; About, Visit us, Fabrics, Delivery and returns and page not found on a phone-sized screen, Delivery and returns on a desktop (the list stays beside the text). The local dev server showed two headers on a not-found page under the shop's routes; a local production build and the live site show one.
 
 ### 16 October 2026 — Phase 18C R4: basket, checkout and order pages
