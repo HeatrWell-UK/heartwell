@@ -24,7 +24,12 @@ export default async function NotFound() {
           </p>
         </div>
         <SearchBox />
-        {department && <ShapeRail tree={tree} node={null} department={department} alwaysTop />}
+        {/* Full width, so the row scrolls inside the screen instead of widening the page (this column aligns to the start). */}
+        {department && (
+          <div className="w-full">
+            <ShapeRail tree={tree} node={null} department={department} alwaysTop />
+          </div>
+        )}
         <div className="flex w-full flex-col gap-3 pt-2 sm:flex-row">
           <ButtonLink href="/" block className="sm:w-auto">
             Go to the home page
