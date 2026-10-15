@@ -33,12 +33,16 @@ export function CatalogueControls(props: Props) {
   const active = chips.length
 
   return (
-    <div className="flex flex-col gap-3" aria-busy={pending}>
-      <div className="flex items-center justify-between gap-3">
+    <div className="contents lg:flex lg:flex-col lg:gap-3" aria-busy={pending}>
+      {/* On phones the bar stays at the top of the screen while the sofas scroll under it. */}
+      <div className="sticky top-0 z-20 -mx-4 flex items-center justify-between gap-3 border-b border-line-soft bg-white/95 px-4 py-2 backdrop-blur-sm lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex min-h-11 items-center gap-2 rounded-full border border-line px-4 text-[15px] font-semibold text-ink lg:hidden"
+          className={cn(
+            'flex min-h-11 items-center gap-2 rounded-full border px-4 text-[15px] font-semibold lg:hidden',
+            active > 0 ? 'border-velvet bg-gold-tint text-velvet' : 'border-line text-ink',
+          )}
         >
           <FadersHorizontalIcon aria-hidden="true" size={20} />
           Filter{active > 0 && ` (${active})`}
@@ -47,7 +51,7 @@ export function CatalogueControls(props: Props) {
           {count} {count === 1 ? noun : `${noun}s`}
         </p>
         <div className="flex items-center gap-2">
-          <label htmlFor={sortId} className="text-[15px] text-slate">
+          <label htmlFor={sortId} className="sr-only text-[15px] text-slate sm:not-sr-only">
             Sort
           </label>
           <select

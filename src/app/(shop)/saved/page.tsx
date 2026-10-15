@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function SavedPage() {
   return (
     <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 pb-16 pt-6 lg:px-6 lg:pt-10">
-      <h1 className="text-[32px] leading-tight lg:text-[40px]">Saved sofas</h1>
+      <h1 className="text-[34px] leading-[1.08] lg:text-[52px]">Saved sofas</h1>
       <div className="min-h-[50vh]">
         <SavedView />
       </div>

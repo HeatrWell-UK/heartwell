@@ -42,18 +42,23 @@ export function SavedView() {
   const shown = (cards ?? []).filter((c) => saved.isSaved(c.slug))
   if (shown.length === 0) {
     return (
-      <div className="flex min-h-svh flex-col items-start gap-4">
-        <p className="text-[17px] text-slate">Nothing saved yet. Tap the heart on any sofa to keep it here, on this phone.</p>
+      <div className="flex min-h-svh flex-col items-start gap-5">
+        <span aria-hidden="true" className="flex size-14 items-center justify-center rounded-full bg-gold-tint text-velvet">
+          <HeartIcon size={28} weight="fill" />
+        </span>
+        <p className="max-w-[32rem] text-[17px] leading-relaxed text-slate">
+          Nothing saved yet. Tap the heart on any sofa to keep it here, on this phone, while you measure up or think it over.
+        </p>
         <ButtonLink href="/sofas">Shop sofas</ButtonLink>
       </div>
     )
   }
 
   return (
-    <ul className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
+    <ul className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-x-6">
       {shown.map((c) => (
         <li key={c.slug} className="relative flex flex-col gap-2">
-          <Link href={c.href} className="flex flex-col gap-2 text-ink no-underline hover:text-ink">
+          <Link href={c.href} className="group flex flex-col gap-2 text-ink no-underline hover:text-ink">
             <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
               {c.image ? (
                 <Image src={c.image} alt={c.imageAlt} fill sizes="(min-width: 1024px) 270px, 50vw" className="object-cover" />
@@ -63,8 +68,8 @@ export function SavedView() {
                 </span>
               )}
             </span>
-            <span className="text-[15px] font-semibold leading-snug">{c.title}</span>
-            <Price amount={c.price} className="text-lg" />
+            <span className="pt-0.5 text-[16px] font-semibold leading-snug group-hover:text-velvet">{c.title}</span>
+            <Price amount={c.price} className="text-[19px]" />
           </Link>
           <button
             type="button"

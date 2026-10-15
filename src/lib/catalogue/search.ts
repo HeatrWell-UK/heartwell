@@ -60,6 +60,8 @@ function fieldsOf(p: ListingProduct, categoryNames: string[]): Field[] {
       ),
       weight: 1,
     },
+    // The range's own words: "velvet", "chesterfield", "chrome feet", "LED".
+    { text: normaliseQuery(p.rangeDescription ?? ''), weight: 1 },
   ]
 }
 

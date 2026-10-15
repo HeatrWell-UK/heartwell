@@ -3,6 +3,7 @@ import { MagnifyingGlassIcon } from '@phosphor-icons/react/ssr'
 import { LogoLockup } from '@/components/brand/Logo'
 import { MenuDrawer } from './MenuDrawer'
 import { BasketLink } from './BasketLink'
+import { NavLink } from './NavLink'
 import { BROWSE_LINKS } from '@/config/navigation'
 import type { NavSection } from '@/lib/catalogue/listing'
 
@@ -38,21 +39,17 @@ export function Header({ shop }: { shop: NavSection[] }) {
           <ul className="mx-auto flex h-12 max-w-[1200px] items-center justify-center gap-6 whitespace-nowrap px-6 text-[15px] font-medium xl:gap-7">
             {categories.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="text-ink no-underline hover:text-velvet hover:underline">
-                  {l.label}
-                </Link>
+                <NavLink href={l.href}>{l.label}</NavLink>
               </li>
             ))}
             <li>
-              <Link href={ranges.href} className="text-ink no-underline hover:text-velvet hover:underline">
-                Ranges
-              </Link>
+              <NavLink href={ranges.href}>Ranges</NavLink>
             </li>
             {all && (
               <li className="hidden xl:block">
-                <Link href={all.href} className="font-semibold text-velvet no-underline hover:underline">
+                <NavLink href={all.href} exact className="font-semibold text-velvet">
                   {all.label}
-                </Link>
+                </NavLink>
               </li>
             )}
           </ul>
