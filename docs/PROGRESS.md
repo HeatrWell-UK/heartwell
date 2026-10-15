@@ -6,13 +6,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 | | |
 | --- | --- |
-| **Current phase** | Phase 17A (the owner's catalogue) live, 15 October 2026: 63 pieces on sale with the owner's photos and Heartwell's words; 14 new pieces hidden until the owner's price list arrives. Phase 18 (quality pass) done 13 October (`docs/QA-REPORT.md`). Phase 18B (Hostinger) waits on the owner's hPanel steps. One site, one database, no approval step. |
+| **Current phase** | Phase 18B done, 15 October 2026: the shop runs on Hostinger at **https://heartwellsofa.co.uk**, still in pre-launch mode. Phase 17A (the owner's catalogue) live: 63 pieces on sale, 14 new pieces hidden until the price list arrives. Phase 18 (quality pass) done 13 October (`docs/QA-REPORT.md`). |
 | **Design** | Approved 3 October 2026 (revision 2). Spec in `docs/DESIGN.md` · source in `design/` · canvas https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y |
-| **The site** | https://heartwellfurniture.vercel.app (branch `main`, pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Moves to Hostinger in Phase 18B and to heartwellfurniture.co.uk at go-live (Phase 19). |
-| **Live site** | Not yet (move to Hostinger is Phase 18B, go-live Phase 19) |
-| **Admin** | https://heartwellfurniture.vercel.app/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
-| **Next phase** | The owner's price list (prices for all pieces, and sizes for the 14 new ones), then Phase 18B: move to Hostinger, then 19 (go-live). |
-| **Next prompt** | `Phase 18B — Move to Hostinger. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 18B. I'm logged into hPanel on the hosting account and ready to follow your steps.` · when ready: `Phase 17A — My catalogue. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 17A. My photos and details are in: <folder path>.` |
+| **The site** | https://heartwellsofa.co.uk on Hostinger (hosting account, Node.js web app, auto-deploys from `main`; pre-launch mode: noindex, orders are tests, customer emails go to the owner, no tracking). Vercel (heartwellfurniture.vercel.app) still builds from `main` as a fallback for a week after go-live, then it's deleted. |
+| **Live site** | Not yet: go-live is Phase 19 (switch pre-launch off, tracking, Search Console). |
+| **Admin** | https://heartwellsofa.co.uk/admin. Anyone not signed in as an admin is sent to the ordinary-looking /login (Supabase email and password; allowlist in `public.admins`). |
+| **Next phase** | The owner's price list (prices for all pieces, sizes for the 14 new ones), then Phase 19: go-live. |
+| **Next prompt** | When the price list is sent: it goes in this chat as it is. Then: `Phase 19 — Go-live. Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then run Phase 19. I'm logged into both Hostinger accounts (domains and hosting) and Meta Business settings.` |
 | **Open decisions** | D1–D11 in `docs/PLAN.md` section 10 |
 
 ## Known facts (so nobody has to ask again)
@@ -47,6 +47,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - Admins: `public.admins` holds heartwellsofa@gmail.com (both projects). The account itself is created by the owner in the Supabase dashboard; `claim_admin()` links it on first sign-in.
 
 ## Log
+
+### 15 October 2026 — Phase 18B: the shop runs on Hostinger at heartwellsofa.co.uk
+- **Hosting account:** one Node.js web app (Business plan), connected to GitHub through the HeatrWell-UK organisation (the hosting account's GitHub user has read access to `heartwell`; Hostinger's GitHub app is installed on the organisation for that repository only). Auto-deploys on every push to `main`. Node 24, Next.js preset; Hostinger adds standalone output itself. Nine environment variables (pre-launch), its own Supabase secret key named `hostinger`.
+- **Two build fixes:** Hostinger's build servers have an old glibc, so Next.js falls back to its WebAssembly compiler: Turbopack can't run (now `next build --webpack`) and a TypeScript config can't be loaded through Hostinger's wrapper (now `next.config.mjs`). Both checked locally with `NEXT_TEST_WASM=1`; rule in CLAUDE.md.
+- **Visitor address:** measured with `/api/health?ip=`: on Hostinger the visitor is the last `x-forwarded-for` entry and a made-up header only adds entries in front, so the old "first entry" reading could be faked to dodge rate limits. `visitorAddress()` now reads from the right (`TRUSTED_PROXIES`, 0 on both hosts). Also used for the IP sent with Meta's server events.
+- **Domain:** heartwellsofa.co.uk connected through Hostinger's ownership TXT record; web records now point at Hostinger's CDN (A, AAAA, `www` CNAME). **Email records unchanged** (MX, SPF, DKIM a/b/c, DMARC, autodiscover/autoconfig checked against the 15 October record). Let's Encrypt certificate, renews automatically. `www.` → bare domain (308), http → https (301). The CDN serves pages but keeps no copies of private ones (`x-hcdn-cache-status: DYNAMIC`).
+- **Database:** `private.app_config.site_url` = https://heartwellsofa.co.uk, so scheduled jobs and health checks call Hostinger. A health check run by hand answered "ok, nothing red".
+- **Checked on the live address:** every main page, product pages, basket, checkout, track order, login, the Meta feed (105 items), sitemap, robots, health checks, 404.
 
 ### 15 October 2026 — Phase 18B: the domain is heartwellsofa.co.uk
 - **Owner:** the hosting plan's free domain doesn't cover .co.uk, so the site uses **heartwellsofa.co.uk**, already owned in the other Hostinger account, with its existing email.

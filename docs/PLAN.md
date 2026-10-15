@@ -800,6 +800,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** open the Hostinger address; place and confirm a test order; the admin Health card is green.
 - **Done means:** the Hostinger app redeploys on push and behaves exactly as the site did on Vercel.
+- **As built (15 October 2026).** The site runs on Hostinger at https://heartwellsofa.co.uk (the owner chose the domain already owned; it stays in the domains account with its email, and only its web records point at the hosting account). GitHub through the HeatrWell-UK organisation (the hosting account's GitHub user has read access; Hostinger's app installed for `heartwell` only). Builds use webpack and a plain-JavaScript `next.config.mjs`, because Hostinger's old glibc forces Next.js onto its WebAssembly compiler. Visitor addresses are read from the right of `x-forwarded-for` (measured; a made-up header could fool the old reading). Scheduled jobs call the new address; a health check run by hand came back clean. Vercel stays as a fallback. Details in `docs/PROGRESS.md`.
 
 ---
 
