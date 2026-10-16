@@ -38,10 +38,15 @@ const csp = [
   "font-src 'self' data:",
   `connect-src 'self' ${META} ${GOOGLE}`,
   "media-src 'self' https://res.cloudinary.com",
-  "frame-src 'none'",
+  // The Pixel sends events with product data (ViewContent, AddToCart,
+  // InitiateCheckout) as a form posted into a hidden facebook.com frame; only
+  // PageView fits in an image request. Seen blocked on the live site on 17
+  // October 2026. Its extra collectors on *.run.app and *.on.aws stay blocked:
+  // too broad to allow, and it falls back to facebook.com/tr without them.
+  "frame-src https://www.facebook.com",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  "form-action 'self' https://www.facebook.com",
   "frame-ancestors 'none'",
   ...(isProd ? ['upgrade-insecure-requests'] : []),
 ].join('; ')
