@@ -67,11 +67,15 @@ Link it (**Settings → Linked accounts → Instagram**) and give it the same na
 ## On go-live day (Phase 19)
 
 1. Website: https://heartwellsofa.co.uk.
-2. Pin a post introducing Heartwell, for example:
+2. Post and pin the introduction. The picture is ready: `design/social/heartwell-announcement.png` (1080 × 1350, the room with "We're now Heartwell Sofa" in the alcove, "Free UK Mainland delivery. Nothing to pay until it's in your room." and the web address; built from `announcement.html`). The words:
 
-   > We're now Heartwell Sofa. Sofas made to order, free delivery anywhere on UK Mainland, and nothing to pay until it's in your room: pay the driver in cash or by bank transfer. Have a look at heartwellsofa.co.uk, or message us on WhatsApp with any question.
+   > We're now Heartwell Sofa.
+   >
+   > Fabric sofas made to order, free delivery anywhere on UK Mainland, and nothing to pay until it's in your room: pay the driver in cash or by bank transfer.
+   >
+   > Have a look at heartwellsofa.co.uk, or message us on WhatsApp with any question.
 
-   With the cover photo or a photo of a sofa. No prices in it, so it never goes out of date.
+   No prices in either, so it never goes out of date. "Fabric sofas made to order" rather than "sofas", because the recliners and leather pieces aren't made to order. Then on the post: **… → Pin post**.
 3. The website gets the Page in its footer and in what it tells search engines about Heartwell (owner sends the Page's link).
 
 Not yet, and not here: the Pixel, ads, the catalogue and domain verification are set up in Phase 19 with `docs/TRACKING-SETUP.md`.
