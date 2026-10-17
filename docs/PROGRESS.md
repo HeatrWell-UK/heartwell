@@ -48,6 +48,10 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 17 October 2026 — Social profiles
+- The owner sent the profiles. **Facebook** (facebook.com/heartwellsofa, the Page shows as "Heartwell Sofa | Brimington") and **Instagram** (instagram.com/heartwellsofa) are in `CONTACT.socials`: a "Follow us" row in the footer on every page (44px icon links, open in a new tab) and `sameAs` in the Organization data for search engines. **TikTok** is left out: the link sent had no @, and tiktok.com/@heartwellsofa said "Couldn't find this account". Add it to `CONTACT.socials` once the profile opens.
+- Flagged to the owner: the Facebook Page's location says Brimington while the site's Visit us address is in Burnley.
+
 ### 17 October 2026 — Search check of every page
 - **Crawled the live site as Googlebot (smartphone):** all 110 sitemap addresses answer 200 with no redirect, `index, follow`, no `noindex` header, not blocked by robots.txt, `lang="en-GB"`, a title, a description and one h1; no error text; structured data parses on every page; all 137 photos and share images load. http and www land on `https://heartwellsofa.co.uk` (308 for www). Unknown pages and products give a real 404. Colour links (`?variant=`) point their canonical at the plain product page; filtered category pages are `noindex, follow`. Median response 0.5 s.
 - **Google's Rich Results Test** (a product page): product snippet, 5 merchant listings and breadcrumbs valid. Its two notes are fixed: `availability` is now InStock (Google rejects schema.org/MadeToOrder; the feeds already say in stock and the return policy still says made to order), and each colour carries the description.
