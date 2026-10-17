@@ -72,7 +72,7 @@ export interface DeliveryLine {
   amount: number
 }
 
-/** The chargeable extras as lines for a basket, checkout or email. Base delivery is free. */
+/** The chargeable extras as lines for a basket, checkout or email. A charged delivery area has its own line. */
 export function deliveryLines(quote: DeliveryQuote, s: DeliverySettings): DeliveryLine[] {
   const lines: DeliveryLine[] = []
   if (quote.upstairs > 0) {

@@ -10,7 +10,7 @@ const [, , MAP_W, MAP_H] = BRITAIN.viewBox.split(' ').map(Number) as [number, nu
 const HEART = 'M0 -2.6C-1.6 -6.4 -7.6 -6.2 -7.6 -1.4C-7.6 2.6 -2.4 5.6 0 7.6C2.4 5.6 7.6 2.6 7.6 -1.4C7.6 -6.2 1.6 -6.4 0 -2.6Z'
 
 /**
- * Mainland Britain (where delivery is free) with the showroom marked by a gold
+ * Mainland Britain (where we deliver, free to most of it) with the showroom marked by a gold
  * heart: on the home page, Visit us and Delivery and returns. The same area
  * the checkout calls UK Mainland (src/lib/delivery/postcode.ts).
  */
@@ -56,7 +56,7 @@ export function BritainMap({
         </span>
       )}
       <figcaption id={`${id}-caption`} className="sr-only">
-        {caption ?? `Map of mainland Great Britain, where delivery is free${a ? `, with our showroom in ${a.locality} marked` : ''}.`}
+        {caption ?? `Map of mainland Great Britain, where we deliver, free to most of it${a ? `, with our showroom in ${a.locality} marked` : ''}.`}
       </figcaption>
     </figure>
   )

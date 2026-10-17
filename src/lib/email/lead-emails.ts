@@ -180,5 +180,5 @@ export function basketReminderEmail(o: { name: string | null; lines: { title: st
     'Delivery is free to most of mainland Britain and you pay nothing until it is in your room.',
     contactText(o.shop),
   ].join('\n')
-  return { subject, html: layout(subject, body, 'Free delivery, and nothing to pay until it arrives.'), text }
+  return { subject, html: layout(subject, body, 'Free delivery to most postcodes, and nothing to pay until it arrives.'), text }
 }
