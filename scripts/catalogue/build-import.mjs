@@ -32,6 +32,7 @@ import {
   PRODUCT_TYPES,
   TIER_MAP,
   VARIANT_OVERRIDES,
+  coverFor,
   sizeRank,
 } from '../../src/lib/catalogue/import-config.ts'
 
@@ -148,8 +149,10 @@ const payloadProducts = products.map((p) => {
   const specsRaw = p.specifications ?? {}
   const dims = parseDimensions(specsRaw.Dimensions ?? specsRaw.dimensions ?? null)
   const reclining = refCats.includes('electric-sofa') ? 'Electric' : refCats.includes('recliner') ? 'Manual' : null
+  const cover = coverFor(productSlug[p.slug])
   const specifications = {
     ...cleanSpecifications(specsRaw),
+    ...(cover?.material ? { material: cover.material } : {}),
     shape,
     ...(seats ? { seats } : {}),
     ...(reclining ? { reclining } : {}),
@@ -185,12 +188,14 @@ const payloadProducts = products.map((p) => {
 const payloadVariants = variants.map((v) => {
   const colour = cleanColour(v.color, v.color_hex, VARIANT_OVERRIDES[v.sku])
   if (!colour.name) warnings.push(`colourway ${v.sku} has no colour name`)
+  const material = (v.material ?? '').replace(/\s+/g, ' ').trim().replace(/\b([a-z])/g, (c) => c.toUpperCase()) || null
+  const cover = coverFor(productSlug[v.product])
   return {
     product: productSlug[v.product],
     sku: v.sku,
     colour_name: colour.name,
     colour_hex: colour.hex,
-    material_label: (v.material ?? '').replace(/\s+/g, ' ').trim().replace(/\b([a-z])/g, (c) => c.toUpperCase()) || null,
+    material_label: cover && material === 'Leather' ? cover.leather : material,
     price_adjustment: Number(v.price_adjustment ?? 0),
     image_url: image(v.image),
     sort: Number(v.priority ?? 99),

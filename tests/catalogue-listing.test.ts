@@ -121,6 +121,7 @@ describe('filters', () => {
     expect(materialGroups('Fabric & Faux Leather')).toEqual(['fabric', 'leather-look'])
     expect(materialGroups('Real Leather')).toEqual(['leather'])
     expect(materialGroups('Tech Leather')).toEqual(['leather-look'])
+    expect(materialGroups('Leather Aire & Fabric')).toEqual(['fabric', 'leather-look'])
   })
 
   it('counts each option as if it were the only choice in its group', () => {

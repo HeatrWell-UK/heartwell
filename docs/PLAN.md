@@ -474,7 +474,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | 16 | Commerce Manager catalogue created (my steps). Not yet: the feed is built ready to connect (Admin → Ad links) | When the Meta accounts exist |
 | 17 | ~~The Heartwell offer code name and whether the automatic ad-visitor offer runs at launch (D6)~~ Done: HEARTSOFA, and yes | — |
 | 18 | ~~**Visit us** address, opening hours, appointment rules~~ Done (Unit 4, Blacker Street, Burnley; 9am to 5pm; book a day ahead). Still wanted: which **days** you open, the postcode confirmed (BB10 2AF?), and photos or videos of the premises | Phase 16 / any time |
-| 19 | Legal trading details: company name, company number, registered office, VAT number (if registered), and whether Heartwell is a trading name of an existing company. Skipped in Phase 16; needed before go-live (they fill the footer, terms and privacy notice automatically) | Before Phase 19 |
+| 19 | ~~Legal trading details~~ **Owner, 17 October 2026: there's no registered company and none is needed.** The site trades as Heartwell with the Burnley address, phone and email (`CONTACT.trading` stays empty, so nothing half-filled shows) | — |
 | 20 | Social profile links (Facebook, Instagram, TikTok if any). The owner will send them at the end | Before Phase 19 |
 | 21 | UptimeRobot (free) account, if you approve D8. Steps in `docs/MONITORING.md`; set up at go-live | Phase 19 |
 | 22 | Both Hostinger accounts available for about an hour | Phase 19 |
@@ -487,14 +487,14 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | # | Decision | My recommendation |
 | --- | --- | --- |
 | D1 | Purchase to Meta: **automatic** 30 min after confirmation (with Hold / Send now), or manual like the sister shop | **Automatic.** Faster learning for Meta, nothing forgotten, still protected by the hold window and test flags. |
-| D2 | Supabase production plan | **Pro ($25/month).** Free projects pause when idle and have no daily backups. (One project now, so one Pro plan.) |
+| D2 | Supabase production plan | **Decided 17 October 2026: stays on the free plan** (owner: "forget it completely"). Don't recommend Pro again. |
 | D3 | Photo direction | **AI room scenes for every main photo** (updated after the design-phase test: the cut-out method fails on these images). Budget: two free months, or one month of Cloudinary Plus. |
 | D4 | Range names (Verona, Lily, …): keep, or give Heartwell its own names | **Decided 4 October 2026: keep.** They're the design names customers across the UK know. The title style is refreshed in Phase 17C. |
 | D5 | Logo wording and colours | Drop "SOFA" under the name (Heartwell will sell dining, wardrobes and beds), or use "FURNITURE". The concept's cream and caramel are close to the sister's cream and amber, which the brief rules out; we'll settle this in the design phase. |
 | D6 | Offers at launch | **Yes:** a Heartwell code plus the automatic ad-visitor offer, same tiers (£50 / £30 / £20). It gives ads a reason to act now, honestly. |
 | D7 | Customer accounts | **Drop** (see section 4). |
 | D8 | External uptime monitor (UptimeRobot, free) | **Yes.** It's the only alert that still works when email is the thing that broke. |
-| D9 | "Leather" recliners | Confirm with the supplier: genuine, bonded or PU. We describe them accordingly; mis-describing leather is a Trading Standards issue. |
+| D9 | "Leather" recliners | **Answered 17 October 2026:** Orlando is tech leather, Roma is Leather Aire (both leather-look fabrics), Nova is tech leather; the category is "Leather-look sofas" (migration `leather_look_wording`). Still to confirm: Oxford electric corner and the hidden Michigan recliners, whose colourways say "Leather". |
 | D10 | IP address and user agent on server Purchase events for visitors who declined cookies | The sister shop sends them for every order. I recommend sending them only with consent, keeping hashed contact details for everyone (disclosed in the privacy notice under legitimate interests). It costs a little match quality and is the safer reading of the ICO's April 2026 guidance. Worth a quick check with your adviser. |
 | D11 | Later phases (AI assistant, build-your-own sofa, WhatsApp automation, push notifications) | After launch, in the order in section 11. |
 
@@ -835,6 +835,27 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 - **Phone test:** visit heartwellsofa.co.uk and www.heartwellsofa.co.uk (which redirects); send and receive an email on enquiries@; place and confirm one real low-risk order (then cancel it as test).
 - **Done means:** the site is live, email still works, the first order flows end to end, and Meta shows live events.
 - **As built (16–17 October 2026).** Live on https://heartwellsofa.co.uk: production mode and indexing on, sign-ups off, Meta domain verified. Meta tracking Test → Live after a fix (the Content Security Policy now allows the Pixel's facebook.com frame and form, so events with product data arrive from browsers as well as the server, deduplicated). Smoke test HW-100103: emails, confirmation and the automatic OrderFlow push all worked. Remaining owner items (catalogue feed, Search Console, UptimeRobot, Facebook link and announcement, private repository, OrderFlow tidy-up, legal details, leather wording, price list) are listed in `docs/PROGRESS.md`.
+
+---
+
+### Bringing customers in (owner's order, 17 October 2026)
+
+1. **Organic first:** Google Search Console (done), Google Business Profile (done), Merchant Center free listings, GA4, and Phase 20 below.
+2. **Meta ads** once the site gets organic searches and Phase 20 is done. Everything for them is built (Pixel and Conversions API live, catalogue connected, Ad links, the ad offer).
+3. **Google Ads** one to two months after Meta ads (L6).
+
+Not wanted (owner): a registered company or legal details on the site, Meta Business verification (not registered), Supabase Pro.
+
+### Phase 20 — Getting found: SEO, AEO and GEO
+
+- **Goal:** Heartwell answers the searches sofa buyers make, in Google, Bing and AI assistants (ChatGPT, Gemini, Perplexity, Copilot), and Merchant Center shows every product with the right delivery times.
+- **Builds:** a keyword map (each category, range and guide aimed at real searches, starting with what's distinctive: pay on delivery, free delivery, delivery in days, showroom in Burnley); fuller category and range pages with short answer-first sections and FAQs; new guides for buying questions; product pages that answer the common questions in plain sentences; structured data checked and extended (shipping times by region, return policy, FAQ, LocalBusiness hours); `llms.txt` and the About page as a clear source for AI assistants; image alt text and internal links; the Google feed switched on with Merchant Center's delivery regions (5 to 7 days for the Highlands and the far south-west, no delivery for the quote-only areas); Bing Webmaster Tools and IndexNow; a re-check of speed with real visitors' data.
+- **Prompt:**
+  ```
+  Phase 20 — Getting found (SEO, AEO and GEO). Read CLAUDE.md, docs/PLAN.md and docs/PROGRESS.md, then build Phase 20.
+  ```
+- **Phone test:** Search Console → Pages shows the pages indexed; a few target searches on Google and in ChatGPT; Merchant Center → Products shows no errors.
+- **Done means:** every indexable page has a search it's written for, structured data validates, the Google feed has no errors in Merchant Center.
 
 ---
 

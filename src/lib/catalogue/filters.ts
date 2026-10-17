@@ -45,7 +45,7 @@ const PRICES: { value: string; label: string; min: number; max: number }[] = [
   { value: '750-1000', label: '£750 to £1,000', min: 750.01, max: 1000 },
   { value: 'over-1000', label: 'Over £1,000', min: 1000.01, max: Infinity },
 ]
-const MATERIALS: Record<string, string> = { fabric: 'Fabric', 'leather-look': 'Faux or tech leather', leather: 'Leather' }
+const MATERIALS: Record<string, string> = { fabric: 'Fabric', 'leather-look': 'Leather-look', leather: 'Leather' }
 const COLOUR_FAMILIES: { value: string; label: string; test: RegExp }[] = [
   { value: 'grey', label: 'Grey', test: /grey|gray|charcoal|pebble|silver|slate|steel/ },
   { value: 'black', label: 'Black', test: /black/ },
@@ -80,7 +80,7 @@ export function materialGroups(material: string | null): string[] {
   const m = (material ?? '').toLowerCase()
   const groups: string[] = []
   if (/fabric|velvet|chenille|linen|weave/.test(m)) groups.push('fabric')
-  if (/faux|tech|pu\b|bonded|pvc/.test(m)) groups.push('leather-look')
+  if (/faux|tech|pu\b|bonded|pvc|aire/.test(m)) groups.push('leather-look')
   if (/real leather|genuine leather/.test(m)) groups.push('leather')
   return groups
 }

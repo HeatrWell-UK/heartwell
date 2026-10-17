@@ -39,10 +39,16 @@ export const CONTACT = {
   phoneE164: '+447848477056' as string | null,
   /** International digits without "+", for wa.me links. */
   whatsAppNumber: '447848477056' as string | null,
-  /** Owner, 12 October 2026. Postcode from the street (BB10 2AF; a few Blacker Street addresses are BB10 2AY): owner to confirm. */
+  /** Owner, 12 October 2026; postcode confirmed 17 October 2026. */
   visitAddress: { street: 'Unit 4, Blacker Street', locality: 'Burnley', postcode: 'BB10 2AF' } as VisitAddress | null,
-  /** Visits are by appointment only, booked at least a day ahead. */
-  visit: { hours: '9am to 5pm', days: [], opens: '09:00', closes: '17:00', bookAheadDays: 1 } as VisitDetails,
+  /** Showroom visits (owner, 17 October 2026): Monday to Friday, by appointment, booked at least a day ahead. Ordering online never closes and deliveries run seven days a week. */
+  visit: {
+    hours: '9am to 5pm',
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '09:00',
+    closes: '17:00',
+    bookAheadDays: 1,
+  } as VisitDetails,
   trading: {
     companyName: null,
     companyNumber: null,

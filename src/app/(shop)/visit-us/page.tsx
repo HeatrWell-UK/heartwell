@@ -51,7 +51,8 @@ export default function VisitUsPage() {
           <li>A photo of your room helps when you’re choosing a fabric colour.</li>
         </ul>
         <p>
-          Can’t get to {a.locality}? Everything can be done online or on WhatsApp, and <Link href="/fabric-samples">fabric samples</Link> come by post.
+          Can’t get to {a.locality}? You can order online at any time, day or night, or on WhatsApp, and <Link href="/fabric-samples">fabric samples</Link> come
+          by post. We deliver seven days a week.
         </p>
       </section>
     </div>

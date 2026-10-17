@@ -14,7 +14,7 @@ export const SHOP_LINKS: NavLink[] = [
   { label: 'U-shaped sofas', href: '/sofas/u-shaped-sofas' },
   { label: '3+2 sofa sets', href: '/sofas/3-2-sofa-sets' },
   { label: 'Fabric sofas', href: '/sofas/fabric-sofas' },
-  { label: 'Leather sofas', href: '/sofas/leather-sofas' },
+  { label: 'Leather-look sofas', href: '/sofas/leather-sofas' },
   { label: 'Recliners', href: '/sofas/recliners' },
   { label: 'All sofas', href: '/sofas' },
 ]
