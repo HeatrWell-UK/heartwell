@@ -70,8 +70,8 @@ export const POLICIES = {
 } as const
 
 /** The one sentence in the bar at the top of every page. */
-export const ANNOUNCEMENT = 'Free UK Mainland delivery. Pay nothing until it arrives.'
+export const ANNOUNCEMENT = 'Free delivery to most postcodes. Pay nothing until it arrives.'
 
 /** Default meta description. */
 export const META_DESCRIPTION =
-  'Sofas made to order with free UK Mainland delivery. Pay nothing until it arrives: cash or bank transfer on delivery. 1-year frame guarantee.'
+  'Sofas made to order with free delivery to most of mainland Britain. Pay nothing until it arrives: cash or bank transfer on delivery. 1-year frame guarantee.'
