@@ -834,6 +834,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** visit heartwellsofa.co.uk and www.heartwellsofa.co.uk (which redirects); send and receive an email on enquiries@; place and confirm one real low-risk order (then cancel it as test).
 - **Done means:** the site is live, email still works, the first order flows end to end, and Meta shows live events.
+- **As built (16–17 October 2026).** Live on https://heartwellsofa.co.uk: production mode and indexing on, sign-ups off, Meta domain verified. Meta tracking Test → Live after a fix (the Content Security Policy now allows the Pixel's facebook.com frame and form, so events with product data arrive from browsers as well as the server, deduplicated). Smoke test HW-100103: emails, confirmation and the automatic OrderFlow push all worked. Remaining owner items (catalogue feed, Search Console, UptimeRobot, Facebook link and announcement, private repository, OrderFlow tidy-up, legal details, leather wording, price list) are listed in `docs/PROGRESS.md`.
 
 ---
 
