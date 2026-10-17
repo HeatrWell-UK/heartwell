@@ -5,11 +5,12 @@ import { cloudinaryVideo } from '@/lib/videos'
 import { CATALOGUE_TAG, getCategories } from '@/lib/catalogue/listing'
 import { deliveryWindow, earliestPreferredDate, latestPreferredDate } from '@/lib/delivery/window'
 import type { DeliverySettings } from '@/lib/delivery/pricing'
+import type { DeliveryArea } from '@/lib/delivery/areas'
 import { fromPrice } from '@/lib/catalogue/pricing'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
 import type { OfferTier } from '@/lib/offers/paid'
 import { specRows, type SpecField } from './specs'
-import type { DeliveryInfo, FabricCollectionView, ProductCardView, ProductPageData, SiblingView, VariantView } from './types'
+import type { AreaDelivery, DeliveryInfo, FabricCollectionView, ProductCardView, ProductPageData, SiblingView, VariantView } from './types'
 
 /** Cache tag for shop settings; the catalogue's is CATALOGUE_TAG. The admin revalidates both (Phase 12). */
 export const SETTINGS_TAG = 'settings'
@@ -162,15 +163,47 @@ const loadDeliverySettings = unstable_cache(
     const { data, error } = await createPublicClient()
       .from('shop_settings')
       .select(
-        'upstairs_first_floor, upstairs_per_extra_floor, max_floor, assembly_fee, removal_per_seat, removal_min_seats, removal_max_seats, removal_default_seats, delivery_min_working_days, delivery_max_working_days, preferred_date_min_days, preferred_date_max_days',
+        'upstairs_first_floor, upstairs_per_extra_floor, max_floor, assembly_fee, removal_per_seat, removal_min_seats, removal_max_seats, removal_default_seats, delivery_min_working_days, delivery_max_working_days, preferred_date_min_days, preferred_date_max_days, no_delivery_days',
       )
       .single()
     if (error) throw new Error(`Shop settings: ${error.message}`)
     return data
   },
-  ['delivery-settings-v2'],
+  ['delivery-settings-v3'],
   { revalidate: FIVE_MINUTES, tags: [SETTINGS_TAG] },
 )
+
+/** The mainland areas that pay a delivery charge (delivery_areas), in their display order. */
+export const getDeliveryAreas = unstable_cache(
+  async (): Promise<DeliveryArea[]> => {
+    const { data, error } = await createPublicClient()
+      .from('delivery_areas')
+      .select('slug, name, places, charge, min_working_days, max_working_days, districts, sort')
+      .order('sort')
+      .order('slug')
+    if (error) throw new Error(`Delivery areas: ${error.message}`)
+    return data.map((a) => ({
+      slug: a.slug,
+      name: a.name,
+      places: a.places,
+      charge: Number(a.charge),
+      minWorkingDays: a.min_working_days,
+      maxWorkingDays: a.max_working_days,
+      districts: a.districts,
+    }))
+  },
+  ['delivery-areas-v1'],
+  { revalidate: FIVE_MINUTES, tags: [SETTINGS_TAG] },
+)
+
+/** Each charged area with today's window and first preferred day. */
+async function areaDeliveries(s: Awaited<ReturnType<typeof loadDeliverySettings>>, now: Date): Promise<AreaDelivery[]> {
+  return (await getDeliveryAreas()).map((a) => ({
+    ...a,
+    windowLabel: deliveryWindow(s, now, a).label,
+    earliestDate: earliestPreferredDate(s, now, a),
+  }))
+}
 
 /** Delivery prices and today's delivery window (worked out per request, so the dates are always today's). */
 export async function getDeliveryInfo(now = new Date()): Promise<DeliveryInfo> {
@@ -183,6 +216,8 @@ export async function getDeliveryInfo(now = new Date()): Promise<DeliveryInfo> {
     upstairsPerExtraFloor: s.upstairs_per_extra_floor,
     assemblyFee: s.assembly_fee,
     removalPerSeat: s.removal_per_seat,
+    areas: await areaDeliveries(s, now),
+    noDeliveryDays: s.no_delivery_days,
   }
 }
 
@@ -191,12 +226,16 @@ export interface CheckoutSettings {
   windowLabel: string
   earliestDate: string
   latestDate: string
+  areas: AreaDelivery[]
+  noDeliveryDays: number[]
 }
 
-/** Everything checkout needs to price extras and offer delivery days, from shop_settings. */
+/** Everything checkout needs to price extras and offer delivery days, from shop_settings and delivery_areas. */
 export async function getCheckoutSettings(now = new Date()): Promise<CheckoutSettings> {
   const s = await loadDeliverySettings()
   return {
+    areas: await areaDeliveries(s, now),
+    noDeliveryDays: s.no_delivery_days,
     delivery: {
       upstairs_first_floor: s.upstairs_first_floor,
       upstairs_per_extra_floor: s.upstairs_per_extra_floor,

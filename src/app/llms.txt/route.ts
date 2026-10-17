@@ -10,6 +10,7 @@ import { allFaqItems, faqGroups } from '@/content/faq'
 import { GUIDES } from '@/content/guides'
 import { getCategories, sentenceCase } from '@/lib/catalogue/listing'
 import { categoryHref } from '@/lib/catalogue/tree'
+import { formatPrice } from '@/lib/format'
 import { getDeliveryInfo } from '@/lib/product/load'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 
@@ -28,6 +29,9 @@ export async function GET() {
     '',
     `- Payment: ${PROMISES.payment.long} No card payments.`,
     `- Delivery: ${PROMISES.delivery.long} ${PROMISES.delivery.timingLong}`,
+    ...(delivery?.areas.length
+      ? [`- Delivery charges: ${delivery.areas.map((d) => `${d.name} ${formatPrice(d.charge)}`).join(', ')}; these areas take ${PROMISES.delivery.chargedTiming}. Free everywhere else on the mainland.`]
+      : []),
     '- Outside UK Mainland (Northern Ireland, islands, Isle of Wight): delivered by arrangement, quoted on WhatsApp.',
     `- Orders count once the customer taps Confirm on the link sent by email and WhatsApp.`,
     `- Returns: ${POLICIES.changeOfMindDays} days to change your mind on ready-made pieces; made-to-order pieces are exempt; faults always covered.`,

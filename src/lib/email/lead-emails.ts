@@ -169,7 +169,7 @@ export function basketReminderEmail(o: { name: string | null; lines: { title: st
   const body = [
     h(`${greeting}, you left these in your basket`),
     `<ul style="margin:0 0 14px;padding-left:20px">${o.lines.map((l) => `<li style="margin-bottom:6px">${link(l.href, l.title)}${l.option ? `<br><span style="color:${C.slate};font-size:14px">${escapeHtml(l.option)}</span>` : ''}</li>`).join('')}</ul>`,
-    p('Delivery is free to UK Mainland and you pay nothing until it’s in your room.'),
+    p('Delivery is free to most of mainland Britain and you pay nothing until it’s in your room.'),
     p(`Any questions about sizes, fabrics or delivery? ${contactHtml(o.shop)}.`, `font-size:15px;color:${C.slate}`),
     p('You asked us to remind you once. We won’t email about this basket again.', `font-size:13px;color:${C.slate}`),
   ].join('')
@@ -177,7 +177,7 @@ export function basketReminderEmail(o: { name: string | null; lines: { title: st
     `${greeting}, you left these in your basket:`,
     ...o.lines.map((l) => `- ${l.title}${l.option ? `, ${l.option}` : ''}: ${l.href}`),
     '',
-    'Delivery is free to UK Mainland and you pay nothing until it is in your room.',
+    'Delivery is free to most of mainland Britain and you pay nothing until it is in your room.',
     contactText(o.shop),
   ].join('\n')
   return { subject, html: layout(subject, body, 'Free delivery, and nothing to pay until it arrives.'), text }

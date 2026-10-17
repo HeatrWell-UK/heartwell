@@ -3,7 +3,7 @@ import type { CustomerOrder } from '@/lib/checkout/read'
 import { PayRows } from './PayRows'
 
 /** An order's lines and totals, as the customer sees them after ordering. */
-export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'itemsSubtotal' | 'discountAmount' | 'extras' | 'totalAmount'> }) {
+export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'itemsSubtotal' | 'discountAmount' | 'delivery' | 'extras' | 'totalAmount'> }) {
   return (
     <div className="flex flex-col gap-3">
       <ul className="flex flex-col divide-y divide-line-soft">
@@ -32,8 +32,8 @@ export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'it
           </div>
         )}
         <div className="flex justify-between">
-          <dt>Delivery to UK Mainland</dt>
-          <dd className="font-semibold text-velvet">Free</dd>
+          <dt>{order.delivery.label}</dt>
+          {order.delivery.amount > 0 ? <dd>{formatPrice(order.delivery.amount)}</dd> : <dd className="font-semibold text-velvet">Free</dd>}
         </div>
         {order.extras.map((e) => (
           <div key={e.label} className="flex justify-between">

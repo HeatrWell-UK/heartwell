@@ -26,6 +26,8 @@ export interface OrderRowForView {
   fee_assembly: number
   removal_seats: number | null
   fee_removal: number
+  delivery_area: string | null
+  fee_area: number
   delivery_total: number
   total_amount: number
   order_items: {
@@ -46,8 +48,8 @@ export function toEmailData(o: OrderRowForView): OrderEmailData {
   if (o.fee_upstairs > 0) extras.push({ label: 'Carrying upstairs', detail: o.delivery_has_lift ? `${floorName(o.delivery_floor)}, with a lift` : floorName(o.delivery_floor), amount: o.fee_upstairs })
   if (o.fee_assembly > 0) extras.push({ label: 'Assembly in your room', amount: o.fee_assembly })
   if (o.removal_seats) extras.push({ label: 'Taking your old sofa away', detail: `${o.removal_seats} ${o.removal_seats === 1 ? 'seat' : 'seats'}`, amount: o.fee_removal })
-  // A delivery charge agreed by staff that isn't one of the standard extras.
-  const listed = extras.reduce((n, e) => n + e.amount, 0)
+  // A charged area's price, then any delivery charge agreed by staff that isn't one of the standard extras.
+  const listed = extras.reduce((n, e) => n + e.amount, 0) + o.fee_area
   if (o.delivery_total - listed > 0.005) extras.push({ label: 'Delivery (agreed)', amount: Math.round((o.delivery_total - listed) * 100) / 100 })
   return {
     id: o.id,
@@ -71,6 +73,7 @@ export function toEmailData(o: OrderRowForView): OrderEmailData {
     itemsSubtotal: o.items_subtotal,
     discountAmount: o.discount_amount,
     promotionCode: o.promotion_code,
+    delivery: o.fee_area > 0 ? { label: `Delivery to ${o.delivery_area ?? 'the area'}`, amount: o.fee_area } : { label: 'Delivery', amount: 0 },
     extras,
     deliveryTotal: o.delivery_total,
     totalAmount: o.total_amount,

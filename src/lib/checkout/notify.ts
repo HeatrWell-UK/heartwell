@@ -8,6 +8,7 @@ import { customerOrderEmail, customerStatusEmail, EMAILED_STATUSES, shopConfirme
 import { fabricLabel } from '@/lib/product/helpers'
 import { floorName } from '@/lib/delivery/pricing'
 import { getDeliveryInfo } from '@/lib/product/load'
+import { areaForPostcode, orderDeliveryLine } from '@/lib/delivery/areas'
 
 export const confirmUrl = (id: string) => `${SITE_URL}/confirm-order/${id}`
 const adminUrl = () => `${SITE_URL}/admin`
@@ -19,7 +20,7 @@ export async function loadOrderForEmail(id: string): Promise<OrderEmailData | nu
     .select(
       `id, reference, is_test, customer_name, customer_email, customer_phone, shipping_address, postcode,
        preferred_delivery_date, special_instructions, has_made_to_order, items_subtotal, discount_amount, promotion_code,
-       delivery_floor, delivery_has_lift, fee_upstairs, fee_assembly, removal_seats, fee_removal, delivery_total, total_amount,
+       delivery_floor, delivery_has_lift, fee_upstairs, fee_assembly, removal_seats, fee_removal, delivery_area, fee_area, delivery_total, total_amount,
        order_items(position, title, custom_title, sku, colour_name, material_code, material_name, material_collection, quantity, unit_price)`,
     )
     .eq('id', id)
@@ -58,6 +59,7 @@ export async function loadOrderForEmail(id: string): Promise<OrderEmailData | nu
     itemsSubtotal: o.items_subtotal,
     discountAmount: o.discount_amount,
     promotionCode: o.promotion_code,
+    delivery: orderDeliveryLine(o),
     extras,
     deliveryTotal: o.delivery_total,
     totalAmount: o.total_amount,
@@ -70,8 +72,9 @@ const shopContact = () => ({ email: CONTACT.email, phoneDisplay: CONTACT.phoneDi
 export async function sendOrderPlacedEmails(id: string): Promise<void> {
   const order = await loadOrderForEmail(id)
   if (!order) return
+  // A charged area's own, slower window.
   const windowLabel = await getDeliveryInfo()
-    .then((d) => d.windowLabel)
+    .then((d) => areaForPostcode(order.postcode, d.areas)?.windowLabel ?? d.windowLabel)
     .catch(() => null)
   const jobs: Promise<unknown>[] = [
     (async () => {

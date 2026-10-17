@@ -30,7 +30,18 @@ export interface CheckoutQuote {
   promotionCode: string | null
   /** The ad-visitor offer is live and counted (the discount is the same whichever applies). */
   adOffer: boolean
-  delivery: { floor: number; hasLift: boolean; upstairs: number; assembly: number; removalSeats: number | null; removal: number; total: number }
+  delivery: {
+    floor: number
+    hasLift: boolean
+    upstairs: number
+    assembly: number
+    removalSeats: number | null
+    removal: number
+    /** A charged delivery area's price (0 for the free rest of the mainland) and its name. */
+    areaFee: number
+    areaName: string | null
+    total: number
+  }
   deliveryTotal: number
   total: number
   hasMadeToOrder: boolean
@@ -72,6 +83,8 @@ export async function quoteCheckout(input: unknown): Promise<{ ok: true; quote: 
         assembly: num(d.assembly),
         removalSeats: d.removal_seats === null || d.removal_seats === undefined ? null : num(d.removal_seats),
         removal: num(d.removal),
+        areaFee: num(d.area_fee),
+        areaName: ((d.area as Record<string, unknown> | null)?.name as string | undefined) ?? null,
         total: num(d.total),
       },
       deliveryTotal: num(r.delivery_total),

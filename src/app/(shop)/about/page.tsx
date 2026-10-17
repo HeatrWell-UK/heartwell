@@ -45,7 +45,7 @@ export default function AboutPage() {
       <ol className="hw-steps">
         <li>Choose your sofa online or on WhatsApp. It takes a couple of minutes, and there’s no account to set up.</li>
         <li>Tap Confirm on the link we send you, and we ring or WhatsApp to book your delivery day.</li>
-        <li>We bring it to your room, free to UK Mainland addresses. You check it, then you pay.</li>
+        <li>We bring it to your room, free to most of mainland Britain. You check it, then you pay.</li>
       </ol>
 
       <h2 id="made-to-order">Made for you</h2>

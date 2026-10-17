@@ -4,6 +4,13 @@
 import type { SizeFields } from '@/lib/catalogue/display'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
 import type { OfferTier } from '@/lib/offers/paid'
+import type { DeliveryArea } from '@/lib/delivery/areas'
+
+/** A charged delivery area with today's window ("Sat 24 – Tue 27 October") and first day a customer may pick. */
+export interface AreaDelivery extends DeliveryArea {
+  windowLabel: string
+  earliestDate: string
+}
 
 export interface VariantView {
   id: string
@@ -109,4 +116,8 @@ export interface DeliveryInfo {
   upstairsPerExtraFloor: number
   assemblyFee: number
   removalPerSeat: number
+  /** The mainland areas that pay a delivery charge. */
+  areas: AreaDelivery[]
+  /** ISO days with no deliveries (1 = Monday). */
+  noDeliveryDays: number[]
 }

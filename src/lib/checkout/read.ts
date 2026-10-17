@@ -2,6 +2,7 @@ import 'server-only'
 import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { fabricLabel } from '@/lib/product/helpers'
+import { orderDeliveryLine } from '@/lib/delivery/areas'
 
 // Orders as the customer's own pages read them: through the database's
 // order_for_confirmation, which the public key may call (an order's ID is
@@ -22,6 +23,8 @@ export interface CustomerOrder {
   items: { title: string; option: string | null; quantity: number; unitPrice: number }[]
   itemsSubtotal: number
   discountAmount: number
+  /** "Delivery" and £0 (free), or "Delivery to Devon" and its charge. */
+  delivery: { label: string; amount: number }
   extras: { label: string; amount: number }[]
   totalAmount: number
 }
@@ -64,6 +67,7 @@ export async function orderForCustomer(id: string): Promise<CustomerOrder | null
     items: itemsFrom(o.items),
     itemsSubtotal: n(o.items_subtotal),
     discountAmount: n(o.discount_amount),
+    delivery: orderDeliveryLine(o),
     extras,
     totalAmount: n(o.total_amount),
   }

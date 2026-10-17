@@ -63,8 +63,9 @@ export default function TermsPage() {
       <h2 id="prices">3. Prices, offers and paying</h2>
       <ol>
         <li>
-          Prices are in pounds and are the total you pay for each piece. Delivery to UK Mainland addresses is free; extras you choose at checkout (carrying
-          upstairs, assembly, taking furniture away) are shown with their prices before you order.
+          Prices are in pounds and are the total you pay for each piece. Delivery is free to most of mainland Britain; the areas with a delivery charge are listed on
+          our <Link href="/delivery-and-returns#areas">Delivery and returns</Link> page, and the charge for your postcode, like the extras you choose at
+          checkout (carrying upstairs, assembly, taking furniture away), is shown with its price before you order.
         </li>
         <li>
           {PROMISES.payment.long} We don’t take card payments, deposits or any payment in advance for furniture.

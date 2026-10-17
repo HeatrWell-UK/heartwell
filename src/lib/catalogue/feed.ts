@@ -232,7 +232,9 @@ function rss(items: string[], siteUrl: string, title: string): string {
   ].join('\n')
 }
 
-const shipping = `<g:shipping><g:country>GB</g:country><g:service>${escapeXml(PROMISES.delivery.short)}</g:service><g:price>${money(0)}</g:price></g:shipping>`
+// No shipping element (17 October 2026): delivery is free to most of mainland
+// Britain but charged in a few postcode areas (delivery_areas), which a feed
+// can't say per postcode. Merchant Center takes it from its own settings.
 
 /** Meta's catalogue feed (RSS 2.0 with Google's namespace, which Meta reads). */
 export function metaFeedXml(items: FeedItem[], siteUrl: string): string {
@@ -257,7 +259,6 @@ export function metaFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('google_product_category', i.googleCategory),
         tag('fb_product_category', i.metaCategory),
         tag('product_type', i.productType),
-        shipping,
         ...i.customLabels.map((label, n) => tag(`custom_label_${n}`, label)),
         '</item>',
       ]
@@ -293,7 +294,6 @@ export function googleFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('size', i.size),
         tag('google_product_category', i.googleCategory),
         tag('product_type', i.productType),
-        shipping,
         ...i.customLabels.map((label, n) => tag(`custom_label_${n}`, label)),
         '</item>',
       ]

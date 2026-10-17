@@ -130,7 +130,7 @@ const QUOTE_PLACES: Partial<Record<PostcodeReason | 'mixed_geography_unavailable
 export type PostcodeOutcome =
   | { kind: 'empty' }
   | { kind: 'invalid' }
-  | { kind: 'free'; area: string; postcode: string }
+  | { kind: 'mainland'; area: string; postcode: string }
   | { kind: 'depends'; area: string; postcode: string }
   | { kind: 'quote'; area: string; postcode: string; place: string | null }
 
@@ -140,6 +140,6 @@ export function postcodeOutcome(raw: string): PostcodeOutcome {
   if (result.kind === 'invalid') return { kind: 'invalid' }
   const area = outwardCode(result.postcode)
   if (result.kind === 'ambiguous') return { kind: 'depends', area, postcode: result.postcode }
-  if (result.zone === 'MAINLAND_STANDARD') return { kind: 'free', area, postcode: result.postcode }
+  if (result.zone === 'MAINLAND_STANDARD') return { kind: 'mainland', area, postcode: result.postcode }
   return { kind: 'quote', area, postcode: result.postcode, place: QUOTE_PLACES[result.reason] ?? null }
 }

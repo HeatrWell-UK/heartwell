@@ -102,7 +102,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: jsonLdString([
-            productJsonLd(product, SITE_URL, delivery),
+            productJsonLd(product, SITE_URL),
             breadcrumbJsonLd([...crumbs.map((c) => ({ name: c.name, path: c.href })), { name: product.title, path: `/products/${product.slug}` }], SITE_URL),
           ]),
         }}
@@ -116,7 +116,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         offer={{ amount: tierAmount(product.offerTier, offers.amounts), code: offers.code }}
         plans={plans}
       >
-        <PostcodeCheck windowLabel={delivery.windowLabel} />
+        <PostcodeCheck windowLabel={delivery.windowLabel} areas={delivery.areas} noDeliveryDays={delivery.noDeliveryDays} />
         <PromiseRows madeToOrder={product.madeToOrder} />
       </ProductPurchase>
 

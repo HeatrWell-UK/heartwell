@@ -6,7 +6,7 @@ export const BRAND = {
   /** Used under the name in the stacked logo and in titles. */
   tagline: 'Sofas made to order, delivered free, paid for on delivery',
   shortDescription:
-    'Sofas made to order, delivered free across UK Mainland, and paid for on the doorstep once they are in your room.',
+    'Sofas made to order, delivered free to most of mainland Britain, and paid for on the doorstep once they are in your room.',
 } as const
 
 /**

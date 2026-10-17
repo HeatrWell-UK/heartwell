@@ -4,16 +4,28 @@ import { useId, useState, useSyncExternalStore } from 'react'
 import { CheckIcon, InfoIcon, WarningCircleIcon } from '@phosphor-icons/react'
 import { WhatsAppOrEmail } from '@/components/ui/WhatsAppButton'
 import { recallPostcode, rememberPostcode } from '@/lib/basket/store'
+import { areaForPostcode } from '@/lib/delivery/areas'
+import { deliveryDaysText } from '@/lib/delivery/window'
+import { formatPrice } from '@/lib/format'
 import { postcodeOutcome, type PostcodeOutcome } from '@/lib/product/helpers'
+import type { AreaDelivery } from '@/lib/product/types'
 
 /**
  * "Check delivery to your postcode": answered instantly on the phone (the same
- * rules the database applies at checkout). The postcode is remembered on this
- * device for the next product and for checkout.
+ * rules the database applies at checkout, including a charged area's price and
+ * slower window). The postcode is remembered on this device for the next
+ * product and for checkout.
  */
 const noSubscription = () => () => {}
 
-export function PostcodeCheck({ windowLabel, className = 'mt-6' }: { windowLabel: string; className?: string }) {
+interface Props {
+  windowLabel: string
+  areas: AreaDelivery[]
+  noDeliveryDays: number[]
+  className?: string
+}
+
+export function PostcodeCheck({ windowLabel, areas, noDeliveryDays, className = 'mt-6' }: Props) {
   const id = useId()
   // The postcode checked last time on this device, read once storage is available.
   const remembered = useSyncExternalStore(noSubscription, recallPostcode, () => '')
@@ -22,6 +34,7 @@ export function PostcodeCheck({ windowLabel, className = 'mt-6' }: { windowLabel
 
   const value = typed ?? remembered
   const outcome: PostcodeOutcome = checked ?? (remembered ? postcodeOutcome(remembered) : { kind: 'empty' })
+  const area = outcome.kind === 'mainland' ? areaForPostcode(outcome.postcode, areas) : null
 
   const check = () => {
     const result = postcodeOutcome(value)
@@ -71,9 +84,17 @@ export function PostcodeCheck({ windowLabel, className = 'mt-6' }: { windowLabel
             Please enter a full UK postcode, like LS6 2AB.
           </p>
         )}
-        {outcome.kind === 'free' && (
+        {outcome.kind === 'mainland' && !area && (
           <Result tone="ok">
             <strong className="font-semibold">Free delivery to {outcome.area}.</strong> Most orders arrive {windowLabel}.
+          </Result>
+        )}
+        {outcome.kind === 'mainland' && area && (
+          <Result tone="ok">
+            <strong className="font-semibold">
+              Delivery to {outcome.area} ({area.name}) is {formatPrice(area.charge)}.
+            </strong>{' '}
+            Orders there take {area.minWorkingDays} to {area.maxWorkingDays} working days, so most arrive {area.windowLabel}.
           </Result>
         )}
         {outcome.kind === 'depends' && (
@@ -98,7 +119,9 @@ export function PostcodeCheck({ windowLabel, className = 'mt-6' }: { windowLabel
         )}
       </div>
 
-      <p className="text-sm leading-snug text-slate">Upstairs delivery, assembly and taking your old sofa away can be added at checkout.</p>
+      <p className="text-sm leading-snug text-slate">
+        {deliveryDaysText(noDeliveryDays)} Upstairs delivery, assembly and taking your old sofa away can be added at checkout.
+      </p>
     </section>
   )
 }

@@ -5,16 +5,22 @@ import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { PostcodeCheck } from '@/components/product/PostcodeCheck'
 import { PROMISES } from '@/config/promises'
 import { CONTACT, visitBookingText, visitHoursText } from '@/config/contact'
+import Link from 'next/link'
+import { chargeRange } from '@/lib/delivery/areas'
+import { deliveryDaysText } from '@/lib/delivery/window'
+import type { DeliveryInfo } from '@/lib/product/types'
 import { appleMapsHref, directionsHref } from './VisitUs'
 import { BritainMap } from '@/components/content/BritainMap'
 
 /**
- * Where we deliver free, drawn: mainland Britain with the Burnley showroom
- * marked, the instant postcode check beside it, and how to visit. The map is
- * the same area the checkout calls UK Mainland (src/lib/delivery/postcode.ts).
+ * Where we deliver, drawn: mainland Britain with the Burnley showroom marked,
+ * the instant postcode check beside it, and how to visit. The map is the area
+ * the online checkout takes (src/lib/delivery/postcode.ts); a few parts of it
+ * pay a delivery charge (delivery_areas).
  */
-export function DeliveryMap({ windowLabel }: { windowLabel: string | null }) {
+export function DeliveryMap({ delivery }: { delivery: DeliveryInfo | null }) {
   const a = CONTACT.visitAddress
+  const charges = delivery ? chargeRange(delivery.areas) : ''
   return (
     <section
       aria-labelledby="delivery"
@@ -22,18 +28,24 @@ export function DeliveryMap({ windowLabel }: { windowLabel: string | null }) {
     >
       <div className="flex flex-col gap-3 lg:col-start-2 lg:row-start-1">
         <h2 id="delivery" className="text-[30px] leading-tight lg:text-[42px]">
-          Free delivery across mainland Britain
+          Free delivery to most of mainland Britain
         </h2>
         <p className="text-[17px] leading-relaxed text-slate">
-          Usually in {PROMISES.delivery.timingShort}, into the room of your choice on the ground floor. Northern Ireland and the islands are
-          delivered by arrangement.
+          Usually in {PROMISES.delivery.timingShort}, into the room of your choice on the ground floor.{' '}
+          {charges && (
+            <>
+              {PROMISES.delivery.chargedAreas} pay {charges} and take {PROMISES.delivery.chargedTiming} (
+              <Link href="/delivery-and-returns#areas">see the areas</Link>).{' '}
+            </>
+          )}
+          Northern Ireland and the islands are delivered by arrangement. {delivery ? deliveryDaysText(delivery.noDeliveryDays) : ''}
         </p>
       </div>
 
       <BritainMap className="mx-auto w-[64%] max-w-[300px] lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-full lg:max-w-[330px] lg:self-center" />
 
       <div className="flex flex-col gap-8 lg:col-start-2 lg:row-start-2">
-        {windowLabel && <PostcodeCheck windowLabel={windowLabel} className="" />}
+        {delivery && <PostcodeCheck windowLabel={delivery.windowLabel} areas={delivery.areas} noDeliveryDays={delivery.noDeliveryDays} className="" />}
 
         {a && (
           <div className="flex flex-col gap-4 border-t border-line pt-7">

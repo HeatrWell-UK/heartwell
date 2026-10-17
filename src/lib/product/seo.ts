@@ -38,7 +38,7 @@ export function productDescription(p: ProductPageData): string {
   const colours = p.variants.map((v) => v.colourName).filter(Boolean)
   const made = p.madeToOrder ? ' Made to order.' : ''
   const text = (colourText: string) =>
-    `${p.title}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.short}. ${PROMISES.payment.short}: cash or bank transfer on delivery.`
+    `${p.title}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.brief}. ${PROMISES.payment.short}: cash or bank transfer on delivery.`
   // Google shows about 160 characters, so a long colour list becomes a count
   // rather than cutting off how paying works at the end.
   const options = colours.length > 1
@@ -55,23 +55,10 @@ export function jsonLdString(data: unknown): string {
   return JSON.stringify(data).replace(/</g, '\\u003c')
 }
 
-/** Free delivery in Great Britain, in the shop's working-day window. */
-function shippingDetails(delivery: { minDays: number; maxDays: number } | null) {
-  return {
-    '@type': 'OfferShippingDetails',
-    shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'GBP' },
-    shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'GB' },
-    ...(delivery
-      ? {
-          deliveryTime: {
-            '@type': 'ShippingDeliveryTime',
-            handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-            transitTime: { '@type': 'QuantitativeValue', minValue: delivery.minDays, maxValue: delivery.maxDays, unitCode: 'DAY' },
-          },
-        }
-      : {}),
-  }
-}
+// No shippingDetails on the offers (17 October 2026): delivery is free to most
+// of mainland Britain but charged in a few postcode areas (delivery_areas), and
+// one "free to GB" claim would be wrong there. Google takes delivery costs from
+// Merchant Center's settings, by postcode (docs/MERCHANT-CENTER.md).
 
 /** Ready-made: 14 days to change your mind, return at the customer's cost. Made to order: exempt. */
 export function returnPolicy(madeToOrder: boolean) {
@@ -86,14 +73,13 @@ export function returnPolicy(madeToOrder: boolean) {
       }
 }
 
-export function productJsonLd(p: ProductPageData, siteUrl: string, delivery: { minDays: number; maxDays: number } | null = null) {
+export function productJsonLd(p: ProductPageData, siteUrl: string) {
   const url = `${siteUrl}/products/${p.slug}`
   // Made-to-order pieces are on sale now and arrive in the same delivery window,
   // so they're in stock, as the Meta and Google feeds say. Google rejects
   // schema.org/MadeToOrder (Rich Results Test, 17 October 2026); the return
   // policy below is what tells it they're made to order.
   const availability = 'https://schema.org/InStock'
-  const shipping = shippingDetails(delivery)
   const returns = returnPolicy(p.madeToOrder)
   const images = [...p.variants.map((v) => v.image), ...p.gallery].filter((x): x is string => Boolean(x))
   const description = productDescription(p)
@@ -136,7 +122,6 @@ export function productJsonLd(p: ProductPageData, siteUrl: string, delivery: { m
         availability,
         itemCondition: 'https://schema.org/NewCondition',
         seller: { '@type': 'Organization', name: BRAND.name },
-        shippingDetails: shipping,
         hasMerchantReturnPolicy: returns,
       },
     })),

@@ -35,6 +35,8 @@ export interface OrderEmailData {
   itemsSubtotal: number
   discountAmount: number
   promotionCode: string | null
+  /** "Delivery" and £0 (free), or "Delivery to Devon" and its charge. */
+  delivery: { label: string; amount: number }
   extras: { label: string; detail?: string; amount: number }[]
   deliveryTotal: number
   totalAmount: number
@@ -73,7 +75,7 @@ function itemsTable(o: OrderEmailData, withSku: boolean): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 18px;font-size:15px">${rows}
 ${line('Items', money(o.itemsSubtotal))}
 ${o.discountAmount > 0 ? line(`Offer${o.promotionCode ? ` (${escapeHtml(o.promotionCode)})` : ''}`, `−${money(o.discountAmount)}`) : ''}
-${line('Delivery to UK Mainland', 'Free')}
+${line(escapeHtml(o.delivery.label), o.delivery.amount > 0 ? money(o.delivery.amount) : 'Free')}
 ${extras}
 ${line('To pay today', `<span style="color:${C.velvet};font-weight:bold">£0</span>`)}
 ${line('To pay on delivery', money(o.totalAmount), true)}</table>`
@@ -86,7 +88,7 @@ function itemsText(o: OrderEmailData, withSku: boolean): string {
     ...lines,
     `Items: ${money(o.itemsSubtotal)}`,
     ...(o.discountAmount > 0 ? [`Offer${o.promotionCode ? ` (${o.promotionCode})` : ''}: -${money(o.discountAmount)}`] : []),
-    'Delivery to UK Mainland: Free',
+    `${o.delivery.label}: ${o.delivery.amount > 0 ? money(o.delivery.amount) : 'Free'}`,
     ...extras,
     'To pay today: £0',
     `To pay on delivery: ${money(o.totalAmount)}`,

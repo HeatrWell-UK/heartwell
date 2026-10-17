@@ -162,7 +162,7 @@ describe('catalogue feed', () => {
     const blocks = xml.match(/<item>[\s\S]*?<\/item>/g) ?? []
     expect(blocks).toHaveLength(2)
     for (const block of blocks) {
-      for (const field of ['id', 'item_group_id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'google_product_category', 'shipping']) {
+      for (const field of ['id', 'item_group_id', 'title', 'description', 'availability', 'condition', 'price', 'link', 'image_link', 'brand', 'google_product_category']) {
         expect(block).toContain(`<g:${field}>`)
       }
     }
@@ -171,7 +171,8 @@ describe('catalogue feed', () => {
     expect(xml).toContain('<g:brand>Heartwell</g:brand>')
     expect(xml).toContain('<g:title>Roma &amp; Co &lt;3 Seater&gt;, Grey</g:title>')
     expect(xml).toContain('<g:custom_label_0>Roma &quot;Plush&quot;</g:custom_label_0>')
-    expect(xml).toContain('<g:shipping><g:country>GB</g:country>')
+    // Delivery is charged in a few postcode areas, so the feed claims no shipping price.
+    expect(xml).not.toContain('<g:shipping>')
     // No bare ampersands anywhere: every & starts an entity.
     expect(xml.replace(/&(amp|lt|gt|quot|apos);/g, '')).not.toContain('&')
     const link = /<g:link>([^<]+)<\/g:link>/.exec(xml)![1]!.replace(/&amp;/g, '&')

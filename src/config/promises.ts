@@ -3,15 +3,25 @@
 // for delivery extras live in the shop_settings table, not here.
 
 export const PROMISES = {
+  // Owner, 17 October 2026: free to most of mainland Britain; Devon, Cornwall,
+  // the Aberdeen area and the north of Scotland pay £40 to £100 and take 5 to 7
+  // working days (names, charges and postcodes in the delivery_areas table);
+  // no deliveries on Mondays (shop_settings.no_delivery_days, which the
+  // database enforces).
   delivery: {
     label: 'Free delivery',
-    sub: 'UK Mainland',
-    short: 'Free UK Mainland delivery',
-    long: 'Free delivery to UK Mainland addresses, brought to the ground floor or a ground-floor room of your choice.',
+    sub: 'Most of mainland Britain',
+    short: 'Free delivery to most of mainland Britain',
+    /** For search descriptions, where every character counts. */
+    brief: 'Free delivery to most areas',
+    long: 'Free delivery to most of mainland Britain, brought to the ground floor or a ground-floor room of your choice. Devon, Cornwall and the north of Scotland have a delivery charge, shown as soon as you enter your postcode.',
     timingShort: '2–4 working days',
     timingSub: 'Most postcodes',
     timingLong:
-      'Most UK Mainland orders arrive in 2 to 4 working days. Some postcodes in the Scottish Highlands and the far south-west of England take 5 to 7 working days. We deliver seven days a week.',
+      'Most orders arrive in 2 to 4 working days; Devon, Cornwall and the north of Scotland take 5 to 7 working days. We deliver every day except Monday.',
+    /** The charged areas in a phrase, for sentences that give their price from delivery_areas. */
+    chargedAreas: 'Devon, Cornwall and the north of Scotland',
+    chargedTiming: '5 to 7 working days',
   },
   payment: {
     label: 'Pay on delivery',
