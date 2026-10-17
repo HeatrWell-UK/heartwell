@@ -96,8 +96,8 @@ export const RANGE_COPY = {
   },
   oxford: {
     intro:
-      'Oxford is an electric reclining corner sofa with LED lighting, cup holders and USB ports built in, so the whole family can put their feet up.',
-    highlights: ['Electric reclining corner', 'LED lights', 'USB ports and cup holders'],
+      'Oxford is an electric reclining corner sofa in tech leather, a leather-look fabric that wipes clean, with LED lighting, cup holders and USB ports built in, so the whole family can put their feet up.',
+    highlights: ['Electric reclining corner', 'Tech leather that wipes clean', 'LED lights, USB ports and cup holders'],
   },
   'michigan-electric-recliner': {
     intro:
