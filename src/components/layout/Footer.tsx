@@ -1,6 +1,7 @@
 import Link from 'next/link'
+import { FacebookLogoIcon, InstagramLogoIcon, TiktokLogoIcon } from '@phosphor-icons/react/ssr'
 import { LogoStacked } from '@/components/brand/Logo'
-import { CONTACT, phoneHref } from '@/config/contact'
+import { CONTACT, phoneHref, type SocialProfile } from '@/config/contact'
 import { ABOUT_LINKS, BROWSE_LINKS, HELP_LINKS, LEGAL_LINKS } from '@/config/navigation'
 import type { NavSection } from '@/lib/catalogue/listing'
 import { NewsletterSignup } from './NewsletterSignup'
@@ -8,6 +9,12 @@ import { CookieSettingsButton } from '@/components/tracking/CookieSettingsButton
 import { TelLink } from '@/components/tracking/TelLink'
 
 const linkClass = 'text-[15px] text-on-wine-link no-underline hover:text-white hover:underline'
+
+const SOCIAL_ICONS: Record<SocialProfile['platform'], typeof FacebookLogoIcon> = {
+  facebook: FacebookLogoIcon,
+  instagram: InstagramLogoIcon,
+  tiktok: TiktokLogoIcon,
+}
 
 /** Wine footer with the gold logo. Contact, address and company lines appear only once set in config. */
 export function Footer({ shop }: { shop: NavSection[] }) {
@@ -37,6 +44,29 @@ export function Footer({ shop }: { shop: NavSection[] }) {
                 </Link>
               )}
             </div>
+            {CONTACT.socials.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <span className="text-[15px] font-bold">Follow us</span>
+                <ul className="-ml-2.5 flex gap-1">
+                  {CONTACT.socials.map((s) => {
+                    const Icon = SOCIAL_ICONS[s.platform]
+                    return (
+                      <li key={s.platform}>
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noopener"
+                          aria-label={`Heartwell on ${s.label} (opens in a new tab)`}
+                          className="flex size-11 items-center justify-center rounded-full text-on-wine-link hover:bg-white/10 hover:text-white"
+                        >
+                          <Icon size={26} aria-hidden="true" />
+                        </a>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:pt-1">

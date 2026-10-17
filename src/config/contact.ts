@@ -49,7 +49,21 @@ export const CONTACT = {
     registeredOffice: null,
     vatNumber: null,
   } as TradingDetails,
-  socials: [] as { platform: 'facebook' | 'instagram' | 'tiktok'; url: string }[],
+  /**
+   * Owner, 17 October 2026: shown in the footer and given to search engines
+   * (Organization sameAs). TikTok is left out until tiktok.com/@heartwellsofa
+   * opens: on 17 October it said "Couldn't find this account".
+   */
+  socials: [
+    { platform: 'facebook', label: 'Facebook', url: 'https://www.facebook.com/heartwellsofa' },
+    { platform: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/heartwellsofa' },
+  ] as SocialProfile[],
+}
+
+export interface SocialProfile {
+  platform: 'facebook' | 'instagram' | 'tiktok'
+  label: string
+  url: string
 }
 
 /** wa.me link, optionally with a pre-filled message. Null until a number is set. */
