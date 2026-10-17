@@ -112,6 +112,7 @@ export const COVERS: { slugPrefix: string; material?: string; leather: string }[
   { slugPrefix: 'orlando-', material: 'Tech Leather', leather: 'Tech Leather' },
   { slugPrefix: 'roma-recliner-', material: 'Leather Aire & Fabric', leather: 'Leather Aire' },
   { slugPrefix: 'nova-electric-recliner-', leather: 'Tech Leather' },
+  { slugPrefix: 'oxford-', material: 'Tech Leather', leather: 'Tech Leather' },
 ]
 
 export function coverFor(slug: string) {

@@ -494,7 +494,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 | D6 | Offers at launch | **Yes:** a Heartwell code plus the automatic ad-visitor offer, same tiers (£50 / £30 / £20). It gives ads a reason to act now, honestly. |
 | D7 | Customer accounts | **Drop** (see section 4). |
 | D8 | External uptime monitor (UptimeRobot, free) | **Yes.** It's the only alert that still works when email is the thing that broke. |
-| D9 | "Leather" recliners | **Answered 17 October 2026:** Orlando is tech leather, Roma is Leather Aire (both leather-look fabrics), Nova is tech leather; the category is "Leather-look sofas" (migration `leather_look_wording`). Still to confirm: Oxford electric corner and the hidden Michigan recliners, whose colourways say "Leather". |
+| D9 | "Leather" recliners | **Answered 17 October 2026:** Orlando, Nova and Oxford are tech leather, Roma is Leather Aire (all leather-look fabrics); the category is "Leather-look sofas" (migrations `leather_look_wording`, `oxford_tech_leather`). Still to confirm: the hidden Michigan recliners, whose colourways say "Leather", before they go on sale. |
 | D10 | IP address and user agent on server Purchase events for visitors who declined cookies | The sister shop sends them for every order. I recommend sending them only with consent, keeping hashed contact details for everyone (disclosed in the privacy notice under legitimate interests). It costs a little match quality and is the safer reading of the ICO's April 2026 guidance. Worth a quick check with your adviser. |
 | D11 | Later phases (AI assistant, build-your-own sofa, WhatsApp automation, push notifications) | After launch, in the order in section 11. |
 
