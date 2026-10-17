@@ -86,13 +86,13 @@ export const RANGE_COPY = {
   },
   'roma-recliner': {
     intro:
-      'Roma reclines by hand, so there are no cables or plugs to find room for. It comes in leather or fabric, as an armchair, a 2 or 3 seater, a 3+2 set or a corner.',
-    highlights: ['Manual reclining', 'Leather or fabric', 'Armchair to corner sofa'],
+      'Roma reclines by hand, so there are no cables or plugs to find room for. It comes in Leather Aire, a soft leather-look fabric, or in grey fabric, as an armchair, a 2 or 3 seater, a 3+2 set or a corner.',
+    highlights: ['Manual reclining', 'Leather Aire or fabric', 'Armchair to corner sofa'],
   },
   orlando: {
     intro:
-      'Orlando is an electric recliner in real leather, with LED lighting, cup holders and USB ports built in.',
-    highlights: ['Electric reclining', 'Real leather', 'LED lights, USB ports and cup holders'],
+      'Orlando is an electric recliner in tech leather, a leather-look fabric that wipes clean, with LED lighting, cup holders and USB ports built in.',
+    highlights: ['Electric reclining', 'Tech leather that wipes clean', 'LED lights, USB ports and cup holders'],
   },
   oxford: {
     intro:

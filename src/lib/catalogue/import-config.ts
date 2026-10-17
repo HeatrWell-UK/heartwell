@@ -67,7 +67,7 @@ export const CATEGORY_TREE: { slug: string; name: string; parent: string | null;
   { slug: 'u-shaped-sofas', name: 'U-Shaped Sofas', parent: 'sofas', sort: 2 },
   { slug: '3-2-sofa-sets', name: '3+2 Sofa Sets', parent: 'sofas', sort: 3 },
   { slug: 'fabric-sofas', name: 'Fabric Sofas', parent: 'sofas', sort: 4 },
-  { slug: 'leather-sofas', name: 'Leather Sofas', parent: 'sofas', sort: 5 },
+  { slug: 'leather-sofas', name: 'Leather-look Sofas', parent: 'sofas', sort: 5 },
   { slug: 'recliners', name: 'Recliners', parent: 'sofas', sort: 6 },
   { slug: 'electric-recliners', name: 'Electric Recliners', parent: 'recliners', sort: 1 },
   { slug: 'armchairs-and-footstools', name: 'Armchairs & Footstools', parent: 'sofas', sort: 7 },
@@ -100,6 +100,22 @@ export const TIER_MAP: Record<string, 'HIGH' | 'MID' | 'STANDARD' | 'EXCLUDED'> 
 /** Colourways whose reference name isn't a name. Keyed by SKU (unchanged). */
 export const VARIANT_OVERRIDES: Record<string, { name?: string; hex?: string }> = {
   'BU-T': { name: 'Truffle' },
+}
+
+/**
+ * What the leather-look ranges are really covered in (owner, 17 October 2026).
+ * The source data calls them "Leather" or "Real Leather"; none of them is real
+ * leather. Keyed by the start of Heartwell's product slug: `material` replaces
+ * the specification, `leather` replaces a colourway's "Leather" label.
+ */
+export const COVERS: { slugPrefix: string; material?: string; leather: string }[] = [
+  { slugPrefix: 'orlando-', material: 'Tech Leather', leather: 'Tech Leather' },
+  { slugPrefix: 'roma-recliner-', material: 'Leather Aire & Fabric', leather: 'Leather Aire' },
+  { slugPrefix: 'nova-electric-recliner-', leather: 'Tech Leather' },
+]
+
+export function coverFor(slug: string) {
+  return COVERS.find((c) => slug.startsWith(c.slugPrefix)) ?? null
 }
 
 /**

@@ -11,7 +11,7 @@ export const PROMISES = {
     timingShort: '2–4 working days',
     timingSub: 'Most postcodes',
     timingLong:
-      'Most UK Mainland orders arrive in 2 to 4 working days. Some Wales and Scotland postcodes take 5 to 7 working days.',
+      'Most UK Mainland orders arrive in 2 to 4 working days. Some postcodes in the Scottish Highlands and the far south-west of England take 5 to 7 working days. We deliver seven days a week.',
   },
   payment: {
     label: 'Pay on delivery',

@@ -35,7 +35,7 @@ When you're ready, say so and we'll go through this together, screen by screen (
 
 ## Where each value goes
 
-All in Vercel → the heartwell project → Settings → Environment Variables (and the same names on Hostinger after the move in Phase 18B). Tick **Production** for each, then redeploy.
+All in Hostinger → the heartwellsofa.co.uk Node.js app → Environment variables, then redeploy (`NEXT_PUBLIC_` values are built into the pages, so they only take effect after a redeploy). The Meta values went in at go-live (16 October 2026); the GA4 steps are below.
 
 | Name | What | Sensitive? |
 | --- | --- | --- |
@@ -53,6 +53,23 @@ Admin → Tracking then shows a tick for each one (never the values).
 2. **Test**, before go-live: set the mode to **Test**. Server events and test-order Purchases appear in Events Manager → **Test events**; GA4 purchases go to Google's checker. Nothing counts.
 3. **At go-live** (Phase 19, on heartwellsofa.co.uk with `NEXT_PUBLIC_APP_ENV=production`): stay on **Test** and browse the live site through Events Manager's test link. Each event should show from both **Browser** and **Server**, deduplicated. Then switch to **Live**.
 4. **In your ads**: use a link from the admin's **Ad links** page as the website address, and paste the URL parameters from the same page into every ad, so every sale shows its campaign and ad in the admin and ad visitors get the ad offer.
+
+## GA4, step by step (17 October 2026)
+
+The site's code and Content Security Policy are ready; GA4 only needs its two values. Use the same Google account as Search Console.
+
+1. **analytics.google.com → Start measuring** (or Admin → Create → Account). Account name **Heartwell**. Data sharing: leave only "Technical support" ticked.
+2. **Property:** name **Heartwell**, reporting time zone **United Kingdom**, currency **British pound (£)**.
+3. **Business details:** industry **Home & garden**, size **Small**. **Objectives:** "Drive online sales" and "Generate leads". Accept the terms with **United Kingdom** and tick the data processing terms.
+4. **Data collection → Web:** URL `https://heartwellsofa.co.uk`, stream name **Heartwell website**. Open **Enhanced measurement**'s settings (the gear): open **Page views → Show advanced settings** and **untick "Page changes based on browser history events"** (the site sends its own page views with private addresses removed); turn **Form interactions** off; leave Scrolls, Outbound clicks and Site search on (search parameter `q`, the default). Create the stream.
+5. **Measurement ID:** on the stream's page, copy the ID starting **G-**.
+6. **API secret:** same page → **Measurement Protocol API secrets** → accept the terms if asked → **Create**, nickname **Heartwell server** → copy the **Secret value**.
+7. **Hostinger:** the Node.js app → Environment variables → add `NEXT_PUBLIC_GA4_MEASUREMENT_ID` (the G- ID) and `GA4_API_SECRET` (the secret) → save → **redeploy**.
+8. **Check:** Admin → Tracking shows a tick for both. On a phone that isn't excluded in Admin → Tracking → This device, open the site, tap **Accept all** and browse: GA4 → Reports → **Realtime** shows the visit within a minute.
+9. **Settings once it works:** Admin → Data collection and modification → **Data retention** → 14 months. Leave **Google signals** off (only needed for Google Ads). Admin → Product links → **Search Console links** → link heartwellsofa.co.uk to the web stream, then Reports → Library → publish the Search Console collection.
+10. **Key events** (a day after the first ones arrive): Admin → Data display → Key events → New key event: `order_placed`, `generate_lead`, `contact`. `purchase` is one already; it comes from the server when a customer confirms, so GA4 revenue matches the admin.
+
+GA4 only counts visitors who accept cookies (Consent Mode estimates some of the rest). The admin's own visit statistics count everyone.
 
 ## The catalogue (for catalogue ads)
 
