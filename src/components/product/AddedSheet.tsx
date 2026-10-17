@@ -41,8 +41,8 @@ export function AddedSheet({ item, onClose }: { item: AddedItem | null; onClose:
               </div>
             )}
             <div className="flex justify-between">
-              <dt>Delivery to UK Mainland</dt>
-              <dd className="font-semibold text-velvet">Free</dd>
+              <dt>Delivery</dt>
+              <dd className="font-semibold text-velvet">Free for most postcodes</dd>
             </div>
             <PayRows total={basket.subtotal} className="mt-1" />
           </dl>

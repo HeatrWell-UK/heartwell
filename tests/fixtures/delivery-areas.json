@@ -1,0 +1,19 @@
+{
+  "_about": "Captured from public.delivery_areas and public.delivery_area on heartwell-prod on 17 October 2026, after migration delivery_areas. The TypeScript lookup must give the same answers (tests/delivery-areas.test.ts). Recapture if the areas change.",
+  "areas": [
+    {"slug":"devon","name":"Devon","places":"Exeter, Plymouth, Torquay, Paignton, Newton Abbot, Tavistock, Ivybridge","charge":40,"minWorkingDays":5,"maxWorkingDays":7,"districts":["EX1","EX2","EX3","EX4","EX5","EX6","EX7","EX8","EX9","EX10","EX11","EX12","EX13","EX14","EX15","EX16","EX17","EX18","EX19","EX20","EX21","EX22","EX24","EX25","EX26","EX27","EX28","EX29","EX30","EX31","EX32","EX33","EX34","EX35","EX36","EX37","EX38","EX39","PL1","PL2","PL3","PL4","PL5","PL6","PL7","PL8","PL9","PL16","PL19","PL20","PL21","TQ1","TQ2","TQ3","TQ4","TQ5","TQ6","TQ7","TQ8","TQ9","TQ10","TQ11","TQ12","TQ13","TQ14"]},
+    {"slug":"aberdeen-area","name":"Aberdeen area","places":"Aberdeen, Stonehaven, Inverurie, Banchory, Ellon","charge":40,"minWorkingDays":5,"maxWorkingDays":7,"districts":["AB10","AB11","AB12","AB13","AB14","AB15","AB16","AB21","AB22","AB23","AB24","AB25","AB30","AB31","AB32","AB33","AB34","AB35","AB36","AB39","AB41","AB51","AB52"]},
+    {"slug":"cornwall","name":"Cornwall","places":"Truro, Penzance, St Ives, Newquay, Bodmin, Liskeard, Bude","charge":80,"minWorkingDays":5,"maxWorkingDays":7,"districts":["TR1","TR2","TR3","TR4","TR5","TR6","TR7","TR8","TR9","TR10","TR11","TR12","TR13","TR14","TR15","TR16","TR17","TR18","TR19","TR20","TR26","TR27","PL10","PL11","PL12","PL13","PL14","PL15","PL17","PL18","PL22","PL23","PL24","PL25","PL26","PL27","PL28","PL29","PL30","PL31","PL32","PL33","PL34","PL35","EX23"]},
+    {"slug":"highlands-moray","name":"Scottish Highlands and Moray","places":"Inverness, Nairn, Elgin, Aviemore, Fort William, Mallaig","charge":80,"minWorkingDays":5,"maxWorkingDays":7,"districts":["IV1","IV2","IV3","IV4","IV5","IV6","IV7","IV8","IV9","IV10","IV11","IV12","IV13","IV14","IV15","IV16","IV17","IV18","IV19","IV20","IV30","IV31","IV32","IV36","IV40","IV52","IV53","IV54","IV63","PH19","PH20","PH21","PH22","PH23","PH24","PH25","PH26","PH30","PH31","PH32","PH33","PH34","PH35","PH36","PH37","PH38","PH39","PH40","PH41","PH49","PH50","AB37","AB38","AB56"]},
+    {"slug":"north-east-scotland","name":"North East Scotland","places":"Peterhead, Fraserburgh, Banff, Turriff, Keith","charge":80,"minWorkingDays":5,"maxWorkingDays":7,"districts":["AB42","AB43","AB44","AB45","AB53","AB54","AB55"]},
+    {"slug":"far-north-scotland","name":"Far north of Scotland","places":"Thurso, Wick, Ullapool, Lairg, Gairloch (Caithness and Sutherland)","charge":100,"minWorkingDays":5,"maxWorkingDays":7,"districts":["KW1","KW2","KW3","KW5","KW6","KW7","KW8","KW9","KW10","KW11","KW12","KW13","KW14","IV21","IV22","IV23","IV24","IV25","IV26","IV27","IV28"]}
+  ],
+  "answers": [
+    ["LS6 2AB",null],["M1 1AE",null],["EX4 1AA","devon"],["ex23 8aa","cornwall"],["PL15 7AA","cornwall"],["PL19 0AA","devon"],["PL1 1AA","devon"],
+    ["TQ1 1AA","devon"],["TR1 1AA","cornwall"],["TR26 1AA","cornwall"],["AB10 1AA","aberdeen-area"],["AB39 2AA","aberdeen-area"],
+    ["AB42 1AA","north-east-scotland"],["AB55 5AA","north-east-scotland"],["AB56 1AA","highlands-moray"],["AB37 9AA","highlands-moray"],
+    ["IV2 3AA","highlands-moray"],["IV21 2AA","far-north-scotland"],["IV26 2AA","far-north-scotland"],["IV40 8AA","highlands-moray"],
+    ["KW1 4AA","far-north-scotland"],["KW14 7AA","far-north-scotland"],["PH33 6AA","highlands-moray"],["PH16 5AA",null],["PA34 4AA",null],
+    ["FK17 8AA",null],["DD1 1AA",null],["G1 1AA",null],["EH1 1AA",null]
+  ]
+}

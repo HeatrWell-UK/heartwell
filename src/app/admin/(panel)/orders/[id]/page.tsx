@@ -206,13 +206,14 @@ export default async function OrderPage({ params, searchParams }: Props) {
           <dl className="flex flex-col gap-1 border-t border-zinc-100 pt-2 text-sm">
             <Row label="Items" value={formatPrice(order.items_subtotal)} />
             {order.discount_amount > 0 && <Row label={`Offer${order.promotion_code ? ` ${order.promotion_code}` : ''}${order.discount_tier ? ` (${order.discount_tier})` : ''}`} value={`−${formatPrice(order.discount_amount)}`} />}
-            {order.delivery_total > 0 && <Row label="Delivery extras" value={formatPrice(order.delivery_total)} />}
+            {order.delivery_total > 0 && <Row label="Delivery" value={formatPrice(order.delivery_total)} />}
             <Row label="To collect on delivery" value={formatPrice(order.total_amount)} strong />
           </dl>
           {order.delivery_total > 0 && (
             <div className="flex items-start gap-2 rounded-lg bg-zinc-50 p-3 text-sm">
               <TruckIcon aria-hidden="true" size={18} className="mt-0.5 shrink-0 text-zinc-500" />
               <ul className="flex flex-col gap-0.5">
+                {order.fee_area > 0 && <li>{order.delivery_area ?? 'Delivery area'} · {formatPrice(order.fee_area)}</li>}
                 {order.fee_upstairs > 0 && <li>Upstairs: {order.delivery_has_lift ? `${floorName(order.delivery_floor)}, lift` : `${floorName(order.delivery_floor)}, no lift`} · {formatPrice(order.fee_upstairs)}</li>}
                 {order.fee_assembly > 0 && <li>Assembly · {formatPrice(order.fee_assembly)}</li>}
                 {order.removal_seats ? <li>Old sofa removal: {order.removal_seats} seats · {formatPrice(order.fee_removal)}</li> : null}

@@ -15,6 +15,10 @@ import { isQaVisit, readConsent, sessionFbclid, touchForOrder, track } from '@/l
 import { TRACKING } from '@/config/tracking'
 import { useHydrated } from '@/lib/basket/use-hydrated'
 import { deliveryLines, floorName, quoteDelivery, type DeliverySettings } from '@/lib/delivery/pricing'
+import { areaForPostcode, chargeRange } from '@/lib/delivery/areas'
+import { deliveryDaysText, formatDeliveryDate, isNoDeliveryDay } from '@/lib/delivery/window'
+import type { AreaDelivery } from '@/lib/product/types'
+import { PROMISES } from '@/config/promises'
 import { isUkPhone } from '@/lib/checkout/phone'
 import type { PlainError } from '@/lib/checkout/order'
 import { PayRows } from '@/components/checkout/PayRows'
@@ -27,6 +31,9 @@ interface Props {
   windowLabel: string
   earliestDate: string
   latestDate: string
+  /** The mainland areas that pay a delivery charge, with today's window and first day. */
+  areas: AreaDelivery[]
+  noDeliveryDays: number[]
   lookupAvailable: boolean
 }
 
@@ -34,7 +41,7 @@ type FieldKey = NonNullable<PlainError['field']>
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
-export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, lookupAvailable }: Props) {
+export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, areas, noDeliveryDays, lookupAvailable }: Props) {
   const router = useRouter()
   const basket = useBasket()
   const hydrated = useHydrated()
@@ -85,7 +92,11 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
 
   const items = useMemo(() => basket.lines.map((l) => ({ id: l.id, variantId: l.variantId, materialId: l.materialId, quantity: l.quantity })), [basket.lines])
   const extras = useMemo(() => ({ floor, hasLift: floor > 0 && hasLift, assembly, removal, removalSeats: removal ? removalSeats : null }), [floor, hasLift, assembly, removal, removalSeats])
-  const quoteInput = useMemo(() => ({ items, extras, promotionCode: code || undefined }), [items, extras, code])
+  const canOrderHere = address.outcome.kind === 'mainland' || address.outcome.kind === 'depends'
+  // A charged area's price and slower window, once the postcode is known; the database adds the same charge.
+  const area = canOrderHere ? areaForPostcode(address.postcode, areas) : null
+  const quotePostcode = canOrderHere ? address.postcode : undefined
+  const quoteInput = useMemo(() => ({ items, extras, promotionCode: code || undefined, postcode: quotePostcode }), [items, extras, code, quotePostcode])
   const quoteKey = JSON.stringify(quoteInput)
   const quoteIsCurrent = quote?.key === quoteKey
 
@@ -109,10 +120,12 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const local = quoteDelivery({ floor, hasLift, assembly, removal, removalSeats }, settings)
   const subtotal = basket.subtotal
   const shown = quoteIsCurrent && quote ? quote.value : null
-  const total = shown ? shown.total : subtotal + local.total
+  const total = shown ? shown.total : subtotal + local.total + (area?.charge ?? 0)
+  const areaFee = shown ? shown.delivery.areaFee : (area?.charge ?? 0)
+  const areaName = shown ? shown.delivery.areaName : (area?.name ?? null)
+  const firstDay = area?.earliestDate ?? earliestDate
   const lines = deliveryLines(shown ? shown.delivery : local, settings)
   const madeToOrder = basket.lines.some((l) => l.view.madeToOrder || l.materialId !== null)
-  const canOrderHere = address.outcome.kind === 'free' || address.outcome.kind === 'depends'
   const basketSummary = basket.lines.map((l) => `${l.quantity} x ${l.view.title} (${l.view.option})`).join('; ')
 
   const leadSent = useRef(false)
@@ -157,6 +170,14 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
     track('OrderPlaced', { contents: basket.lines.map((l) => ({ id: l.variantId, quantity: l.quantity, item_price: l.view.unitPrice })), value })
   }
 
+  /** Why this preferred day can't be had, or null. Blank is fine: we agree a day when we ring. */
+  const preferredDateProblem = (value: string): string | null => {
+    if (!value) return null
+    if (isNoDeliveryDay(value, noDeliveryDays)) return `${deliveryDaysText(noDeliveryDays)} Please pick another day.`
+    if (value < firstDay) return `The first day we can deliver${area ? ` to ${area.name}` : ''} is ${formatDeliveryDate(firstDay)}.`
+    return null
+  }
+
   const validate = (): Partial<Record<FieldKey, string>> => {
     const e: Partial<Record<FieldKey, string>> = {}
     if (name.trim().length < 2) e.name = 'Please enter your full name.'
@@ -164,6 +185,8 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
     if (email.trim() && !EMAIL.test(email.trim())) e.email = 'Please check your email address.'
     if (!canOrderHere) e.postcode = address.outcome.kind === 'quote' ? 'This postcode needs a delivery quote.' : 'Please enter your postcode and press Find address.'
     else if (address.line.trim().length < 5) e.address = 'Please choose or type your address.'
+    const dateProblem = preferredDateProblem(preferredDate)
+    if (dateProblem) e.date = dateProblem
     return e
   }
 
@@ -305,7 +328,12 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         <fieldset className={sectionClass} disabled={!canOrderHere && address.outcome.kind === 'quote'}>
           <Legend n={3}>Delivery</Legend>
           <p className="text-[15px] text-slate">
-            Free to the ground floor anywhere on UK Mainland. Most orders arrive {windowLabel}; we ring to book the day.
+            {area
+              ? `Delivery to ${area.name} is ${formatPrice(area.charge)}, to the ground floor. Orders there take ${area.minWorkingDays} to ${area.maxWorkingDays} working days, so most arrive ${area.windowLabel}; we ring to book the day.`
+              : canOrderHere
+                ? `Free to the ground floor at your postcode. Most orders arrive ${windowLabel}; we ring to book the day.`
+                : `Free to the ground floor for most of mainland Britain${areas.length ? `; ${PROMISES.delivery.chargedAreas} pay ${chargeRange(areas)}` : ''}. Most orders arrive ${windowLabel}; we ring to book the day.`}{' '}
+            {deliveryDaysText(noDeliveryDays)}
           </p>
           <Field label="Which floor is the room on?" id={`${id}-floor`}>
             <select
@@ -343,14 +371,17 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
               </select>
             </Field>
           )}
-          <Field label="Preferred delivery day" optional help="We’ll ring to agree the day either way." helpId={`${id}-date-help`} id={`${id}-date`} error={err('date')} errorId={`${id}-date-error`}>
+          <Field label="Preferred delivery day" optional help={`We’ll ring to agree the day either way. ${deliveryDaysText(noDeliveryDays)}`} helpId={`${id}-date-help`} id={`${id}-date`} error={err('date')} errorId={`${id}-date-error`}>
             <TextInput
               id={`${id}-date`}
               type="date"
-              min={earliestDate}
+              min={firstDay}
               max={latestDate}
               value={preferredDate}
-              onChange={(e) => setPreferredDate(e.target.value)}
+              onChange={(e) => {
+                setPreferredDate(e.target.value)
+                setFieldErrors((f) => ({ ...f, date: preferredDateProblem(e.target.value) ?? undefined }))
+              }}
               aria-invalid={!!err('date') || undefined}
               aria-describedby={describedBy('date', `${id}-date-help`)}
             />
@@ -431,7 +462,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         <dl className="flex flex-col gap-1.5 border-t border-line pt-3 text-[15px]">
           <Row label="Items" value={formatPrice(shown ? shown.itemsSubtotal : subtotal)} />
           {shown && shown.discountAmount > 0 && <Row label={shown.promotionCode ? `Offer (${shown.promotionCode})` : shown.adOffer ? 'Your offer' : 'Offer'} value={`−${formatPrice(shown.discountAmount)}`} />}
-          <Row label="Delivery to UK Mainland" value="Free" accent />
+          {areaFee > 0 ? <Row label={`Delivery to ${areaName ?? 'your area'}`} value={formatPrice(areaFee)} /> : <Row label="Delivery" value="Free" accent />}
           {lines.map((l) => (
             <Row key={l.key} label={l.detail ? `${l.label} (${l.detail})` : l.label} value={formatPrice(l.amount)} />
           ))}

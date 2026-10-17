@@ -100,6 +100,8 @@ const row: OrderRowForView = {
   fee_assembly: 0,
   removal_seats: null,
   fee_removal: 0,
+  delivery_area: null,
+  fee_area: 0,
   delivery_total: 50,
   total_amount: 799,
   order_items: [{ title: 'Sample Corner', custom_title: null, sku: 'SC-1', colour_name: 'Grey', material_code: null, material_name: null, material_collection: null, quantity: 1, unit_price: 749 }],

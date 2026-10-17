@@ -29,6 +29,8 @@ export interface FaqFacts {
   upstairsPerExtraFloor: number
   assemblyFee: number
   removalPerSeat: number
+  /** The mainland areas with a delivery charge (delivery_areas). */
+  areas?: { name: string; charge: number }[]
 }
 
 export function faqGroups(facts: FaqFacts | null, extras: { fabricCount: number; sampleLimit: number | null }): FaqGroup[] {
@@ -71,7 +73,7 @@ export function faqGroups(facts: FaqFacts | null, extras: { fabricCount: number;
         {
           id: 'where',
           q: 'Do you deliver to my area?',
-          a: `${PROMISES.delivery.long} Northern Ireland, the Isle of Man, the Channel Islands, the Isle of Wight, the Scottish islands and the Isles of Scilly are delivered by arrangement: enter your postcode on any product page and we’ll tell you straight away, then quote on WhatsApp.`,
+          a: `${PROMISES.delivery.long}${facts?.areas?.length ? ` The charges: ${facts.areas.map((d) => `${d.name} ${formatPrice(d.charge)}`).join(', ')}.` : ''} Northern Ireland, the Isle of Man, the Channel Islands, the Isle of Wight, the Scottish islands and the Isles of Scilly are delivered by arrangement: enter your postcode on any product page and we’ll tell you straight away, then quote on WhatsApp.`,
         },
         ...(facts
           ? [

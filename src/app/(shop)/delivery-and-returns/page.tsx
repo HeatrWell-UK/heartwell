@@ -12,12 +12,13 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Delivery and returns',
-  description: `${PROMISES.delivery.short}, ${PROMISES.delivery.timingShort.toLowerCase()} for most postcodes. Pay on delivery. What extras cost, damaged deliveries and your right to change your mind.`,
+  description: `${PROMISES.delivery.short}, ${PROMISES.delivery.timingShort.toLowerCase()} for most postcodes. Pay on delivery. Where delivery costs extra, damaged deliveries and your right to change your mind.`,
   alternates: { canonical: '/delivery-and-returns' },
 }
 
 const CONTENTS = [
   { id: 'delivery', label: 'Getting it to you' },
+  { id: 'areas', label: 'Where delivery costs extra' },
   { id: 'charges', label: 'What extras cost' },
   { id: 'elsewhere', label: 'Outside UK Mainland' },
   { id: 'paying', label: 'Paying on delivery' },
@@ -33,13 +34,18 @@ const ordinal = (n: number) => `${n}${n % 10 === 1 && n % 100 !== 11 ? 'st' : n 
 export default async function DeliveryAndReturnsPage() {
   const settings = SUPABASE_CONFIGURED ? await getCheckoutSettings().catch(() => null) : null
   const d = settings?.delivery
+  const areas = settings?.areas ?? []
   const days = POLICIES.changeOfMindDays
 
   return (
     <ContentPage
       title="Delivery and returns"
-      intro={<p>Free delivery to UK Mainland addresses, nothing to pay until your furniture is in your room, and plain rules if anything goes wrong.</p>}
-      updated="2026-10-12"
+      intro={
+        <p>
+          Free delivery to most of mainland Britain, nothing to pay until your furniture is in your room, and plain rules if anything goes wrong.
+        </p>
+      }
+      updated="2026-10-17"
       contents={CONTENTS}
       figure={
         <div className="hw-panel flex items-center gap-5 px-5 py-6 sm:gap-8 sm:px-8">
@@ -51,6 +57,12 @@ export default async function DeliveryAndReturnsPage() {
             <li>
               <strong className="font-semibold">Usually {PROMISES.delivery.timingShort}</strong>{settings ? `: order today and most arrive ${settings.windowLabel}.` : '.'}
             </li>
+            {areas.length > 0 && (
+              <li>
+                <strong className="font-semibold">{PROMISES.delivery.chargedAreas}</strong>: a delivery charge and {PROMISES.delivery.chargedTiming},{' '}
+                <a href="#areas">see below</a>.
+              </li>
+            )}
             <li>
               <strong className="font-semibold">Northern Ireland and the islands</strong> by arrangement: <a href="#elsewhere">see below</a>.
             </li>
@@ -70,14 +82,51 @@ export default async function DeliveryAndReturnsPage() {
         not sure it will fit, <Link href="/will-it-fit">check before you order</Link> or ask us: it’s much easier to sort out beforehand than on the day.
       </p>
 
+      {areas.length > 0 && (
+        <>
+          <h2 id="areas">Where delivery costs extra</h2>
+          <p>
+            Delivery is free everywhere else on the mainland. These areas are further from us, so delivery there has a charge and takes a little longer. The
+            charge is added as soon as you enter your postcode, before you order, and it’s paid with everything else on delivery.
+          </p>
+          <table>
+            <caption className="sr-only">Areas with a delivery charge</caption>
+            <thead>
+              <tr>
+                <th scope="col">Area</th>
+                <th scope="col">Charge</th>
+                <th scope="col">Delivery time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {areas.map((a) => (
+                <tr key={a.slug}>
+                  <th scope="row">
+                    {a.name}
+                    {a.places && <span className="block text-sm font-normal text-slate">{a.places}</span>}
+                  </th>
+                  <td>{formatPrice(a.charge)}</td>
+                  <td>
+                    {a.minWorkingDays} to {a.maxWorkingDays} working days
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p>
+            Not sure which side of a line you’re on? Enter your postcode on any product page and it tells you the price and delivery time straight away.
+          </p>
+        </>
+      )}
+
       <h2 id="charges">What extras cost</h2>
       <p>Choose any of these at checkout. They’re paid with your order on delivery, never in advance.</p>
       <table>
         <caption className="sr-only">Delivery and extras, all paid on delivery</caption>
         <tbody>
           <tr>
-            <th scope="row">Delivery to UK Mainland, ground floor</th>
-            <td>Free</td>
+            <th scope="row">Delivery to the ground floor</th>
+            <td>{areas.length > 0 ? <>Free for most postcodes (<a href="#areas">areas with a charge</a>)</> : 'Free'}</td>
           </tr>
           {d && (
             <>

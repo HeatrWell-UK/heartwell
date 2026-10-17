@@ -26,6 +26,8 @@ export const QuoteInput = z.object({
   items: z.array(Item).min(1).max(30),
   extras: Extras,
   promotionCode: z.string().trim().max(24).optional(),
+  /** Once known: a charged delivery area's price is added by the database. */
+  postcode: z.string().trim().max(10).optional(),
 })
 export type QuoteInput = z.infer<typeof QuoteInput>
 
@@ -74,6 +76,7 @@ export function pricingPayload(q: QuoteInput, offerToken: string | null = null) 
     },
     promotion_code: q.promotionCode?.trim().toUpperCase() || null,
     offer_entitlement_token: offerToken,
+    postcode: q.postcode?.trim() || null,
   }
 }
 
@@ -186,6 +189,14 @@ export function explainOrderError(dbMessage: string): PlainError {
       return { code, field: 'postcode', message: 'Please check your postcode.' }
     case 'NOT_MAINLAND':
       return { code, field: 'postcode', message: 'We deliver to this postcode by arrangement, not through the online checkout. Please ask us for a quote.' }
+    case 'DELIVERY_DATE_CLOSED': {
+      const day = dbMessage.match(/^DELIVERY_DATE_CLOSED: ([A-Za-z]+)/)?.[1]
+      return {
+        code,
+        field: 'date',
+        message: `We don’t deliver on ${day ? `${day}s` : 'that day'}. Please pick another day, or leave it blank and we’ll agree one when we ring.`,
+      }
+    }
     case 'BAD_DELIVERY_DATE':
     case 'DELIVERY_DATE_TOO_SOON':
     case 'DELIVERY_DATE_TOO_FAR':

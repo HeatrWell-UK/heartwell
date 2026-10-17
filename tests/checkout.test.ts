@@ -50,6 +50,7 @@ describe('checkout input', () => {
       extras: { floor: 2, has_lift: true, assembly: true, removal: false, removal_seats: null },
       promotion_code: 'EXTRA20',
       offer_entitlement_token: null,
+      postcode: 'LS6 2AB',
     })
     const p = orderPayload(order(), { appEnv: 'production', mixedAreaEvidence: null })
     expect(p).toMatchObject({
@@ -120,6 +121,7 @@ const emailOrder: OrderEmailData = {
   itemsSubtotal: 998,
   discountAmount: 20,
   promotionCode: 'EXTRA20',
+  delivery: { label: 'Delivery', amount: 0 },
   extras: [{ label: 'Carrying upstairs', detail: '2nd floor', amount: 30 }],
   deliveryTotal: 30,
   totalAmount: 1008,
@@ -144,6 +146,17 @@ describe('order emails', () => {
     expect(e.text).toContain(confirmUrl)
     expect(e.text).toContain('To pay on delivery: £1,008')
     expect(e.text).toContain('Tuesday 20 October')
+    expect(e.text).toContain('Delivery: Free')
+  })
+
+  it('shows a charged delivery area’s price as the delivery line', () => {
+    const e = customerOrderEmail(
+      { ...emailOrder, delivery: { label: 'Delivery to Devon', amount: 40 }, deliveryTotal: 70, totalAmount: 1048 },
+      { confirmUrl, windowLabel: null, shop: { email: 'shop@example.test', phoneDisplay: null, whatsAppHref: null }, now: new Date('2026-10-06T10:00:00Z') },
+    )
+    expect(e.text).toContain('Delivery to Devon: £40')
+    expect(e.html).toContain('Delivery to Devon')
+    expect(e.text).toContain('To pay on delivery: £1,048')
   })
 
   it('gives the shop the customer, a WhatsApp ask-to-confirm link and a copy block with SKUs', () => {

@@ -43,7 +43,7 @@ export default async function HomePage() {
       {sofas && <ShopByShape tree={tree} department={sofas} listing={listing} />}
       <OurRanges ranges={homeRanges(ranges)} total={ranges.length} />
       <FabricStory collections={fabrics} />
-      <DeliveryMap windowLabel={delivery?.windowLabel ?? null} />
+      <DeliveryMap delivery={delivery} />
       <HomeFaq delivery={delivery} fabricCount={fabricCount} />
     </div>
   )

@@ -112,7 +112,7 @@ describe('will it fit', () => {
 
 describe('postcode check', () => {
   it('answers free delivery for UK Mainland', () => {
-    expect(postcodeOutcome('ls62ab')).toEqual({ kind: 'free', area: 'LS6', postcode: 'LS6 2AB' })
+    expect(postcodeOutcome('ls62ab')).toEqual({ kind: 'mainland', area: 'LS6', postcode: 'LS6 2AB' })
   })
 
   it('sends islands and Northern Ireland to a quote, naming the place', () => {

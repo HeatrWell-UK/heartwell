@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Button, ButtonLink } from '@/components/ui/Button'
 import { Price } from '@/components/ui/Price'
 import { FEATURES } from '@/config/features'
+import { PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
 import { useBasket } from '@/lib/basket/store'
 import { useHydrated } from '@/lib/basket/use-hydrated'
@@ -155,14 +156,14 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
               </div>
             )}
             <div className="flex justify-between">
-              <dt>Delivery to UK Mainland</dt>
-              <dd className="font-semibold text-velvet">Free</dd>
+              <dt>Delivery</dt>
+              <dd className="font-semibold text-velvet">Free for most postcodes</dd>
             </div>
             <PayRows total={toPay} className="mt-1" />
           </dl>
           <p className="text-sm leading-snug text-slate">
-            Cash or bank transfer to the driver, once it&rsquo;s in your room. Upstairs delivery, assembly and taking your old sofa away can be
-            added at checkout.
+            Cash or bank transfer to the driver, once it&rsquo;s in your room. {PROMISES.delivery.chargedAreas} pay a delivery charge, shown
+            at checkout. Upstairs delivery, assembly and taking your old sofa away can be added there too.
           </p>
           {FEATURES.checkout ? (
             <ButtonLink href="/checkout" block>

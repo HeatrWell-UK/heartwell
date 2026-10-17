@@ -465,6 +465,45 @@ export type Database = {
           },
         ]
       }
+      delivery_areas: {
+        Row: {
+          charge: number
+          created_at: string
+          districts: string[]
+          max_working_days: number
+          min_working_days: number
+          name: string
+          places: string
+          slug: string
+          sort: number
+          updated_at: string
+        }
+        Insert: {
+          charge: number
+          created_at?: string
+          districts?: string[]
+          max_working_days: number
+          min_working_days: number
+          name: string
+          places?: string
+          slug: string
+          sort?: number
+          updated_at?: string
+        }
+        Update: {
+          charge?: number
+          created_at?: string
+          districts?: string[]
+          max_working_days?: number
+          min_working_days?: number
+          name?: string
+          places?: string
+          slug?: string
+          sort?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_log: {
         Row: {
           created_at: string
@@ -948,6 +987,7 @@ export type Database = {
           customer_phone: string
           customer_user_agent: string | null
           delivered_at: string | null
+          delivery_area: string | null
           delivery_floor: number
           delivery_has_lift: boolean
           delivery_total: number
@@ -955,6 +995,7 @@ export type Database = {
           discount_amount: number
           discount_tier: string | null
           fbclid: string | null
+          fee_area: number
           fee_assembly: number
           fee_removal: number
           fee_upstairs: number
@@ -1017,6 +1058,7 @@ export type Database = {
           customer_phone: string
           customer_user_agent?: string | null
           delivered_at?: string | null
+          delivery_area?: string | null
           delivery_floor?: number
           delivery_has_lift?: boolean
           delivery_total?: number
@@ -1024,6 +1066,7 @@ export type Database = {
           discount_amount?: number
           discount_tier?: string | null
           fbclid?: string | null
+          fee_area?: number
           fee_assembly?: number
           fee_removal?: number
           fee_upstairs?: number
@@ -1086,6 +1129,7 @@ export type Database = {
           customer_phone?: string
           customer_user_agent?: string | null
           delivered_at?: string | null
+          delivery_area?: string | null
           delivery_floor?: number
           delivery_has_lift?: boolean
           delivery_total?: number
@@ -1093,6 +1137,7 @@ export type Database = {
           discount_amount?: number
           discount_tier?: string | null
           fbclid?: string | null
+          fee_area?: number
           fee_assembly?: number
           fee_removal?: number
           fee_upstairs?: number
@@ -1610,6 +1655,7 @@ export type Database = {
           delivery_min_working_days: number
           id: boolean
           max_floor: number
+          no_delivery_days: number[]
           offer_tier_high: number
           offer_tier_mid: number
           offer_tier_standard: number
@@ -1637,6 +1683,7 @@ export type Database = {
           delivery_min_working_days?: number
           id?: boolean
           max_floor?: number
+          no_delivery_days?: number[]
           offer_tier_high?: number
           offer_tier_mid?: number
           offer_tier_standard?: number
@@ -1664,6 +1711,7 @@ export type Database = {
           delivery_min_working_days?: number
           id?: boolean
           max_floor?: number
+          no_delivery_days?: number[]
           offer_tier_high?: number
           offer_tier_mid?: number
           offer_tier_standard?: number
@@ -1937,6 +1985,7 @@ export type Database = {
       }
       create_whatsapp_enquiry: { Args: { p_input: Json }; Returns: Json }
       delete_test_order: { Args: { p_order_id: string }; Returns: Json }
+      delivery_area: { Args: { p_postcode: string }; Returns: Json }
       digest_data: { Args: { p_ticket: string }; Returns: Json }
       health_ping: { Args: never; Returns: Json }
       health_report: {

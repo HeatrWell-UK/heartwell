@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const sizes = rangeSizeCount(range)
   return {
     title: `${range.name} sofas`,
-    description: `The ${range.name} range at Heartwell: ${sizes} ${sizes === 1 ? 'size' : 'sizes'} from ${formatPrice(range.price)}${range.madeToOrder ? ', made to order in your choice of fabric' : ''}. Free UK Mainland delivery, pay on delivery.`,
+    description: `The ${range.name} range at Heartwell: ${sizes} ${sizes === 1 ? 'size' : 'sizes'} from ${formatPrice(range.price)}${range.madeToOrder ? ', made to order in your choice of fabric' : ''}. Free delivery to most of Britain, pay on delivery.`,
     alternates: { canonical: `/ranges/${range.slug}` },
   }
 }

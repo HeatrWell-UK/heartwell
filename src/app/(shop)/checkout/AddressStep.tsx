@@ -43,7 +43,7 @@ export function AddressStep({
   const [typed, setTyped] = useState(() => {
     if (value.postcode) return value.postcode
     const saved = postcodeOutcome(recallPostcode())
-    return saved.kind === 'free' ? saved.postcode : ''
+    return saved.kind === 'mainland' ? saved.postcode : ''
   })
   const [mode, setMode] = useState<Mode>(value.line ? 'manual' : 'idle')
   const [addresses, setAddresses] = useState<string[]>([])
@@ -59,9 +59,9 @@ export function AddressStep({
   const find = async () => {
     const outcome = postcodeOutcome(typed)
     setNotice(null)
-    onChange({ postcode: outcome.kind === 'free' || outcome.kind === 'quote' || outcome.kind === 'depends' ? outcome.postcode : typed, outcome, line: '' })
-    if (outcome.kind === 'free' || outcome.kind === 'quote' || outcome.kind === 'depends') setTyped(outcome.postcode)
-    if (outcome.kind !== 'free' && outcome.kind !== 'depends') {
+    onChange({ postcode: outcome.kind === 'mainland' || outcome.kind === 'quote' || outcome.kind === 'depends' ? outcome.postcode : typed, outcome, line: '' })
+    if (outcome.kind === 'mainland' || outcome.kind === 'quote' || outcome.kind === 'depends') setTyped(outcome.postcode)
+    if (outcome.kind !== 'mainland' && outcome.kind !== 'depends') {
       setMode('idle')
       return
     }
@@ -147,7 +147,7 @@ export function AddressStep({
         </p>
       )}
 
-      {mode === 'list' && (o.kind === 'free' || o.kind === 'depends') && (
+      {mode === 'list' && (o.kind === 'mainland' || o.kind === 'depends') && (
         <div className={fieldClass}>
           <label htmlFor={`${id}-pick`} className={labelClass}>
             Choose your address
@@ -175,7 +175,7 @@ export function AddressStep({
         </div>
       )}
 
-      {mode === 'manual' && (o.kind === 'free' || o.kind === 'depends') && (
+      {mode === 'manual' && (o.kind === 'mainland' || o.kind === 'depends') && (
         <div className="flex flex-col gap-3">
           {notice && <p className="text-[15px] text-slate">{notice}</p>}
           <div className={fieldClass}>

@@ -29,6 +29,8 @@ export default async function CheckoutPage() {
         windowLabel={s.windowLabel}
         earliestDate={s.earliestDate}
         latestDate={s.latestDate}
+        areas={s.areas}
+        noDeliveryDays={s.noDeliveryDays}
         lookupAvailable={ADDRESS_LOOKUP_CONFIGURED}
       />
     </div>

@@ -170,7 +170,7 @@ export function ProductPurchase({
             </h1>
             <p className="flex items-baseline gap-3 pt-1">
               <Price amount={price} className="text-[34px] leading-none" />
-              <span className="text-[15px] font-semibold text-velvet">Free delivery</span>
+              <span className="text-[15px] font-semibold text-velvet">Free delivery for most postcodes</span>
             </p>
             {/* What's paid when: the shop's whole promise, in two lines. */}
             <dl className="flex flex-col rounded-[14px] border border-line px-3.5 text-[15px]">
