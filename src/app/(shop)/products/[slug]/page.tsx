@@ -12,6 +12,7 @@ import { RelatedRail } from '@/components/product/ProductCard'
 import { CONTACT, whatsAppHref } from '@/config/contact'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { SITE_URL } from '@/config/site'
+import { OPEN_GRAPH_BASE } from '@/config/brand'
 import { getDeliveryInfo, getProductPage } from '@/lib/product/load'
 import { getCategories, getListing, sentenceCase } from '@/lib/catalogue/listing'
 import { categoryHref, trail } from '@/lib/catalogue/tree'
@@ -47,7 +48,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     description,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
-      type: 'website',
+      ...OPEN_GRAPH_BASE,
       title,
       description,
       url: `/products/${product.slug}`,

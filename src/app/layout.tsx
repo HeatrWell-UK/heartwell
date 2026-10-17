@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Gloock, Figtree } from 'next/font/google'
 import './globals.css'
-import { BRAND, BRAND_COLOURS } from '@/config/brand'
+import { BRAND, BRAND_COLOURS, OPEN_GRAPH_BASE } from '@/config/brand'
 import { META_DESCRIPTION } from '@/config/promises'
 import { METADATA_BASE } from '@/config/site'
 import { SITE_INDEXABLE } from '@/config/env'
@@ -22,12 +22,7 @@ export const metadata: Metadata = {
   },
   description: META_DESCRIPTION,
   applicationName: BRAND.name,
-  openGraph: {
-    type: 'website',
-    locale: 'en_GB',
-    siteName: BRAND.name,
-    url: '/',
-  },
+  openGraph: OPEN_GRAPH_BASE,
   robots: SITE_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
   formatDetection: { telephone: false },
 }
