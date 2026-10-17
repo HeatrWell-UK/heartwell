@@ -36,10 +36,19 @@ export function productPrice(p: ProductPageData): number {
 export function productDescription(p: ProductPageData): string {
   if (p.seoDescription) return p.seoDescription
   const colours = p.variants.map((v) => v.colourName).filter(Boolean)
-  const colourText = colours.length ? ` in ${colours.length > 1 ? `${colours.slice(0, -1).join(', ')} or ${colours.at(-1)}` : colours[0]}` : ''
   const made = p.madeToOrder ? ' Made to order.' : ''
-  return `${p.title}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.short}. ${PROMISES.payment.short}: cash or bank transfer on delivery.`
+  const text = (colourText: string) =>
+    `${p.title}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.short}. ${PROMISES.payment.short}: cash or bank transfer on delivery.`
+  // Google shows about 160 characters, so a long colour list becomes a count
+  // rather than cutting off how paying works at the end.
+  const options = colours.length > 1
+    ? [` in ${colours.slice(0, -1).join(', ')} or ${colours.at(-1)}`, ` in ${colours.length} colours`]
+    : [colours.length ? ` in ${colours[0]}` : '']
+  return options.map(text).find((t) => t.length <= DESCRIPTION_MAX) ?? text(options.at(-1)!)
 }
+
+/** About what Google shows of a meta description. */
+export const DESCRIPTION_MAX = 160
 
 /** JSON for a <script type="application/ld+json">, safe to inline. */
 export function jsonLdString(data: unknown): string {
@@ -79,17 +88,22 @@ export function returnPolicy(madeToOrder: boolean) {
 
 export function productJsonLd(p: ProductPageData, siteUrl: string, delivery: { minDays: number; maxDays: number } | null = null) {
   const url = `${siteUrl}/products/${p.slug}`
-  const availability = p.madeToOrder ? 'https://schema.org/MadeToOrder' : 'https://schema.org/InStock'
+  // Made-to-order pieces are on sale now and arrive in the same delivery window,
+  // so they're in stock, as the Meta and Google feeds say. Google rejects
+  // schema.org/MadeToOrder (Rich Results Test, 17 October 2026); the return
+  // policy below is what tells it they're made to order.
+  const availability = 'https://schema.org/InStock'
   const shipping = shippingDetails(delivery)
   const returns = returnPolicy(p.madeToOrder)
   const images = [...p.variants.map((v) => v.image), ...p.gallery].filter((x): x is string => Boolean(x))
+  const description = productDescription(p)
   return {
     '@context': 'https://schema.org',
     '@type': 'ProductGroup',
     name: p.title,
     url,
     productGroupID: p.slug,
-    description: productDescription(p),
+    description,
     brand: { '@type': 'Brand', name: BRAND.name },
     ...(images.length ? { image: [...new Set(images)] } : {}),
     // Ratings only from real, approved reviews: nothing at all until the first one.
@@ -110,6 +124,7 @@ export function productJsonLd(p: ProductPageData, siteUrl: string, delivery: { m
     hasVariant: p.variants.map((v) => ({
       '@type': 'Product',
       name: v.colourName ? `${p.title}, ${v.colourName}` : p.title,
+      description,
       sku: v.sku,
       ...(v.colourName ? { color: v.colourName } : {}),
       ...(v.image ? { image: v.image } : {}),

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { Hero } from '@/components/home/Hero'
 import { HowPayingWorks } from '@/components/home/HowPayingWorks'
 import { ShopByShape } from '@/components/home/ShopByShape'
@@ -14,6 +15,9 @@ import { SITE_URL } from '@/config/site'
 
 // Rebuilt at most every five minutes, so the delivery dates and featured ranges stay current.
 export const revalidate = 300
+
+// Title, description and share card come from the root layout.
+export const metadata: Metadata = { alternates: { canonical: '/' } }
 
 /**
  * The home page (docs/DESIGN.md, revision 3): the owner's room with the promise

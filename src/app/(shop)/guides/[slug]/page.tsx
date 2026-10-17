@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ContentPage, Note } from '@/components/content/ContentPage'
-import { BRAND } from '@/config/brand'
+import { BRAND, OPEN_GRAPH_BASE } from '@/config/brand'
 import { SITE_URL } from '@/config/site'
 import { GUIDES, guideBySlug, type GuideBlock } from '@/content/guides'
 import { jsonLdString } from '@/lib/product/seo'
@@ -22,7 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: guide.title,
     description: guide.summary,
     alternates: { canonical: `/guides/${guide.slug}` },
-    openGraph: { type: 'article', title: guide.title, description: guide.summary, url: `/guides/${guide.slug}` },
+    // Its own openGraph replaces the layout's, share picture included, so both come back in here.
+    openGraph: {
+      ...OPEN_GRAPH_BASE,
+      type: 'article',
+      title: guide.title,
+      description: guide.summary,
+      url: `/guides/${guide.slug}`,
+      images: [{ url: '/opengraph-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
+    },
   }
 }
 

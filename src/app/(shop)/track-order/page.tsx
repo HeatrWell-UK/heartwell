@@ -5,6 +5,8 @@ export const metadata: Metadata = {
   title: 'Track my order',
   description: 'See where your Heartwell order is, with your order reference and delivery postcode.',
   alternates: { canonical: '/track-order' },
+  // A form for customers with an order, nothing to find in search; links from it still count.
+  robots: { index: false, follow: true },
 }
 
 export default function TrackOrderPage() {

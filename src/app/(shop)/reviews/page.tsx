@@ -11,7 +11,7 @@ import { ukDate } from '@/lib/format'
 
 export const metadata: Metadata = {
   title: 'Reviews',
-  description: 'Reviews of Heartwell sofas, only from people who bought from us.',
+  description: 'Reviews of Heartwell sofas, only from people who bought from us. Made to order, delivered free across UK Mainland and paid for on delivery.',
   alternates: { canonical: '/reviews' },
 }
 export const revalidate = 300

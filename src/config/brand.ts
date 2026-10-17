@@ -9,6 +9,14 @@ export const BRAND = {
     'Sofas made to order, delivered free across UK Mainland, and paid for on the doorstep once they are in your room.',
 } as const
 
+/**
+ * What every page's share card carries. A page that sets its own openGraph
+ * replaces the layout's whole entry, so it spreads this in. No url here: a
+ * page without its own og:url is shared as the address it was opened at,
+ * where a shared one would turn every share into the home page on Facebook.
+ */
+export const OPEN_GRAPH_BASE = { type: 'website', locale: 'en_GB', siteName: BRAND.name } as const
+
 export const BRAND_COLOURS = {
   velvet: '#8E1B2E',
   wine: '#4A0D17',

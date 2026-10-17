@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { backOptions, checkFit, pickFabric, pickVariant, postcodeOutcome, productHref, sizeOptions } from '@/lib/product/helpers'
 import { measurementLayout } from '@/lib/product/measurements'
 import { specRows } from '@/lib/product/specs'
-import { jsonLdString, productJsonLd, shareImageUrl } from '@/lib/product/seo'
+import { DESCRIPTION_MAX, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
 import { fromPrice, unitPrice } from '@/lib/catalogue/pricing'
 import type { ProductPageData, SiblingView, VariantView } from '@/lib/product/types'
 
@@ -193,11 +193,23 @@ describe('search and sharing', () => {
     } as unknown as ProductPageData
     const data = productJsonLd(p, 'https://example.test')
     expect(data['@type']).toBe('ProductGroup')
-    expect(data.hasVariant.map((v) => [v.sku, v.offers.price, v.offers.availability])).toEqual([
-      ['S-G', '749.00', 'https://schema.org/MadeToOrder'],
-      ['S-B', '769.00', 'https://schema.org/MadeToOrder'],
+    // Google accepts InStock, not MadeToOrder; the return policy carries made to order.
+    expect(data.hasVariant.map((v) => [v.sku, v.offers.price, v.offers.availability, v.description])).toEqual([
+      ['S-G', '749.00', 'https://schema.org/InStock', data.description],
+      ['S-B', '769.00', 'https://schema.org/InStock', data.description],
     ])
+    expect(data.hasVariant[0]?.offers.hasMerchantReturnPolicy.returnPolicyCategory).toBe('https://schema.org/MerchantReturnNotPermitted')
     expect(JSON.stringify(data)).not.toMatch(/aggregateRating|ratingValue/)
     expect(jsonLdString({ a: '</script>' })).toBe('{"a":"\\u003c/script>"}')
+  })
+
+  it('keeps the meta description short enough for Google, counting colours when there are many', () => {
+    const p = (colours: string[], title = 'Sims 5 Seater Corner High Back') =>
+      ({ title, basePrice: 749, madeToOrder: true, seoDescription: null, variants: colours.map((c, i) => variant(`S-${i}`, c)) }) as unknown as ProductPageData
+    expect(productDescription(p(['Grey', 'Black'], 'Sims 3 Seater'))).toMatch(/^Sims 3 Seater in Grey or Black, £749\. Made to order\./)
+    const many = productDescription(p(['Grey', 'Black', 'Navy Blue', 'Beige', 'Silver']))
+    expect(many).toMatch(/^Sims 5 Seater Corner High Back in 5 colours, £749\./)
+    expect(many.length).toBeLessThanOrEqual(DESCRIPTION_MAX)
+    expect(many).toMatch(/cash or bank transfer on delivery\.$/)
   })
 })
