@@ -1,5 +1,7 @@
-// Google Merchant Center's feed, built and tested but dormant: it answers 404
-// until FEATURES.googleFeed is switched on (when Google Shopping is wanted).
+
+// Google Merchant Center's feed, for free listings (switched on in Phase 20).
+// FEATURES.googleFeed turns it off again (404). Delivery prices and times come
+// from Merchant Center's own settings, by postcode (docs/MERCHANT-CENTER.md).
 
 import { after } from 'next/server'
 import { FEATURES } from '@/config/features'

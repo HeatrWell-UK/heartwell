@@ -10,7 +10,7 @@ import { getCategories, getFabricLibrary, getListing, rangesFrom } from '@/lib/c
 import { homeRanges } from '@/lib/home/picks'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { getDeliveryInfo } from '@/lib/product/load'
-import { jsonLdString, organizationJsonLd } from '@/lib/product/seo'
+import { jsonLdString, organizationJsonLd, websiteJsonLd } from '@/lib/product/seo'
 import { SITE_URL } from '@/config/site'
 
 // Rebuilt at most every five minutes, so the delivery dates and featured ranges stay current.
@@ -37,7 +37,7 @@ export default async function HomePage() {
 
   return (
     <div className="pb-16 lg:pb-24">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(organizationJsonLd(SITE_URL)) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString([organizationJsonLd(SITE_URL), websiteJsonLd(SITE_URL)]) }} />
       <Hero />
       <HowPayingWorks />
       {sofas && <ShopByShape tree={tree} department={sofas} listing={listing} />}

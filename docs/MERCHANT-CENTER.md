@@ -343,6 +343,12 @@ Two districts are part island, part mainland (IV40 includes Raasay, PA34 include
 
 Settings → Shipping and returns → **Returns** → add a policy for the United Kingdom: **14 days** from delivery, customer pays the return delivery, refund within 14 days of the item coming back, returns by arrangement (email or WhatsApp). Made-to-order pieces can't be returned for a change of mind (faults always can), as `/delivery-and-returns` says. Return policy link: `https://heartwellsofa.co.uk/delivery-and-returns`.
 
-## 4. Products
+## 4. Products (the feed, on since Phase 20)
 
-The site has a Google product feed built and switched off (`/feeds/google-merchant.xml`, Phase 20 switches it on). It carries no delivery price: Merchant Center's settings above decide that, by postcode. Until it's on, Merchant Center can read the products from the site's own product data (Products → Add products → from your website).
+Feed address: **`https://heartwellsofa.co.uk/feeds/google-merchant.xml`** (also in Admin → Ad links, with when Google last fetched it).
+
+Merchant Center → **Products** → **Add products** → **Add a file** → **Enter a link to your file**: paste the address, name it "Heartwell feed", country **United Kingdom**, language **English**, fetch **daily**. If Merchant Center already reads products from the website, keep the feed and remove the website source once the feed shows its products, so each product is listed once.
+
+What's in it: one item per colourway that has its own photo (the same items as Meta's catalogue), priced from the database, with `identifier_exists: no` (made for us, no barcode), `item_group_id` and colour for the colourways of one product, measurements (`product_width`, `product_length`, `product_height`) and the product's highlights. There's no `shipping` in the feed: Merchant Center's delivery settings (sections 1 and 2) set it by postcode, which a feed can't. Search pages can't say it by postcode either (Google accepts postcodes in page data only for Australia, Canada and the US), so these settings are the one place Google learns the delivery charges and the 5 to 7 day areas.
+
+After the first fetch, check **Products → Needs attention**. Common first-day notes and what to do: "Missing shipping information" (finish sections 1 and 2), "Missing return policy" (section 3), "Pending initial review" (wait 3 to 5 working days).

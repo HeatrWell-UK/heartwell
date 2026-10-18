@@ -7,6 +7,8 @@ export const BRAND = {
   tagline: 'Sofas made to order, delivered free to most of Britain, paid for on delivery',
   shortDescription:
     'Sofas made to order, delivered free to most of mainland Britain, and paid for on the doorstep once they are in your room.',
+  /** Other names people know the shop by (the social profiles, the domain), for search engines. */
+  alternateNames: ['Heartwell Sofa', 'heartwellsofa.co.uk'],
 } as const
 
 /**

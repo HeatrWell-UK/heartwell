@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { basketOfferAmount, classifyPaidLanding, offerEnds, offerToken, tierAmount, type TierAmounts } from '@/lib/offers/paid'
-import { buildFeed, catalogueLink, feedAgent, googleFeedXml, itemDescription, metaFeedXml, priceBand, type FeedProductRow } from '@/lib/catalogue/feed'
+import { buildFeed, catalogueLink, feedAgent, footprint, googleFeedXml, itemDescription, metaFeedXml, priceBand, type FeedProductRow } from '@/lib/catalogue/feed'
 import { adLink, META_URL_PARAMETERS, PROFILE_LINKS, profileLink, testAdLink } from '@/lib/admin/ad-links'
 import { buildStatusChecks, type AdminStatusData, type StatusContext } from '@/lib/admin/status'
 import { pricingPayload } from '@/lib/checkout/order'
@@ -185,12 +185,22 @@ describe('catalogue feed', () => {
     expect(xml).not.toMatch(/confirm-order|track-order|\/order\/|HW-1\d{5}/)
   })
 
-  it('keeps a Google version ready (Google’s spellings, no Meta tags)', () => {
-    const xml = googleFeedXml(buildFeed([product()], SITE).items, SITE)
+  it('gives Google its own version (Google’s spellings, measurements, no Meta tags)', () => {
+    const xml = googleFeedXml(buildFeed([product({ highlights: ['Foam seat cushions'] })], SITE).items, SITE)
     expect(xml).toContain('<g:availability>in_stock</g:availability>')
     expect(xml).toContain('<g:identifier_exists>no</g:identifier_exists>')
+    expect(xml).toContain('<g:product_width>210 cm</g:product_width>')
+    expect(xml).toContain('<g:product_length>95 cm</g:product_length>')
+    expect(xml).toContain('<g:product_height>90 cm</g:product_height>')
+    expect(xml).toContain('<g:product_highlight>Foam seat cushions</g:product_highlight>')
     expect(xml).not.toContain('fb_product_category')
     expect(xml).not.toContain('utm_')
+    expect(xml).not.toContain('<g:shipping>')
+  })
+
+  it('measures a corner by its two sides', () => {
+    expect(footprint({ width_cm: null, depth_cm: 90, height_cm: 95, side_a_cm: 200, side_b_cm: 260 })).toEqual({ width: 260, length: 200, height: 95 })
+    expect(footprint({ width_cm: 198, depth_cm: 94, height_cm: 97, side_a_cm: null, side_b_cm: null })).toEqual({ width: 198, length: 94, height: 97 })
   })
 
   it('knows Meta’s fetcher from anyone else', () => {

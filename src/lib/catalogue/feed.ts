@@ -1,5 +1,5 @@
 // The product feeds: Meta's catalogue (for catalogue ads) and Google's
-// Merchant Center feed (built, kept dormant until Google Shopping is wanted).
+// Merchant Center feed (free listings, switched on in Phase 20).
 // Pure: the rows come in, items and XML come out; src/lib/catalogue/feed-load.ts
 // reads the database.
 //
@@ -72,6 +72,9 @@ export interface FeedItem {
   productType: string | null
   /** range · made to order · price band · offer tier · type, for product sets in Commerce Manager. */
   customLabels: [string, string, string, string, string]
+  /** Its footprint and height in centimetres, for Google (product_width, product_length, product_height). */
+  dimensions: { width: number | null; length: number | null; height: number | null }
+  highlights: string[]
 }
 
 export type LeftOutReason = 'no-photo' | 'no-price'
@@ -104,6 +107,20 @@ export function priceBand(price: number): string {
 const TIER_LABEL: Record<OfferTier, string> = { HIGH: 'offer high', MID: 'offer mid', STANDARD: 'offer standard', EXCLUDED: 'no offer' }
 
 const clip = (text: string, max: number) => (text.length <= max ? text : `${text.slice(0, max - 1).trimEnd()}…`)
+
+// Google's limits for product_highlight.
+const HIGHLIGHTS_MAX = 10
+const HIGHLIGHT_MAX = 150
+
+/**
+ * The space it takes, as Google asks for it: width the longest side, length
+ * the other way (a straight sofa's depth, a corner's other side), and height.
+ */
+export function footprint(s: SizeFields): FeedItem['dimensions'] {
+  const { width_cm: w, depth_cm: d, height_cm: h, side_a_cm: a, side_b_cm: b } = s
+  if (a && b) return { width: Math.max(w ?? 0, a, b), length: Math.min(a, b), height: h }
+  return { width: w, length: d, height: h }
+}
 
 function itemTitle(p: FeedProductRow, v: FeedVariantRow): string {
   const option = [v.colourName, v.materialLabel].filter(Boolean).join(' ')
@@ -173,6 +190,8 @@ export function buildFeed(products: FeedProductRow[], siteUrl: string): { items:
           p.offerTier ? TIER_LABEL[p.offerTier] : 'no offer',
           clip(p.typeName.toLowerCase(), 100),
         ],
+        dimensions: footprint(p.size),
+        highlights: p.highlights.slice(0, HIGHLIGHTS_MAX).map((h) => clip(h, HIGHLIGHT_MAX)),
       })
     }
     // Meta groups colourways by item_group_id; a product with one item in the feed has no group.
@@ -270,7 +289,9 @@ export function metaFeedXml(items: FeedItem[], siteUrl: string): string {
   )
 }
 
-/** Google Merchant Center's feed. Dormant: its route answers 404 until switched on. */
+const centimetres = (n: number | null) => (n && n > 0 ? `${Math.round(n)} cm` : null)
+
+/** Google Merchant Center's feed (switched on in Phase 20; delivery comes from Merchant Center's settings). */
 export function googleFeedXml(items: FeedItem[], siteUrl: string): string {
   return rss(
     items.map((i) =>
@@ -292,6 +313,10 @@ export function googleFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('color', i.colour),
         tag('material', i.material),
         tag('size', i.size),
+        tag('product_width', centimetres(i.dimensions.width)),
+        tag('product_length', centimetres(i.dimensions.length)),
+        tag('product_height', centimetres(i.dimensions.height)),
+        ...i.highlights.map((h) => tag('product_highlight', h)),
         tag('google_product_category', i.googleCategory),
         tag('product_type', i.productType),
         ...i.customLabels.map((label, n) => tag(`custom_label_${n}`, label)),

@@ -32,10 +32,12 @@ function lastFetch(fetches: FeedFetch[]) {
 }
 
 export default async function AdLinksPage() {
-  const { feedUrl, feed, fetches, ranges } = await loadAdLinks()
+  const { feedUrl, feed, fetches, googleFeedUrl, googleFetches, ranges } = await loadAdLinks()
   const { meta, other } = lastFetch(fetches)
   const metaAt = dualTime(meta?.last)
   const otherAt = dualTime(other?.last)
+  const google = googleFetches.find((f) => f.agent === 'google')
+  const googleAt = dualTime(google?.last)
   const leftOutCount = feed.leftOut.reduce((n, g) => n + g.colours.length, 0)
 
   return (
@@ -43,7 +45,7 @@ export default async function AdLinksPage() {
       <header className="flex flex-col gap-2">
         <h1 className="font-display text-2xl font-bold tracking-tight lg:text-4xl">Ad links</h1>
         <p className="text-[15px] text-zinc-600">
-          The catalogue feed for Meta, and ready-made links for your ads and profiles. Ad links mark the visit as coming from an ad, so the visitor gets the ad offer and every sale shows its campaign and ad in the admin.
+          The catalogue feeds for Meta and Google, and ready-made links for your ads and profiles. Ad links mark the visit as coming from an ad, so the visitor gets the ad offer and every sale shows its campaign and ad in the admin.
         </p>
       </header>
 
@@ -122,6 +124,25 @@ export default async function AdLinksPage() {
             </ul>
           </div>
         </details>
+      </Card>
+
+      <Card
+        title="Product feed for Google"
+        intro="The same colourways for Google’s free listings, with measurements and highlights. In Merchant Center → Products → Add products → Add a file, choose “Enter a link to your file”, paste this address and fetch it daily. Delivery prices and times come from Merchant Center’s own delivery settings (docs/MERCHANT-CENTER.md)."
+      >
+        <ul className="divide-y divide-zinc-100">
+          <LinkRow label="Feed address" href={googleFeedUrl} copyLabel="Copy address" />
+        </ul>
+        <p className="text-sm text-zinc-600">
+          {googleAt && google ? (
+            <>
+              <CheckCircleIcon aria-hidden="true" size={16} weight="fill" className="mr-1 inline text-emerald-600" />
+              Google last fetched it {googleAt.uk} UK ({googleAt.pk} PK): {google.items} items, {google.count} {google.count === 1 ? 'fetch' : 'fetches'} so far.
+            </>
+          ) : (
+            'Google hasn’t fetched it yet. It shows here once Merchant Center does.'
+          )}
+        </p>
       </Card>
 
       <Card

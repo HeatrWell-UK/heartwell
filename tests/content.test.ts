@@ -118,7 +118,7 @@ describe('structured data', () => {
 
   it('names the shop, its contact details and (once set) its address', () => {
     const org = organizationJsonLd('https://heartwellsofa.co.uk')
-    expect(org).toMatchObject({ '@type': 'Organization', name: 'Heartwell', email: CONTACT.email })
+    expect(org).toMatchObject({ '@type': 'OnlineStore', name: 'Heartwell', email: CONTACT.email })
     if (CONTACT.visitAddress) expect(org.address).toMatchObject({ postalCode: CONTACT.visitAddress.postcode, addressCountry: 'GB' })
     expect(JSON.stringify(org)).not.toMatch(/undefined|null/)
   })
