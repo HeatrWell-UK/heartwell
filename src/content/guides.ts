@@ -33,7 +33,7 @@ export const GUIDES: Guide[] = [
   {
     slug: 'how-paying-on-delivery-works',
     title: 'Cash on delivery sofas: how paying on delivery works',
-    summary: 'Nothing to pay when you order, no deposit and no card: you pay the driver in cash or by bank transfer once your sofa is in your room. Here’s each step, and how to buy safely.',
+    summary: 'No deposit, no card: you pay the driver in cash or by bank transfer once your sofa is in your room. Here’s each step, and how to buy cash on delivery safely.',
     updated: '2026-10-18',
     published: '2026-10-12',
     sections: [
@@ -299,7 +299,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'choosing-a-sofa-fabric',
-    title: 'Choosing a sofa fabric: velvet, chenille or leather-look',
+    title: 'Choosing a sofa fabric: velvet, chenille and more',
     summary: 'Velvet, crushed velvet, chenille or a wipe-clean finish: what each is like to live with, and which suits pets, children and sunny rooms.',
     updated: '2026-10-18',
     published: '2026-10-12',
@@ -421,8 +421,8 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'high-back-or-scatter-back-sofa',
-    title: 'High back or scatter back sofa: which should you choose?',
-    summary: 'A high back has fixed back cushions and a tailored look; a scatter back has loose cushions for a softer, more relaxed sofa. How they compare, and which suits you.',
+    title: 'High back or scatter back sofa: which is best?',
+    summary: 'A high back has fixed back cushions and a tailored look; a scatter back has loose cushions for a softer, relaxed sofa. How they compare, and which suits you.',
     updated: '2026-10-18',
     sections: [
       {
@@ -478,7 +478,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'left-or-right-hand-corner-sofa',
-    title: 'Left or right hand corner sofa: how to tell which you need',
+    title: 'Left or right hand corner sofa: which do you need?',
     summary: 'What 2c2, 2c1 and 1c2 mean, how to work out which way round your corner sofa should go, and when it doesn’t matter at all.',
     updated: '2026-10-18',
     sections: [
@@ -595,7 +595,7 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'tech-leather-and-leather-aire',
-    title: 'Tech leather, Leather Aire and faux leather: what leather-look means',
+    title: 'Tech leather and Leather Aire: what leather-look means',
     summary: 'None of them is real leather. What each one is, what it’s like to live with and how to look after it, so you know exactly what you’re buying.',
     updated: '2026-10-18',
     sections: [
