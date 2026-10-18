@@ -8,7 +8,7 @@ import { POLICIES, PROMISES } from '@/config/promises'
 import { SITE_URL } from '@/config/site'
 import { allFaqItems, faqGroups } from '@/content/faq'
 import { GUIDES } from '@/content/guides'
-import { getCategories, sentenceCase } from '@/lib/catalogue/listing'
+import { getCategories, getListing, rangesFrom, sentenceCase } from '@/lib/catalogue/listing'
 import { categoryHref } from '@/lib/catalogue/tree'
 import { formatPrice } from '@/lib/format'
 import { getDeliveryInfo } from '@/lib/product/load'
@@ -17,7 +17,10 @@ import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 export const revalidate = 3600
 
 export async function GET() {
-  const [delivery, tree] = SUPABASE_CONFIGURED ? await Promise.all([getDeliveryInfo().catch(() => null), getCategories().catch(() => [])]) : [null, []]
+  const [delivery, tree, listing] = SUPABASE_CONFIGURED
+    ? await Promise.all([getDeliveryInfo().catch(() => null), getCategories().catch(() => []), getListing().catch(() => [])])
+    : [null, [], []]
+  const ranges = rangesFrom(listing)
   const url = (path: string) => `${SITE_URL}${path}`
   const a = CONTACT.visitAddress
   const lines = [
@@ -25,9 +28,9 @@ export async function GET() {
     '',
     `> ${BRAND.shortDescription}`,
     '',
-    `${BRAND.name} sells sofas, corner sofas, recliners, armchairs and footstools online to households in the UK. Key facts:`,
+    `${BRAND.name} is an online sofa shop${a ? ` based in ${a.locality}, ${a.county}, England` : ''}. It sells sofas, corner sofas, U-shaped sofas, 3+2 sets, recliners, armchairs and footstools to households across mainland Britain, paid for in cash or by bank transfer on delivery. Key facts:`,
     '',
-    `- Payment: ${PROMISES.payment.long} No card payments.`,
+    `- Payment: ${PROMISES.payment.long} No card payments, no deposit and no finance.`,
     `- Delivery: ${PROMISES.delivery.long} ${PROMISES.delivery.timingLong}`,
     ...(delivery?.areas.length
       ? [`- Delivery charges: ${delivery.areas.map((d) => `${d.name} ${formatPrice(d.charge)}`).join(', ')}; these areas take ${PROMISES.delivery.chargedTiming}. Free everywhere else on the mainland.`]
@@ -43,6 +46,8 @@ export async function GET() {
     '',
     ...tree.filter((c) => !c.parentId).flatMap((d) => [`- [${sentenceCase(d.name)}](${url(categoryHref(tree, d))})`, ...tree.filter((c) => c.parentId === d.id).map((c) => `  - [${sentenceCase(c.name)}](${url(categoryHref(tree, c))})`)]),
     `- [Ranges](${url('/ranges')})`,
+    ...ranges.map((r) => `  - [${r.name}](${url(`/ranges/${r.slug}`)}): ${r.products.length} ${r.products.length === 1 ? 'piece' : 'pieces'} from ${formatPrice(r.price)}${r.madeToOrder ? ', made to order' : ', ready-made'}`),
+    `- [Every product with its price, size and cover](${url('/llms-full.txt')})`,
     `- [Fabrics](${url('/fabrics')}): the fabric library for made-to-order sofas`,
     `- [Fabric samples](${url('/fabric-samples')})`,
     '',

@@ -198,8 +198,9 @@ describe('catalogue feed', () => {
     expect(xml).not.toContain('<g:shipping>')
   })
 
-  it('measures a corner by its two sides', () => {
+  it('measures a corner by its two sides and a U-shape by its back and longer side', () => {
     expect(footprint({ width_cm: null, depth_cm: 90, height_cm: 95, side_a_cm: 200, side_b_cm: 260 })).toEqual({ width: 260, length: 200, height: 95 })
+    expect(footprint({ width_cm: 340, depth_cm: 90, height_cm: 95, side_a_cm: 200, side_b_cm: 180 })).toEqual({ width: 340, length: 200, height: 95 })
     expect(footprint({ width_cm: 198, depth_cm: 94, height_cm: 97, side_a_cm: null, side_b_cm: null })).toEqual({ width: 198, length: 94, height: 97 })
   })
 

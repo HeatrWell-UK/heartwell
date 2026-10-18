@@ -13,6 +13,8 @@ import { CONTACT, whatsAppHref } from '@/config/contact'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { SITE_URL } from '@/config/site'
 import { OPEN_GRAPH_BASE } from '@/config/brand'
+import { QuestionList } from '@/components/content/QuestionList'
+import { productQuestions } from '@/lib/seo/answers'
 import { getDeliveryInfo, getProductPage } from '@/lib/product/load'
 import { getCategories, getListing, sentenceCase } from '@/lib/catalogue/listing'
 import { categoryHref, trail } from '@/lib/catalogue/tree'
@@ -130,9 +132,17 @@ export default async function ProductPage({ params, searchParams }: Props) {
           askHref={askHref}
         />
         <div className="flex flex-col gap-12 px-4 lg:grid lg:grid-cols-[6fr_5fr] lg:gap-16 lg:px-0">
-          <div className="flex flex-col gap-4">
-            <h2 className="text-[28px] leading-tight lg:text-[36px]">About {name}</h2>
-            <ProductDetails product={product} delivery={delivery} />
+          <div className="flex flex-col gap-12">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-[28px] leading-tight lg:text-[36px]">About {name}</h2>
+              <ProductDetails product={product} delivery={delivery} />
+            </div>
+            {/* The questions people search for, answered from this piece's own details (docs/KEYWORDS.md). */}
+            <QuestionList
+              id="questions"
+              title={`Questions about the ${name}`}
+              items={productQuestions(product, { delivery, fabricCount: product.fabrics.reduce((n, c) => n + c.fabrics.length, 0) })}
+            />
           </div>
           <div className="flex flex-col gap-10">
             <Videos videos={product.videos} title={product.title} />

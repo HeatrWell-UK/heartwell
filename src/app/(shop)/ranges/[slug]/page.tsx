@@ -16,6 +16,10 @@ import { planFrame, planSummary, rangeSizes, type RangeSize } from '@/lib/catalo
 import { homeRanges } from '@/lib/home/picks'
 import { breadcrumbJsonLd, jsonLdString } from '@/lib/product/seo'
 import { SITE_URL } from '@/config/site'
+import { QuestionList } from '@/components/content/QuestionList'
+import { rangeQuestions } from '@/lib/seo/answers'
+import { getDeliveryInfo } from '@/lib/product/load'
+import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 
 export const revalidate = 300
 
@@ -35,9 +39,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { range } = await findRange((await params).slug)
   if (!range) return {}
   const sizes = rangeSizeCount(range)
+  // Written for "<range> sofa", "<range> corner sofa" and "<range> dimensions" (docs/KEYWORDS.md).
+  const noun = /recliner/i.test(range.name) ? '' : ' sofas'
   return {
-    title: `${range.name} sofas`,
-    description: `The ${range.name} range at Heartwell: ${sizes} ${sizes === 1 ? 'size' : 'sizes'} from ${formatPrice(range.price)}${range.madeToOrder ? ', made to order in your choice of fabric' : ''}. Free delivery to most of Britain, pay on delivery.`,
+    title: `${range.name}${noun}: sizes, dimensions and prices`,
+    description: `The ${range.name} range at Heartwell: ${sizes} ${sizes === 1 ? 'size' : 'sizes'} from ${formatPrice(range.price)}${range.madeToOrder ? ', made to order in your choice of fabric' : ''}, each drawn to scale. Free delivery to most areas, pay on delivery.`,
     alternates: { canonical: `/ranges/${range.slug}` },
   }
 }
@@ -51,7 +57,11 @@ const numberWords = ['no', 'one', 'two', 'three', 'four', 'five', 'six']
  * the room. Colours and fabrics are chosen on the size's own page.
  */
 export default async function RangePage({ params }: Props) {
-  const [{ range, ranges }, fabrics] = await Promise.all([findRange((await params).slug), getFabricLibrary()])
+  const [{ range, ranges }, fabrics, delivery] = await Promise.all([
+    findRange((await params).slug),
+    getFabricLibrary(),
+    SUPABASE_CONFIGURED ? getDeliveryInfo().catch(() => null) : Promise.resolve(null),
+  ])
   if (!range) notFound()
 
   const fabricCount = fabrics.reduce((n, c) => n + c.fabrics.length, 0)
@@ -153,6 +163,16 @@ export default async function RangePage({ params }: Props) {
           </span>
         </p>
       </section>
+
+      <div className="mx-auto max-w-[1200px] px-4 pt-14 lg:px-6 lg:pt-24">
+        <QuestionList
+          id="range-questions"
+          title={`Questions about ${range.name}`}
+          items={rangeQuestions(range, { delivery, fabricCount })}
+          structured
+          className="max-w-[46rem]"
+        />
+      </div>
 
       {others.length > 0 && <OtherRanges ranges={others} />}
     </div>

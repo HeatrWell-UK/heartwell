@@ -53,6 +53,8 @@ const product = (slug: string, extra: Partial<ListingProduct> = {}): ListingProd
   madeInUk: false,
   price: 500,
   widthCm: 200,
+  depthCm: 90,
+  heightCm: 95,
   plan: null,
   shape: 'straight',
   seats: 3,

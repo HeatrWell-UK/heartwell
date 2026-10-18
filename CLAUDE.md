@@ -41,3 +41,8 @@ Heartwell (heartwellsofa.co.uk) is a new online furniture brand for UK Mainland 
 - The admin keeps the sister shop's admin design, with Heartwell branding.
 - British English everywhere: sofa, wardrobe, basket, £, UK dates (3 October 2026, 03/10/2026).
 - Accessibility WCAG 2.2 AA. No fake reviews, ratings, urgency or countdowns.
+
+## Search (Phase 20)
+- Every indexable page has the search it's written for in `docs/KEYWORDS.md`; a new page gets a line there. Questions on category, range and product pages are built from live data (`src/lib/seo/answers.ts`, `src/content/categories.ts`), so never hard-code a price, size or delivery charge in them.
+- FAQ data only for questions shown on the page. No shipping in page data (UK postcodes aren't supported there): Merchant Center's settings hold delivery by region (`docs/MERCHANT-CENTER.md`).
+- IndexNow tells Bing about admin saves; after a deploy that changes many pages, run `node scripts/indexnow-submit.mjs`.

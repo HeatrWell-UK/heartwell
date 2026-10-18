@@ -18,7 +18,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(METADATA_BASE),
   title: {
     template: `%s | ${BRAND.name}`,
-    default: `${BRAND.name} | Sofas made to order, pay on delivery`,
+    // Written for "cash on delivery sofas" and "sofa fast delivery uk" (docs/KEYWORDS.md).
+    default: `${BRAND.name}: sofas delivered in days, pay cash on delivery`,
   },
   description: META_DESCRIPTION,
   applicationName: BRAND.name,

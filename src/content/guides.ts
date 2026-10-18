@@ -3,6 +3,7 @@
 // Each block is plain text, so the same words feed the page, search engines
 // and llms.txt.
 
+import { CARE } from '@/config/care'
 import { POLICIES, PROMISES } from '@/config/promises'
 import { SAMPLES } from '@/config/samples'
 
@@ -21,6 +22,8 @@ export interface Guide {
   summary: string
   /** ISO date the guide last changed. */
   updated: string
+  /** ISO date it first appeared, when that's earlier than the last change. */
+  published?: string
   sections: GuideSection[]
   /** Where to go next. */
   next: { href: string; label: string }[]
@@ -29,9 +32,10 @@ export interface Guide {
 export const GUIDES: Guide[] = [
   {
     slug: 'how-paying-on-delivery-works',
-    title: 'How paying on delivery works',
-    summary: 'Nothing to pay when you order: you pay the driver once your sofa is in your room. Here’s each step.',
-    updated: '2026-10-12',
+    title: 'Cash on delivery sofas: how paying on delivery works',
+    summary: 'Nothing to pay when you order, no deposit and no card: you pay the driver in cash or by bank transfer once your sofa is in your room. Here’s each step, and how to buy safely.',
+    updated: '2026-10-18',
+    published: '2026-10-12',
     sections: [
       {
         id: 'why',
@@ -69,6 +73,34 @@ export const GUIDES: Guide[] = [
               title: 'Staying safe',
               text: 'We never ask for payment for furniture before it’s delivered, and we never ask for card details. If anyone claiming to be from Heartwell asks you to pay for furniture in advance, don’t, and tell us.',
             },
+          },
+        ],
+      },
+      {
+        id: 'safe',
+        heading: 'Is it safe to buy a sofa cash on delivery?',
+        blocks: [
+          {
+            p: 'Paying on delivery is the safest way to buy a sofa you haven’t seen, because no money changes hands until it’s in your home. The risk people worry about runs the other way: sellers on social media who ask for a deposit or a “delivery fee” first and then disappear. Before you buy cash on delivery from anyone, check that:',
+          },
+          {
+            list: [
+              'they have a real address you can visit, and a phone number that’s answered;',
+              'the full price is in writing before delivery, with nothing to pay upfront;',
+              'you can look the sofa over before you pay.',
+            ],
+          },
+          {
+            p: 'With us, that’s a showroom you can visit by appointment, a phone and WhatsApp line that’s answered, and an order email with the full price before anything is delivered.',
+          },
+        ],
+      },
+      {
+        id: 'deposit',
+        heading: 'No deposit, no card, no finance',
+        blocks: [
+          {
+            p: 'There’s no deposit to pay and we never ask for card details. We don’t offer finance or pay-monthly plans either: you pay the full price, once, when the sofa arrives.',
           },
         ],
       },
@@ -143,14 +175,15 @@ export const GUIDES: Guide[] = [
     slug: 'measuring-for-a-corner-sofa',
     title: 'How to measure for a corner sofa',
     summary: 'Which way round, how much room to leave, and how a corner sofa gets through your door.',
-    updated: '2026-10-12',
+    updated: '2026-10-18',
+    published: '2026-10-12',
     sections: [
       {
         id: 'sides',
         heading: 'Work out which side the corner goes',
         blocks: [
           {
-            p: 'Stand facing where the sofa will go, as if you were sitting looking out. If the longer part should run to your left, you want the corner on the left. Our product pages show the shape and both side lengths.',
+            p: 'Most of our corners have two equal sides and go either way round. If yours has one longer side (a 2c1 or 1c2), decide which wall the longer side goes against before you order. Our product pages show the shape and both side lengths, and our left or right hand guide explains the codes.',
           },
         ],
       },
@@ -192,15 +225,17 @@ export const GUIDES: Guide[] = [
       },
     ],
     next: [
+      { href: '/guides/left-or-right-hand-corner-sofa', label: 'Left or right hand corner sofa?' },
       { href: '/will-it-fit', label: 'Will it fit? Measuring guide' },
       { href: '/sofas/corner-sofas', label: 'Corner sofas' },
     ],
   },
   {
     slug: 'choosing-the-right-size-sofa',
-    title: 'Choosing the right size of sofa',
-    summary: 'Two-seater, three-seater, corner or U-shape: how to match the sofa to your room and the way you use it.',
-    updated: '2026-10-12',
+    title: 'What size sofa do I need? Choosing the right size',
+    summary: 'Two-seater, three-seater, corner or U-shape: how to match the sofa to your room and the way you use it, with rules of thumb for each size of room.',
+    updated: '2026-10-18',
+    published: '2026-10-12',
     sections: [
       {
         id: 'people',
@@ -239,17 +274,35 @@ export const GUIDES: Guide[] = [
           { note: { title: 'Not sure?', text: 'Send us a photo of the room and your measurements on WhatsApp and we’ll suggest what would fit.' } },
         ],
       },
+      {
+        id: 'room',
+        heading: 'What size of sofa for the size of room',
+        blocks: [
+          { p: 'Rules of thumb that work in most British living rooms (a metre is about 3 feet 3 inches):' },
+          {
+            list: [
+              'A sofa looks right at about two thirds of the length of the wall it stands against.',
+              'Small room, around 3 × 3.5 m (10 × 12 ft): a 2 or 3 seater, up to about 200 cm wide.',
+              'Medium room, around 3.7 × 4.3 m (12 × 14 ft): a 3+2 set, or a corner up to about 240 cm each way.',
+              'Large or open-plan room, 4.5 m (15 ft) or more: a large corner or a U-shape, with space to walk all the way round.',
+              'Leave about 60 cm for walkways, and 40 to 50 cm between the sofa and a coffee table.',
+            ],
+          },
+        ],
+      },
     ],
     next: [
       { href: '/will-it-fit', label: 'Will it fit? Measuring guide' },
+      { href: '/guides/high-back-or-scatter-back-sofa', label: 'High back or scatter back?' },
       { href: '/sofas', label: 'Browse sofas' },
     ],
   },
   {
     slug: 'choosing-a-sofa-fabric',
-    title: 'Choosing a sofa fabric',
-    summary: 'Velvet, crushed velvet, chenille or a wipe-clean finish: what each is like to live with.',
-    updated: '2026-10-12',
+    title: 'Choosing a sofa fabric: velvet, chenille or leather-look',
+    summary: 'Velvet, crushed velvet, chenille or a wipe-clean finish: what each is like to live with, and which suits pets, children and sunny rooms.',
+    updated: '2026-10-18',
+    published: '2026-10-12',
     sections: [
       {
         id: 'velvet',
@@ -281,7 +334,7 @@ export const GUIDES: Guide[] = [
       },
       {
         id: 'life',
-        heading: 'Thinking about your home',
+        heading: 'The best sofa fabric for pets, children and sunny rooms',
         blocks: [
           {
             list: [
@@ -297,6 +350,300 @@ export const GUIDES: Guide[] = [
     next: [
       { href: '/fabrics', label: 'See all fabrics' },
       { href: SAMPLES.href, label: 'Order fabric samples' },
+      { href: '/care-guide', label: 'Care guide' },
+    ],
+  },
+  {
+    slug: 'how-long-does-sofa-delivery-take',
+    title: 'How long does sofa delivery take?',
+    summary: `Most Heartwell orders arrive in ${PROMISES.delivery.timingShort}, made-to-order sofas included. What decides your day, how we book it, and the areas that take longer.`,
+    updated: '2026-10-18',
+    sections: [
+      {
+        id: 'short-answer',
+        heading: 'The short answer',
+        blocks: [
+          {
+            p: `${PROMISES.delivery.timingLong} That includes made-to-order sofas: there’s no wait of several weeks while yours is made.`,
+          },
+        ],
+      },
+      {
+        id: 'what-decides',
+        heading: 'What decides your delivery day',
+        blocks: [
+          {
+            list: [
+              `Where you live: most postcodes take ${PROMISES.delivery.timingShort}; ${PROMISES.delivery.chargedAreas} take ${PROMISES.delivery.chargedTiming} and have a delivery charge, shown as soon as you enter your postcode.`,
+              'When you confirm: we book your day once you’ve tapped Confirm on the link we send.',
+              'The day of the week: we don’t deliver on Mondays.',
+              'The day that suits you: at checkout you choose a preferred day from the dates on offer.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'booking',
+        heading: 'How we book it',
+        blocks: [
+          {
+            steps: [
+              'You order online or on WhatsApp, then tap Confirm on the link we send by email and WhatsApp.',
+              'We ring or WhatsApp you to agree the day.',
+              'The driver brings the sofa into your room, and you pay once you’ve seen it.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'next-day',
+        heading: 'Can I get a sofa next day?',
+        blocks: [
+          {
+            p: 'Not from us: two working days is the soonest we deliver. In return, it’s brought into the room you choose, and there’s nothing to pay until it’s there.',
+          },
+        ],
+      },
+      {
+        id: 'islands',
+        heading: 'Islands and Northern Ireland',
+        blocks: [
+          {
+            p: 'Northern Ireland, the Isle of Man, the Channel Islands, the Isle of Wight, the Scottish islands and the Isles of Scilly are delivered by arrangement. Enter your postcode on any product page and we’ll quote on WhatsApp.',
+          },
+        ],
+      },
+    ],
+    next: [
+      { href: '/delivery-and-returns', label: 'Delivery and returns' },
+      { href: '/guides/getting-ready-for-delivery-day', label: 'Getting ready for delivery day' },
+    ],
+  },
+  {
+    slug: 'high-back-or-scatter-back-sofa',
+    title: 'High back or scatter back sofa: which should you choose?',
+    summary: 'A high back has fixed back cushions and a tailored look; a scatter back has loose cushions for a softer, more relaxed sofa. How they compare, and which suits you.',
+    updated: '2026-10-18',
+    sections: [
+      {
+        id: 'difference',
+        heading: 'The difference',
+        blocks: [
+          {
+            p: 'On a high back sofa (also called a full back or fixed back), the back cushions are fixed in place, so it keeps a neat, tailored shape and supports your head. On a scatter back sofa (or scattered back), the back is a row of loose cushions you can plump, move and arrange.',
+          },
+        ],
+      },
+      {
+        id: 'compare',
+        heading: 'How they compare',
+        blocks: [
+          {
+            list: [
+              'Look: a high back is smart and tailored; a scatter back is soft and relaxed.',
+              'Comfort: a high back gives firm support up to your head; a scatter back lets you sink in and arrange the cushions the way you like.',
+              'Upkeep: a high back needs little more than a weekly plump; scatter cushions need plumping and straightening more often to look their best.',
+              'Size: in our ranges both styles come in the same sizes, but the depth can differ by a few centimetres, so check the measurements on the page you choose.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'which',
+        heading: 'Which suits you',
+        blocks: [
+          {
+            list: [
+              'Choose a high back if you like to sit upright, want support for your head, or prefer a neat look with little fuss.',
+              'Choose a scatter back if you like to curl up or lie down, enjoy rearranging cushions, and like a softer, lived-in look.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'ours',
+        heading: 'Our ranges with both',
+        blocks: [
+          {
+            p: 'Ashton, Sims and Verona come with a high back or a scattered back, and each range’s page shows both side by side with their prices. Our classic 5 seater corners, such as Harrison, Olympia and Windsor, have scattered backs.',
+          },
+        ],
+      },
+    ],
+    next: [
+      { href: '/ranges/verona', label: 'The Verona range' },
+      { href: '/ranges/ashton', label: 'The Ashton range' },
+      { href: '/ranges', label: 'All ranges' },
+    ],
+  },
+  {
+    slug: 'left-or-right-hand-corner-sofa',
+    title: 'Left or right hand corner sofa: how to tell which you need',
+    summary: 'What 2c2, 2c1 and 1c2 mean, how to work out which way round your corner sofa should go, and when it doesn’t matter at all.',
+    updated: '2026-10-18',
+    sections: [
+      {
+        id: 'codes',
+        heading: 'What 2c2, 2c1 and 1c2 mean',
+        blocks: [
+          {
+            list: [
+              '2c2: two seats, the corner, then two seats. Both sides are the same length, so it goes either way round. All our 5 seater corners are like this.',
+              '2c1: two seats, the corner, then one seat. A 4 seater with one side longer than the other.',
+              '1c2: the same sofa in mirror image.',
+            ],
+          },
+          {
+            p: 'L-shapes and armed U-shapes can have one longer side too: the drawing on each sofa’s page shows the length of every side.',
+          },
+        ],
+      },
+      {
+        id: 'work-out',
+        heading: 'Working out which you need',
+        blocks: [
+          {
+            steps: [
+              'Decide where the corner of the sofa will sit, usually in the corner of the room.',
+              'Measure the two walls it will run along, each from the corner.',
+              'Choose which wall takes the longer side: usually the longer wall, or the one facing the television.',
+              'Stand in the room looking at that corner and note whether the longer side is on your left or your right.',
+              'Tell us, or send a quick sketch on WhatsApp, and we’ll confirm whether that’s the 2c1 or the 1c2 before you order.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'shops-differ',
+        heading: 'Why shops disagree about “left hand”',
+        blocks: [
+          {
+            p: 'Some shops describe a corner sofa as you face it, others as if you were sitting on it, so “left hand” can mean opposite things. That’s why we’d rather check with you than guess: on most corner sofas the sides can’t be swapped once it’s made.',
+          },
+        ],
+      },
+      {
+        id: 'equal',
+        heading: 'When it doesn’t matter',
+        blocks: [
+          {
+            p: 'A corner with two equal sides fits either way round, so you only need to decide where it goes. That’s every 5 seater corner we sell.',
+          },
+        ],
+      },
+    ],
+    next: [
+      { href: '/guides/measuring-for-a-corner-sofa', label: 'How to measure for a corner sofa' },
+      { href: '/sofas/corner-sofas', label: 'Corner sofas' },
+    ],
+  },
+  {
+    slug: 'electric-or-manual-recliner',
+    title: 'Electric or manual recliner sofa: which is better?',
+    summary: 'Electric recliners move at the press of a button; manual ones need no plug and cost less. How they compare, the space each needs and which to choose.',
+    updated: '2026-10-18',
+    sections: [
+      {
+        id: 'difference',
+        heading: 'The difference',
+        blocks: [
+          {
+            p: 'A manual recliner reclines by hand: you pull a handle or lean back, and there are no cables or plugs. An electric recliner (also called a power recliner) moves when you press a button and stops wherever you let go.',
+          },
+        ],
+      },
+      {
+        id: 'compare',
+        heading: 'How they compare',
+        blocks: [
+          {
+            list: [
+              'Ease: electric is effortless and stops at any angle; manual takes a little push.',
+              'Power: electric needs a plug socket near the sofa, with a cable running to it; manual needs neither, so it can stand anywhere in the room.',
+              'Extras: electric recliners often have USB ports and cup holders built in, as our Hannah and Nova recliners do.',
+              'Price: manual recliners cost less. Our manual Roma recliners start at a lower price than our electric ones.',
+            ],
+          },
+        ],
+      },
+      {
+        id: 'space',
+        heading: 'The space a recliner needs',
+        blocks: [
+          {
+            p: 'Either kind needs room in front for the footrest and a gap behind for the back to tilt. Check the measurements on the sofa’s page against your room, and leave space to walk past it while it’s reclined.',
+          },
+        ],
+      },
+      {
+        id: 'which',
+        heading: 'Which to choose',
+        blocks: [
+          {
+            list: [
+              'Electric, if anyone at home finds a handle hard to use, or you want to stop at exactly the right angle.',
+              'Manual, if there’s no socket where the sofa will go, or you’d like the lower price.',
+            ],
+          },
+        ],
+      },
+    ],
+    next: [
+      { href: '/sofas/recliners', label: 'Recliner sofas' },
+      { href: '/sofas/electric-recliners', label: 'Electric recliners' },
+    ],
+  },
+  {
+    slug: 'tech-leather-and-leather-aire',
+    title: 'Tech leather, Leather Aire and faux leather: what leather-look means',
+    summary: 'None of them is real leather. What each one is, what it’s like to live with and how to look after it, so you know exactly what you’re buying.',
+    updated: '2026-10-18',
+    sections: [
+      {
+        id: 'short-answer',
+        heading: 'The short answer',
+        blocks: [
+          {
+            p: 'Tech leather, Leather Aire and faux leather are leather-look covers: man-made materials that look like leather and wipe clean. None of them is real leather, and every Heartwell sofa’s page names its cover.',
+          },
+        ],
+      },
+      {
+        id: 'tech',
+        heading: 'Tech leather',
+        blocks: [
+          {
+            p: 'A fabric with a leather-like finish. It looks and feels like leather, wipes clean and costs less than the real thing. Our Orlando, Nova and Oxford electric recliners are covered in it.',
+          },
+        ],
+      },
+      {
+        id: 'aire',
+        heading: 'Leather Aire',
+        blocks: [{ p: 'A soft leather-look material, sometimes called air leather. Our Roma recliners come in it, or in grey fabric.' }],
+      },
+      {
+        id: 'faux',
+        heading: 'Faux leather',
+        blocks: [
+          {
+            p: 'The classic leather-look cover, with a smooth finish. Our Oakland corner is covered in it, and Shannon and Tango use it on the arms, where hands rest most.',
+          },
+        ],
+      },
+      {
+        id: 'care',
+        heading: 'Looking after it',
+        blocks: [{ list: [...CARE.other] }],
+      },
+      {
+        id: 'real',
+        heading: 'If you want real leather',
+        blocks: [{ p: 'Ask us before you order and we’ll tell you honestly what we can offer.' }],
+      },
+    ],
+    next: [
+      { href: '/sofas/leather-sofas', label: 'Leather-look sofas' },
       { href: '/care-guide', label: 'Care guide' },
     ],
   },

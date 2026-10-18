@@ -5,7 +5,7 @@ import { GUIDES } from '@/content/guides'
 
 export const metadata: Metadata = {
   title: 'Guides',
-  description: 'Plain answers before you buy a sofa online: paying on delivery, made to order, measuring, sizes, fabrics and delivery day.',
+  description: 'Plain answers before you buy a sofa online: cash on delivery, delivery times, sizes, corner sofas, high or scatter backs, recliners, fabrics and leather-look.',
   alternates: { canonical: '/guides' },
 }
 

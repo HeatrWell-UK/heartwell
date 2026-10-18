@@ -74,4 +74,4 @@ export const ANNOUNCEMENT = 'Free delivery to most postcodes. Pay nothing until 
 
 /** Default meta description. */
 export const META_DESCRIPTION =
-  'Sofas made to order with free delivery to most of mainland Britain. Pay nothing until it arrives: cash or bank transfer on delivery. 1-year frame guarantee.'
+  'Corner sofas, U-shapes, 3+2 sets and recliners, many made to order. Free delivery to most areas in 2–4 working days; pay cash or bank transfer on delivery.'

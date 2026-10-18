@@ -50,7 +50,7 @@ export const getListing = unstable_cache(
     const { data, error } = await createPublicClient()
       .from('products')
       .select(
-        `slug, title, base_price, made_to_order, origin, is_featured, sort, width_cm, depth_cm, side_a_cm, side_b_cm, axis1_value, axis2_value, specifications,
+        `slug, title, base_price, made_to_order, origin, is_featured, sort, width_cm, depth_cm, height_cm, side_a_cm, side_b_cm, axis1_value, axis2_value, specifications,
          type:product_types(slug, name, filters),
          range:ranges(slug, name, sort, description),
          product_categories(category_id),
@@ -80,6 +80,8 @@ export const getListing = unstable_cache(
         madeInUk: p.origin === 'uk',
         price: fromPrice(p.base_price, variants.map((v) => v.price_adjustment)),
         widthCm: p.width_cm,
+        depthCm: p.depth_cm,
+        heightCm: p.height_cm,
         plan: measurementLayout(
           typeof specs.shape === 'string' ? specs.shape : null,
           { width_cm: p.width_cm, depth_cm: p.depth_cm, height_cm: null, side_a_cm: p.side_a_cm, side_b_cm: p.side_b_cm },
@@ -98,7 +100,7 @@ export const getListing = unstable_cache(
       }
     })
   },
-  ['listing-v2'],
+  ['listing-v3'],
   { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
 )
 

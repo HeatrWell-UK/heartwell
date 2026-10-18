@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ContentPage } from '@/components/content/ContentPage'
-import { CONTACT, visitBookingText } from '@/config/contact'
+import { CONTACT, visitBookingText, visitHoursText } from '@/config/contact'
 import { BRAND } from '@/config/brand'
 import { POLICIES, PROMISES } from '@/config/promises'
 
@@ -10,7 +10,9 @@ const ROOM = 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792009382/Home-
 
 export const metadata: Metadata = {
   title: 'About Heartwell',
-  description: `${BRAND.shortDescription} Here’s how we work, and why.`,
+  description: CONTACT.visitAddress
+    ? `Heartwell is an online sofa shop in ${CONTACT.visitAddress.locality}, ${CONTACT.visitAddress.county}: sofas made to order, free delivery to most of mainland Britain, and you pay on delivery.`
+    : `${BRAND.shortDescription} Here’s how we work, and why.`,
   alternates: { canonical: '/about' },
 }
 
@@ -35,6 +37,29 @@ export default function AboutPage() {
         </div>
       }
     >
+      {/* The facts in one place, for people skimming and for search engines and AI assistants (docs/KEYWORDS.md). */}
+      <h2 id="glance">Heartwell at a glance</h2>
+      <ul>
+        <li>
+          An online sofa shop{a ? ` based in ${a.locality}, ${a.county}` : ''}, selling to homes across mainland Britain.
+        </li>
+        <li>Corner sofas, U-shaped sofas, 3+2 sets, recliners, armchairs and footstools, in ranges such as Verona, Ashton and Sims.</li>
+        <li>You pay on delivery, in cash or by bank transfer, once the sofa is in your room: no deposit, no card details, no finance.</li>
+        <li>
+          {PROMISES.delivery.long} {PROMISES.delivery.timingLong}
+        </li>
+        <li>Many fabric sofas are made to order in the UK, in the colour shown or any fabric from our library.</li>
+        {a && (
+          <li>
+            A showroom at {a.street}, {a.locality} {a.postcode}: {visitHoursText()}, by appointment.
+          </li>
+        )}
+        <li>
+          {CONTACT.phoneDisplay ? `Phone and WhatsApp ${CONTACT.phoneDisplay}, email ` : 'Email '}
+          <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
+        </li>
+      </ul>
+
       <h2 id="why">Why you pay on delivery</h2>
       <p>
         Buying a sofa online from a name you haven’t heard of is a leap. So we take the risk instead of you: nothing is paid when you order, and you pay

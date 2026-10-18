@@ -856,6 +856,7 @@ Not wanted (owner): a registered company or legal details on the site, Meta Busi
   ```
 - **Phone test:** Search Console → Pages shows the pages indexed; a few target searches on Google and in ChatGPT; Merchant Center → Products shows no errors.
 - **Done means:** every indexable page has a search it's written for, structured data validates, the Google feed has no errors in Merchant Center.
+- **As built (18 October 2026), in two parts deployed separately.** **20A:** the Google feed switched on (measurements, highlights; Admin → Ad links), product photos in the sitemap, IndexNow (admin saves, `scripts/indexnow-submit.mjs`), `OnlineStore` with its return policy, `WebSite`, the showroom with map position and hours. **20B:** `docs/KEYWORDS.md`; questions from live data on category, range and product pages (FAQ data on categories and ranges); five new guides and three reworked; titles aimed at searches (home, categories, ranges, Visit us, help pages); About "at a glance"; `/llms.txt` with ranges and `/llms-full.txt` with every product. Delivery by region stays in Merchant Center's settings (page data can't carry UK postcodes). Owner steps: the feed in Merchant Center, Bing Webmaster Tools, letting GPTBot and Meta's AI crawler past Hostinger's bot setting. Two weeks on, a search results check against the keyword map (`docs/PROGRESS.md`, next prompt).
 
 ---
 
