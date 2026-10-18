@@ -11,7 +11,7 @@ import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: 'Delivery and returns',
+  title: 'Sofa delivery and returns: times, costs and areas',
   description: `${PROMISES.delivery.short}, ${PROMISES.delivery.timingShort.toLowerCase()} for most postcodes. Pay on delivery. Where delivery costs extra, damaged deliveries and your right to change your mind.`,
   alternates: { canonical: '/delivery-and-returns' },
 }

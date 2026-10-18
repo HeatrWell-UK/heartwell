@@ -113,12 +113,15 @@ const HIGHLIGHTS_MAX = 10
 const HIGHLIGHT_MAX = 150
 
 /**
- * The space it takes, as Google asks for it: width the longest side, length
- * the other way (a straight sofa's depth, a corner's other side), and height.
+ * The space it takes, as Google asks for it: width across the back, length
+ * front to back (a straight sofa's depth, a corner's shorter side, a U-shape's
+ * longer side), and height. Read the same way as the drawings on its page
+ * (src/lib/product/measurements.ts).
  */
 export function footprint(s: SizeFields): FeedItem['dimensions'] {
   const { width_cm: w, depth_cm: d, height_cm: h, side_a_cm: a, side_b_cm: b } = s
-  if (a && b) return { width: Math.max(w ?? 0, a, b), length: Math.min(a, b), height: h }
+  if (a && b && w && w > Math.max(a, b)) return { width: w, length: Math.max(a, b), height: h }
+  if (a && b) return { width: Math.max(a, b), length: Math.min(a, b), height: h }
   return { width: w, length: d, height: h }
 }
 

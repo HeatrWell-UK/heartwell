@@ -7,8 +7,8 @@ import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { buttonClasses } from '@/components/ui/Button'
 
 export const metadata: Metadata = {
-  title: 'Will it fit? Measuring for a sofa',
-  description: 'How to measure your doors, hallway, stairs and room before ordering a sofa, with a quick door check.',
+  title: 'Will a sofa fit through my door? How to measure',
+  description: 'How to measure your doors, hallway, stairs and room before ordering a sofa, with a quick door check and what to do if it’s tight.',
   alternates: { canonical: '/will-it-fit' },
 }
 

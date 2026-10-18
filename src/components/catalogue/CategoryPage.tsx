@@ -7,7 +7,12 @@ import { ProductGrid } from './ProductTile'
 import { ShapePlan } from './ShapePlan'
 import { ShapeRail } from './ShapeRail'
 import { formatPrice } from '@/lib/format'
-import { getCategories, getListing, sentenceCase } from '@/lib/catalogue/listing'
+import Link from 'next/link'
+import { getCategories, getFabricLibrary, getListing, sentenceCase } from '@/lib/catalogue/listing'
+import { QuestionList } from '@/components/content/QuestionList'
+import { categoryGuides, categoryQuestions } from '@/content/categories'
+import { getDeliveryInfo } from '@/lib/product/load'
+import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { activeChips, applyFilters, facetsFor, hasFilters, listingHref, parseListing, sortProducts } from '@/lib/catalogue/filters'
 import { categoryHref, resolveCategory, subtreeIds, trail } from '@/lib/catalogue/tree'
 import { breadcrumbJsonLd, jsonLdString } from '@/lib/product/seo'
@@ -37,7 +42,14 @@ export async function categoryMetadata({ params, searchParams }: CategoryRoutePr
 }
 
 export async function CategoryPage({ params, searchParams }: CategoryRouteProps) {
-  const [{ department, category }, query, tree, listing] = await Promise.all([params, searchParams, getCategories(), getListing()])
+  const [{ department, category }, query, tree, listing, fabrics, delivery] = await Promise.all([
+    params,
+    searchParams,
+    getCategories(),
+    getListing(),
+    getFabricLibrary(),
+    SUPABASE_CONFIGURED ? getDeliveryInfo().catch(() => null) : Promise.resolve(null),
+  ])
   const node = resolveCategory(tree, department, category)
   if (!node) notFound()
 
@@ -56,6 +68,18 @@ export async function CategoryPage({ params, searchParams }: CategoryRouteProps)
   const controls = { path, facets, filters, sort, chips, count: shown.length, noun }
   const from = products.length ? Math.min(...products.map((p) => p.price)) : null
   const title = sentenceCase(node.name)
+  const titleInSentence = /^[A-Z]-/.test(title) ? title : title.charAt(0).toLowerCase() + title.slice(1)
+  // Answers to what people search for about this kind of sofa (src/content/categories.ts).
+  const children = tree
+    .filter((c) => c.parentId === node.id)
+    .map((c) => {
+      const ids = subtreeIds(tree, c.id)
+      const inside = products.filter((p) => p.categoryIds.some((id) => ids.has(id)))
+      return { name: sentenceCase(c.name), href: categoryHref(tree, c), count: inside.length, from: inside.length ? Math.min(...inside.map((p) => p.price)) : 0 }
+    })
+    .filter((c) => c.count > 0)
+  const questions = categoryQuestions(node.slug, { products, delivery, fabricCount: fabrics.reduce((n, c) => n + c.fabrics.length, 0), children })
+  const guides = categoryGuides(node.slug)
 
   return (
     <div className="pb-16">
@@ -110,7 +134,7 @@ export async function CategoryPage({ params, searchParams }: CategoryRouteProps)
         {(more.length > 0 || intro) && (
           <section aria-labelledby="about-category" className={`mt-8 max-w-[46rem] border-t border-line pt-8 ${more.length === 0 ? 'lg:hidden' : ''}`}>
             <h2 id="about-category" className="text-[26px] leading-tight lg:text-[30px]">
-              About {/^[A-Z]-/.test(title) ? title : title.charAt(0).toLowerCase() + title.slice(1)}
+              About {titleInSentence}
             </h2>
             <div className="mt-3 flex flex-col gap-3 text-[16px] leading-relaxed text-body-dark">
               {intro && <p className="lg:hidden">{intro}</p>}
@@ -119,6 +143,25 @@ export async function CategoryPage({ params, searchParams }: CategoryRouteProps)
               ))}
             </div>
           </section>
+        )}
+
+        <QuestionList id="category-questions" title={`Questions about ${titleInSentence}`} items={questions} structured className="mt-8 max-w-[46rem]" />
+
+        {guides.length > 0 && (
+          <nav aria-labelledby="category-guides" className="flex max-w-[46rem] flex-col gap-3 border-t border-line pt-8">
+            <h2 id="category-guides" className="text-[22px] leading-tight lg:text-[26px]">
+              Guides
+            </h2>
+            <ul className="flex flex-col gap-2 text-[16px]">
+              {guides.map((g) => (
+                <li key={g.href}>
+                  <Link href={g.href} className="font-semibold">
+                    {g.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         )}
       </div>
     </div>

@@ -11,8 +11,8 @@ import { getFabricLibrary } from '@/lib/catalogue/listing'
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: 'Our fabrics',
-  description: 'The fabric library for Heartwell’s made-to-order sofas: plush velvet, chenille, crushed velvet and more, in every colour we offer.',
+  title: 'Sofa fabrics: plush velvet, chenille and more',
+  description: 'The fabric library for Heartwell’s made-to-order sofas: plush velvet, chenille, crushed velvet and more, in every colour we offer. Samples by post.',
   alternates: { canonical: '/fabrics' },
 }
 

@@ -20,6 +20,9 @@ export interface ListingProduct {
   madeInUk: boolean
   price: number
   widthCm: number | null
+  /** Front to back, and height, in centimetres (for range pages' measurement answers). */
+  depthCm: number | null
+  heightCm: number | null
   /** Its top view in centimetres, for drawings to scale; null when the measurements aren't known. */
   plan: Layout | null
   shape: string | null

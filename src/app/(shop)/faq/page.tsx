@@ -11,8 +11,8 @@ import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: 'Questions and answers',
-  description: 'How paying on delivery works, delivery times and extras, returns, the guarantee, fabrics and samples: straight answers from Heartwell.',
+  title: 'Questions and answers: paying, delivery, returns',
+  description: 'How paying cash on delivery works, delivery times and extras, returns, the guarantee, fabrics and samples: straight answers from Heartwell.',
   alternates: { canonical: '/faq' },
 }
 

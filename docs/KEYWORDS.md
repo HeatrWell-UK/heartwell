@@ -1,0 +1,67 @@
+# Keyword map: the search each page is written for
+
+Phase 20, 18 October 2026. Every page Google can index has a search it's written for, so pages don't compete with each other and nothing important is left unanswered. Searches come from Google's own UK suggestions (what people type, in the order Google ranks it), collected on 18 October 2026; there are no volume figures yet, so Search Console → Performance is the check from here (see "Next" at the end).
+
+**What makes Heartwell different, and leads every page:** pay **cash on delivery** (or bank transfer), **no deposit**, **delivered in 2 to 4 working days** to most of mainland Britain (made-to-order sofas too), **free delivery** to most areas, a **showroom in Burnley**. People search these exact words: "cash on delivery sofas", "pay on delivery sofas", "corner sofa cash on delivery", "corner sofa fast delivery uk", "sofa quick delivery uk", "sofas delivered in 7 days", "sofa no deposit", "sofa shop burnley".
+
+**Answer engines (AEO/GEO).** ChatGPT search and Copilot read Bing's index, Perplexity its own and Bing's, Gemini and Google's AI answers Google's. So the same work counts twice: pages answer the question in their first lines and in a questions section (FAQ data on category, range and FAQ pages), Bing hears about every change through IndexNow, and `/llms.txt` and `/llms-full.txt` give assistants the shop and the whole catalogue in plain text.
+
+## Home and shop
+
+| Page | Written for | Also answers | Where the words live |
+| --- | --- | --- | --- |
+| `/` | heartwell sofa, cash on delivery sofas, sofas delivered in days | pay on delivery furniture, sofa free delivery uk | `src/app/layout.tsx` (title), `META_DESCRIPTION` |
+| `/sofas` | sofas delivered in days, pay cash on delivery | sofa quick delivery uk, how much is a sofa | database `categories` (migration `category_search_words`), questions in `src/content/categories.ts` |
+| `/sofas/corner-sofas` | corner sofa fast delivery uk, corner sofa cash on delivery | corner sofas under 500, left or right hand corner sofa, will a corner sofa fit through my door | same |
+| `/sofas/u-shaped-sofas` | u shaped sofa uk | how much space does a u shaped sofa need, u shaped sofa cheap | same |
+| `/sofas/3-2-sofa-sets` | 3+2 sofa set, 3 and 2 seater sofa set | 3+2 sofa set price | same |
+| `/sofas/fabric-sofas` | plush velvet sofa, chenille sofa, crushed velvet sofa | best sofa fabric, fabric sofa made in uk | same |
+| `/sofas/leather-sofas` | leather look sofa, tech leather sofa, leather aire sofa | is tech leather real leather, faux leather sofa uk | same |
+| `/sofas/recliners` | recliner sofa, manual recliner sofa | electric vs manual recliner, recliner sofa with usb | same |
+| `/sofas/electric-recliners` | electric recliner sofa uk | electric recliner sofa with usb and cup holders | same |
+| `/sofas/armchairs-and-footstools` | armchair and footstool to match sofa | reclining armchair | same |
+| `/ranges` | sofa ranges | | `src/app/(shop)/ranges/page.tsx` |
+| `/ranges/<range>` | "<range> sofa", "<range> corner sofa", "<range> sofa dimensions" | what colours, high back or scatter back, made to order, delivery, can I see it | `src/app/(shop)/ranges/[slug]/page.tsx`, answers in `src/lib/seo/answers.ts` |
+| `/products/<piece>` | the piece by name and size ("roma recliner sofa 3+2 dimensions", "orlando electric recliner sofa") | how big, cover and colours, delivery, paying, fit, returns, extras | product title and description (database), answers in `src/lib/seo/answers.ts` |
+| `/fabrics` | sofa fabrics, plush velvet colours | | `src/app/(shop)/fabrics/page.tsx` |
+| `/fabric-samples` | sofa fabric samples | | `src/app/(shop)/fabric-samples/page.tsx` |
+
+Range names are trade names other UK shops use too (Verona, Roma, Orlando, Nova, Ashton, Malibu, Windsor…), so "<range> sofa dimensions" and "<range> sofa reviews" are real searches the range and product pages can win with exact measurements. Big names own some of them ("windsor corner sofa" leads to DFS); "sims sofa" is the video game. That's fine: the range page still answers people who already know the name.
+
+## Help and guides
+
+| Page | Written for | Also answers |
+| --- | --- | --- |
+| `/visit-us` | sofa shop burnley, sofa showroom lancashire, furniture shop burnley | sofas near burnley, sofa blackburn |
+| `/delivery-and-returns` | sofa delivery and returns, sofa delivery charges | delivery to devon, cornwall, scotland |
+| `/faq` | questions about paying on delivery, delivery, returns | |
+| `/will-it-fit` | will a sofa fit through my door | will my sofa fit through the door calculator |
+| `/guides/how-paying-on-delivery-works` | cash on delivery sofas, pay on delivery sofas | sofa cash on delivery scam, sofa no deposit, sofa without card |
+| `/guides/how-long-does-sofa-delivery-take` | how long does sofa delivery take | sofa next day delivery, sofas delivered in 7 days |
+| `/guides/choosing-the-right-size-sofa` | what size sofa do I need | what size sofa for a 12x12 room |
+| `/guides/measuring-for-a-corner-sofa` | how to measure for a corner sofa | |
+| `/guides/left-or-right-hand-corner-sofa` | left or right hand corner sofa | what does 2c1 mean, 1c2 corner sofa |
+| `/guides/high-back-or-scatter-back-sofa` | scatter back vs high back sofa | scatter back sofa pros and cons, scatter back meaning |
+| `/guides/electric-or-manual-recliner` | electric vs manual recliner sofa | are electric or manual recliners better |
+| `/guides/tech-leather-and-leather-aire` | tech leather vs leather, leather aire sofa | is air leather real leather |
+| `/guides/choosing-a-sofa-fabric` | best sofa fabric for pets, is velvet good for a sofa | best sofa fabric for kids, chenille or velvet |
+| `/guides/what-made-to-order-means` | made to order sofa uk | how long do made to order sofas take |
+| `/guides/getting-ready-for-delivery-day` | sofa delivery day checklist | |
+| `/about` | heartwell sofa, who are heartwell | |
+| `/care-guide` | how to clean a velvet sofa, how to clean faux leather sofa | |
+| `/reviews` | heartwell sofa reviews | |
+| `/contact` | heartwell sofa contact | |
+
+Not indexed on purpose: basket, saved, checkout, search, order and confirm links, track my order, the style guide, filtered and sorted category pages.
+
+## Ideas for later (each would be a new page)
+
+- **Collections** for searches the categories don't cover: "chesterfield corner sofa" (Rio Chesterfield, Windsor), "grey corner sofa", "corner sofas under £500", "high back corner sofa". Each needs a category in Admin → Catalogue → Structure and its words.
+- **Places** only where it's true: the Burnley showroom page already covers Burnley and Lancashire; a page per town would be thin and Google treats it as spam.
+- **TikTok** in the footer and Organization data once the profile opens.
+
+## Next
+
+1. **Search Console → Performance**, from about two weeks after launch: which searches show Heartwell, at what position, and which pages. Pages with impressions but few clicks get a better title; searches that land on the wrong page get their own answer.
+2. **Bing Webmaster Tools** (owner): sign in with the Microsoft account, choose **Import from Google Search Console**, and the site and sitemap come across. IndexNow already tells Bing about every change.
+3. Re-run the search check (`docs/PROGRESS.md`, 17 October) after any big content change.

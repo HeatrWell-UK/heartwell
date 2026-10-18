@@ -21,7 +21,8 @@ function files(dir: string): string[] {
 /** Does a shop link lead to a page we have? Category and product pages are dynamic, so their prefixes count. */
 function pageExists(href: string): boolean {
   const [path = '', anchor] = href.split('#')
-  if (/^\/sofas(\/[a-z0-9-]+)?$/.test(path) || path.startsWith('/products/')) return true
+  if (/^\/sofas(\/[a-z0-9-]+)?$/.test(path) || path.startsWith('/products/') || path.startsWith('/ranges/')) return true
+  if (path.startsWith('/guides/')) return GUIDES.some((g) => `/guides/${g.slug}` === path)
   const page = join(SHOP, ...path.split('/').filter(Boolean), 'page.tsx')
   if (!existsSync(page)) return false
   return anchor ? readFileSync(page, 'utf8').includes(`id: '${anchor}'`) || readFileSync(page, 'utf8').includes(`id="${anchor}"`) : true
