@@ -12,7 +12,7 @@ export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Sofa delivery and returns: times, costs and areas',
-  description: `${PROMISES.delivery.short}, ${PROMISES.delivery.timingShort.toLowerCase()} for most postcodes. Pay on delivery. Where delivery costs extra, damaged deliveries and your right to change your mind.`,
+  description: `${PROMISES.delivery.short}, ${PROMISES.delivery.timingShort.toLowerCase()} for most postcodes. Pay on delivery. Where it costs extra, damage and changing your mind.`,
   alternates: { canonical: '/delivery-and-returns' },
 }
 

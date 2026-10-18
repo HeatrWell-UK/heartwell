@@ -43,7 +43,9 @@ export function productDescription(p: ProductPageData): string {
   // rather than cutting off how paying works at the end.
   const options = colours.length > 1
     ? [` in ${colours.slice(0, -1).join(', ')} or ${colours.at(-1)}`, ` in ${colours.length} colours`]
-    : [colours.length ? ` in ${colours[0]}` : '']
+    : colours.length
+      ? [` in ${colours[0]}`, '']
+      : ['']
   return options.map(text).find((t) => t.length <= DESCRIPTION_MAX) ?? text(options.at(-1)!)
 }
 
