@@ -18,6 +18,10 @@ export interface VisitAddress {
   street: string
   locality: string
   postcode: string
+  /** County, for search engines and "where are you?" answers. */
+  county: string
+  /** The postcode's centre (postcodes.io), for search engines' maps. */
+  geo: { latitude: number; longitude: number }
 }
 
 export interface VisitDetails {
@@ -40,8 +44,14 @@ export const CONTACT = {
   /** International digits without "+", for wa.me links. */
   whatsAppNumber: '447848477056' as string | null,
   /** Owner, 12 October 2026; postcode confirmed 17 October 2026. */
-  visitAddress: { street: 'Unit 4, Blacker Street', locality: 'Burnley', postcode: 'BB10 2AF' } as VisitAddress | null,
-  /** Showroom visits (owner, 17 October 2026): Monday to Friday, by appointment, booked at least a day ahead. Ordering online never closes and deliveries run seven days a week. */
+  visitAddress: {
+    street: 'Unit 4, Blacker Street',
+    locality: 'Burnley',
+    postcode: 'BB10 2AF',
+    county: 'Lancashire',
+    geo: { latitude: 53.809469, longitude: -2.240479 },
+  } as VisitAddress | null,
+  /** Showroom visits (owner, 17 October 2026): Monday to Friday, by appointment, booked at least a day ahead. Ordering online never closes; delivery days are in shop_settings (no Mondays). */
   visit: {
     hours: '9am to 5pm',
     days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],

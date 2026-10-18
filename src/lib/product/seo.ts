@@ -136,21 +136,50 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[], siteUr
   }
 }
 
-/** Who runs the shop, for search engines: name, logo, contact, address and profiles (each only once set). */
+const postalAddress = (a: NonNullable<typeof CONTACT.visitAddress>) => ({
+  '@type': 'PostalAddress',
+  streetAddress: a.street,
+  addressLocality: a.locality,
+  addressRegion: a.county,
+  postalCode: a.postcode,
+  addressCountry: 'GB',
+})
+
+/**
+ * The shop's return policy, for Google: ${POLICIES.changeOfMindDays} days on ready-made pieces,
+ * the customer paying the return. Each made-to-order product overrides it on
+ * its own page (no change-of-mind returns).
+ */
+export function shopReturnPolicy(siteUrl: string) {
+  return {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: 'GB',
+    returnPolicyCountry: 'GB',
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: POLICIES.changeOfMindDays,
+    returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+    refundType: 'https://schema.org/FullRefund',
+    merchantReturnLink: `${siteUrl}/delivery-and-returns`,
+  }
+}
+
+/** Who runs the shop, for search engines: name, logo, contact, address, profiles and return policy (each only once set). */
 export function organizationJsonLd(siteUrl: string) {
   const a = CONTACT.visitAddress
   return {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': 'OnlineStore',
     '@id': `${siteUrl}/#organization`,
     name: BRAND.name,
+    alternateName: BRAND.alternateNames,
     ...(CONTACT.trading.companyName ? { legalName: CONTACT.trading.companyName } : {}),
     url: siteUrl,
     logo: `${siteUrl}/brand/hw-logo.webp`,
     description: BRAND.shortDescription,
     email: CONTACT.email,
     ...(CONTACT.phoneE164 ? { telephone: CONTACT.phoneE164 } : {}),
-    ...(a ? { address: { '@type': 'PostalAddress', streetAddress: a.street, addressLocality: a.locality, postalCode: a.postcode, addressCountry: 'GB' } } : {}),
+    ...(a ? { address: postalAddress(a) } : {}),
+    areaServed: { '@type': 'Country', name: 'United Kingdom' },
     ...(CONTACT.socials.length ? { sameAs: CONTACT.socials.map((s) => s.url) } : {}),
     contactPoint: {
       '@type': 'ContactPoint',
@@ -160,5 +189,49 @@ export function organizationJsonLd(siteUrl: string) {
       areaServed: 'GB',
       availableLanguage: 'en-GB',
     },
+    hasMerchantReturnPolicy: shopReturnPolicy(siteUrl),
+    // The Burnley showroom (Visit us).
+    ...(a ? { location: { '@id': `${siteUrl}/visit-us#store` } } : {}),
+  }
+}
+
+/** The site itself, so Google shows "Heartwell" as the site's name in results. */
+export function websiteJsonLd(siteUrl: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteUrl}/#website`,
+    name: BRAND.name,
+    alternateName: BRAND.alternateNames,
+    url: `${siteUrl}/`,
+    inLanguage: 'en-GB',
+    publisher: { '@id': `${siteUrl}/#organization` },
+  }
+}
+
+/** The showroom, for local searches ("sofa shop Burnley"): address, map position and opening hours. */
+export function storeJsonLd(siteUrl: string, mapHref: string) {
+  const a = CONTACT.visitAddress
+  if (!a) return null
+  const v = CONTACT.visit
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FurnitureStore',
+    '@id': `${siteUrl}/visit-us#store`,
+    name: `${BRAND.name} showroom`,
+    url: `${siteUrl}/visit-us`,
+    image: `${siteUrl}/opengraph-image.jpg`,
+    description: `See and sit on ${BRAND.name} sofas and feel the fabrics, by appointment.`,
+    email: CONTACT.email,
+    ...(CONTACT.phoneE164 ? { telephone: CONTACT.phoneE164 } : {}),
+    address: postalAddress(a),
+    geo: { '@type': 'GeoCoordinates', latitude: a.geo.latitude, longitude: a.geo.longitude },
+    hasMap: mapHref,
+    // Days only once the owner confirms them; until then search engines get no hours rather than wrong ones.
+    ...(v.days.length ? { openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: v.days, opens: v.opens, closes: v.closes }] } : {}),
+    priceRange: '££',
+    currenciesAccepted: 'GBP',
+    paymentAccepted: 'Cash, Bank transfer',
+    parentOrganization: { '@id': `${siteUrl}/#organization` },
   }
 }

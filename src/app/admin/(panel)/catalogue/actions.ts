@@ -1,6 +1,7 @@
 'use server'
 
 import { updateTag } from 'next/cache'
+import { after } from 'next/server'
 import { adminGuard } from '@/lib/auth/admin'
 import { createClient } from '@/lib/supabase/server'
 import { CATALOGUE_TAG } from '@/lib/catalogue/listing'
@@ -8,10 +9,12 @@ import { asRecord, checkDraft, DraftSchema, explainCatalogueError, savedNote, sa
 import { readSpecFields } from '@/lib/admin/structure-form'
 import { signedUpload, type SignedUpload } from '@/lib/admin/cloudinary'
 import type { Json } from '@/types/database'
+import { submitToIndexNow } from '@/lib/seo/indexnow'
 
 // Saving, hiding and deleting products. The database function checks the
 // admin again and does the whole save in one transaction; afterwards the
-// shop's cached catalogue is expired so the change shows on the next visit.
+// shop's cached catalogue is expired so the change shows on the next visit,
+// and Bing (IndexNow) is told the product's page changed.
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -44,15 +47,17 @@ export async function saveProduct(input: unknown): Promise<SaveResult> {
   updateTag(CATALOGUE_TAG)
 
   const r = data as { id: string; slug: string; colourways_hidden: number; colourways_deleted: number }
+  after(() => submitToIndexNow([`/products/${r.slug}`]))
   return { ok: true, id: r.id, slug: r.slug, removed: r.colourways_deleted, hidden: r.colourways_hidden, message: savedNote(r.colourways_deleted, r.colourways_hidden) }
 }
 
 export async function setProductShown(id: string, shown: boolean): Promise<SimpleResult> {
   if (!UUID.test(id)) return { ok: false, message: 'Unknown product.' }
   if (await adminGuard()) return { ok: false, message: SIGN_IN }
-  const { error } = await (await createClient()).from('products').update({ is_active: shown }).eq('id', id)
+  const { data, error } = await (await createClient()).from('products').update({ is_active: shown }).eq('id', id).select('slug').maybeSingle()
   if (error) return { ok: false, message: explainCatalogueError(error.message) }
   updateTag(CATALOGUE_TAG)
+  if (data?.slug) after(() => submitToIndexNow([`/products/${data.slug}`]))
   return { ok: true, message: shown ? 'Shown in the shop again.' : 'Hidden from the shop. Orders and history are kept.' }
 }
 
@@ -62,7 +67,9 @@ export async function deleteProduct(id: string): Promise<SimpleResult> {
   const { data, error } = await (await createClient()).rpc('admin_delete_product', { p_product_id: id })
   if (error) return { ok: false, message: explainCatalogueError(error.message) }
   updateTag(CATALOGUE_TAG)
-  return { ok: true, message: `Deleted ${(data as { slug?: string } | null)?.slug ?? 'the product'}.` }
+  const slug = (data as { slug?: string } | null)?.slug
+  if (slug) after(() => submitToIndexNow([`/products/${slug}`]))
+  return { ok: true, message: `Deleted ${slug ?? 'the product'}.` }
 }
 
 /** Signed fields for one direct upload to Cloudinary, or a reason there's no upload. */

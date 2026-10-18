@@ -1,5 +1,6 @@
-// Admin → Ad links: the catalogue feed's state (what's in it, what's left out,
-// when Meta last fetched it) and the shop's ranges and products for links.
+// Admin → Ad links: the catalogue feeds' state (what's in them, what's left
+// out, when Meta and Google last fetched them) and the shop's ranges and
+// products for links.
 
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
@@ -29,9 +30,10 @@ export interface AdLinkRange {
 
 export async function loadAdLinks() {
   const db = await createClient()
-  const [feedProducts, fetches, ranges, products] = await Promise.all([
+  const [feedProducts, fetches, googleFetches, ranges, products] = await Promise.all([
     getFeedProducts(),
     db.from('feed_fetches').select('agent, first_fetched_at, last_fetched_at, fetch_count, last_items').eq('feed', 'meta'),
+    db.from('feed_fetches').select('agent, first_fetched_at, last_fetched_at, fetch_count, last_items').eq('feed', 'google'),
     db.from('ranges').select('id, name, slug, sort').eq('is_active', true).order('sort').order('name'),
     db
       .from('products')
@@ -40,7 +42,7 @@ export async function loadAdLinks() {
       .order('sort')
       .order('slug'),
   ])
-  for (const r of [fetches, ranges, products]) if (r.error) throw new Error(`Ad links: ${r.error.message}`)
+  for (const r of [fetches, googleFetches, ranges, products]) if (r.error) throw new Error(`Ad links: ${r.error.message}`)
 
   const { items, leftOut } = buildFeed(feedProducts, SITE_URL)
   const toProduct = (p: NonNullable<typeof products.data>[number]): AdLinkProduct => ({
@@ -58,10 +60,15 @@ export async function loadAdLinks() {
   return {
     feedUrl: `${SITE_URL}/feeds/meta-catalogue.xml`,
     feed: { items: items.length, products: new Set(items.map((i) => i.itemGroupId ?? i.id)).size, leftOut: groupLeftOut(leftOut) },
-    fetches: fetches.data!.map((f) => ({ agent: f.agent as FeedAgent, last: f.last_fetched_at, first: f.first_fetched_at, count: f.fetch_count, items: f.last_items })) satisfies FeedFetch[],
+    fetches: fetches.data!.map(toFetch),
+    googleFeedUrl: `${SITE_URL}/feeds/google-merchant.xml`,
+    googleFetches: googleFetches.data!.map(toFetch),
     ranges: grouped.filter((r) => r.products.length > 0),
   }
 }
+
+type FetchRow = { agent: string; first_fetched_at: string; last_fetched_at: string; fetch_count: number; last_items: number }
+const toFetch = (f: FetchRow): FeedFetch => ({ agent: f.agent as FeedAgent, last: f.last_fetched_at, first: f.first_fetched_at, count: f.fetch_count, items: f.last_items })
 
 /** "Lily Footstool: Grey, Navy Blue (no photo of these colours)": one line per product and reason. */
 function groupLeftOut(list: LeftOut[]) {

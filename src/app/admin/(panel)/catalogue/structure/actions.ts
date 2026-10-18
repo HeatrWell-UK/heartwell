@@ -1,6 +1,8 @@
 'use server'
 
 import { updateTag } from 'next/cache'
+import { after } from 'next/server'
+import { submitToIndexNow } from '@/lib/seo/indexnow'
 import { adminGuard } from '@/lib/auth/admin'
 import { createClient } from '@/lib/supabase/server'
 import { CATALOGUE_TAG } from '@/lib/catalogue/listing'
@@ -90,7 +92,10 @@ export async function saveRange(input: RangeDraft): Promise<StructureResult> {
   if (!isDraft(input)) return { ok: false, message: 'Check the form and try again.' }
   const problems = checkRange(input)
   if (problems.length) return { ok: false, message: problems[0]! }
-  return upsertRow('ranges', idOf(input), rangeRow(input))
+  const saved = await upsertRow('ranges', idOf(input), rangeRow(input))
+  const slug = typeof input.slug === 'string' ? input.slug : null
+  if (saved.ok && slug) after(() => submitToIndexNow([`/ranges/${slug}`]))
+  return saved
 }
 
 export async function deleteRange(id: string) {

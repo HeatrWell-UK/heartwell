@@ -29,7 +29,8 @@ export function VisitUs({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' })
   return (
     <section aria-labelledby="visit-us" className="flex flex-col gap-4">
       <Heading id="visit-us" className={headingLevel === 'h1' ? 'text-[38px] leading-[1.06] lg:text-[56px]' : 'text-[28px] leading-tight lg:text-[34px]'}>
-        Visit us
+        {/* As the page's own heading it names the place, as people search for it ("sofa shop Burnley"). */}
+        {headingLevel === 'h1' ? `Our sofa showroom in ${a.locality}` : 'Visit us'}
       </Heading>
       <p className="text-[17px] leading-relaxed text-slate">
         See the sofas and feel the fabrics in person, in {a.locality}. Visits are by appointment, so someone is there to show you round.
