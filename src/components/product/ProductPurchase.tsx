@@ -21,10 +21,14 @@ import { FabricSheet, FabricSwatch, type ChosenFabric } from './FabricSheet'
 import { AddedSheet, type AddedItem } from './AddedSheet'
 import { StickyBuyBar } from './StickyBuyBar'
 import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
+import { useWelcome, WelcomePanel } from '@/components/offer/WelcomeOffer'
 import { ScalePlan } from '@/components/catalogue/ScalePlan'
 import { planFrame, sizeLabel } from '@/lib/catalogue/range-sizes'
+import { dealFor, dealLabel } from '@/lib/catalogue/deal'
 import { homeSwatches } from '@/lib/home/picks'
+import { bestOffer, welcomeOff, type ShopOffers } from '@/lib/offers/welcome'
 import type { Layout } from '@/lib/product/measurements'
+import { InfoIcon } from '@phosphor-icons/react'
 
 export type PurchaseProduct = Pick<
   ProductPageData,
@@ -33,6 +37,7 @@ export type PurchaseProduct = Pick<
   | 'title'
   | 'typeName'
   | 'basePrice'
+  | 'wasPrice'
   | 'madeToOrder'
   | 'madeInUk'
   | 'variants'
@@ -57,7 +62,8 @@ export function ProductPurchase({
   product: p,
   initialVariantId,
   initialFabric,
-  offer,
+  adAmount,
+  offers,
   plans,
   children,
 }: {
@@ -65,8 +71,10 @@ export function ProductPurchase({
   initialVariantId: string | null
   initialFabric: ChosenFabric | null
   plans: SizePlans
-  /** What an ad visitor’s offer takes off this piece, and the code to use elsewhere. */
-  offer: { amount: number; code: string | null }
+  /** What an ad visitor’s offer takes off this piece (its tier's amount). */
+  adAmount: number
+  /** The welcome offer, the minimum order, and the ad offer's code and amounts. */
+  offers: ShopOffers
   children: ReactNode
 }) {
   const basket = useBasket()
@@ -118,9 +126,18 @@ export function ProductPurchase({
   // Each size's top view, all to one scale (the same drawings as the range page).
   const frame = planFrame(sizes.map((s) => plans[s.slug]?.plan ?? null))
 
-  // The ad-visitor offer, while it's live, comes off what's paid on delivery.
-  const offerEnds = useOfferEnds()
-  const offerOff = offerEnds ? Math.min(offer.amount, price) : 0
+  // A was-price, with the same colourway or fabric difference as today's price.
+  const deal = dealFor(price, p.wasPrice === null ? null : unitPrice(p.wasPrice, variant?.priceAdjustment ?? 0, fabric?.collection.surcharge ?? 0))
+
+  // One offer comes off what's paid on delivery, while it's live: the welcome
+  // offer or an ad visitor's, whichever takes more off (as the database decides).
+  const welcome = useWelcome(offers.welcome.enabled)
+  const adEnds = useOfferEnds()
+  const adOff = adEnds ? Math.min(adAmount, price) : 0
+  const welcomeAmount = welcomeOff(1, price, offers.welcome.amount)
+  const showWelcome = welcome.kind !== 'none' && welcomeAmount > adOff
+  const offer = bestOffer(welcome.kind === 'live' ? welcomeAmount : 0, adOff)
+  const offerOff = offer.amount
 
   const sizeText = p.axis1Value ? [p.axis1Value, p.axis2Value].filter((v): v is string => Boolean(v)).map(sizeLabel) : []
   const heading =
@@ -168,10 +185,21 @@ export function ProductPurchase({
               <span className="text-[40px] leading-none lg:text-[52px]">{heading.name}</span>
               {heading.detail && <span className="font-sans text-[17px] leading-snug tracking-normal text-slate">{heading.detail}</span>}
             </h1>
-            <p className="flex items-baseline gap-3 pt-1">
+            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 pt-1">
+              {deal && <span className="sr-only">Now </span>}
               <Price amount={price} className="text-[34px] leading-none" />
+              {deal && (
+                <>
+                  <s className="font-display text-[21px] leading-none text-slate decoration-[1.5px]">
+                    <span className="sr-only">, was </span>
+                    {formatPrice(deal.was)}
+                  </s>
+                  <span className="self-center rounded-full bg-gold-pale px-2.5 py-1 text-[13px] font-semibold leading-none text-wine">{dealLabel(deal, formatPrice)}</span>
+                </>
+              )}
               <span className="text-[15px] font-semibold text-velvet">Free delivery for most postcodes</span>
             </p>
+            {showWelcome && <WelcomePanel state={welcome} amount={welcomeAmount} hours={offers.welcome.hours} noun={noun} />}
             {/* What's paid when: the shop's whole promise, in two lines. */}
             <dl className="flex flex-col rounded-[14px] border border-line px-3.5 text-[15px]">
               <div className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2.5">
@@ -183,11 +211,12 @@ export function ProductPurchase({
                 <dt>To pay on delivery</dt>
                 <dd className="font-display text-[20px] leading-none">{formatPrice(price - offerOff)}</dd>
                 <dd className="basis-full text-[13px] leading-snug text-slate">
-                  Cash or bank transfer to the driver, once it&rsquo;s in your room{offerOff > 0 ? `, with your ${formatPrice(offerOff)} off` : ''}.
+                  Cash or bank transfer to the driver, once it&rsquo;s in your room
+                  {offerOff > 0 ? `, with your ${formatPrice(offerOff)} ${offer.kind === 'welcome' ? 'welcome offer' : 'offer'} taken off` : ''}.
                 </dd>
               </div>
             </dl>
-            <OfferStrip amount={Math.min(offer.amount, price)} noun={noun} code={offer.code} />
+            {!showWelcome && <OfferStrip amount={Math.min(adAmount, price)} noun={noun} code={offers.code} />}
           </div>
 
           {p.variants.length > 0 && (
@@ -328,6 +357,12 @@ export function ProductPurchase({
               <WhatsAppGlyph />
               Ask about this {noun} on WhatsApp
             </WhatsAppButton>
+            {variant && price < offers.minOrder && (
+              <p className="flex items-start gap-2 text-[14px] leading-snug text-slate">
+                <InfoIcon aria-hidden="true" size={18} className="mt-px shrink-0 text-velvet" />
+                Orders start at {formatPrice(offers.minOrder)}, so add this {noun} to an order with another piece.
+              </p>
+            )}
           </div>
 
           {children}
@@ -335,7 +370,7 @@ export function ProductPurchase({
       </div>
 
       {variant && <StickyBuyBar price={price} onAdd={addToBasket} watch={addRef} />}
-      <AddedSheet item={added} onClose={() => setAdded(null)} />
+      <AddedSheet item={added} offers={offers} onClose={() => setAdded(null)} />
       {p.madeToOrder && (
         <FabricSheet
           open={fabricsOpen}

@@ -25,7 +25,7 @@ export async function ShopShell({ children }: { children: ReactNode }) {
       </main>
       <Footer shop={shop} />
       <Tracking mode={tracking.mode} />
-      <OfferCapture enabled={offers.adOffer} />
+      <OfferCapture enabled={offers.adOffer} welcome={offers.welcome.enabled} />
     </div>
   )
 }

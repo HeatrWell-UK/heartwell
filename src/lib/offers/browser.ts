@@ -1,9 +1,11 @@
-// The ad-visitor offer in the browser: claiming it when a visit lands from an
-// ad, and a small store the offer strips subscribe to. Client components only.
+// The offers in the browser: claiming the ad-visitor offer when a visit lands
+// from an ad, starting the welcome offer on a first visit, and small stores
+// the offer strips subscribe to. Client components only.
 
 import { newEventId, readCookie } from '@/lib/tracking/browser'
 import { visitIds } from '@/lib/basket/store'
 import { classifyPaidLanding, OFFER_UNTIL_COOKIE } from './paid'
+import { WELCOME_UNTIL_COOKIE } from './welcome'
 
 const CHANGED = 'hw:offer'
 const CLAIMED = 'hw-offer-claimed'
@@ -44,6 +46,53 @@ export async function claimOfferFromAd(): Promise<void> {
   } catch {
     // No offer this time; the code still works at checkout.
   }
+}
+
+// The welcome offer ------------------------------------------------------------
+
+const WELCOME_CHANGED = 'hw:welcome'
+/** This page has asked the shop and has its answer (none, when the cookie didn't come back). */
+let welcomeAsked = false
+let welcomeAsking: Promise<void> | null = null
+
+export const welcomeStore = {
+  subscribe(onChange: () => void) {
+    window.addEventListener(WELCOME_CHANGED, onChange)
+    return () => window.removeEventListener(WELCOME_CHANGED, onChange)
+  },
+  /**
+   * The offer's end (ISO, possibly past) once the shop has said; 'none' when
+   * it has no offer for this browser; '' while that isn't known yet.
+   */
+  getSnapshot(): string {
+    return readCookie(WELCOME_UNTIL_COOKIE) || (welcomeAsked ? 'none' : '')
+  },
+  getServerSnapshot: () => '',
+}
+
+/**
+ * On a visit without the welcome cookie, asks the shop for this visitor's
+ * welcome offer (the database starts it on the first visit and never again).
+ * Once per page; the cookie then answers every later page.
+ */
+export function claimWelcome(): Promise<void> {
+  if (readCookie(WELCOME_UNTIL_COOKIE) || welcomeAsked) return Promise.resolve()
+  welcomeAsking ??= (async () => {
+    // Some in-app browsers block storage; the offer is then keyed to a one-off ID and this browser's cookie.
+    const visit = visitIds()
+    try {
+      await fetch('/api/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitorId: visit?.visitorId ?? newEventId() }),
+      })
+    } catch {
+      // No offer shown this time; nothing promised that checkout wouldn't honour.
+    }
+    welcomeAsked = true
+    window.dispatchEvent(new Event(WELCOME_CHANGED))
+  })()
+  return welcomeAsking
 }
 
 function session(op: 'get' | 'set', value = ''): string | null {

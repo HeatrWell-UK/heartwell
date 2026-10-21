@@ -47,6 +47,15 @@ export async function setAdOffer(on: boolean): Promise<SettingsResult> {
   return { ok: true, message: on ? 'Ad visitors get the offer again.' : 'Switched off. Offers already given still apply until their date.' }
 }
 
+/** The welcome offer. Off stops new ones and takes it off checkout straight away (the countdowns go too). */
+export async function setWelcomeOffer(on: boolean): Promise<SettingsResult> {
+  if (await adminGuard()) return SIGN_IN
+  const { error } = await (await createClient()).from('shop_settings').update({ welcome_offer_enabled: on === true }).eq('id', true)
+  if (error) return { ok: false, message: `Couldn’t change it: ${error.message}` }
+  updateTag(SETTINGS_TAG)
+  return { ok: true, message: on ? 'Every visitor gets the welcome offer again.' : 'Switched off. The welcome offer and its countdown are gone from the shop and checkout.' }
+}
+
 export async function setOfferCodeActive(rawCode: string, active: boolean): Promise<SettingsResult> {
   if (await adminGuard()) return SIGN_IN
   const code = cleanOfferCode(String(rawCode ?? ''))

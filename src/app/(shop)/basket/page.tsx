@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getOfferSettings } from '@/lib/offers/server'
+import { getOfferSettings, shopOffers } from '@/lib/offers/server'
 import { BasketView } from './BasketView'
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export default async function BasketPage() {
       <h1 className="text-[34px] leading-[1.08] lg:text-[52px]">Your basket</h1>
       {/* The same minimum height before and after the basket is read, so nothing jumps. */}
       <div className="min-h-[50vh]">
-        <BasketView offerAmounts={offers.amounts} offerCode={offers.code} />
+        <BasketView offers={shopOffers(offers)} />
       </div>
     </div>
   )

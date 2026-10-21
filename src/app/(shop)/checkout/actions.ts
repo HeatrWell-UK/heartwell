@@ -15,6 +15,7 @@ import { ga4ClientIdFromCookie } from '@/lib/tracking/ga4-event'
 import { sendOrderPlacedEmails } from '@/lib/checkout/notify'
 import { isUkPhone, formatUkPhone } from '@/lib/checkout/phone'
 import { OFFER_COOKIE, OFFER_UNTIL_COOKIE, offerToken } from '@/lib/offers/paid'
+import { WELCOME_COOKIE } from '@/lib/offers/welcome'
 
 const UNAVAILABLE: PlainError = {
   code: 'UNAVAILABLE',
@@ -28,8 +29,18 @@ export interface CheckoutQuote {
   discountTier: string | null
   codeValid: boolean
   promotionCode: string | null
-  /** The ad-visitor offer is live and counted (the discount is the same whichever applies). */
+  /** The ad-visitor offer is live (it, a code or the welcome offer applies, whichever takes the most off). */
   adOffer: boolean
+  /** Which offer the discount is: an offer code, the ad offer or the welcome offer. */
+  offerSource: 'manual_code' | 'paid_entitlement' | 'welcome' | null
+  /** The welcome offer is live, and what it would take off. */
+  welcome: boolean
+  welcomeAmount: number
+  /** What a code (or the ad offer) would take off, to explain why the welcome offer won. */
+  codeAmount: number
+  /** The minimum order, and whether these pieces fall short of it. */
+  minimumOrder: number
+  belowMinimum: boolean
   delivery: {
     floor: number
     hasLift: boolean
@@ -58,15 +69,18 @@ export async function quoteCheckout(input: unknown): Promise<{ ok: true; quote: 
 
   const jar = await cookies()
   const token = offerToken(jar.get(OFFER_COOKIE)?.value)
-  const { data, error } = await createAdminClient().rpc('price_order', { p_input: pricingPayload(parsed.data, token) })
+  // The welcome offer's cookie stays after it ends, so an ended offer stays ended on this browser.
+  const welcomeToken = offerToken(jar.get(WELCOME_COOKIE)?.value)
+  const { data, error } = await createAdminClient().rpc('price_order', { p_input: pricingPayload(parsed.data, token, welcomeToken) })
   if (error) return { ok: false, error: explainOrderError(error.message) }
   const r = data as Record<string, unknown>
-  // An offer that has ended (or was withdrawn) stops showing anywhere.
+  // An ad offer that has ended (or was withdrawn) stops showing anywhere.
   if (token && r.entitlement_valid !== true) {
     jar.delete(OFFER_COOKIE)
     jar.delete(OFFER_UNTIL_COOKIE)
   }
   const d = (r.delivery ?? {}) as Record<string, unknown>
+  const source = r.offer_source
   return {
     ok: true,
     quote: {
@@ -76,6 +90,12 @@ export async function quoteCheckout(input: unknown): Promise<{ ok: true; quote: 
       codeValid: r.code_valid === true,
       promotionCode: (r.promotion_code as string | null) ?? null,
       adOffer: r.entitlement_valid === true,
+      offerSource: source === 'manual_code' || source === 'paid_entitlement' || source === 'welcome' ? source : null,
+      welcome: r.welcome_valid === true,
+      welcomeAmount: num(r.welcome_amount),
+      codeAmount: num(r.code_amount),
+      minimumOrder: num(r.minimum_order),
+      belowMinimum: r.below_minimum === true,
       delivery: {
         floor: num(d.floor),
         hasLift: d.has_lift === true,
@@ -152,7 +172,11 @@ export async function placeOrder(input: unknown): Promise<PlaceOrderResult> {
     userAgent: (await headers()).get('user-agent')?.slice(0, 400) ?? null,
   }
   const offer = offerToken(jar.get(OFFER_COOKIE)?.value)
-  const payload = orderPayload({ ...order, postcode: classification.postcode }, { appEnv: APP_ENV, mixedAreaEvidence: evidence, tracking, offerToken: offer })
+  const welcome = offerToken(jar.get(WELCOME_COOKIE)?.value)
+  const payload = orderPayload(
+    { ...order, postcode: classification.postcode },
+    { appEnv: APP_ENV, mixedAreaEvidence: evidence, tracking, offerToken: offer, welcomeToken: welcome },
+  )
   const { data, error } = await createAdminClient().rpc('place_order', { p_input: payload })
   if (error) return { ok: false, error: explainOrderError(error.message) }
 

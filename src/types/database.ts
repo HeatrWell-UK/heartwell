@@ -1219,6 +1219,38 @@ export type Database = {
           },
         ]
       }
+      product_price_log: {
+        Row: {
+          changed_at: string
+          id: number
+          price: number
+          product_id: string
+          was_price: number | null
+        }
+        Insert: {
+          changed_at?: string
+          id?: never
+          price: number
+          product_id: string
+          was_price?: number | null
+        }
+        Update: {
+          changed_at?: string
+          id?: never
+          price?: number
+          product_id?: string
+          was_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_price_log_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_types: {
         Row: {
           created_at: string
@@ -1357,6 +1389,7 @@ export type Database = {
           title: string
           trade_title: string | null
           updated_at: string
+          was_price: number | null
           width_cm: number | null
         }
         Insert: {
@@ -1392,6 +1425,7 @@ export type Database = {
           title: string
           trade_title?: string | null
           updated_at?: string
+          was_price?: number | null
           width_cm?: number | null
         }
         Update: {
@@ -1427,6 +1461,7 @@ export type Database = {
           title?: string
           trade_title?: string | null
           updated_at?: string
+          was_price?: number | null
           width_cm?: number | null
         }
         Relationships: [
@@ -1655,6 +1690,7 @@ export type Database = {
           delivery_min_working_days: number
           id: boolean
           max_floor: number
+          min_order_value: number
           no_delivery_days: number[]
           offer_tier_high: number
           offer_tier_mid: number
@@ -1676,6 +1712,9 @@ export type Database = {
           updated_at: string
           upstairs_first_floor: number
           upstairs_per_extra_floor: number
+          welcome_offer_amount: number
+          welcome_offer_enabled: boolean
+          welcome_offer_hours: number
         }
         Insert: {
           assembly_fee?: number
@@ -1683,6 +1722,7 @@ export type Database = {
           delivery_min_working_days?: number
           id?: boolean
           max_floor?: number
+          min_order_value?: number
           no_delivery_days?: number[]
           offer_tier_high?: number
           offer_tier_mid?: number
@@ -1704,6 +1744,9 @@ export type Database = {
           updated_at?: string
           upstairs_first_floor?: number
           upstairs_per_extra_floor?: number
+          welcome_offer_amount?: number
+          welcome_offer_enabled?: boolean
+          welcome_offer_hours?: number
         }
         Update: {
           assembly_fee?: number
@@ -1711,6 +1754,7 @@ export type Database = {
           delivery_min_working_days?: number
           id?: boolean
           max_floor?: number
+          min_order_value?: number
           no_delivery_days?: number[]
           offer_tier_high?: number
           offer_tier_mid?: number
@@ -1732,6 +1776,9 @@ export type Database = {
           updated_at?: string
           upstairs_first_floor?: number
           upstairs_per_extra_floor?: number
+          welcome_offer_amount?: number
+          welcome_offer_enabled?: boolean
+          welcome_offer_hours?: number
         }
         Relationships: []
       }
@@ -1829,6 +1876,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      welcome_offers: {
+        Row: {
+          expires_at: string
+          started_at: string
+          token: string
+          visitor_id: string
+        }
+        Insert: {
+          expires_at: string
+          started_at?: string
+          token?: string
+          visitor_id: string
+        }
+        Update: {
+          expires_at?: string
+          started_at?: string
+          token?: string
+          visitor_id?: string
+        }
+        Relationships: []
       }
       whatsapp_enquiries: {
         Row: {
@@ -1965,6 +2033,7 @@ export type Database = {
           p_items: Json
           p_offer_entitlement_token?: string
           p_promotion_code?: string
+          p_welcome_token?: string
         }
         Returns: Json
       }
@@ -1998,6 +2067,10 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       issue_paid_offer_entitlement: {
         Args: { p_arrival_id?: string; p_source: string; p_visitor_id: string }
+        Returns: Json
+      }
+      issue_welcome_offer: {
+        Args: { p_token?: string; p_visitor_id: string }
         Returns: Json
       }
       job_claim: { Args: { p_job: string; p_ticket: string }; Returns: Json }

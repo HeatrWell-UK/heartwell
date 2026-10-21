@@ -37,7 +37,14 @@ export default async function EditProductPage({ params, searchParams }: { params
         </div>
       </header>
       {/* Keyed by the last change, so after a save the form reloads what the database now holds. */}
-      <ProductForm key={product.updated_at} initial={draftFromRow(product, fields)} options={options} orderedVariantIds={product.orderedVariantIds} savedNote={saved ? savedNote(Number(removed) || 0, Number(hidden) || 0) : null} />
+      <ProductForm
+        key={product.updated_at}
+        initial={draftFromRow(product, fields)}
+        options={options}
+        orderedVariantIds={product.orderedVariantIds}
+        priceLog={product.priceLog}
+        savedNote={saved ? savedNote(Number(removed) || 0, Number(hidden) || 0) : null}
+      />
       <ProductDangerZone id={product.id} title={product.title} isActive={product.is_active} orderCount={product.orderCount} />
     </div>
   )

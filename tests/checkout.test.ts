@@ -50,6 +50,7 @@ describe('checkout input', () => {
       extras: { floor: 2, has_lift: true, assembly: true, removal: false, removal_seats: null },
       promotion_code: 'EXTRA20',
       offer_entitlement_token: null,
+      welcome_token: null,
       postcode: 'LS6 2AB',
     })
     const p = orderPayload(order(), { appEnv: 'production', mixedAreaEvidence: null })

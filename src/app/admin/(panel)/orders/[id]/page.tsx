@@ -205,7 +205,16 @@ export default async function OrderPage({ params, searchParams }: Props) {
           </ul>
           <dl className="flex flex-col gap-1 border-t border-zinc-100 pt-2 text-sm">
             <Row label="Items" value={formatPrice(order.items_subtotal)} />
-            {order.discount_amount > 0 && <Row label={`Offer${order.promotion_code ? ` ${order.promotion_code}` : ''}${order.discount_tier ? ` (${order.discount_tier})` : ''}`} value={`−${formatPrice(order.discount_amount)}`} />}
+            {order.discount_amount > 0 && (
+              <Row
+                label={
+                  order.offer_source === 'welcome'
+                    ? 'Welcome offer'
+                    : `Offer${order.promotion_code ? ` ${order.promotion_code}` : ''}${order.discount_tier ? ` (${order.discount_tier})` : ''}`
+                }
+                value={`−${formatPrice(order.discount_amount)}`}
+              />
+            )}
             {order.delivery_total > 0 && <Row label="Delivery" value={formatPrice(order.delivery_total)} />}
             <Row label="To collect on delivery" value={formatPrice(order.total_amount)} strong />
           </dl>

@@ -20,6 +20,9 @@ export type SettingKey =
   | 'offer_tier_mid'
   | 'offer_tier_standard'
   | 'paid_offer_days'
+  | 'welcome_offer_amount'
+  | 'welcome_offer_hours'
+  | 'min_order_value'
   | 'sample_limit'
 
 export interface SettingField {
@@ -64,6 +67,16 @@ export const SETTING_GROUPS: { title: string; intro: string; fields: SettingFiel
       { key: 'offer_tier_mid', label: 'Mid tier', kind: 'money', min: 0, max: 5000 },
       { key: 'offer_tier_standard', label: 'Standard tier', kind: 'money', min: 0, max: 5000 },
       { key: 'paid_offer_days', label: 'An ad offer lasts', hint: 'Days after they arrive.', kind: 'whole', min: 1, max: 60 },
+    ],
+  },
+  {
+    title: 'Welcome offer and minimum order',
+    intro:
+      'Every visitor gets the welcome amount off each piece for the hours below, counted from their first visit and never restarted. One offer per order: the welcome offer, a code or an ad offer, whichever takes the most off. Website orders need their pieces (before offers and delivery) to come to the minimum; orders you take by phone or WhatsApp don’t.',
+    fields: [
+      { key: 'welcome_offer_amount', label: 'Welcome offer, off each piece', kind: 'money', min: 0, max: 1000 },
+      { key: 'welcome_offer_hours', label: 'Welcome offer lasts', hint: 'Hours from the first visit (48 = 2 days).', kind: 'whole', min: 1, max: 720 },
+      { key: 'min_order_value', label: 'Minimum order', hint: 'The pieces’ prices, before offers and delivery. 0 for none.', kind: 'money', min: 0, max: 100000 },
     ],
   },
   {

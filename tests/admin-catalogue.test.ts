@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   checkDraft,
   copyDraft,
+  daysAtOrAbove,
   draftFromRow,
   emptyDraft,
   explainCatalogueError,
@@ -92,6 +93,33 @@ describe('product drafts', () => {
     )
   })
 
+  it('takes a was price only above the price, and never copies it', () => {
+    const fields = (wasPrice: string) => checkDraft({ ...coffeeTable(), wasPrice }, TABLE_FIELDS).map((p) => p.field)
+    expect(fields('')).toEqual([])
+    expect(fields('249')).toEqual([])
+    expect(fields('199')).toContain('wasPrice')
+    expect(fields('£249')).toContain('wasPrice')
+    expect(savePayload({ ...coffeeTable(), wasPrice: ' 249 ' }, TABLE_FIELDS).was_price).toBe('249')
+    expect(copyDraft({ ...coffeeTable(), wasPrice: '249' }).wasPrice).toBe('')
+    expect(explainCatalogueError('WAS_PRICE_NOT_HIGHER')).toMatch(/more than the price/)
+  })
+
+  it('measures how long a was price was really charged', () => {
+    const day = 86_400_000
+    const now = Date.parse('2026-12-01T12:00:00Z')
+    const at = (daysAgo: number) => new Date(now - daysAgo * day).toISOString()
+    // £999 for 40 days, then £799 for the last 10.
+    const log = [
+      { price: 999, wasPrice: null, at: at(50) },
+      { price: 799, wasPrice: 999, at: at(10) },
+    ]
+    expect(daysAtOrAbove(log, 999, now)).toBe(40)
+    expect(daysAtOrAbove(log, 1099, now)).toBe(0)
+    // A was-price change alone doesn't break a run at the same price.
+    expect(daysAtOrAbove([{ price: 999, wasPrice: null, at: at(30) }, { price: 999, wasPrice: 1199, at: at(5) }], 999, now)).toBe(30)
+    expect(daysAtOrAbove([], 999, now)).toBe(0)
+  })
+
   it('needs a colourway, and one of them shown', () => {
     expect(checkDraft({ ...coffeeTable(), variants: [] }, TABLE_FIELDS).map((p) => p.field)).toContain('variants')
     const hidden = coffeeTable()
@@ -131,6 +159,7 @@ describe('product drafts', () => {
       axis1_value: '3 Seater',
       axis2_value: 'High back',
       base_price: 749,
+      was_price: 899,
       origin: 'uk',
       made_to_order: true,
       is_featured: false,
@@ -164,7 +193,7 @@ describe('product drafts', () => {
     const p = savePayload(draft, SOFA_FIELDS, row.specifications as Record<string, unknown>)
     expect(p.specifications).toEqual(row.specifications)
     expect(p.categories).toEqual(['fabric-sofas', 'sofas'])
-    expect(p).toMatchObject({ base_price: '749', offer_tier: 'MID', origin: 'uk', made_to_order: true, axis1_value: '3 Seater', width_cm: '198', depth_cm: '94' })
+    expect(p).toMatchObject({ base_price: '749', was_price: '899', offer_tier: 'MID', origin: 'uk', made_to_order: true, axis1_value: '3 Seater', width_cm: '198', depth_cm: '94' })
     expect(p.variants.map((v) => [v.sku, v.sort, v.price_adjustment])).toEqual([
       ['AHB3-G', '1', '0'],
       ['AHB3-B', '2', '20'],
@@ -279,6 +308,9 @@ describe('shop settings', () => {
     offer_tier_mid: 30,
     offer_tier_standard: 20,
     paid_offer_days: 7,
+    welcome_offer_amount: 20,
+    welcome_offer_hours: 48,
+    min_order_value: 400,
     sample_limit: 5,
   }
 

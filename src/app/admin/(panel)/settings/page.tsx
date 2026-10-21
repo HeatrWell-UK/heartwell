@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PulseIcon } from '@phosphor-icons/react/ssr'
-import { AdOfferSwitch, OfferCodes, SettingsForm } from '@/components/admin/SettingsForms'
+import { AdOfferSwitch, OfferCodes, SettingsForm, WelcomeOfferSwitch } from '@/components/admin/SettingsForms'
 import { loadSettings } from '@/lib/admin/load-catalogue'
 import { settingsDraft } from '@/lib/admin/settings-form'
 import { OrderFlowCard, type OrderFlowState } from '@/components/admin/OrderFlowCard'
@@ -13,10 +13,11 @@ export const dynamic = 'force-dynamic'
 
 export default async function SettingsPage() {
   const db = await createClient()
-  const [{ settings, codes, tierCounts }, orderflow, areas] = await Promise.all([
+  const [{ settings, codes, tierCounts }, orderflow, areas, welcomeLive] = await Promise.all([
     loadSettings(),
     db.rpc('admin_orderflow'),
     db.from('delivery_areas').select('slug, name, places, charge, min_working_days, max_working_days, districts').order('sort').order('slug'),
+    db.from('welcome_offers').select('visitor_id', { count: 'exact', head: true }).gt('expires_at', new Date().toISOString()),
   ])
   if (areas.error) throw new Error(`Delivery areas: ${areas.error.message}`)
   return (
@@ -32,6 +33,12 @@ export default async function SettingsPage() {
       </header>
       <SettingsForm initial={settingsDraft(settings)} tierCounts={tierCounts} />
       <DeliveryAreasForm areas={areas.data.map((a) => ({ ...a, charge: Number(a.charge) }))} noDeliveryDays={settings.no_delivery_days} />
+      <WelcomeOfferSwitch
+        on={settings.welcome_offer_enabled}
+        amount={Number(settings.welcome_offer_amount)}
+        hours={settings.welcome_offer_hours}
+        live={welcomeLive.count ?? 0}
+      />
       <AdOfferSwitch on={settings.paid_offer_enabled} days={settings.paid_offer_days} code={codes.find((c) => c.is_active)?.code ?? null} />
       <OfferCodes codes={codes} />
       {orderflow.data ? <OrderFlowCard state={orderflow.data as unknown as OrderFlowState} /> : null}

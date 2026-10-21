@@ -6,6 +6,9 @@ import { WhenNear } from '@/components/ui/WhenNear'
 import { SaveButton } from '@/components/product/SaveButton'
 import type { ListingProduct } from '@/lib/catalogue/listing-types'
 import { sizeLabel } from '@/lib/catalogue/range-sizes'
+import { dealFor, dealLabel } from '@/lib/catalogue/deal'
+import { formatPrice } from '@/lib/format'
+import { cn } from '@/lib/cn'
 
 /** "5 seater corner, high back", "Armed U-shape". */
 export function sizeLine(p: Pick<ListingProduct, 'axis1Value' | 'axis2Value'>): string | null {
@@ -24,11 +27,13 @@ function badgeFor(p: ListingProduct): string | null {
 /**
  * A product in a grid: photo with a badge and the save heart, the range's
  * name with the size underneath (said once), the price it starts from and its
- * colours. `eager` for the first row, so the page's main images load first;
- * photos further down wait until they're near.
+ * colours. A piece on a deal shows its was-price struck through, and the
+ * percentage off is its one label. `eager` for the first row, so the page's
+ * main images load first; photos further down wait until they're near.
  */
 export function ProductTile({ product: p, eager = false, defer = false }: { product: ListingProduct; eager?: boolean; defer?: boolean }) {
-  const badge = badgeFor(p)
+  const deal = dealFor(p.price, p.wasPrice)
+  const badge = deal ? dealLabel(deal, formatPrice) : badgeFor(p)
   const size = sizeLine(p)
   // "Ashton" over "3+2 seater, high back" rather than "Ashton 3+2 Seater High Back" over the same words again.
   const name = p.rangeName && size ? p.rangeName : p.title
@@ -60,7 +65,14 @@ export function ProductTile({ product: p, eager = false, defer = false }: { prod
             </span>
           )}
           {badge && (
-            <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2.5 py-1 text-[12px] font-semibold leading-none text-velvet">{badge}</span>
+            <span
+              className={cn(
+                'absolute left-2 top-2 rounded-full px-2.5 py-1 text-[12px] font-semibold leading-none',
+                deal ? 'bg-gold-pale text-wine' : 'bg-white/95 text-velvet',
+              )}
+            >
+              {badge}
+            </span>
           )}
         </span>
         <span className="flex flex-col gap-0.5 pt-0.5">
@@ -68,10 +80,16 @@ export function ProductTile({ product: p, eager = false, defer = false }: { prod
           {size && <span className="text-[14px] leading-snug text-slate">{size}</span>}
         </span>
       </Link>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <span className="flex items-baseline gap-1.5">
           {p.colours.length > 1 && <span className="text-[13px] text-slate">from</span>}
           <Price amount={p.price} className="text-[19px]" />
+          {deal && (
+            <s className="font-display text-[15px] text-slate">
+              <span className="sr-only">, was </span>
+              {formatPrice(deal.was)}
+            </s>
+          )}
         </span>
         {p.colours.length > 0 && (
           <span className="flex items-center gap-1" aria-label={`Colours: ${p.colours.map((c) => c.name).join(', ')}`} role="img">

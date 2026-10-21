@@ -17,7 +17,7 @@ export const SETTINGS_TAG = 'settings'
 const FIVE_MINUTES = 300
 
 const PRODUCT_FIELDS = `
-  id, slug, title, base_price, axis1_value, axis2_value, made_to_order, origin,
+  id, slug, title, base_price, was_price, axis1_value, axis2_value, made_to_order, origin,
   width_cm, depth_cm, height_cm, side_a_cm, side_b_cm, dimensions_note,
   specifications, description, highlights, gallery_images, seo_title, seo_description, review_count, average_rating,
   type:product_types(slug, name, spec_fields, material_kinds),
@@ -65,7 +65,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     p.category
       ? db
           .from('products')
-          .select('slug, title, base_price, sort, range_id, variants:product_variants(colour_name, price_adjustment, image_url, sort)')
+          .select('slug, title, base_price, was_price, sort, range_id, variants:product_variants(colour_name, price_adjustment, image_url, sort)')
           .eq('primary_category_id', p.category.id)
           .neq('slug', slug)
           .order('sort')
@@ -104,10 +104,12 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     seenRanges.add(key)
     const vs = [...r.variants].sort(bySort)
     const shown = vs.find((v) => v.image_url) ?? vs[0]
+    const adjustments = vs.map((v) => v.price_adjustment)
     relatedViews.push({
       slug: r.slug,
       title: r.title,
-      price: fromPrice(r.base_price, vs.map((v) => v.price_adjustment)),
+      price: fromPrice(r.base_price, adjustments),
+      wasPrice: r.was_price === null ? null : fromPrice(r.was_price, adjustments),
       image: shown?.image_url ?? null,
       imageAlt: shown?.colour_name ? `${r.title} in ${shown.colour_name}` : r.title,
     })
@@ -122,6 +124,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     typeSlug: p.type.slug,
     typeName: p.type.name,
     basePrice: p.base_price,
+    wasPrice: p.was_price,
     madeToOrder: p.made_to_order,
     madeInUk: p.origin === 'uk',
     shape: (typeof specs.shape === 'string' ? specs.shape : null) as Shape | null,
@@ -156,7 +159,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
   }
 }
 
-export const getProductPage = unstable_cache(loadProductPage, ['product-page-v3'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
+export const getProductPage = unstable_cache(loadProductPage, ['product-page-v4'],{ revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
 
 const loadDeliverySettings = unstable_cache(
   async () => {

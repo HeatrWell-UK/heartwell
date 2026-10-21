@@ -35,6 +35,8 @@ export interface OrderEmailData {
   itemsSubtotal: number
   discountAmount: number
   promotionCode: string | null
+  /** Which offer the discount was (orders.offer_source): 'welcome' names it. */
+  offerSource?: string | null
   /** "Delivery" and £0 (free), or "Delivery to Devon" and its charge. */
   delivery: { label: string; amount: number }
   extras: { label: string; detail?: string; amount: number }[]
@@ -74,11 +76,17 @@ function itemsTable(o: OrderEmailData, withSku: boolean): string {
   const extras = o.extras.map((e) => line(`${escapeHtml(e.label)}${e.detail ? ` <span style="color:${C.slate}">(${escapeHtml(e.detail)})</span>` : ''}`, money(e.amount))).join('')
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 18px;font-size:15px">${rows}
 ${line('Items', money(o.itemsSubtotal))}
-${o.discountAmount > 0 ? line(`Offer${o.promotionCode ? ` (${escapeHtml(o.promotionCode)})` : ''}`, `−${money(o.discountAmount)}`) : ''}
+${o.discountAmount > 0 ? line(escapeHtml(offerName(o)), `−${money(o.discountAmount)}`) : ''}
 ${line(escapeHtml(o.delivery.label), o.delivery.amount > 0 ? money(o.delivery.amount) : 'Free')}
 ${extras}
 ${line('To pay today', `<span style="color:${C.velvet};font-weight:bold">£0</span>`)}
 ${line('To pay on delivery', money(o.totalAmount), true)}</table>`
+}
+
+/** "Welcome offer", "Offer (HEARTSOFA)" or "Offer". */
+export function offerName(o: Pick<OrderEmailData, 'offerSource' | 'promotionCode'>): string {
+  if (o.offerSource === 'welcome') return 'Welcome offer'
+  return `Offer${o.promotionCode ? ` (${o.promotionCode})` : ''}`
 }
 
 function itemsText(o: OrderEmailData, withSku: boolean): string {
@@ -87,7 +95,7 @@ function itemsText(o: OrderEmailData, withSku: boolean): string {
   return [
     ...lines,
     `Items: ${money(o.itemsSubtotal)}`,
-    ...(o.discountAmount > 0 ? [`Offer${o.promotionCode ? ` (${o.promotionCode})` : ''}: -${money(o.discountAmount)}`] : []),
+    ...(o.discountAmount > 0 ? [`${offerName(o)}: -${money(o.discountAmount)}`] : []),
     `${o.delivery.label}: ${o.delivery.amount > 0 ? money(o.delivery.amount) : 'Free'}`,
     ...extras,
     'To pay today: £0',
@@ -162,7 +170,7 @@ export function copyBlock(o: OrderEmailData): string {
     'Items:',
     ...o.items.map((i) => `  ${i.quantity} x ${i.title}${i.option ? `, ${i.option}` : ''}${i.sku ? ` [${i.sku}]` : ''} @ ${money(i.unitPrice)}`),
     ...(o.extras.length ? ['Extras:', ...o.extras.map((e) => `  ${e.label}${e.detail ? ` (${e.detail})` : ''}: ${money(e.amount)}`)] : []),
-    ...(o.discountAmount > 0 ? [`Offer: -${money(o.discountAmount)}${o.promotionCode ? ` (${o.promotionCode})` : ''}`] : []),
+    ...(o.discountAmount > 0 ? [`${offerName(o)}: -${money(o.discountAmount)}`] : []),
     `Preferred day: ${date}`,
     `Notes: ${o.notes ?? 'none'}`,
     `To collect on delivery: ${money(o.totalAmount)}`,

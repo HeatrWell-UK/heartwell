@@ -61,10 +61,10 @@ export type OrderInput = z.infer<typeof OrderInput>
 
 /**
  * The pricing part of the database input (price_order and place_order share
- * it). The ad-visitor offer’s token comes from its httpOnly cookie, never from
- * the page.
+ * it). The ad-visitor offer’s and the welcome offer’s tokens come from their
+ * httpOnly cookies, never from the page.
  */
-export function pricingPayload(q: QuoteInput, offerToken: string | null = null) {
+export function pricingPayload(q: QuoteInput, offerToken: string | null = null, welcomeToken: string | null = null) {
   return {
     items: q.items.map((i) => ({ item_id: i.id, variant_id: i.variantId, material_id: i.materialId, quantity: i.quantity })),
     extras: {
@@ -76,6 +76,7 @@ export function pricingPayload(q: QuoteInput, offerToken: string | null = null) 
     },
     promotion_code: q.promotionCode?.trim().toUpperCase() || null,
     offer_entitlement_token: offerToken,
+    welcome_token: welcomeToken,
     postcode: q.postcode?.trim() || null,
   }
 }
@@ -142,10 +143,13 @@ export function trackingPayload(o: Pick<OrderInput, 'visitor' | 'attribution'>, 
   }
 }
 
-export function orderPayload(o: OrderInput, ctx: { appEnv: string; mixedAreaEvidence: 'island' | 'mainland' | null; tracking?: OrderTracking; offerToken?: string | null }) {
+export function orderPayload(
+  o: OrderInput,
+  ctx: { appEnv: string; mixedAreaEvidence: 'island' | 'mainland' | null; tracking?: OrderTracking; offerToken?: string | null; welcomeToken?: string | null },
+) {
   const reason = testReason(o, ctx.appEnv, { qa: o.qa, staffDevice: ctx.tracking?.staffDevice })
   return {
-    ...pricingPayload(o, ctx.offerToken ?? null),
+    ...pricingPayload(o, ctx.offerToken ?? null, ctx.welcomeToken ?? null),
     customer_name: o.name.replace(/\s+/g, ' ').trim(),
     customer_phone: formatUkPhone(o.phone),
     customer_email: o.email.trim().toLowerCase() || null,
@@ -203,6 +207,11 @@ export function explainOrderError(dbMessage: string): PlainError {
       return { code, field: 'date', message: 'Please pick another delivery day, or leave it blank and we’ll agree one when we ring.' }
     case 'PRICE_MISMATCH':
       return { code, field: 'basket', message: 'A price has changed since you opened this page. Please check your order total and place it again.' }
+    case 'BELOW_MINIMUM': {
+      const minimum = Number(dbMessage.match(/^BELOW_MINIMUM: ([0-9.]+)/)?.[1])
+      const amount = Number.isFinite(minimum) && minimum > 0 ? `£${Number.isInteger(minimum) ? minimum : minimum.toFixed(2)}` : 'a minimum amount'
+      return { code, field: 'basket', message: `Orders start at ${amount} (the pieces’ prices, before offers and delivery). Please add another piece to your basket.` }
+    }
     case 'UNAVAILABLE_ITEMS':
     case 'UNAVAILABLE_MATERIAL':
       return { code, field: 'basket', message: 'Something in your basket is no longer available. Please go back to your basket.' }
