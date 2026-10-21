@@ -19,6 +19,8 @@ export interface ListingProduct {
   madeToOrder: boolean
   madeInUk: boolean
   price: number
+  /** The from-price before a deal (products.was_price), when it's on one. */
+  wasPrice: number | null
   widthCm: number | null
   /** Front to back, and height, in centimetres (for range pages' measurement answers). */
   depthCm: number | null

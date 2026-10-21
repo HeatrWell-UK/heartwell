@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlusIcon } from '@phosphor-icons/react'
 import { checkSettings, SETTING_GROUPS, type SettingsDraft } from '@/lib/admin/settings-form'
-import { addOfferCode, deleteOfferCode, saveSettings, setAdOffer, setOfferCodeActive, type SettingsResult } from '@/app/admin/(panel)/settings/actions'
+import { addOfferCode, deleteOfferCode, saveSettings, setAdOffer, setOfferCodeActive, setWelcomeOffer, type SettingsResult } from '@/app/admin/(panel)/settings/actions'
 import { Card, OutcomeNote, primaryButton, SaveBar, secondaryButton, TextField, type Outcome } from './Fields'
 
 const UNREACHABLE: SettingsResult = { ok: false, message: 'Couldn’t reach the server. Try again.' }
@@ -130,6 +130,49 @@ export function OfferCodes({ codes }: { codes: { code: string; label: string | n
           className={`${primaryButton} self-start`}
         >
           <PlusIcon aria-hidden="true" size={16} weight="bold" /> Add code
+        </button>
+      </div>
+      <OutcomeNote outcome={outcome} />
+    </Card>
+  )
+}
+
+export function WelcomeOfferSwitch({ on, amount, hours, live }: { on: boolean; amount: number; hours: number; live: number }) {
+  const router = useRouter()
+  const [busy, setBusy] = useState(false)
+  const [outcome, setOutcome] = useState<Outcome>(null)
+  return (
+    <Card
+      title="Welcome offer"
+      intro={
+        <>
+          Every visitor gets £{amount} off each piece for {hours} hours from their first visit, already applied at checkout (no code). Product pages, the basket
+          and checkout show it with a countdown to the real end time; it never restarts for the same visitor, so the countdown is true. Change the amount, the
+          hours and the minimum order in the settings above.
+        </>
+      }
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-[15px] font-semibold text-zinc-900">
+          {on ? 'On' : 'Off'}
+          <span className="font-normal text-zinc-500">
+            {' '}
+            · live now for {live} {live === 1 ? 'visitor' : 'visitors'}
+          </span>
+        </p>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true)
+            const r = await setWelcomeOffer(!on).catch(() => UNREACHABLE)
+            setBusy(false)
+            setOutcome(r)
+            if (r.ok) router.refresh()
+          }}
+          className={secondaryButton}
+        >
+          {on ? 'Switch off' : 'Switch on'}
         </button>
       </div>
       <OutcomeNote outcome={outcome} />

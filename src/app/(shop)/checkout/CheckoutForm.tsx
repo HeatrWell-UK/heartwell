@@ -11,6 +11,9 @@ import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import { useBasket, visitIds, rememberPostcode } from '@/lib/basket/store'
 import { OfferStrip } from '@/components/offer/OfferStrip'
+import { useWelcome, WelcomeNote } from '@/components/offer/WelcomeOffer'
+import { MinimumNote } from '@/components/checkout/MinimumNote'
+import { shortOfMinimum, type ShopOffers } from '@/lib/offers/welcome'
 import { isQaVisit, readConsent, sessionFbclid, touchForOrder, track } from '@/lib/tracking/browser'
 import { TRACKING } from '@/config/tracking'
 import { useHydrated } from '@/lib/basket/use-hydrated'
@@ -35,16 +38,19 @@ interface Props {
   areas: AreaDelivery[]
   noDeliveryDays: number[]
   lookupAvailable: boolean
+  /** The welcome offer and the minimum order. */
+  offers: ShopOffers
 }
 
 type FieldKey = NonNullable<PlainError['field']>
 
 const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
-export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, areas, noDeliveryDays, lookupAvailable }: Props) {
+export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, areas, noDeliveryDays, lookupAvailable, offers }: Props) {
   const router = useRouter()
   const basket = useBasket()
   const hydrated = useHydrated()
+  const welcome = useWelcome(offers.welcome.enabled)
   const id = useId()
 
   const [name, setName] = useState('')
@@ -127,6 +133,18 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const lines = deliveryLines(shown ? shown.delivery : local, settings)
   const madeToOrder = basket.lines.some((l) => l.view.madeToOrder || l.materialId !== null)
   const basketSummary = basket.lines.map((l) => `${l.quantity} x ${l.view.title} (${l.view.option})`).join('; ')
+  // The database's own minimum once it has priced the basket; the page's figures until then.
+  const minimum = shown ? shown.minimumOrder : offers.minOrder
+  const short = shortOfMinimum(shown ? shown.itemsSubtotal : subtotal, minimum)
+  const welcomeApplies = shown ? shown.offerSource === 'welcome' : welcome.kind !== 'none'
+  const offerLabel =
+    shown?.offerSource === 'welcome'
+      ? 'Welcome offer'
+      : shown?.promotionCode
+        ? `Offer (${shown.promotionCode})`
+        : shown?.offerSource === 'paid_entitlement'
+          ? 'Your offer'
+          : 'Offer'
 
   const leadSent = useRef(false)
   const saveReminder = (opt: boolean) => {
@@ -201,6 +219,11 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
     }
     if (!shown) {
       setError(quoteError ?? { code: 'QUOTING', message: 'Just checking the latest prices. Please try again in a moment.' })
+      errorRef.current?.focus()
+      return
+    }
+    if (shown.belowMinimum) {
+      setError({ code: 'BELOW_MINIMUM', field: 'basket', message: `Orders start at ${formatPrice(shown.minimumOrder)}. Please add another piece to your basket.` })
       errorRef.current?.focus()
       return
     }
@@ -393,7 +416,8 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           <Field label="Delivery notes" optional help="Parking, steps, a tight turn on the stairs: anything that helps the drivers." helpId={`${id}-notes-help`} id={`${id}-notes`}>
             <TextArea id={`${id}-notes`} value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} aria-describedby={`${id}-notes-help`} />
           </Field>
-          {shown?.adOffer && shown.discountAmount > 0 && code === '' ? (
+          {welcomeApplies && <WelcomeNote state={welcome} amount={offers.welcome.amount} hours={offers.welcome.hours} applied />}
+          {shown?.offerSource === 'paid_entitlement' && shown.discountAmount > 0 && code === '' ? (
             <OfferStrip amount={shown.discountAmount} atCheckout />
           ) : (
             <details className="group" open={code !== ''}>
@@ -409,11 +433,13 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
               </div>
               {code && shown && (
                 <p role="status" className={cn('pt-2 text-[15px]', shown.codeValid ? 'text-ink' : 'font-semibold text-error')}>
-                  {shown.codeValid
-                    ? shown.discountAmount > 0
-                      ? `${code} applied: ${formatPrice(shown.discountAmount)} off.`
-                      : `${code} is valid, but doesn’t apply to the pieces in your basket.`
-                    : `We don’t recognise ${code}. Please check it.`}
+                  {!shown.codeValid
+                    ? `We don’t recognise ${code}. Please check it.`
+                    : shown.codeAmount === 0
+                      ? `${code} is valid, but doesn’t apply to the pieces in your basket.`
+                      : shown.offerSource === 'welcome'
+                        ? `${code} takes ${formatPrice(shown.codeAmount)} off, and your welcome offer takes off more, so we’ve kept that. One offer per order.`
+                        : `${code} applied: ${formatPrice(shown.discountAmount)} off.`}
                 </p>
               )}
             </details>
@@ -461,7 +487,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </Link>
         <dl className="flex flex-col gap-1.5 border-t border-line pt-3 text-[15px]">
           <Row label="Items" value={formatPrice(shown ? shown.itemsSubtotal : subtotal)} />
-          {shown && shown.discountAmount > 0 && <Row label={shown.promotionCode ? `Offer (${shown.promotionCode})` : shown.adOffer ? 'Your offer' : 'Offer'} value={`−${formatPrice(shown.discountAmount)}`} />}
+          {shown && shown.discountAmount > 0 && <Row label={offerLabel} value={`−${formatPrice(shown.discountAmount)}`} />}
           {areaFee > 0 ? <Row label={`Delivery to ${areaName ?? 'your area'}`} value={formatPrice(areaFee)} /> : <Row label="Delivery" value="Free" accent />}
           {lines.map((l) => (
             <Row key={l.key} label={l.detail ? `${l.label} (${l.detail})` : l.label} value={formatPrice(l.amount)} />
@@ -476,9 +502,17 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
             Made-to-order pieces are built for you, so they can’t be returned for a change of mind. Faults are always covered.
           </p>
         )}
+        {short > 0 && (
+          <div className="flex flex-col gap-2">
+            <MinimumNote short={short} minimum={minimum} subtotal={shown ? shown.itemsSubtotal : subtotal} />
+            <Link href="/sofas" className="self-start text-sm font-semibold">
+              Add another piece
+            </Link>
+          </div>
+        )}
         <button
           type="submit"
-          disabled={placing || address.outcome.kind === 'quote'}
+          disabled={placing || address.outcome.kind === 'quote' || short > 0}
           className="flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-velvet-sheen px-6 text-[17px] font-semibold text-white disabled:bg-none disabled:bg-line-soft disabled:text-slate"
         >
           <LockSimpleIcon aria-hidden="true" size={20} />

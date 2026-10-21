@@ -1,7 +1,7 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import { catalogueIssues, type CatalogueIssue } from '@/lib/catalogue/display'
-import { asRecord, type ProductRow } from './catalogue-form'
+import { asRecord, type PricePoint, type ProductRow } from './catalogue-form'
 import { categoryTree, readSpecFields, type CategoryRow, type CollectionRow, type RangeRow, type TypeRow } from './structure-form'
 import { UPLOADS_CONFIGURED } from './cloudinary'
 
@@ -62,7 +62,7 @@ export type CatalogueData = Awaited<ReturnType<typeof loadCatalogue>>
 export type CatalogueRow = CatalogueData['rows'][number]
 
 const EDIT_FIELDS = `
-  id, updated_at, slug, title, trade_title, axis1_value, axis2_value, base_price, origin, made_to_order, is_featured, is_active, sort,
+  id, updated_at, slug, title, trade_title, axis1_value, axis2_value, base_price, was_price, origin, made_to_order, is_featured, is_active, sort,
   width_cm, depth_cm, height_cm, seat_height_cm, seat_depth_cm, side_a_cm, side_b_cm, dimensions_note,
   specifications, description, highlights, seo_title, seo_description, gallery_images,
   type:product_types(slug), range:ranges(slug), primary:categories!products_primary_category_id_fkey(slug),
@@ -74,15 +74,19 @@ const EDIT_FIELDS = `
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /** One product in the editor's shape, or null. */
-export async function loadProduct(id: string): Promise<(ProductRow & { updated_at: string; orderedVariantIds: string[]; orderCount: number }) | null> {
+export async function loadProduct(
+  id: string,
+): Promise<(ProductRow & { updated_at: string; orderedVariantIds: string[]; orderCount: number; priceLog: PricePoint[] }) | null> {
   if (!UUID.test(id)) return null
   const supabase = await createClient()
-  const [product, ordered] = await Promise.all([
+  const [product, ordered, prices] = await Promise.all([
     supabase.from('products').select(EDIT_FIELDS).eq('id', id).maybeSingle(),
     supabase.from('order_items').select('variant_id').eq('product_id', id).limit(1000),
+    supabase.from('product_price_log').select('price, was_price, changed_at').eq('product_id', id).order('changed_at', { ascending: false }).limit(60),
   ])
   if (product.error) throw new Error(`Product ${id}: ${product.error.message}`)
   if (ordered.error) throw new Error(`Product ${id} orders: ${ordered.error.message}`)
+  if (prices.error) throw new Error(`Product ${id} prices: ${prices.error.message}`)
   const p = product.data
   if (!p) return null
   return {
@@ -91,6 +95,7 @@ export async function loadProduct(id: string): Promise<(ProductRow & { updated_a
     tier: p.tier?.tier ?? null,
     orderedVariantIds: [...new Set(ordered.data.map((o) => o.variant_id).filter((v): v is string => Boolean(v)))],
     orderCount: ordered.data.length,
+    priceLog: prices.data.map((r) => ({ price: Number(r.price), wasPrice: r.was_price === null ? null : Number(r.was_price), at: r.changed_at })),
   }
 }
 

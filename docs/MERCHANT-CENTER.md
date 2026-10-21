@@ -17,6 +17,9 @@ Merchant Center → Settings → **Shipping and returns** → Shipping → add a
 | Transit time | **2 to 4 days** for everywhere, then by region below: the three charged regions **5 to 7 days** |
 | Delivery cost | **Free** for everywhere, then by region below: **£40**, **£80**, **£100** |
 | Region **No online delivery** | **No delivery** (these customers get a WhatsApp quote instead) |
+| Minimum order value | **£400** (Phase 21, owner, 22 October 2026: website orders start at £400). Google then tells shoppers about the minimum on pieces priced under it (footstools, armchairs, some 2 seaters). Keep it the same as Admin → Settings → Minimum order. |
+
+Google's help on the minimum: [Add a minimum order value](https://support.google.com/merchants/answer/14955659). The feed has no `shipping` attribute, which matters: a product's own `shipping` would cancel the account's minimum.
 
 ## 2. Regions
 

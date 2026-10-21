@@ -119,6 +119,10 @@ export default function PrivacyPage() {
         If you arrived from one of our adverts, the shop remembers it for up to a week (two small cookies) so your ad offer applies at checkout. That
         doesn’t depend on your cookie choices, because it’s part of the offer you were shown.
       </p>
+      <p>
+        Every visitor’s welcome offer works the same way: two small cookies, and a note in our database of your device’s random ID with when the offer
+        started and ends, so it applies at checkout and never starts again. We delete that note a year after the offer ends.
+      </p>
 
       <h2 id="sharing">Who helps us</h2>
       <p>We share only what each needs, under contracts that protect it:</p>

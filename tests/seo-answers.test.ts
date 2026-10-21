@@ -61,6 +61,7 @@ const listed = (slug: string, over: Partial<ListingProduct> = {}): ListingProduc
   madeToOrder: true,
   madeInUk: true,
   price: 499,
+  wasPrice: null,
   widthCm: 240,
   depthCm: 95,
   heightCm: 90,

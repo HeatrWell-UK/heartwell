@@ -69,6 +69,8 @@ export interface ProductDraft {
   primaryCategory: string
   categories: string[]
   basePrice: string
+  /** The price before a deal, struck through on the shop. Blank when it isn't on one. */
+  wasPrice: string
   offerTier: OfferTier | ''
   origin: 'uk' | 'imported' | 'unspecified'
   madeToOrder: boolean
@@ -140,6 +142,7 @@ export function emptyDraft(productType: string): ProductDraft {
     primaryCategory: '',
     categories: [],
     basePrice: '',
+    wasPrice: '',
     offerTier: 'STANDARD',
     origin: 'unspecified',
     madeToOrder: false,
@@ -171,6 +174,7 @@ export interface ProductRow {
   axis1_value: string | null
   axis2_value: string | null
   base_price: number
+  was_price: number | null
   origin: string
   made_to_order: boolean
   is_featured: boolean
@@ -241,6 +245,7 @@ export function draftFromRow(row: ProductRow, fields: SpecFieldDef[]): ProductDr
     primaryCategory: row.primary?.slug ?? '',
     categories: row.categories.filter((c) => c !== row.primary?.slug),
     basePrice: str(row.base_price),
+    wasPrice: str(row.was_price),
     offerTier: tier,
     origin,
     madeToOrder: row.made_to_order,
@@ -279,9 +284,39 @@ export function copyDraft(d: ProductDraft): ProductDraft {
     id: null,
     title: `${d.title} (copy)`,
     slug: d.slug ? `${d.slug}-copy` : '',
+    // A new piece hasn't sold at any earlier price yet.
+    wasPrice: '',
     isActive: false,
     variants: d.variants.map((v) => ({ ...v, key: newKey(), id: null, sku: '' })),
   }
+}
+
+/** One row of a product's price history (product_price_log). */
+export interface PricePoint {
+  price: number
+  wasPrice: number | null
+  at: string
+}
+
+/** Days in a row a was-price should have been charged first (the CTSI's guidance on UK pricing practices). */
+export const WAS_PRICE_DAYS = 28
+
+/**
+ * The longest run of days the piece was on sale at `was` or more, from its
+ * price history (each price runs until the next change, the last until now).
+ * A was-price is only honest when the piece really sold at it for a good while.
+ */
+export function daysAtOrAbove(log: PricePoint[], was: number, now = Date.now()): number {
+  const points = [...log].sort((a, b) => a.at.localeCompare(b.at))
+  let run = 0
+  let best = 0
+  points.forEach((p, i) => {
+    const start = new Date(p.at).getTime()
+    const end = i + 1 < points.length ? new Date(points[i + 1]!.at).getTime() : now
+    run = p.price >= was ? run + Math.max(0, end - start) : 0
+    best = Math.max(best, run)
+  })
+  return Math.floor(best / 86_400_000)
 }
 
 export interface DraftProblem {
@@ -297,6 +332,9 @@ export function checkDraft(d: ProductDraft, fields: SpecFieldDef[]): DraftProble
   if (!SLUG.test(d.slug)) add('slug', 'The web address can use small letters, numbers and single hyphens only.')
   if (!d.productType) add('productType', 'Choose the product type.')
   if (!PRICE.test(d.basePrice.trim())) add('basePrice', 'Enter the price in pounds, e.g. 749 or 749.99.')
+  const was = d.wasPrice.trim()
+  if (was && !PRICE.test(was)) add('wasPrice', 'Enter the was price in pounds, e.g. 999, or leave it blank.')
+  else if (was && PRICE.test(d.basePrice.trim()) && Number(was) <= Number(d.basePrice.trim())) add('wasPrice', 'The was price must be more than the price, or blank.')
   if (d.range && !d.axis1.trim()) add('axis1', 'Products in a range need their size (or first option).')
   for (const dim of DIM_FIELDS) {
     const v = d.dims[dim.key].trim()
@@ -373,6 +411,7 @@ export function savePayload(d: ProductDraft, fields: SpecFieldDef[], storedSpecs
     primary_category: d.primaryCategory,
     categories: [...new Set([d.primaryCategory, ...d.categories].filter(Boolean))],
     base_price: d.basePrice.trim(),
+    was_price: d.wasPrice.trim(),
     offer_tier: d.offerTier,
     origin: d.origin,
     made_to_order: d.madeToOrder,
@@ -419,6 +458,7 @@ export const DraftSchema = z.object({
   primaryCategory: text(80),
   categories: z.array(text(80)).max(30),
   basePrice: text(12),
+  wasPrice: text(12),
   offerTier: z.enum([...OFFER_TIERS, '']),
   origin: z.enum(['uk', 'imported', 'unspecified']),
   madeToOrder: z.boolean(),
@@ -455,6 +495,8 @@ const MESSAGES: Record<string, string> = {
   BAD_SLUG: 'The web address can use small letters, numbers and single hyphens only.',
   MISSING_TITLE: 'Give the product a name.',
   BAD_PRICE: 'Enter the price in pounds, e.g. 749 or 749.99.',
+  BAD_WAS_PRICE: 'Enter the was price in pounds, e.g. 999, or leave it blank.',
+  WAS_PRICE_NOT_HIGHER: 'The was price must be more than the price, or blank.',
   UNKNOWN_TYPE: 'That product type no longer exists. Reload the page.',
   UNKNOWN_RANGE: 'That range no longer exists. Reload the page.',
   UNKNOWN_CATEGORY: 'That category no longer exists. Reload the page.',

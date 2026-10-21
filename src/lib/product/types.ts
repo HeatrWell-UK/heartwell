@@ -51,6 +51,8 @@ export interface ProductCardView {
   slug: string
   title: string
   price: number
+  /** The price before a deal, when it's on one (shown struck through). */
+  wasPrice?: number | null
   image: string | null
   imageAlt: string
 }
@@ -75,6 +77,8 @@ export interface ProductPageData {
   typeSlug: string
   typeName: string
   basePrice: number
+  /** The base price before a deal (Admin → product → was price), or null when it isn't on one. */
+  wasPrice: number | null
   madeToOrder: boolean
   madeInUk: boolean
   shape: Shape | null

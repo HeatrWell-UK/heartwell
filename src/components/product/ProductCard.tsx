@@ -4,9 +4,12 @@ import { ImageIcon } from '@phosphor-icons/react/ssr'
 import { Price } from '@/components/ui/Price'
 import { WhenNear } from '@/components/ui/WhenNear'
 import type { ProductCardView } from '@/lib/product/types'
+import { dealFor, dealLabel } from '@/lib/catalogue/deal'
+import { formatPrice } from '@/lib/format'
 
-/** A product in a rail or grid: photo, name and price. */
+/** A product in a rail or grid: photo, name and price (with its was-price when it's on a deal). */
 export function ProductCard({ product }: { product: ProductCardView }) {
+  const deal = dealFor(product.price, product.wasPrice)
   return (
     <Link href={`/products/${product.slug}`} className="flex flex-col gap-2 text-ink no-underline hover:text-ink">
       <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
@@ -22,7 +25,18 @@ export function ProductCard({ product }: { product: ProductCardView }) {
         )}
       </span>
       <span className="text-[15px] font-semibold leading-snug">{product.title}</span>
-      <Price amount={product.price} className="text-lg" />
+      <span className="flex flex-wrap items-baseline gap-x-1.5">
+        <Price amount={product.price} className="text-lg" />
+        {deal && (
+          <>
+            <s className="font-display text-[15px] text-slate">
+              <span className="sr-only">, was </span>
+              {formatPrice(deal.was)}
+            </s>
+            <span className="text-[13px] font-semibold text-wine">{dealLabel(deal, formatPrice)}</span>
+          </>
+        )}
+      </span>
     </Link>
   )
 }

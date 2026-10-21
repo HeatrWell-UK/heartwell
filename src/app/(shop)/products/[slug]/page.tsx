@@ -22,7 +22,7 @@ import { pickFabric, pickVariant } from '@/lib/product/helpers'
 import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
 import type { ProductPageData } from '@/lib/product/types'
 import { tierAmount } from '@/lib/offers/paid'
-import { getOfferSettings } from '@/lib/offers/server'
+import { getOfferSettings, shopOffers } from '@/lib/offers/server'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -33,8 +33,8 @@ const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v
 
 /** Only what the interactive part needs, so the page sends the browser no more than that. */
 function purchaseProps(p: ProductPageData): PurchaseProduct {
-  const { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value } = p
-  return { id, slug, title, typeName, basePrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value }
+  const { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value } = p
+  return { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value }
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
@@ -115,7 +115,8 @@ export default async function ProductPage({ params, searchParams }: Props) {
         product={purchaseProps(product)}
         initialVariantId={variant?.id ?? null}
         initialFabric={fabric}
-        offer={{ amount: tierAmount(product.offerTier, offers.amounts), code: offers.code }}
+        adAmount={tierAmount(product.offerTier, offers.amounts)}
+        offers={shopOffers(offers)}
         plans={plans}
       >
         <PostcodeCheck windowLabel={delivery.windowLabel} areas={delivery.areas} noDeliveryDays={delivery.noDeliveryDays} />

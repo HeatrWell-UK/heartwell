@@ -27,7 +27,7 @@ export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'it
         </div>
         {order.discountAmount > 0 && (
           <div className="flex justify-between">
-            <dt>Offer</dt>
+            <dt>Your offer</dt>
             <dd>−{formatPrice(order.discountAmount)}</dd>
           </div>
         )}

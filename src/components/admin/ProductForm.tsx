@@ -15,10 +15,12 @@ import {
   ORIGINS,
   slugify,
   type DraftProblem,
+  type PricePoint,
   type ProductDraft,
   type SpecFieldDef,
   type VariantDraft,
 } from '@/lib/admin/catalogue-form'
+import { WasPriceCheck } from './WasPriceCheck'
 import type { EditorOptions } from '@/lib/admin/load-catalogue'
 import { saveProduct } from '@/app/admin/(panel)/catalogue/actions'
 import { cn } from '@/lib/cn'
@@ -74,11 +76,14 @@ export function ProductForm({
   initial,
   options,
   orderedVariantIds = [],
+  priceLog = [],
   savedNote = null,
 }: {
   initial: ProductDraft
   options: EditorOptions
   orderedVariantIds?: string[]
+  /** Every price this product has had (newest first), to check a was-price against. */
+  priceLog?: PricePoint[]
   savedNote?: string | null
 }) {
   const router = useRouter()
@@ -165,6 +170,18 @@ export function ProductForm({
             hint="Decides the Specifications fields and the filters it appears under."
           />
           <TextField label="Price" prefix="£" value={draft.basePrice} invalid={invalid('basePrice')} inputMode="decimal" onChange={(basePrice) => set({ basePrice })} hint="The price before any colourway difference." />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField
+            label="Was price (optional)"
+            prefix="£"
+            value={draft.wasPrice}
+            invalid={invalid('wasPrice')}
+            inputMode="decimal"
+            onChange={(wasPrice) => set({ wasPrice })}
+            hint="Only for a piece on a deal: the shop shows it struck through, with the % off. Leave blank otherwise."
+          />
+          <WasPriceCheck price={draft.basePrice} wasPrice={draft.wasPrice} log={priceLog} isNew={!draft.id} />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <SelectField

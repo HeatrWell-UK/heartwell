@@ -52,6 +52,7 @@ const product = (slug: string, extra: Partial<ListingProduct> = {}): ListingProd
   madeToOrder: false,
   madeInUk: false,
   price: 500,
+  wasPrice: null,
   widthCm: 200,
   depthCm: 90,
   heightCm: 95,

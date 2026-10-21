@@ -37,6 +37,8 @@ export const STORAGE_GROUPS: StorageGroup[] = [
       { name: 'hw-offer', kind: 'cookie', purpose: 'Your offer from one of our adverts, so it applies at checkout.', lasts: 'Until the offer ends (up to a week or so)' },
       { name: 'hw-offer-until', kind: 'cookie', purpose: 'When that offer ends, to show it on the page.', lasts: 'Until the offer ends' },
       { name: 'hw-offer-claimed', kind: 'session storage', purpose: 'Stops the shop asking for the same offer twice.', lasts: 'Until you close the tab' },
+      { name: 'hw-welcome', kind: 'cookie', purpose: 'Your welcome offer, so it comes off at checkout (and, once it ends, so it stays ended).', lasts: '1 year' },
+      { name: 'hw-welcome-until', kind: 'cookie', purpose: 'When your welcome offer ends, for the countdown.', lasts: '1 year' },
     ],
   },
   {

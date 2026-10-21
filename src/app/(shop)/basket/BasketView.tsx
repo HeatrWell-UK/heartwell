@@ -14,9 +14,12 @@ import { useBasket } from '@/lib/basket/store'
 import { useHydrated } from '@/lib/basket/use-hydrated'
 import { MAX_QUANTITY } from '@/lib/basket/model'
 import { productHref } from '@/lib/product/helpers'
-import { basketOfferAmount, type TierAmounts } from '@/lib/offers/paid'
-import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
+import type { ShopOffers } from '@/lib/offers/welcome'
+import { OfferStrip } from '@/components/offer/OfferStrip'
+import { WelcomeNote } from '@/components/offer/WelcomeOffer'
+import { useBasketOffer } from '@/components/offer/useBasketOffer'
 import { PayRows } from '@/components/checkout/PayRows'
+import { MinimumNote } from '@/components/checkout/MinimumNote'
 import { refreshBasket } from './actions'
 
 const NEXT = [
@@ -25,10 +28,10 @@ const NEXT = [
   'Pay the driver once it’s in your room.',
 ]
 
-export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmounts; offerCode: string | null }) {
+export function BasketView({ offers }: { offers: ShopOffers }) {
   const basket = useBasket()
   const hydrated = useHydrated()
-  const offerEnds = useOfferEnds()
+  const offer = useBasketOffer(basket.lines, offers)
   const [removed, setRemoved] = useState(0)
   const refreshed = useRef(false)
 
@@ -68,8 +71,8 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
   }
 
   // Shown as the database works it out; checkout's figure is the one that counts.
-  const offer = offerEnds ? basketOfferAmount(basket.lines.map((l) => ({ tier: l.view.offerTier ?? null, lineTotal: l.view.unitPrice * l.quantity })), offerAmounts) : 0
-  const toPay = basket.subtotal - offer
+  const toPay = basket.subtotal - offer.amount
+  const canCheckout = FEATURES.checkout && offer.short === 0
 
   return (
     <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-12">
@@ -141,7 +144,11 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
           <h2 id="summary" className="text-[26px] leading-tight">
             Summary
           </h2>
-          <OfferStrip amount={offer} code={offerCode} />
+          {offer.kind === 'ad' ? (
+            <OfferStrip amount={offer.amount} code={offers.code} />
+          ) : (
+            <WelcomeNote state={offer.welcome} amount={offers.welcome.amount} hours={offers.welcome.hours} />
+          )}
           <dl className="flex flex-col gap-2 text-[15px]">
             <div className="flex justify-between">
               <dt>
@@ -149,10 +156,10 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
               </dt>
               <dd>{formatPrice(basket.subtotal)}</dd>
             </div>
-            {offer > 0 && (
+            {offer.amount > 0 && (
               <div className="flex justify-between">
-                <dt>Your offer</dt>
-                <dd>−{formatPrice(offer)}</dd>
+                <dt>{offer.kind === 'welcome' ? `Welcome offer (${basket.count} × ${formatPrice(offers.welcome.amount)})` : 'Your offer'}</dt>
+                <dd>−{formatPrice(offer.amount)}</dd>
               </div>
             )}
             <div className="flex justify-between">
@@ -165,7 +172,8 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
             Cash or bank transfer to the driver, once it&rsquo;s in your room. {PROMISES.delivery.chargedAreas} pay a delivery charge, shown
             at checkout. Upstairs delivery, assembly and taking your old sofa away can be added there too.
           </p>
-          {FEATURES.checkout ? (
+          {offer.short > 0 && <MinimumNote short={offer.short} minimum={offers.minOrder} subtotal={basket.subtotal} />}
+          {canCheckout ? (
             <ButtonLink href="/checkout" block>
               Go to checkout
             </ButtonLink>
@@ -174,7 +182,7 @@ export function BasketView({ offerAmounts, offerCode }: { offerAmounts: TierAmou
               <Button block disabled>
                 Go to checkout
               </Button>
-              <p className="text-sm text-slate">Checkout is switched on in the next build phase.</p>
+              {!FEATURES.checkout && <p className="text-sm text-slate">Checkout is switched on in the next build phase.</p>}
             </>
           )}
         </section>

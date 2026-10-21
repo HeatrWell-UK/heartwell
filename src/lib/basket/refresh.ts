@@ -84,7 +84,7 @@ export async function savedCards(items: z.infer<typeof SavedIdentities>): Promis
   if (items.length === 0) return []
   const { data, error } = await createPublicClient()
     .from('products')
-    .select('slug, title, base_price, variants:product_variants(sku, colour_name, price_adjustment, image_url, sort)')
+    .select('slug, title, base_price, was_price, variants:product_variants(sku, colour_name, price_adjustment, image_url, sort)')
     .in(
       'slug',
       items.map((i) => i.slug),
@@ -100,6 +100,7 @@ export async function savedCards(items: z.infer<typeof SavedIdentities>): Promis
         slug: p.slug,
         title: p.title,
         price: v ? unitPrice(p.base_price, v.price_adjustment) : fromPrice(p.base_price, []),
+        wasPrice: p.was_price === null ? null : v ? unitPrice(p.was_price, v.price_adjustment) : p.was_price,
         image: v?.image_url ?? null,
         imageAlt: v?.colour_name ? `${p.title} in ${v.colour_name.toLowerCase()}` : p.title,
         href: productHref(p.slug, v?.sku),

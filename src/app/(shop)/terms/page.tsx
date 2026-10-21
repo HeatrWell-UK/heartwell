@@ -4,6 +4,7 @@ import { ContentPage } from '@/components/content/ContentPage'
 import { CONTACT } from '@/config/contact'
 import { POLICIES, PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
+import { getOfferSettings } from '@/lib/offers/server'
 
 export const metadata: Metadata = {
   title: 'Terms of sale',
@@ -24,15 +25,16 @@ const CONTENTS = [
   { id: 'law', label: '10. Complaints and the law' },
 ]
 
-export default function TermsPage() {
+export default async function TermsPage() {
   const t = CONTACT.trading
   const a = CONTACT.visitAddress
   const days = POLICIES.changeOfMindDays
+  const offers = await getOfferSettings()
   return (
     <ContentPage
       title="Terms of sale"
       intro={<p>These terms apply when you buy from us as a consumer, online, on WhatsApp or by phone. Please read them before you order.</p>}
-      updated="2026-10-12"
+      updated="2026-10-22"
       contents={CONTENTS}
     >
       <h2 id="us">1. Who we are</h2>
@@ -70,9 +72,21 @@ export default function TermsPage() {
         <li>
           {PROMISES.payment.long} We don’t take card payments, deposits or any payment in advance for furniture.
         </li>
+        {offers.minOrder > 0 && (
+          <li>
+            Orders on our website start at {formatPrice(offers.minOrder)}, counting the pieces’ prices before any offer or delivery charge.
+          </li>
+        )}
         <li>
-          Offers (an offer code, or the offer for visitors from our adverts) take a fixed amount off an order, set by the pieces in it. One offer applies per
-          order, it can’t be exchanged for cash, and it applies only to orders placed while it’s running (the end date is shown).
+          {offers.welcome.enabled
+            ? `Our welcome offer takes ${formatPrice(offers.welcome.amount)} off each piece in an order placed within ${offers.welcome.hours} hours of your first visit to our website, on the device you visited from. It starts once and isn’t restarted or extended; the time left is shown on the page. `
+            : ''}
+          Other offers (an offer code, or the offer for visitors from our adverts) take a fixed amount off an order, set by the pieces in it. One offer
+          applies per order (the one that takes the most off), it can’t be exchanged for cash, and it applies only to orders placed while it’s running (the
+          end is shown).
+        </li>
+        <li>
+          A price shown struck through (a “was” price) is the price that piece sold for on our website before its current price.
         </li>
         <li>The price you confirm is the price you pay. If our prices change after you’ve confirmed, your order isn’t affected.</li>
       </ol>
