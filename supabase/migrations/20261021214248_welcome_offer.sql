@@ -9,7 +9,7 @@
 --    calculate_order_offer checks it. One offer per order: the welcome offer,
 --    an offer code or an ad visitor's offer, whichever takes the most off.
 -- 2. Minimum order. A website order's pieces (before offers and delivery) must
---    come to shop_settings.min_order_value (£400). price_order says whether a
+--    come to shop_settings.min_order_value (£399). price_order says whether a
 --    basket is short; a trigger on orders refuses a website order that is
 --    (BELOW_MINIMUM). Orders staff take by phone or WhatsApp are exempt.
 -- 3. Was-prices. products.was_price, set in the admin on the pieces on a deal,
@@ -24,7 +24,7 @@ alter table public.shop_settings
   add column welcome_offer_enabled boolean not null default true,
   add column welcome_offer_amount numeric(10,2) not null default 20 check (welcome_offer_amount between 0 and 1000),
   add column welcome_offer_hours smallint not null default 48 check (welcome_offer_hours between 1 and 720),
-  add column min_order_value numeric(10,2) not null default 400 check (min_order_value between 0 and 100000);
+  add column min_order_value numeric(10,2) not null default 399 check (min_order_value between 0 and 100000);
 
 comment on column public.shop_settings.welcome_offer_amount is 'Pounds off each piece during a visitor''s welcome offer.';
 comment on column public.shop_settings.welcome_offer_hours is 'How long a welcome offer lasts from the first visit.';
