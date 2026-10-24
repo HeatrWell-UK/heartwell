@@ -84,9 +84,30 @@ async function loadRange(slug) {
 
 const lower = (s) => String(s ?? '').toLowerCase()
 
+/** "Black or grey tech air leather", "grey fabric, or black, brown or cream Leather Aire". */
+function colourList(variants) {
+  const byMaterial = new Map()
+  for (const v of variants) {
+    const m = v.material_label === 'Leather Aire' ? 'Leather Aire' : lower(v.material_label)
+    const list = byMaterial.get(m) ?? []
+    if (!list.includes(lower(v.colour_name))) list.push(lower(v.colour_name))
+    byMaterial.set(m, list)
+  }
+  const or = (xs) => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} or ${xs.at(-1)}` : xs[0])
+  return [...byMaterial].map(([m, cs]) => `${or(cs)} ${m}`).join(', or ')
+}
+
+/** A piece's photo in a colour ("Grey", or "Grey Fabric" when the colour comes in two materials), else its first. */
+function variantOf(p, colour) {
+  if (!colour) return p.variant
+  const want = lower(colour)
+  return p.variants.find((v) => `${lower(v.colour_name)} ${lower(v.material_label)}` === want) ?? p.variants.find((v) => lower(v.colour_name) === want) ?? p.variant
+}
+
 function context(range, copy) {
   const pieces = range.pieces
-  const photoOf = (slug) => (pieces.find((p) => p.slug === slug) ?? pieces[0]).variant.image_url
+  const pieceOf = (slug) => pieces.find((p) => p.slug === slug) ?? pieces[0]
+  const photoOf = (slug, colour) => variantOf(pieceOf(slug), colour).image_url
   const option = (p, v, label) => {
     const l = layoutOf(p, pieces)
     return {
@@ -97,7 +118,8 @@ function context(range, copy) {
       colour: v.colour_name,
       material: v.material_label,
       price: Number(p.base_price) + Number(v.price_adjustment ?? 0),
-      note: copy.photoNotes?.[p.slug],
+      note: copy.photoNotes?.[`${p.slug}|${v.colour_name}`] ?? copy.photoNotes?.[p.slug],
+      extra: copy.optionSubs?.[p.slug],
       set: p.axis1_value.includes('+'),
       depth: p.depth_cm,
       height: p.height_cm,
@@ -109,14 +131,18 @@ function context(range, copy) {
   const groups = sizesInOrder.map((size) => {
     const ps = pieces.filter((p) => p.axis1_value === size)
     const first = ps[0]
+    // Two colours of one piece: named with their material when the two differ ("Grey fabric", "Black Leather Aire").
+    const shownVariants = first.variants.slice(0, 2)
+    const mixed = new Set(shownVariants.map((v) => v.material_label)).size > 1
+    const colourLabel = (v) => (mixed ? `${v.colour_name} ${v.material_label === 'Leather Aire' ? v.material_label : lower(v.material_label)}` : v.colour_name)
     const options =
       ps.length > 1
         ? ps.map((p) => option(p, p.variant, sentence(p.axis2_value ?? p.variant.colour_name)))
-        : first.variants.length > 1
-          ? first.variants.slice(0, 2).map((v) => option(first, v, v.colour_name))
+        : shownVariants.length > 1
+          ? shownVariants.map((v) => option(first, v, colourLabel(v)))
           : [option(first, first.variant, first.axis2_value ? sentence(first.axis2_value) : first.variant.colour_name)]
     const same = (k) => options.every((o) => o[k] === options[0][k])
-    for (const o of options) o.sub = [same('depth') || !o.depth ? null : `${o.depth} cm deep`, o.set ? 'both sofas' : null].filter(Boolean).join(' · ')
+    for (const o of options) o.sub = [o.extra ?? null, same('depth') || !o.depth ? null : `${o.depth} cm deep`, o.set ? 'both sofas' : null].filter(Boolean).join(' · ')
     const layout = layoutOf(first, pieces)
     return {
       size,
@@ -150,17 +176,23 @@ function context(range, copy) {
     groups,
     photoOf,
     cover,
+    coverImage: variantOf(cover, copy.coverColour).image_url,
+    // Covers use the short name ("Roma", "Michigan"); the line under it says what it is.
+    displayName: copy.short ?? range.name,
+    // Every size in both back styles (Ashton), or only some (Sims's U-shapes, Verona's family set).
+    allBacks: backs > 1 && groups.every((g) => new Set(g.options.map((o) => o.piece.axis2_value)).size > 1),
+    colours: colourList(pieces.flatMap((p) => p.variants)),
     from: Math.min(...pieces.map((p) => p.price)),
     backs,
     madeToOrder: Boolean(mto),
     highlights,
     detailsLine: copy.detailsLine ?? highlights.slice(-2).join('. ') + '.',
-    metaLine: [`${groups.length} ${groups.length === 1 ? 'size' : 'sizes'}`, backs > 1 ? 'high or scattered back' : null, madeIn].filter(Boolean).join(' · '),
+    metaLine: [groups.length === 1 ? groups[0].label : `${groups.length} sizes`, backs > 1 ? 'high or scattered back' : null, madeIn].filter(Boolean).join(' · '),
     coverTile: tilePiece ? { image: tilePiece.variant.image_url, label: copy.coverTile?.label ?? (groups.length > 1 ? `${groups[0].label} to ${groups.at(-1).label}` : sentence(tilePiece.axis1_value)) } : null,
     fabrics: {
       count: fabricList.length,
       samePrice: range.collections.length > 0 && range.collections.every((c) => Number(c.surcharge) === 0),
-      shown: mto ? `${lower(mto.variant.colour_name)} ${lower(mto.variant.material_label)}`.trim() : '',
+      shown: mto ? `${lower(mto.variant.colour_name)} ${lower(mto.variant.material_label)}`.trim().replace(/ & /g, ' and ') : '',
       picks: (k) => swatches(range.collections, k),
     },
   }
@@ -182,7 +214,8 @@ function slidesFor(ctx, style) {
   if (copy.details?.length) {
     slides.push({ name: 'details', html: style.details(ctx), alt: `Close-ups of the ${range.name}: ${copy.details.map((d) => lower(d.label)).join(', ')}.` })
   }
-  if (groups.length > 1) {
+  // Every size drawn to scale earns its slide from three sizes up; with two, the size slides say it.
+  if (groups.length > 2) {
     slides.push({
       name: 'sizes',
       html: style.sizes(ctx),
@@ -228,6 +261,9 @@ function postText(ctx, styleName, files) {
     from: money(ctx.from),
     fabrics: ctx.fabrics.count,
     samePrice: ctx.fabrics.samePrice,
+    shown: ctx.fabrics.shown,
+    madeToOrder: ctx.madeToOrder,
+    colours: ctx.colours,
     link: `https://${SITE}/ranges/${range.slug}?utm_source=facebook&utm_medium=social&utm_campaign=range-${range.slug}`,
   }
   return [
@@ -270,7 +306,7 @@ function render(htmlFile, pngFile) {
   if (r.status !== 0 || !existsSync(pngFile)) throw new Error(`Chrome failed on ${htmlFile}: ${r.stderr?.toString() ?? r.error}`)
 }
 
-async function build(slug, styleName, preview) {
+async function build(slug, styleName, preview, textOnly) {
   const copy = COPY[slug]
   if (!copy) throw new Error(`No words for "${slug}" in copy.mjs yet`)
   const style = STYLES[styleName]
@@ -279,6 +315,13 @@ async function build(slug, styleName, preview) {
   const slides = slidesFor(ctx, style)
   // A range in another style than its turn goes to its own folder, so it never replaces the post.
   const dir = join(OUT, preview ? `${slug}-${styleName}` : slug)
+  if (textOnly) {
+    // Captions and alt text only, for the slides already made.
+    const files = slides.map((s, i) => ({ file: `${String(i + 1).padStart(2, '0')}-${s.name}.png`, alt: s.alt }))
+    writeFileSync(join(dir, 'post.txt'), postText(ctx, styleName, files))
+    console.log(`${ctx.range.name}: post.txt rewritten`)
+    return
+  }
   rmSync(dir, { recursive: true, force: true })
   mkdirSync(join(dir, 'html'), { recursive: true })
   // Cloudinary makes each new crop on its first request, which can outlast Chrome's wait: ask for them all first.
@@ -298,14 +341,16 @@ async function build(slug, styleName, preview) {
   console.log(`${ctx.range.name} (${styleName}): ${files.length} slides and post.txt in ${dir}`)
 }
 
-const [arg, flag, value] = process.argv.slice(2)
+const args = process.argv.slice(2)
+const arg = args[0]
 if (!arg) {
-  console.error('Usage: node design/social/products/build.mjs <range-slug|all> [--style velvet|bold|editorial]')
+  console.error('Usage: node design/social/products/build.mjs <range-slug|all> [--style velvet|bold|editorial] [--text]')
   process.exit(1)
 }
+const styleFlag = args.indexOf('--style')
 const order = Object.keys(COPY)
 for (const slug of arg === 'all' ? order : [arg]) {
   const turn = COPY[slug]?.style ?? ROTATION[order.indexOf(slug) % ROTATION.length]
-  const chosen = flag === '--style' ? value : turn
-  await build(slug, chosen, chosen !== turn)
+  const chosen = styleFlag > -1 ? args[styleFlag + 1] : turn
+  await build(slug, chosen, chosen !== turn, args.includes('--text'))
 }
