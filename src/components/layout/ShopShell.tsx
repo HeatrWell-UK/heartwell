@@ -8,10 +8,11 @@ import { Tracking } from '@/components/tracking/Tracking'
 import { getTrackingSettings } from '@/lib/tracking/server'
 import { OfferCapture } from '@/components/offer/OfferCapture'
 import { getOfferSettings } from '@/lib/offers/server'
+import { FloatingWhatsApp } from '@/components/whatsapp/FloatingWhatsApp'
 
 /**
- * The storefront's frame: announcement bar, header, footer. #page is what the
- * menu drawer marks inert while it's open.
+ * The storefront's frame: announcement bar, header, footer and the floating
+ * WhatsApp button. #page is what the menu drawer marks inert while it's open.
  */
 export async function ShopShell({ children }: { children: ReactNode }) {
   const [nav, tracking, offers] = await Promise.all([getShopNavigation().catch(() => [] as NavSection[]), getTrackingSettings(), getOfferSettings()])
@@ -24,6 +25,7 @@ export async function ShopShell({ children }: { children: ReactNode }) {
         {children}
       </main>
       <Footer shop={shop} />
+      <FloatingWhatsApp />
       <Tracking mode={tracking.mode} />
       <OfferCapture enabled={offers.adOffer} welcome={offers.welcome.enabled} />
     </div>

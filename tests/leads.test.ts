@@ -44,13 +44,13 @@ describe('opening WhatsApp', () => {
   it('uses the app’s own link inside them, with wa.me as the way back', () => {
     const text = 'Hi & hello\n\nRef: HW-WA-261007-ABCDEF'
     const encoded = encodeURIComponent(text)
-    expect(whatsAppLaunch('447848477056', text, 'other')).toEqual({ url: `https://wa.me/447848477056?text=${encoded}`, fallback: null })
-    expect(whatsAppLaunch('447848477056', text, 'ios-in-app')).toEqual({
-      url: `whatsapp://send?phone=447848477056&text=${encoded}`,
-      fallback: `https://wa.me/447848477056?text=${encoded}`,
+    expect(whatsAppLaunch('447460669864', text, 'other')).toEqual({ url: `https://wa.me/447460669864?text=${encoded}`, fallback: null })
+    expect(whatsAppLaunch('447460669864', text, 'ios-in-app')).toEqual({
+      url: `whatsapp://send?phone=447460669864&text=${encoded}`,
+      fallback: `https://wa.me/447460669864?text=${encoded}`,
     })
-    const android = whatsAppLaunch('447848477056', text, 'android-in-app')
-    expect(android.url).toMatch(/^intent:\/\/send\?phone=447848477056&text=.+#Intent;scheme=whatsapp;S\.browser_fallback_url=https%3A%2F%2Fwa\.me%2F447848477056.+;end$/)
+    const android = whatsAppLaunch('447460669864', text, 'android-in-app')
+    expect(android.url).toMatch(/^intent:\/\/send\?phone=447460669864&text=.+#Intent;scheme=whatsapp;S\.browser_fallback_url=https%3A%2F%2Fwa\.me%2F447460669864.+;end$/)
     expect(android.fallback).toBeNull()
   })
 })
@@ -74,7 +74,7 @@ describe('product videos', () => {
   })
 })
 
-const shop = { email: 'enquiries@example.test', phoneDisplay: '07848 477056', whatsAppHref: 'https://wa.me/447848477056' }
+const shop = { email: 'enquiries@example.test', phoneDisplay: '07460 669864', whatsAppHref: 'https://wa.me/447460669864' }
 
 describe('lead emails', () => {
   const fabrics = [{ code: 'CH-01', name: 'Grey <b>', collection: 'Chenille' }]

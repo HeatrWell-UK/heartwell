@@ -10,6 +10,7 @@ import { buttonClasses } from '@/components/ui/Button'
 import { Price } from '@/components/ui/Price'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
 import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
+import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 import { formatPrice } from '@/lib/format'
 import { getFabricLibrary, getListing, rangesFrom, type RangeSummary } from '@/lib/catalogue/listing'
 import { planFrame, planSummary, rangeSizes, type RangeSize } from '@/lib/catalogue/range-sizes'
@@ -121,6 +122,7 @@ export default async function RangePage({ params }: Props) {
             <a href="#sizes" className={buttonClasses({ block: true, className: 'sm:w-auto' })}>
               Choose a size
             </a>
+            <WhatsAppTopic message={`Hi Heartwell, I have a question about the ${range.name} range: ${SITE_URL}/ranges/${range.slug}`} context="sticky-range" />
             <WhatsAppButton
               message={`Hi Heartwell, I have a question about the ${range.name} range.`}
               context="range"

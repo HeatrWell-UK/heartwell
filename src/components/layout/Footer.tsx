@@ -24,7 +24,8 @@ export function Footer({ shop }: { shop: NavSection[] }) {
   const year = new Date().getFullYear()
   return (
     <footer className="bg-wine text-white">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-8 pt-10 lg:gap-12 lg:px-6 lg:pt-16">
+      {/* Room at the bottom for the floating WhatsApp button, so it never sits on the last line. */}
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 pb-24 pt-10 lg:gap-12 lg:px-6 lg:pt-16">
         <div className="grid gap-8 lg:grid-cols-[4fr_7fr_4fr] lg:gap-12">
           <div className="flex flex-col gap-8">
             <LogoStacked reversed width={190} />

@@ -37,12 +37,12 @@ export interface VisitDetails {
 
 export const CONTACT = {
   email: SUPPORT_EMAIL,
-  /** UK national format for display, e.g. "07700 900123". */
-  phoneDisplay: '07848 477056' as string | null,
+  /** UK national format for display, e.g. "07700 900123". Phone and WhatsApp: the owner's new number, 24 October 2026. */
+  phoneDisplay: '07460 669864' as string | null,
   /** E.164, e.g. "+447700900123". */
-  phoneE164: '+447848477056' as string | null,
+  phoneE164: '+447460669864' as string | null,
   /** International digits without "+", for wa.me links. */
-  whatsAppNumber: '447848477056' as string | null,
+  whatsAppNumber: '447460669864' as string | null,
   /** Owner, 12 October 2026; postcode confirmed 17 October 2026. */
   visitAddress: {
     street: 'Unit 4, Blacker Street',

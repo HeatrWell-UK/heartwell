@@ -10,6 +10,7 @@ import { orderForCustomer } from '@/lib/checkout/read'
 import { createPublicClient } from '@/lib/supabase/public'
 import { clientIp, rateLimit } from '@/lib/http/rate-limit'
 import { sendOrderConfirmedEmail } from '@/lib/checkout/notify'
+import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 
 export const metadata: Metadata = { title: 'Confirm your order', robots: { index: false, follow: false } }
 export const dynamic = 'force-dynamic'
@@ -46,6 +47,7 @@ export default async function ConfirmOrderPage({ params, searchParams }: { param
   if (order.status === 'cancelled') {
     return (
       <Shell title={`Order ${order.reference} was cancelled`}>
+        <WhatsAppTopic message={`Hi Heartwell, I have a question about my cancelled order ${order.reference}.`} context="sticky-order" enquiry={false} />
         <p className="text-[17px]">
           If that’s not what you expected, please {tel ? <a href={tel}>ring us on {CONTACT.phoneDisplay}</a> : 'contact us'} or email{' '}
           <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
@@ -110,6 +112,7 @@ function Shell({ title, children }: { title: string; children: React.ReactNode }
 function Summary({ order }: { order: NonNullable<Awaited<ReturnType<typeof orderForCustomer>>> }) {
   return (
     <section aria-label="Your order" className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-line p-5 lg:p-6">
+      <WhatsAppTopic message={`Hi Heartwell, I have a question about my order ${order.reference}.`} context="sticky-order" enquiry={false} />
       <OrderLines order={order} />
       <p className="text-[15px]">
         <span className="font-semibold">{order.customerName}</span>

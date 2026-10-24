@@ -176,7 +176,8 @@ html:has(dialog.hw-sheet[open]) { overflow: hidden; }
  * the product page's buy bar): src/lib/ui/bottom-cover.ts sets the height. The
  * footer stays reachable, and a focused link or field is never scrolled under it.
  */
-html { scroll-padding-bottom: var(--hw-cover-bottom, 0px); }
+/* Plus the floating WhatsApp button (56px, 12 to 16px up), so a focused link is never scrolled under it. */
+html { scroll-padding-bottom: calc(var(--hw-cover-bottom, 0px) + 80px); }
 body { padding-bottom: var(--hw-cover-bottom, 0px); }
 
 /* A stored cookie choice hides the server-drawn banner before the first paint (consentFlagScript). */
