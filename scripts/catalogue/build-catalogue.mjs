@@ -127,7 +127,9 @@ variants.push({
 })
 
 // ---------------------------------------------------------------------------
-// New pieces: hidden until the owner sends prices and sizes.
+// New pieces: hidden until the owner sends prices and sizes. The owner's price
+// list (23 October 2026, migration owner_price_list) priced 12 of the 14; Lily
+// 2 Seater and the Verona Cuddle Chair stay hidden until they're priced.
 
 ranges.push(
   { slug: 'lily', name: 'Lily', axis1_name: 'Size', axis2_name: null, sort: ranges.length + 1 },
@@ -149,6 +151,21 @@ const hidden = (p) => ({
   gallery_images: [],
   ...p,
 })
+/** On sale from the owner's price list: price and size in centimetres (W, D, H; a corner's two sides; a set's two sofas). */
+const priced = (price, { w, d, h, a = null, b = null, pieces = null }) => ({
+  is_active: true,
+  base_price: price,
+  width_cm: w,
+  depth_cm: d,
+  height_cm: h,
+  side_a_cm: a,
+  side_b_cm: b,
+  ...(pieces ? { pieces } : {}),
+})
+const setPieces = (three, two, d, h) => [
+  { label: '3 Seater', width_cm: three, depth_cm: d, height_cm: h },
+  { label: '2 Seater', width_cm: two, depth_cm: d, height_cm: h },
+]
 const sofaCats = (...extra) => [...new Set(['fabric-sofas', ...extra])].sort()
 // The new Rio sizes share the corner's materials, arms, feet and cushions.
 const rioShared = Object.fromEntries(
@@ -156,72 +173,98 @@ const rioShared = Object.fromEntries(
 )
 
 const newProducts = [
+  // Lily is made to order in the UK (owner's price list).
   ...[
-    ['lily-2-seater', '2 Seater', 2, 'Lily-2-seater-high-back-sofa-1', 'LL2-BG', 20, ['fabric-sofas']],
-    ['lily-3-seater', '3 Seater', 3, 'Lily-3-seater-high-back-sofa-1', 'LL3-BG', 30, ['fabric-sofas']],
-    ['lily-3-2-seater', '3+2 Seater', 5, 'Lily-3-and-2-seater-high-back-sofa-1', 'LL32-BG', 35, sofaCats('3-2-sofa-sets')],
-    ['lily-5-seater-corner', '5 Seater Corner', 5, 'Lily-5-seater-corner-high-back-sofa-1', 'LL5C-BG', 65, sofaCats('corner-sofas')],
-  ].map(([slug, size, seats, img, sku, sort, cats]) => ({
-    product: hidden({
-      slug,
-      title: `Lily ${size}`,
-      product_type: 'sofa',
-      range: 'lily',
-      primary_category: cats.includes('corner-sofas') ? 'corner-sofas' : cats.includes('3-2-sofa-sets') ? '3-2-sofa-sets' : 'fabric-sofas',
-      categories: cats,
-      axis1_value: size,
-      specifications: { material: 'Fabric', shape: /corner/i.test(size) ? 'corner' : /\+/.test(size) ? 'set' : 'straight', seats, cushions_included: true },
-      sort,
-      offer_tier: 'STANDARD',
-    }),
-    variants: [{ sku, colour_name: 'Beige', colour_hex: '#D8CCB8', material_label: 'Fabric', image: img }],
-  })),
+    ['lily-2-seater', '2 Seater', 2, 'Lily-2-seater-high-back-sofa-1', 'LL2-BG', 20, ['fabric-sofas'], null],
+    ['lily-3-seater', '3 Seater', 3, 'Lily-3-seater-high-back-sofa-1', 'LL3-BG', 30, ['fabric-sofas'], priced(449, { w: 195, d: 90, h: 95 })],
+    ['lily-3-2-seater', '3+2 Seater', 5, 'Lily-3-and-2-seater-high-back-sofa-1', 'LL32-BG', 35, sofaCats('3-2-sofa-sets'), priced(749, { w: 195, d: 90, h: 95, pieces: setPieces(195, 168, 90, 95) })],
+    ['lily-5-seater-corner', '5 Seater Corner', 5, 'Lily-5-seater-corner-high-back-sofa-1', 'LL5C-BG', 65, sofaCats('corner-sofas'), priced(749, { w: 240, d: 90, h: 95, a: 240, b: 240 })],
+  ].map(([slug, size, seats, img, sku, sort, cats, sale]) => {
+    const { pieces, ...onSale } = sale ?? {}
+    return {
+      product: hidden({
+        slug,
+        title: `Lily ${size}`,
+        product_type: 'sofa',
+        range: 'lily',
+        primary_category: cats.includes('corner-sofas') ? 'corner-sofas' : cats.includes('3-2-sofa-sets') ? '3-2-sofa-sets' : 'fabric-sofas',
+        categories: cats,
+        axis1_value: size,
+        origin: 'uk',
+        made_to_order: true,
+        specifications: { material: 'Fabric', shape: /corner/i.test(size) ? 'corner' : /\+/.test(size) ? 'set' : 'straight', seats, cushions_included: true, ...(pieces ? { pieces } : {}) },
+        sort,
+        offer_tier: 'STANDARD',
+        ...onSale,
+      }),
+      variants: [{ sku, colour_name: 'Beige', colour_hex: '#D8CCB8', material_label: 'Fabric', image: img }],
+    }
+  }),
+  // Michigan's cover is tech air leather, a leather-look fabric (owner's price list).
   ...[
-    ['michigan-electric-recliner-2-seater', '2 Seater', 2, '2-Seater', 'MI2', 20, []],
-    ['michigan-electric-recliner-3-seater', '3 Seater', 3, '3-Seater', 'MI3', 30, []],
-    ['michigan-electric-recliner-3-2-seater', '3+2 Seater', 5, '3_2-Seater', 'MI32', 35, ['3-2-sofa-sets']],
-    ['michigan-electric-recliner-corner', '5 Seater Corner', 5, '5-Seater-Corner', 'MIC', 65, ['corner-sofas']],
-  ].map(([slug, size, seats, file, sku, sort, extra]) => ({
-    product: hidden({
-      slug,
-      title: `Michigan Electric Recliner ${size}`,
-      product_type: 'sofa',
-      range: 'michigan-electric-recliner',
-      primary_category: 'electric-recliners',
-      categories: [...new Set(['recliners', 'electric-recliners', 'leather-sofas', ...extra])].sort(),
-      axis1_value: size,
-      origin: 'imported',
-      specifications: { material: 'Leather', reclining: 'Electric', led_lights: true, cup_holders: true, shape: /corner/i.test(size) ? 'corner' : /\+/.test(size) ? 'set' : 'straight', seats },
-      sort,
-      offer_tier: 'HIGH',
-    }),
-    variants: [
-      { sku: `${sku}-BK`, colour_name: 'Black', colour_hex: '#1E1C1C', material_label: 'Leather', image: `Michigan-Electric-Recliner-${file}-Black-Leather` },
-      { sku: `${sku}-GR`, colour_name: 'Grey', colour_hex: '#6E6E70', material_label: 'Leather', image: `Michigan-Electric-Recliner-${file}-Grey-Leather` },
-    ],
-  })),
+    ['michigan-electric-recliner-2-seater', '2 Seater', 2, '2-Seater', 'MI2', 20, [], priced(599, { w: 170, d: 85, h: 95 })],
+    ['michigan-electric-recliner-3-seater', '3 Seater', 3, '3-Seater', 'MI3', 30, [], priced(699, { w: 190, d: 85, h: 95 })],
+    ['michigan-electric-recliner-3-2-seater', '3+2 Seater', 5, '3_2-Seater', 'MI32', 35, ['3-2-sofa-sets'], priced(1099, { w: 190, d: 85, h: 95, pieces: setPieces(190, 170, 85, 95) })],
+    ['michigan-electric-recliner-corner', '5 Seater Corner', 5, '5-Seater-Corner', 'MIC', 65, ['corner-sofas'], priced(1099, { w: 270, d: 85, h: 95, a: 230, b: 270 })],
+  ].map(([slug, size, seats, file, sku, sort, extra, sale]) => {
+    const { pieces, ...onSale } = sale
+    return {
+      product: hidden({
+        slug,
+        title: `Michigan Electric Recliner ${size}`,
+        product_type: 'sofa',
+        range: 'michigan-electric-recliner',
+        primary_category: 'electric-recliners',
+        categories: [...new Set(['recliners', 'electric-recliners', 'leather-sofas', ...extra])].sort(),
+        axis1_value: size,
+        origin: 'imported',
+        specifications: {
+          material: 'Tech Air Leather',
+          reclining: 'Electric',
+          led_lights: true,
+          cup_holders: true,
+          usb_ports: true,
+          storage: true,
+          shape: /corner/i.test(size) ? 'corner' : /\+/.test(size) ? 'set' : 'straight',
+          seats,
+          ...(pieces ? { pieces } : {}),
+        },
+        sort,
+        offer_tier: 'HIGH',
+        ...onSale,
+      }),
+      variants: [
+        { sku: `${sku}-BK`, colour_name: 'Black', colour_hex: '#1E1C1C', material_label: 'Tech Air Leather', image: `Michigan-Electric-Recliner-${file}-Black-Leather` },
+        { sku: `${sku}-GR`, colour_name: 'Grey', colour_hex: '#6E6E70', material_label: 'Tech Air Leather', image: `Michigan-Electric-Recliner-${file}-Grey-Leather` },
+      ],
+    }
+  }),
   ...[
-    ['rio-chesterfield-2-seater', '2 Seater', 2, 'Rio-Chesterfield-2-Seater-Corner-High-Back-Sofa', 'RC2-SG', 20, ['fabric-sofas']],
-    ['rio-chesterfield-3-seater', '3 Seater', 3, 'Rio-Chesterfield-3-Seater-Corner-High-Back-Sofa', 'RC3-SG', 30, ['fabric-sofas']],
-    ['rio-chesterfield-3-2-seater', '3+2 Seater', 5, 'Rio-Chesterfield-3-and-2-Seater-Corner-High-Back-Sofa', 'RC32-SG', 35, sofaCats('3-2-sofa-sets')],
-    ['rio-chesterfield-4-seater', '4 Seater', 4, 'Rio-Chesterfield-4-Seater-Corner-High-Back-Sofa', 'RC4-SG', 40, ['fabric-sofas']],
-  ].map(([slug, size, seats, img, sku, sort, cats]) => ({
-    product: hidden({
-      slug,
-      title: `Rio Chesterfield ${size}`,
-      product_type: 'sofa',
-      range: 'rio-chesterfield',
-      primary_category: cats.includes('3-2-sofa-sets') ? '3-2-sofa-sets' : 'fabric-sofas',
-      categories: cats,
-      axis1_value: size,
-      origin: 'uk',
-      made_to_order: true,
-      specifications: { ...rioShared, shape: /\+/.test(size) ? 'set' : 'straight', seats },
-      sort,
-      offer_tier: 'STANDARD',
-    }),
-    variants: [{ sku, colour_name: 'Silver Grey', colour_hex: '#B4B2AE', material_label: 'Fabric', image: img }],
-  })),
+    ['rio-chesterfield-2-seater', '2 Seater', 2, 'Rio-Chesterfield-2-Seater-Corner-High-Back-Sofa', 'RC2-SG', 20, ['fabric-sofas'], priced(399, { w: 168, d: 90, h: 90 })],
+    ['rio-chesterfield-3-seater', '3 Seater', 3, 'Rio-Chesterfield-3-Seater-Corner-High-Back-Sofa', 'RC3-SG', 30, ['fabric-sofas'], priced(449, { w: 198, d: 90, h: 90 })],
+    ['rio-chesterfield-3-2-seater', '3+2 Seater', 5, 'Rio-Chesterfield-3-and-2-Seater-Corner-High-Back-Sofa', 'RC32-SG', 35, sofaCats('3-2-sofa-sets'), priced(699, { w: 198, d: 90, h: 90, pieces: setPieces(198, 168, 90, 90) })],
+    ['rio-chesterfield-4-seater', '4 Seater', 4, 'Rio-Chesterfield-4-Seater-Corner-High-Back-Sofa', 'RC4-SG', 40, ['fabric-sofas'], priced(549, { w: 235, d: 90, h: 90 })],
+  ].map(([slug, size, seats, img, sku, sort, cats, sale]) => {
+    const { pieces, ...onSale } = sale
+    return {
+      product: hidden({
+        slug,
+        title: `Rio Chesterfield ${size}`,
+        product_type: 'sofa',
+        range: 'rio-chesterfield',
+        primary_category: cats.includes('3-2-sofa-sets') ? '3-2-sofa-sets' : 'fabric-sofas',
+        categories: cats,
+        axis1_value: size,
+        origin: 'uk',
+        made_to_order: true,
+        specifications: { ...rioShared, shape: /\+/.test(size) ? 'set' : 'straight', seats, ...(pieces ? { pieces } : {}) },
+        sort,
+        offer_tier: 'STANDARD',
+        ...onSale,
+      }),
+      variants: [{ sku, colour_name: 'Silver Grey', colour_hex: '#B4B2AE', material_label: 'Fabric', image: img }],
+    }
+  }),
   {
     product: hidden({
       slug: 'verona-cuddle-chair',
@@ -239,20 +282,25 @@ const newProducts = [
     }),
     variants: [{ sku: 'VCC-G', colour_name: 'Grey', colour_hex: '#8A8A8E', material_label: 'Fabric', image: 'Verona-Cuddle-Chair' }],
   },
+  // The family set: the scattered back 5 seater corner with a cuddle chair and a
+  // footstool. In the Verona range; its measurements are the corner's.
   {
     product: hidden({
       slug: 'verona-corner-set',
-      title: 'Verona 5 Seater Corner, Cuddle Chair and Footstool Set',
+      title: 'Verona Family Set: 5 Seater Corner, Cuddle Chair and Footstool',
       product_type: 'sofa',
-      range: null,
+      range: 'verona',
       primary_category: 'corner-sofas',
       categories: ['corner-sofas', 'fabric-sofas'],
-      axis1_value: 'Corner Set',
+      axis1_value: 'Family Set',
+      axis2_value: 'Scattered Back',
       origin: 'uk',
       made_to_order: true,
-      specifications: { material: 'Fabric', shape: 'set', seats: 6, cushions_included: true },
+      specifications: { material: 'Fabric', shape: 'corner', seats: 5, cushions_included: true },
+      dimensions_note: 'These are the corner sofa’s measurements; the cuddle chair and footstool come with it.',
       sort: 75,
       offer_tier: 'STANDARD',
+      ...priced(799, { w: 240, d: 90, h: 90, a: 240, b: 240 }),
     }),
     variants: [{ sku: 'VSET-G', colour_name: 'Grey', colour_hex: '#8A8A8E', material_label: 'Fabric', image: 'Verona-5-seater-corner-cuddle-chair-and-footstool-set' }],
   },
@@ -282,8 +330,36 @@ const CATEGORY_PHOTO = {
   'armchairs-and-footstools': 'Verona-Cuddle-Chair',
 }
 const categories = base.categories.map((c) => ({ ...c, image_url: CATEGORY_PHOTO[c.slug] ? photo(CATEGORY_PHOTO[c.slug]) : null }))
+// Fabric swatches. CH12 is one of the owner's photos; the other 69 were copied
+// into Heartwell's Cloudinary on 22 October 2026 as heartwell/fabrics/<code>.jpg
+// (tag heartwell-fabric). Each number is the version Cloudinary gave that file,
+// so a rebuild writes the same address the database already has.
 const FABRIC_PHOTO = { CH12: 'CH12' }
-const materials = base.materials.map((m) => ({ ...m, image_url: FABRIC_PHOTO[m.code] ? photo(FABRIC_PHOTO[m.code]) : null }))
+const FABRIC_SWATCH_VERSION = {
+  CH01: 1792609332, CH02: 1792609375, CH03: 1792609377, CH04: 1792609380, CH05: 1792609382, CH06: 1792609384,
+  CH07: 1792609386, CH08: 1792609388, CH09: 1792609390, CH10: 1792609393, CH11: 1792609395,
+  CV01: 1792609476, CV04: 1792609478, CV05: 1792609480, CV06: 1792609482, CV07: 1792609484, CV08: 1792609486,
+  CV09: 1792609488, CV10: 1792609490, CV11: 1792609492, CV13: 1792609494, CV14: 1792609496, CV15: 1792609498,
+  MB01: 1792609565, MB02: 1792609567, MB03: 1792609569, MB04: 1792609571, MB05: 1792609573, MB06: 1792609575,
+  MB07: 1792609577, MB08: 1792609578, MB09: 1792609581,
+  NP01: 1792609541, NP02: 1792609544, NP03: 1792609546, NP04: 1792609548, NP05: 1792609550, NP06: 1792609552,
+  NP07: 1792609554, NP08: 1792609557, NP09: 1792609559, NP10: 1792609561, NP11: 1792609563,
+  PL01: 1792609397, PL02: 1792609399, PL03: 1792609401, PL05: 1792609403, PL06: 1792609405, PL07: 1792609407,
+  PL08: 1792609409, PL09: 1792609411, PL10: 1792609457, PL11: 1792609459, PL12: 1792609461, PL13: 1792609463,
+  PL14: 1792609465, PL15: 1792609467, PL16: 1792609469, PL17: 1792609471, PL18: 1792609473,
+  PVC01: 1792609607, PVC02: 1792609609, PVC03: 1792609611, PVC04: 1792609613, PVC05: 1792609615, PVC06: 1792609616,
+  PVC07: 1792609618, PVC08: 1792609620, PVC09: 1792609622,
+}
+function fabricPhoto(code) {
+  if (FABRIC_PHOTO[code]) return photo(FABRIC_PHOTO[code])
+  const version = FABRIC_SWATCH_VERSION[code]
+  if (!version) {
+    problems.push(`no swatch photo for fabric ${code}`)
+    return null
+  }
+  return `${CLOUD}/v${version}/heartwell/fabrics/${code.toLowerCase()}.jpg`
+}
+const materials = base.materials.map((m) => ({ ...m, image_url: fabricPhoto(m.code) }))
 
 // ---------------------------------------------------------------------------
 // Words: one description and highlights per product.
@@ -295,9 +371,11 @@ const COPY_KEY = (p) =>
       ? 'orlando'
       : p.slug.startsWith('oxford')
         ? 'oxford'
-        : p.slug === 'verona-cuddle-chair' || p.slug === 'verona-corner-set'
-          ? 'verona'
-          : p.range
+        : p.slug === 'verona-corner-set'
+          ? 'verona-family-set'
+          : p.slug === 'verona-cuddle-chair'
+            ? 'verona'
+            : p.range
 const copy = {}
 for (const p of products) {
   const colours = variants.filter((v) => v.product === p.slug).map((v) => v.colour_name)

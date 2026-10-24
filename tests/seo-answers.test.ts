@@ -122,6 +122,10 @@ describe('answers about a product', () => {
       ),
     ).toMatch(/^It comes in grey or black plush velvet, or silver fabric\./)
     expect(materialWords('Tech Leather')).toBe('tech leather')
+    // Michigan's cover (owner's price list, 23 October 2026) is leather-look too.
+    expect(
+      coverAnswer(piece({ madeToOrder: false, madeInUk: false, variants: [variant('Black', 'Tech Air Leather')], specs: [{ label: 'Material', value: 'Tech Air Leather' }] }), 70),
+    ).toBe('It’s covered in tech air leather, in black. These are leather-look covers, not real leather: they look like leather and wipe clean.')
   })
 
   it('checks a door against the smaller of depth and height, as the door check does', () => {
