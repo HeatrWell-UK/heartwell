@@ -8,8 +8,17 @@
 // Instagram links aren't clickable, so it says "the link in our bio";
 // Facebook gets the range page's link, tagged so the admin sees where visits came from.
 //
-// alcove: where the name and tagline sit in the cover photo, in px on the
-// 1080 px photo (the centre of each line), measured by eye per photo.
+// Ranges are listed in posting order: the first is drawn in the velvet style,
+// the second bold, the third editorial, then round again (styles.mjs), unless
+// an entry sets `style`. Per range:
+//   cover       the piece whose photo leads the post
+//   tagline     the line under the name (velvet cover, alt text); sub: the editorial cover's line
+//   details     close-ups: a square {x, y, s} of a piece's original 1254 px photo, with a label
+//   detailsLine the sentence under the close-ups
+//   callouts    labels on the bold cover's photo: the dot and the label's top-left, in px on the 1080 px photo
+//   coverTile   the editorial cover's second photo and its label (default: a middle size, "2 seater to U-shape")
+//   photoNotes  something in a photo that doesn't come with the piece, said on the photo
+//   altDetail   a detail for every photo's alt text
 
 const WHATSAPP = '07460 669864'
 const NUMBERS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
@@ -20,8 +29,19 @@ const withMoney = (d) => d.sizes.map((s) => ({ ...s, money: d.money(s.from) }))
 export const COPY = {
   ashton: {
     cover: 'ashton-high-back-u-shape',
-    tagline: 'Plush velvet, made in the UK',
-    alcove: { nameY: 245, nameSize: 150, taglineY: 380 },
+    tagline: 'Plush velvet · Deep-buttoned · Made in the UK',
+    sub: 'Plush velvet, deep-buttoned, made in the UK',
+    details: [
+      { label: 'Deep-buttoned arms', photo: 'ashton-high-back-2-seater', x: 60, y: 600, s: 330 },
+      { label: 'Polished chrome feet', photo: 'ashton-high-back-2-seater', x: 70, y: 820, s: 240 },
+      { label: 'Plush velvet with a soft sheen', photo: 'ashton-high-back-2-seater', x: 330, y: 500, s: 300 },
+    ],
+    detailsLine: 'Every cushion included, and made to order in the UK.',
+    callouts: [
+      { label: 'Plush velvet', dot: [540, 470], pill: [440, 290] },
+      { label: 'Deep-buttoned arms', dot: [160, 640], pill: [40, 790] },
+      { label: 'Chrome feet', dot: [280, 730], pill: [370, 850] },
+    ],
     altDetail: 'with deep-buttoned arms and polished chrome feet',
     // The high back 3+2 photo has a footstool in it; the set is two sofas (no Ashton footstool is sold).
     photoNotes: { 'ashton-high-back-3-2-seater': 'Footstool not included' },
