@@ -35,7 +35,7 @@ Changing them adds a post to the Page; that's fine, it shows followers the new l
 | Field | Set it to |
 | --- | --- |
 | Category | Furniture shop (keep) |
-| Phone | 07848 477056 |
+| Phone | 07460 669864 |
 | Email | enquiries@heartwellsofa.co.uk |
 | Website | **Remove the old website now.** Add https://heartwellsofa.co.uk on go-live day |
 | Address | Unit 4, Blacker Street, Burnley BB10 2AF (the postcode is still to be confirmed: BB10 2AF or 2AY) |
@@ -44,7 +44,7 @@ Changing them adds a post to the Page; that's fine, it shows followers the new l
 
 ### 6. Button
 
-**Edit action button → Send WhatsApp message**, to 07848 477056. Facebook sends a code to that WhatsApp to link it. WhatsApp is where people already ask, and it keeps working after go-live.
+**Edit action button → Send WhatsApp message**, to 07460 669864. Facebook sends a code to that WhatsApp to link it. WhatsApp is where people already ask, and it keeps working after go-live.
 
 ### 7. Old posts and reels
 

@@ -258,7 +258,7 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
         {
           id: 'usb',
           q: 'Do your recliners have USB ports and cup holders?',
-          a: 'Some do: the Hannah and Nova electric recliners have USB ports and cup holders built in, and Nova adds storage. Each recliner’s page lists exactly what’s included.',
+          a: 'Our electric recliners do: Hannah, Nova, Orlando, Oxford and Michigan all have USB ports and cup holders built in. Nova and Michigan add storage, and Michigan has wireless charging and Bluetooth speakers too. The manual Roma recliners keep it simple. Each recliner’s page lists exactly what’s included.',
         },
         { id: 'price', q: 'How much is a recliner sofa?', a: priceAnswer('recliners', f.products) ?? '' },
         deliveryQuestion('a recliner', f),
@@ -279,7 +279,7 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
       {
         id: 'usb',
         q: 'Which electric recliners have USB ports?',
-        a: 'The Hannah and Nova electric recliners have USB ports and cup holders built in. Each sofa’s page lists exactly what’s included.',
+        a: 'All of them: Hannah, Nova, Orlando, Oxford and Michigan have USB ports and cup holders built in, and Michigan adds USB-C, wireless charging and Bluetooth speakers. Each sofa’s page lists exactly what’s included.',
       },
       { id: 'price', q: 'How much is an electric recliner sofa?', a: priceAnswer('electric recliners', f.products) ?? '' },
       deliveryQuestion('an electric recliner', f),

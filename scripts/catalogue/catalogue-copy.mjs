@@ -101,8 +101,18 @@ export const RANGE_COPY = {
   },
   'michigan-electric-recliner': {
     intro:
-      'Michigan reclines electrically, with LED lighting along the base and a drop-down console with cup holders. A sofa made for film nights.',
-    highlights: ['Electric reclining', 'LED lighting', 'Drop-down console with cup holders'],
+      'Michigan reclines electrically and is upholstered in tech air leather, a leather-look fabric that wipes clean. Adjustable headrests, LED lighting, cup holders, a storage console, wireless charging, Bluetooth speakers and USB and USB-C ports are built in: a sofa made for film nights.',
+    highlights: [
+      'Electric reclining with adjustable headrests',
+      'Tech air leather that wipes clean',
+      'Wireless charging, Bluetooth speakers, USB and USB-C',
+      'LED lights, cup holders and a storage console',
+    ],
+  },
+  'verona-family-set': {
+    intro:
+      'The Verona family set brings together the scattered back 5 seater corner, a cuddle chair and a footstool, all with Verona’s scrolled arms and all in the same fabric: a whole living room in one order.',
+    highlights: ['5 seater corner, cuddle chair and footstool', 'Scrolled arms and a scattered back', 'Every cushion included'],
   },
   footstool: {
     intro: 'A matching footstool with channel-stitched sides: somewhere to rest your feet, or an extra seat when you need one.',

@@ -22,6 +22,7 @@ import { AddedSheet, type AddedItem } from './AddedSheet'
 import { StickyBuyBar } from './StickyBuyBar'
 import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
 import { useWelcome, WelcomePanel } from '@/components/offer/WelcomeOffer'
+import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 import { ScalePlan } from '@/components/catalogue/ScalePlan'
 import { planFrame, sizeLabel } from '@/lib/catalogue/range-sizes'
 import { dealFor, dealLabel } from '@/lib/catalogue/deal'
@@ -369,6 +370,8 @@ export function ProductPurchase({
         </div>
       </div>
 
+      {/* The floating WhatsApp button asks about this piece, in the colour or fabric chosen. */}
+      <WhatsAppTopic message={waMessage} context="sticky-product" productId={p.id} variantId={variant?.id} productName={p.title} />
       {variant && <StickyBuyBar price={price} onAdd={addToBasket} watch={addRef} />}
       <AddedSheet item={added} offers={offers} onClose={() => setAdded(null)} />
       {p.madeToOrder && (

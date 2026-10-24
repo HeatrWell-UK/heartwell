@@ -17,6 +17,7 @@ import { activeChips, applyFilters, facetsFor, hasFilters, listingHref, parseLis
 import { categoryHref, resolveCategory, subtreeIds, trail } from '@/lib/catalogue/tree'
 import { breadcrumbJsonLd, jsonLdString } from '@/lib/product/seo'
 import { SITE_URL } from '@/config/site'
+import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 
 export type CategoryRouteProps = {
   params: Promise<{ department: string; category?: string }>
@@ -88,6 +89,7 @@ export async function CategoryPage({ params, searchParams }: CategoryRouteProps)
         dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd([...crumbs.map((c) => ({ name: c.name, path: c.href })), { name: title, path }], SITE_URL)) }}
       />
       <Breadcrumbs items={crumbs} />
+      <WhatsAppTopic message={`Hi Heartwell, I'm looking at your ${titleInSentence} and have a question: ${SITE_URL}${path}`} context="sticky-category" />
       <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 pt-2 lg:gap-7 lg:px-6 lg:pt-4">
         <header className="flex items-end justify-between gap-8">
           <div className="flex flex-col gap-2">

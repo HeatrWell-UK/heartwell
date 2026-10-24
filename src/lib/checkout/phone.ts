@@ -1,5 +1,5 @@
-// UK phone numbers as customers type them: "07848 477056", "+44 7848 477056",
-// "(0)7848-477056". Pure functions, shared by checkout and the emails.
+// UK phone numbers as customers type them: "07460 669864", "+44 7460 669864",
+// "(0)7460-669864". Pure functions, shared by checkout and the emails.
 
 /** International digits without "+", for wa.me links, or null when it isn't a UK number. */
 export function ukPhoneDigits(raw: string): string | null {
@@ -14,7 +14,7 @@ export function ukPhoneDigits(raw: string): string | null {
 
 export const isUkPhone = (raw: string) => ukPhoneDigits(raw) !== null
 
-/** "07848 477056" style, for display and the order record. Mobiles get a space after five digits. */
+/** "07460 669864" style, for display and the order record. Mobiles get a space after five digits. */
 export function formatUkPhone(raw: string): string {
   const d = ukPhoneDigits(raw)
   if (!d) return raw.trim()

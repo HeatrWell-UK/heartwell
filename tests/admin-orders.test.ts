@@ -117,7 +117,7 @@ describe('admin order view', () => {
   })
 
   it('emails the customer for the statuses they hear about', () => {
-    const shop = { email: 'shop@example.test', phoneDisplay: '07848 477056', whatsAppHref: null }
+    const shop = { email: 'shop@example.test', phoneDisplay: '07460 669864', whatsAppHref: null }
     const shipped = customerStatusEmail(toEmailData(row), 'shipped', { trackUrl: 'https://example.test/track-order', shop })
     expect(shipped.subject).toBe('Your Heartwell order HW-100300 is on its way')
     expect(shipped.html).toContain('£799')

@@ -36,7 +36,7 @@ export function materialWords(label: string): string {
     .join('')
 }
 
-const LEATHER_LOOK = /tech leather|leather aire|faux leather|leather-look/i
+const LEATHER_LOOK = /tech (air )?leather|leather aire|faux leather|leather-look/i
 
 // Delivery ----------------------------------------------------------------------
 

@@ -134,7 +134,7 @@ describe('order emails', () => {
     const e = customerOrderEmail(emailOrder, {
       confirmUrl,
       windowLabel: 'Tue 6 – Thu 8 October',
-      shop: { email: 'shop@example.test', phoneDisplay: '07848 477056', whatsAppHref: 'https://wa.me/447848477056' },
+      shop: { email: 'shop@example.test', phoneDisplay: '07460 669864', whatsAppHref: 'https://wa.me/447460669864' },
       now: new Date('2026-10-06T10:00:00Z'),
     })
     expect(e.subject).toBe('Please confirm your Heartwell order HW-100123')

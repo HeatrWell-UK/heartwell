@@ -7,6 +7,7 @@ import { OrderLines } from '@/components/checkout/OrderLines'
 import { OrderJourney } from '@/components/checkout/OrderJourney'
 import { CONTACT } from '@/config/contact'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
+import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 import { orderForCustomer } from '@/lib/checkout/read'
 import { orderJourney } from '@/lib/checkout/journey'
 import { formatDeliveryDate } from '@/lib/delivery/window'
@@ -69,6 +70,7 @@ export default async function OrderPlacedPage({ params }: { params: Promise<{ id
         </section>
       )}
 
+      <WhatsAppTopic message={`Hi Heartwell, I have a question about my order ${order.reference}.`} context="sticky-order" enquiry={false} />
       <WhatsAppButton
         message={`Hi Heartwell, I've just placed order ${order.reference}.`}
         context="order-placed"

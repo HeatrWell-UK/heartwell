@@ -480,7 +480,8 @@ export const GUIDES: Guide[] = [
     slug: 'left-or-right-hand-corner-sofa',
     title: 'Left or right hand corner sofa: which do you need?',
     summary: 'What 2c2, 2c1 and 1c2 mean, how to work out which way round your corner sofa should go, and when it doesn’t matter at all.',
-    updated: '2026-10-18',
+    updated: '2026-10-23',
+    published: '2026-10-18',
     sections: [
       {
         id: 'codes',
@@ -488,7 +489,7 @@ export const GUIDES: Guide[] = [
         blocks: [
           {
             list: [
-              '2c2: two seats, the corner, then two seats. Both sides are the same length, so it goes either way round. All our 5 seater corners are like this.',
+              '2c2: two seats, the corner, then two seats. Both sides are the same length, so it goes either way round. Nearly all our 5 seater corners are like this; the Michigan recliner corner is longer on one side.',
               '2c1: two seats, the corner, then one seat. A 4 seater with one side longer than the other.',
               '1c2: the same sofa in mirror image.',
             ],
@@ -527,7 +528,7 @@ export const GUIDES: Guide[] = [
         heading: 'When it doesn’t matter',
         blocks: [
           {
-            p: 'A corner with two equal sides fits either way round, so you only need to decide where it goes. That’s every 5 seater corner we sell.',
+            p: 'A corner with two equal sides fits either way round, so you only need to decide where it goes. That’s nearly every 5 seater corner we sell: each sofa’s page shows the length of both sides.',
           },
         ],
       },
@@ -541,7 +542,8 @@ export const GUIDES: Guide[] = [
     slug: 'electric-or-manual-recliner',
     title: 'Electric or manual recliner sofa: which is better?',
     summary: 'Electric recliners move at the press of a button; manual ones need no plug and cost less. How they compare, the space each needs and which to choose.',
-    updated: '2026-10-18',
+    updated: '2026-10-23',
+    published: '2026-10-18',
     sections: [
       {
         id: 'difference',
@@ -560,7 +562,7 @@ export const GUIDES: Guide[] = [
             list: [
               'Ease: electric is effortless and stops at any angle; manual takes a little push.',
               'Power: electric needs a plug socket near the sofa, with a cable running to it; manual needs neither, so it can stand anywhere in the room.',
-              'Extras: electric recliners often have USB ports and cup holders built in, as our Hannah and Nova recliners do.',
+              'Extras: electric recliners often have USB ports and cup holders built in, as all of ours do; our Michigan adds wireless charging and Bluetooth speakers.',
               'Price: manual recliners cost less. Our manual Roma recliners start at a lower price than our electric ones.',
             ],
           },
@@ -597,7 +599,8 @@ export const GUIDES: Guide[] = [
     slug: 'tech-leather-and-leather-aire',
     title: 'Tech leather and Leather Aire: what leather-look means',
     summary: 'None of them is real leather. What each one is, what it’s like to live with and how to look after it, so you know exactly what you’re buying.',
-    updated: '2026-10-18',
+    updated: '2026-10-23',
+    published: '2026-10-18',
     sections: [
       {
         id: 'short-answer',
@@ -613,7 +616,7 @@ export const GUIDES: Guide[] = [
         heading: 'Tech leather',
         blocks: [
           {
-            p: 'A fabric with a leather-like finish. It looks and feels like leather, wipes clean and costs less than the real thing. Our Orlando, Nova and Oxford electric recliners are covered in it.',
+            p: 'A fabric with a leather-like finish. It looks and feels like leather, wipes clean and costs less than the real thing. Our Orlando, Nova and Oxford electric recliners are covered in it, and Michigan in tech air leather, a version of the same thing.',
           },
         ],
       },

@@ -143,7 +143,7 @@ White and stone grounds; velvet for every action; wine for the one dark band a p
 
 ## Components (as drawn in the revision 2 preview)
 
-Same set as revision 1, recoloured: announcement bar (wine with a thin gold rule), header (mark + wordmark, rose count badge now velvet), primary (velvet sheen), secondary (velvet outline), WhatsApp, on-wine (gold gradient), disabled; promise tiles (stone); how ordering works (gold-gradient numbers); shop by shape (top-view plans); product card; colour swatches (velvet ring); pinking-shear fabric swatches; size cards (velvet border on gold tint); segmented control (velvet); postcode check; delivery extras; measurements (gold dimension lines); will it fit; accordions; honest reviews empty state; sticky buy bar; basket sheet; offer strip (gold tint, gold heart); footer (wine, gold logo).
+Same set as revision 1, recoloured: announcement bar (wine with a thin gold rule), header (mark + wordmark, rose count badge now velvet), primary (velvet sheen), secondary (velvet outline), WhatsApp, on-wine (gold gradient), disabled; promise tiles (stone); how ordering works (gold-gradient numbers); shop by shape (top-view plans); product card; colour swatches (velvet ring); pinking-shear fabric swatches; size cards (velvet border on gold tint); segmented control (velvet); postcode check; delivery extras; measurements (gold dimension lines); will it fit; accordions; honest reviews empty state; sticky buy bar; floating WhatsApp button (velvet circle, gold rim, the WhatsApp mark; a pill with "Ask us on WhatsApp" on wide screens; above anything fixed to the bottom; its first message fits the page); basket sheet; offer strip (gold tint, gold heart); footer (wine, gold logo).
 
 ## Icons
 
