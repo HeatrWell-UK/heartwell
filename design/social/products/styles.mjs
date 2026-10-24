@@ -15,8 +15,14 @@ import {
   STEPS, SITE, PHONE, LOGO_ON_DARK, LOGO_ON_LIGHT,
 } from './lib.mjs'
 
-const detailImage = (ctx, d, w) => closeUp(ctx.photoOf(d.photo), d, w)
+const detailImage = (ctx, d, w) => closeUp(ctx.photoOf(d.photo, d.colour), d, w)
 const n = (ctx) => ctx.groups.length
+/** Escaped, with hyphenated words kept whole ("Armed U-shape" never breaks after "U-"). */
+const nb = (s) => esc(s).replace(/(\S+-\S+)/g, '<span style="white-space:nowrap">$1</span>')
+/** "Ashton · size 2 of 5", or "Harrison · made to order" when there's one size. */
+const sizeKicker = (ctx, i) => `${esc(ctx.range.name)} · ${n(ctx) > 1 ? `size ${i} of ${n(ctx)}` : ctx.madeToOrder ? 'made to order' : 'ready made'}`
+/** A long measurement line leaves no room for the delivery chip beside it (the cover and ordering slides say it anyway). */
+const footChips = (g) => `<span class="chip">${icon.ruler}${esc(g.common)}</span>${g.common.length > 44 ? '' : `<span class="chip">${icon.truck}Free delivery</span>`}`
 
 // ---------------------------------------------------------------- shared: sizes drawn to scale
 
@@ -31,10 +37,10 @@ function sizesGrid(ctx, t) {
   const scale = sharedScale(groups.map((g) => g.layout), bw, bh, 0, false)
   const cells = groups.map(
     (g) => `<div class="sz"><div class="pl">${plan(g.layout, { w: bw, h: bh, line: t.line, fill: t.fill, text: t.text, scale, labels: false })}</div>
-    <div class="tx"><p class="nm">${esc(g.label)}</p><p class="hd">${esc(g.headline)}</p><p class="fr"><span>from</span> <b class="serif ${t.priceClass ?? ''}">${money(g.from)}</b></p></div></div>`,
+    <div class="tx"><p class="nm">${nb(g.label)}</p><p class="hd">${esc(g.headline)}</p><p class="fr"><span>from</span> <b class="serif ${t.priceClass ?? ''}">${money(g.from)}</b></p></div></div>`,
   )
   if (groups.length % 2) {
-    const note = ctx.backs > 1 ? 'Every size comes with a high back or a scattered back.' : ctx.madeToOrder ? `Made to order in the UK, in any of our ${ctx.fabrics.count} fabrics.` : 'Free delivery to most of mainland Britain.'
+    const note = ctx.allBacks ? 'Every size comes with a high back or a scattered back.' : ctx.madeToOrder ? `Made to order in the UK, in any of our ${ctx.fabrics.count} fabrics.` : 'Free delivery to most of mainland Britain.'
     cells.push(`<div class="sz note">${icon.heart}<p>${esc(note)}</p></div>`)
   }
   return {
@@ -53,7 +59,8 @@ function sizesGrid(ctx, t) {
   }
 }
 
-const sizesSub = (ctx) => ['Drawn to the same scale, so you can compare them.', ctx.backs > 1 ? 'Each in high back or scattered back.' : null].filter(Boolean).join(' ')
+const sizesSub = (ctx) =>
+  ['Drawn to the same scale, so you can compare them.', ctx.allBacks ? 'Each in high back or scattered back.' : ctx.backs > 1 ? 'Most come in high back or scattered back.' : null].filter(Boolean).join(' ')
 
 // ---------------------------------------------------------------- A: velvet luxe
 
@@ -75,10 +82,10 @@ const velvet = {
       .swipe{position:absolute;right:-34px;top:760px;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;color:#4A0D17;box-shadow:0 8px 20px rgb(0 0 0 / .4)}
       .swipe svg{width:40px;height:40px;margin-right:30px}`,
       `<img class="logo" src="${LOGO_ON_DARK}" alt="">
-      <h1 class="serif foil">${esc(ctx.range.name)}</h1>
+      <h1 class="serif foil">${esc(ctx.displayName)}</h1>
       <p class="tag">${esc(ctx.copy.tagline)}</p>
-      <div class="frame goldbg"><img src="${full(ctx.cover.variant.image_url, 900)}" alt=""></div>
-      <div class="medal goldbg"><span class="f">FROM</span><span class="p serif">${money(ctx.from)}</span></div>
+      <div class="frame goldbg"><img src="${full(ctx.coverImage, 900)}" alt=""></div>
+      <div class="medal goldbg">${n(ctx) > 1 ? '<span class="f">FROM</span>' : ''}<span class="p serif">${money(ctx.from)}</span></div>
       <div class="chips">${promiseChips(ctx)}</div>
       <div class="swipe goldbg">${icon.arrow}</div>`,
       'velvet',
@@ -145,11 +152,11 @@ const velvet = {
       .note{position:absolute;left:22px;top:22px;padding:10px 20px;border-radius:999px;background:rgb(34 23 26 / .72);color:#fff;font:500 24px/1.2 Figtree,sans-serif}
       .foot{position:absolute;left:62px;right:62px;top:1300px;display:flex;justify-content:space-between;align-items:center}
       .foot svg{color:#E9CC7B}`,
-      `<p class="k">${esc(ctx.range.name)} · size ${i} of ${n(ctx)}</p>
-      <h2 class="serif foil">${esc(g.label)}</h2>
+      `<p class="k">${sizeKicker(ctx, i)}</p>
+      <h2 class="serif foil">${nb(g.label)}</h2>
       <div class="plan">${plan(g.layout, { w: 300, h: 250, line: '#E9CC7B', fill: 'rgba(233,204,123,.12)', text: '#F2E4E6', font: 24 })}</div>
       ${two ? card(g.options[0], 340, 446) + card(g.options[1], 812, 446) : card(g.options[0], 340, 918)}
-      <div class="foot"><span class="chip">${icon.ruler}${esc(g.common)}</span><span class="chip">${icon.truck}Free delivery</span></div>`,
+      <div class="foot">${footChips(g)}</div>`,
       'velvet',
     )
   },
@@ -230,12 +237,12 @@ const bold = {
       .row svg{color:#E9CC7B}
       .go{position:absolute;right:64px;top:1080px;display:flex;align-items:center;gap:12px;padding:20px 30px;border-radius:999px;color:#4A0D17;font:700 30px/1 Figtree,sans-serif}
       .go svg{width:34px;height:34px}`,
-      `<img class="photo" src="${full(ctx.cover.variant.image_url)}" alt="">
+      `<img class="photo" src="${full(ctx.coverImage)}" alt="">
       <div class="fade"></div>
       <svg class="lines" width="1080" height="1080"><g stroke="#fff" stroke-width="3">${calls.map((c) => `<line x1="${c.dot[0]}" y1="${c.dot[1]}" x2="${c.pill[0] + 40}" y2="${c.pill[1] + 25}"/>`).join('')}</g></svg>
       ${calls.map((c) => `<span class="dot" style="left:${c.dot[0]}px;top:${c.dot[1]}px"></span><span class="call" style="left:${c.pill[0]}px;top:${c.pill[1]}px">${esc(c.label)}</span>`).join('')}
-      <div class="sticker" style="right:56px;top:70px;width:270px;height:270px"><span class="f">FROM</span><span class="p serif">${money(ctx.from)}</span></div>
-      <h1 class="serif foil">${esc(ctx.range.name)}</h1>
+      <div class="sticker" style="right:56px;top:70px;width:270px;height:270px">${n(ctx) > 1 ? '<span class="f">FROM</span>' : ''}<span class="p serif">${money(ctx.from)}</span></div>
+      <h1 class="serif foil">${esc(ctx.displayName)}</h1>
       <p class="meta">${esc(ctx.metaLine)}</p>
       <span class="go goldbg">Swipe ${icon.arrow}</span>
       <div class="row">${promiseChips(ctx)}</div>`,
@@ -292,7 +299,7 @@ const bold = {
       .info .chips svg{color:#E9CC7B}`,
       `<img class="photo" src="${full(o.image)}" alt="">
       <div class="fade"></div>
-      <div class="title"><p>${esc(ctx.range.name)}${g.options.length > 1 ? ` · ${esc(o.label.toLowerCase())}` : ''}</p><h2 class="serif">${esc(g.label)}</h2></div>
+      <div class="title"><p>${esc([ctx.range.name, g.options.length > 1 ? o.label.toLowerCase() : null, o.extra].filter(Boolean).join(' · '))}</p><h2 class="serif">${nb(g.label)}</h2></div>
       <div class="sticker" style="right:56px;top:56px;width:236px;height:236px"><span class="p serif">${money(o.price)}</span><span class="s">${o.set ? 'both sofas' : 'free delivery'}</span></div>
       ${o.note ? `<span class="note">${esc(o.note)}</span>` : ''}
       <div class="inset">${plan(g.layout, { w: 300, h: 270, line: '#E9CC7B', fill: 'rgba(233,204,123,.12)', text: '#F2E4E6', font: 24 })}</div>
@@ -332,7 +339,7 @@ const bold = {
       .wa{position:absolute;left:60px;top:1240px;display:flex;align-items:center;gap:14px;padding:22px 34px;border-radius:999px;color:#4A0D17;font:700 36px/1 Figtree,sans-serif}
       .wa svg{width:42px;height:42px}
       .visit{position:absolute;left:64px;right:60px;top:1350px;font:400 26px/1.2 Figtree,sans-serif;color:#EBDADD}`,
-      `<img class="photo" src="${band(ctx.cover.variant.image_url, 1080, 560, 0.45)}" alt="">
+      `<img class="photo" src="${band(ctx.coverImage, 1080, 560, 0.45)}" alt="">
       <div class="fade"></div>
       <h2 class="serif foil">Nothing to pay until it’s in your room</h2>
       <ol class="steps">${STEPS.map((s, i) => `<li><b class="foil">${i + 1}</b>${esc(s)}</li>`).join('')}</ol>
@@ -352,7 +359,7 @@ const editorial = {
     const other = ctx.coverTile
     return page(
       `.logo{position:absolute;right:66px;top:66px;width:150px}
-      h1{position:absolute;left:66px;top:64px;max-width:760px;font-size:${ctx.range.name.length > 9 ? 124 : 168}px;line-height:1;letter-spacing:-.02em}
+      h1{position:absolute;left:66px;top:64px;max-width:760px;font-size:${ctx.displayName.length > 9 ? 124 : 168}px;line-height:1;letter-spacing:-.02em}
       .sub{position:absolute;left:70px;top:246px;font:500 30px/1.3 Figtree,sans-serif;color:#5E4F52}
       .big{position:absolute;left:70px;top:322px;width:940px;height:640px}
       .big::before{content:"";position:absolute;left:18px;top:18px;right:-18px;bottom:-18px;border-radius:470px 470px 26px 26px;border:3px solid #B58A2F}
@@ -366,11 +373,11 @@ const editorial = {
       .chips{position:absolute;left:70px;right:70px;top:1314px;display:flex;justify-content:space-between}
       .chips svg{color:#8E1B2E}`,
       `<img class="logo" src="${LOGO_ON_LIGHT}" alt="">
-      <h1 class="serif">${esc(ctx.range.name)}</h1>
+      <h1 class="serif">${esc(ctx.displayName)}</h1>
       <p class="sub">${esc(ctx.copy.sub ?? ctx.copy.tagline)}</p>
-      <div class="big"><img src="${full(ctx.cover.variant.image_url, 960)}" alt=""></div>
-      <div class="price"><span>${n(ctx) > 1 ? `${n(ctx)} sizes from` : 'From'}</span><b>${money(ctx.from)}</b></div>
-      ${d ? `<div class="tile" style="left:70px"><img src="${detailImage(ctx, d, 460)}" alt=""><span>${esc(d.label)}</span></div>` : ''}
+      <div class="big"><img src="${full(ctx.coverImage, 960)}" alt=""></div>
+      <div class="price"><span>${n(ctx) > 1 ? `${n(ctx)} sizes from` : esc(ctx.groups[0].label)}</span><b>${money(ctx.from)}</b></div>
+      ${d ? `<div class="tile" style="left:70px;${other ? '' : 'width:940px'}"><img src="${other ? detailImage(ctx, d, 460) : detailImage(ctx, d, 940)}" alt="" style="${other ? '' : 'object-position:50% 50%'}"><span>${esc(d.label)}</span></div>` : ''}
       ${other ? `<div class="tile" style="left:${d ? 555 : 70}px;${d ? '' : 'width:940px'}"><img src="${band(other.image, d ? 460 : 940, 270)}" alt=""><span>${esc(other.label)}</span></div>` : ''}
       <div class="chips">${promiseChips(ctx)}</div>`,
       'stone',
@@ -437,11 +444,11 @@ const editorial = {
       .wrap{position:absolute;left:0;top:0;width:1080px;height:1440px;isolation:isolate}
       .foot{position:absolute;left:70px;right:70px;top:1322px;display:flex;justify-content:space-between}
       .foot svg{color:#8E1B2E}`,
-      `<p class="k">${esc(ctx.range.name)} · size ${i} of ${n(ctx)}</p>
-      <h2 class="serif">${esc(g.label)}</h2>
+      `<p class="k">${sizeKicker(ctx, i)}</p>
+      <h2 class="serif">${nb(g.label)}</h2>
       <div class="plan">${plan(g.layout, { w: 250, h: 210, line: '#8E1B2E', fill: 'rgba(142,27,46,.06)', text: '#5E4F52', font: 22 })}</div>
       <div class="wrap">${two ? card(g.options[0], 286) + card(g.options[1], 796) : card(g.options[0], 286)}</div>
-      <div class="foot"><span class="chip">${icon.ruler}${esc(g.common)}</span><span class="chip">${icon.truck}Free delivery</span></div>`,
+      <div class="foot">${footChips(g)}</div>`,
       'stone',
     )
   },
