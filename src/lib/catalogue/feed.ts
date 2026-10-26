@@ -279,7 +279,10 @@ export function metaFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('material', i.material),
         tag('size', i.size),
         tag('google_product_category', i.googleCategory),
-        tag('fb_product_category', i.metaCategory),
+        // Meta reads Google's categories too. Its own field takes only Meta's own
+        // names, so a copy of Google's wording there is rejected on every item
+        // (Commerce Manager warning, 26 October 2026): sent only when it differs.
+        i.metaCategory && i.metaCategory !== i.googleCategory ? tag('fb_product_category', i.metaCategory) : '',
         tag('product_type', i.productType),
         ...i.customLabels.map((label, n) => tag(`custom_label_${n}`, label)),
         '</item>',
