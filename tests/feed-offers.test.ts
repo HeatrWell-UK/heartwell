@@ -180,6 +180,12 @@ describe('catalogue feed', () => {
     expect(classifyPaidLanding(new URL(link).search)).toBe('meta_catalog')
   })
 
+  it('sends Meta’s own category only when it isn’t Google’s wording (Meta rejects that)', () => {
+    expect(metaFeedXml(buildFeed([product()], SITE).items, SITE)).not.toContain('fb_product_category')
+    const own = metaFeedXml(buildFeed([product({ metaCategory: 'Furniture > Living Room Furniture > Sofas' })], SITE).items, SITE)
+    expect(own).toContain('<g:fb_product_category>Furniture &gt; Living Room Furniture &gt; Sofas</g:fb_product_category>')
+  })
+
   it('never puts order details or private links in the feed', () => {
     const xml = metaFeedXml(buildFeed([product()], SITE).items, SITE)
     expect(xml).not.toMatch(/confirm-order|track-order|\/order\/|HW-1\d{5}/)

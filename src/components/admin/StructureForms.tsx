@@ -234,7 +234,7 @@ export function TypeForm({ initial, savedNote }: { initial: TypeDraft; savedNote
 
       <Card title="Google and Meta" intro="The category their shopping catalogues file it under (Phase 15 feeds). Use Google’s product taxonomy wording.">
         <TextField label="Google product category" value={d.googleCategory} maxLength={200} onChange={(googleCategory) => set({ googleCategory })} hint="e.g. Furniture > Tables > Coffee Tables" />
-        <TextField label="Meta product category" value={d.metaCategory} maxLength={200} onChange={(metaCategory) => set({ metaCategory })} hint="Usually the same." />
+        <TextField label="Meta product category" value={d.metaCategory} maxLength={200} onChange={(metaCategory) => set({ metaCategory })} hint="Leave blank: Meta reads the Google category. Only for a name from Meta's own category list." />
       </Card>
 
       <SaveBar saving={saving} label={d.id ? 'Save type' : 'Create type'} outcome={outcome ?? (savedNote ? { ok: true, message: 'Saved.' } : null)} />
