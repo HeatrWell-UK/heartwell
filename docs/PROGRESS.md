@@ -51,6 +51,11 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 26 October 2026 — Google Analytics (GA4)
+- **Owner created the GA4 property and web stream** (its G- Measurement ID goes in Hostinger, not the repo: the leak check blocks account-ID formats). The site's GA4 code was built in Phase 14 and is unchanged: Consent Mode v2 (all denied until the visitor accepts), our own page views with private addresses removed, view_item, add_to_cart, begin_checkout, contact, generate_lead and order_placed from the browser, purchase from the server when a customer confirms (so GA4 revenue matches the admin), nothing from staff devices, QA links or private pages.
+- **Changed:** site search now reaches GA4. The address cleaning dropped `?q=` with everything else, so GA4's site search report would have stayed empty; `/search` keeps the search term unless it looks like a postcode, email or phone number (`safeSearchTerm` in `src/lib/tracking/redact.ts`, tested).
+- **Owner steps:** `docs/TRACKING-SETUP.md`, "GA4, step by step", from step 4 (stream settings), 6 (API secret) and 7 (both values in Hostinger, then redeploy).
+
 ### 26 October 2026 — Meta check before ads (owner connected the Meta Ads connector)
 - **Heartwell's own Meta set-up (business "Heartwell Sofa", `1613027403934862`):** page **Heartwell Sofa** (`120278539876430`); dataset **Heartwell** (`2225014384715139`, active, browser and server events arriving, first-party cookies on); catalogue **Heartwell Products** (`2188993358700151`, 75 products, 121 items) fed by `https://heartwellsofa.co.uk/feeds/meta-catalogue.xml` (feed `1661722362412913`, daily at 16:15 Pakistan time, last upload 26 October: 121 of 121 items, no errors), and the dataset is connected to the catalogue (on 17 October 100% of product IDs matched). Dynamic ads health: 12 of 13 checks pass.
 - **Fixed:** the one warning, on all 121 items: the feed sent Google's category wording ("Furniture > Sofas") in Meta's own category field, which takes only Meta's names. Meta reads the Google category the feed already sends, so `fb_product_category` now goes only when an admin enters a different, Meta-format name (`src/lib/catalogue/feed.ts`; the admin hint says so). The next scheduled fetch clears it.

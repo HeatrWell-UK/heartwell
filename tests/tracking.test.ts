@@ -4,7 +4,7 @@ import { CONSENT_COOKIE, effectiveMode, isPrivatePath, liveAllowed } from '@/con
 import { consentFlagScript, consentForOrder, NO_CHOICE, parseConsent, serialiseConsent } from '@/lib/tracking/consent'
 import { metaEvent, metaUserData, tooOldForMeta } from '@/lib/tracking/meta-event'
 import { anonymousClientId, ga4ClientIdFromCookie, ga4Purchase } from '@/lib/tracking/ga4-event'
-import { redactedLocation } from '@/lib/tracking/redact'
+import { redactedLocation, safeSearchTerm } from '@/lib/tracking/redact'
 import { buildConversion, processConversion, type OutboxRow, type Sender } from '@/lib/tracking/conversions'
 import { ga4Params, pixelParams } from '@/lib/tracking/events'
 import { OrderInput, testReason, trackingPayload, type OrderTracking } from '@/lib/checkout/order'
@@ -128,6 +128,15 @@ describe('GA4', () => {
     expect(redactedLocation('https://example.test/products/ashton?variant=AHB3-G&utm_source=facebook&fbclid=abc')).toBe('https://example.test/products/ashton?utm_source=facebook')
     expect(redactedLocation('https://example.test/order/2d8293ef-5fe9-4836-89e3-dda6274b80ad?x=1')).toBe('https://example.test/private')
     expect(redactedLocation('https://example.test/confirm-order/2d8293ef')).toBe('https://example.test/private')
+  })
+
+  it('keeps a site search term for GA4, never one that could identify someone', () => {
+    expect(redactedLocation('https://example.test/search?q=grey+corner+sofa&fbclid=abc')).toBe('https://example.test/search?q=grey+corner+sofa')
+    expect(redactedLocation('https://example.test/search?q=3+seater+2c1&utm_source=google')).toBe('https://example.test/search?q=3+seater+2c1&utm_source=google')
+    expect(redactedLocation('https://example.test/products/ashton?q=grey')).toBe('https://example.test/products/ashton')
+    for (const q of ['BB10 2AF', 'bb10', 'ann@example.co.uk', '07700 900123', 'x'.repeat(61), '  ']) {
+      expect(safeSearchTerm(q), q).toBeNull()
+    }
   })
 })
 
