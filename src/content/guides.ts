@@ -421,8 +421,9 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'high-back-or-scatter-back-sofa',
-    title: 'High back or scatter back sofa: which is best?',
-    summary: 'A high back has fixed back cushions and a tailored look; a scatter back has loose cushions for a softer, relaxed sofa. How they compare, and which suits you.',
+    // Search Console, 27 October 2026: shown for "scatter back vs fullback sofa", "scatter back sofa vs standard back", "what is a scatter back sofa".
+    title: 'Scatter back vs high back (full back) sofa',
+    summary: 'What is a scatter back sofa? Loose back cushions for a softer, relaxed look. A high back (full or standard back) has fixed cushions and a tailored shape. Which suits you.',
     updated: '2026-10-18',
     sections: [
       {
@@ -597,8 +598,9 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'tech-leather-and-leather-aire',
-    title: 'Tech leather and Leather Aire: what leather-look means',
-    summary: 'None of them is real leather. What each one is, what it’s like to live with and how to look after it, so you know exactly what you’re buying.',
+    // Search Console, 27 October 2026: shown for "what is tech leather", "is air leather real leather", "what is leather aire".
+    title: 'What is tech leather? Is air leather real leather?',
+    summary: 'Tech leather and Leather Aire (air leather) are leather-look fabrics, not real leather. What each one is, how it feels, wears and cleans, so you know what you’re buying.',
     updated: '2026-10-23',
     published: '2026-10-18',
     sections: [

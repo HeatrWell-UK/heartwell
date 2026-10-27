@@ -41,9 +41,9 @@ Range names are trade names other UK shops use too (Verona, Roma, Orlando, Nova,
 | `/guides/choosing-the-right-size-sofa` | what size sofa do I need | what size sofa for a 12x12 room |
 | `/guides/measuring-for-a-corner-sofa` | how to measure for a corner sofa | |
 | `/guides/left-or-right-hand-corner-sofa` | left or right hand corner sofa | what does 2c1 mean, 1c2 corner sofa |
-| `/guides/high-back-or-scatter-back-sofa` | scatter back vs high back sofa | scatter back sofa pros and cons, scatter back meaning |
+| `/guides/high-back-or-scatter-back-sofa` | scatter back vs high back sofa, scatter back vs full back sofa, what is a scatter back sofa | scatter back sofa vs standard back, scatter back sofa pros and cons |
 | `/guides/electric-or-manual-recliner` | electric vs manual recliner sofa | are electric or manual recliners better |
-| `/guides/tech-leather-and-leather-aire` | tech leather vs leather, leather aire sofa | is air leather real leather |
+| `/guides/tech-leather-and-leather-aire` | what is tech leather, is air leather real leather | what is leather aire, leather aire material, tech leather vs leather |
 | `/guides/choosing-a-sofa-fabric` | best sofa fabric for pets, is velvet good for a sofa | best sofa fabric for kids, chenille or velvet |
 | `/guides/what-made-to-order-means` | made to order sofa uk | how long do made to order sofas take |
 | `/guides/getting-ready-for-delivery-day` | sofa delivery day checklist | |
@@ -60,8 +60,16 @@ Not indexed on purpose: basket, saved, checkout, search, order and confirm links
 - **Places** only where it's true: the Burnley showroom page already covers Burnley and Lancashire; a page per town would be thin and Google treats it as spam.
 - **TikTok** in the footer and Organization data once the profile opens.
 
+## First results (27 October 2026, 11 days after launch)
+
+- **Search Console, 28 days:** 5 clicks, 54 impressions, average position 17. All the clicks are the home page (position 1.9: people searching the name). The guides are what Google tries first: tech leather (12 impressions, position 8.7) and scatter back (13 impressions, position 12.5), then delivery times, sizes and recliners. Their titles now use the words people search ("what is tech leather", "air leather", "full back").
+- **Indexing:** 48 pages indexed, 78 found but not yet crawled (mostly product pages). Crawl stats showed why it's slow: 42% of Googlebot's requests (966) failed with server errors, all of them Next.js link preloads (`?_rsc=`) made in bursts by Googlebot's renderer, which Hostinger turned away. robots.txt now keeps crawlers off `?_rsc=` (they're never needed to read a page), so Google stops seeing errors and crawls the site at full speed again.
+- **Brand:** "heartwell sofa" on Google mostly shows "Hartwell" sofas from other shops; the Facebook page appears as "Heartwell Sofa | Brimington". Changing the page's location to Burnley helps.
+- **Bing:** nothing indexed yet (Bing Webmaster Tools isn't set up).
+- **Merchant Center:** 121 products, 120 under review; the account is held only by a missing business address.
+
 ## Next
 
-1. **Search Console → Performance**, from about two weeks after launch: which searches show Heartwell, at what position, and which pages. Pages with impressions but few clicks get a better title; searches that land on the wrong page get their own answer.
+1. **Search Console → Performance** again around 10 November: whether the products are indexed now that the crawl errors are gone, and how the retitled guides do. Pages with impressions but few clicks get a better title; searches that land on the wrong page get their own answer.
 2. **Bing Webmaster Tools** (owner): sign in with the Microsoft account, choose **Import from Google Search Console**, and the site and sitemap come across. IndexNow already tells Bing about every change.
 3. Re-run the search check (`docs/PROGRESS.md`, 17 October) after any big content change.
