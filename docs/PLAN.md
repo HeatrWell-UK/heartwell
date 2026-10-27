@@ -841,7 +841,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
 ### Bringing customers in (owner's order, 17 October 2026)
 
 1. **Organic first:** Google Search Console (done), Google Business Profile (done), Merchant Center free listings, GA4, and Phase 20 below.
-2. **Meta ads** once the site gets organic searches and Phase 20 is done. Everything for them is built (Pixel and Conversions API live, catalogue connected, Ad links, the ad offer).
+2. **Meta ads** once the site gets organic searches and Phase 20 is done. Everything for them is built (Pixel and Conversions API live, catalogue connected, Ad links, the ad offer). **Owner, 27 October 2026: start Meta ads now**, alongside the search work: the plan is `docs/META-ADS.md` (Heartwell's own ad account first).
 3. **Google Ads** one to two months after Meta ads (L6).
 
 Not wanted (owner): a registered company or legal details on the site, Meta Business verification (not registered), Supabase Pro.
