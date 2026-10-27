@@ -51,6 +51,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 27 October 2026 — Search results check
+- **What the search engines show** (Search Console, Merchant Center, Google and Bing, 11 days after launch): the findings are in `docs/KEYWORDS.md`, "First results".
+- **Fixed, crawl errors:** Googlebot's renderer requested Next.js link preloads (`?_rsc=`) in bursts and Hostinger answered 42% of all its requests with server errors (966 between 20 and 24 October), so Google slowed its crawl of the whole site (78 pages, mostly products, found but not crawled). `src/app/robots.ts` now disallows `/*_rsc` for every crawler; pages are unaffected (their HTML has everything). The same requests work from a normal connection, so it was Hostinger's bot handling, not the site.
+- **Better titles** for the two guides Google already shows on its first two pages without clicks, in the words people search: "What is tech leather? Is air leather real leather?" and "Scatter back vs high back (full back) sofa" (`src/content/guides.ts`, keyword map updated).
+- **Owner steps:** Merchant Center business address (the only thing holding product review) and the store address without www; Bing Webmaster Tools (import from Search Console); Facebook page location to Burnley; in Search Console, URL Inspection → Request indexing for the main category and range pages.
+
 ### 26 October 2026 — Google Analytics (GA4)
 - **Owner created the GA4 property and web stream** (its G- Measurement ID goes in Hostinger, not the repo: the leak check blocks account-ID formats). The site's GA4 code was built in Phase 14 and is unchanged: Consent Mode v2 (all denied until the visitor accepts), our own page views with private addresses removed, view_item, add_to_cart, begin_checkout, contact, generate_lead and order_placed from the browser, purchase from the server when a customer confirms (so GA4 revenue matches the admin), nothing from staff devices, QA links or private pages.
 - **Changed:** site search now reaches GA4. The address cleaning dropped `?q=` with everything else, so GA4's site search report would have stayed empty; `/search` keeps the search term unless it looks like a postcode, email or phone number (`safeSearchTerm` in `src/lib/tracking/redact.ts`, tested).
