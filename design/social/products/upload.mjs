@@ -22,11 +22,15 @@ const params = typeof cred.upload_params === 'string' ? Object.fromEntries(new U
 const endpoint = `https://${cred.host ?? 'api.cloudinary.com'}/v1_1/${cred.cloud_name}/image/upload`
 
 const urls = existsSync(URLS) ? JSON.parse(readFileSync(URLS, 'utf8')) : {}
-const files = readdirSync(OUT, { withFileTypes: true })
-  .filter((d) => d.isDirectory() && existsSync(join(OUT, d.name, 'social', 'manifest.json')))
-  .flatMap((d) => {
-    const m = JSON.parse(readFileSync(join(OUT, d.name, 'social', 'manifest.json'), 'utf8'))
-    return [...new Set([...m.instagram.slides, ...m.facebook.slides].map((s) => s.file))].map((f) => join(OUT, d.name, 'social', f))
+/** Every out/<range>/social folder, and out/pinned/<post>/social (made by pinned.mjs --social). */
+const socialDirs = (dir) =>
+  readdirSync(dir, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .flatMap((d) => (existsSync(join(dir, d.name, 'social', 'manifest.json')) ? [join(dir, d.name, 'social')] : d.name === 'pinned' ? socialDirs(join(dir, d.name)) : []))
+const files = socialDirs(OUT)
+  .flatMap((dir) => {
+    const m = JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8'))
+    return [...new Set([...m.instagram.slides, ...m.facebook.slides].map((s) => s.file))].map((f) => join(dir, f))
   })
   .filter((f) => !urls[basename(f)])
 

@@ -59,7 +59,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
   - **3 Talk to us** (editorial, 4 slides): phone and WhatsApp, email, site and address; the showroom (address, Monday to Friday 9am to 5pm, by appointment a day ahead); fabric samples (up to 5 for £5, taken off the sofa); five questions people ask.
 - Every fact is read from the shop when the slides are made: delivery areas, extras and the sample limit from the database; phone, address and hours from `src/config/contact.ts`; the samples fee from `src/config/samples.ts`; prices and photos from the live catalogue. Re-make them after any of those change.
 - Number ranges ("2–4 working days") no longer break at the dash on the ordering slides (`nb` in `styles.mjs`).
-- **Not published:** the owner pins them; publishing through Composio waits for their word.
+- **Published (owner: "Yes, post them on Instagram and Facebook"):** live on Instagram (with alt text on every slide) and the Heartwell Sofa Facebook Page at 21:22–21:23 on 28 October UK time, in order 3, 2, 1, so Start here is newest. IDs and links in `design/social/products/published.json` (`pinned`). `upload.mjs` now also uploads `out/pinned/*/social`. The owner pins them in the Instagram app (3, then 2, then 1, so Start here sits first) and pins Start here on the Facebook Page.
 
 ### 28 October 2026 — All 18 range posts published on Instagram and Facebook
 - **Owner's request:** post every range on Instagram (@heartwellsofa) and the Heartwell Sofa Facebook Page through the Composio connection, in reverse order (18 Windsor first, 1 Ashton last, so Ashton tops the grid), with captions, alt text, and music if suitable.

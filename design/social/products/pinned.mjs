@@ -334,7 +334,7 @@ function allSofas(f) {
     name: 'All our sofas',
     style: 'bold',
     slides: [
-      { name: 'cover', html: cover, alt: `Our sofas: ${f.list.length} ranges from ${money(from)}, corners, U-shapes, 3+2 sets and recliners. Photos of the ${four.map((r) => r.name).join(', ')}. Free delivery and pay on delivery.` },
+      { name: 'cover', html: cover, alt: `Our sofas: ${f.list.length} ranges from ${money(from)}, corners, U-shapes, 3+2 sets and recliners. Photos of the ${four.slice(0, -1).map((r) => r.name).join(', ')} and ${four.at(-1).name}. Free delivery and pay on delivery.` },
       ...groups.map((g) => ({
         name: g.key,
         html: directory(g),

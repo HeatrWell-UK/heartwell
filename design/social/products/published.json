@@ -291,5 +291,58 @@
         "slides": 10
       }
     }
-  ]
+  ],
+  "pinned": {
+    "published": "2026-10-28 21:22–21:23 UTC (UK time), in order 3, 2, 1, so Start here is newest; to be pinned by hand",
+    "posts": [
+      {
+        "number": "pinned-1",
+        "slug": "start-here",
+        "name": "Start here",
+        "style": "velvet",
+        "instagram": {
+          "id": "17956869018270819",
+          "url": "https://www.instagram.com/p/DfDYygTiay7/",
+          "slides": 5
+        },
+        "facebook": {
+          "id": "120278539876430_1733084912160142",
+          "url": "https://www.facebook.com/120278539876430/posts/1733084912160142",
+          "slides": 5
+        }
+      },
+      {
+        "number": "pinned-2",
+        "slug": "all-our-sofas",
+        "name": "All our sofas",
+        "style": "bold",
+        "instagram": {
+          "id": "18131494225627541",
+          "url": "https://www.instagram.com/p/DfDYyeXCRCp/",
+          "slides": 5
+        },
+        "facebook": {
+          "id": "120278539876430_1733084338826866",
+          "url": "https://www.facebook.com/120278539876430/posts/1733084338826866",
+          "slides": 5
+        }
+      },
+      {
+        "number": "pinned-3",
+        "slug": "talk-to-us",
+        "name": "Talk to us",
+        "style": "editorial",
+        "instagram": {
+          "id": "18107365754365942",
+          "url": "https://www.instagram.com/p/DfDYyddiWco/",
+          "slides": 4
+        },
+        "facebook": {
+          "id": "120278539876430_1733083692160264",
+          "url": "https://www.facebook.com/120278539876430/posts/1733083692160264",
+          "slides": 4
+        }
+      }
+    ]
+  }
 }
