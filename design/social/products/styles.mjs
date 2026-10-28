@@ -308,6 +308,41 @@ const bold = {
       'wine',
     )
   },
+  // One size, both of its options (back styles or colours) stacked: for when a
+  // slide per piece would pass Instagram's 10 slides.
+  group(ctx, g, i) {
+    if (g.options.length < 2) return this.piece(ctx, g, g.options[0])
+    const [a, b] = g.options
+    const half = (o, top) => `<img class="half" style="top:${top}px" src="${band(o.image, 1080, 600, 0.52)}" alt="">
+      <span class="pill" style="top:${top + 464}px">${esc(o.label)}${o.sub ? `<small>${esc(o.sub)}</small>` : ''}</span>
+      ${o.note ? `<span class="note" style="top:${top + 474}px">${esc(o.note)}</span>` : ''}`
+    const tag = (o, top) => `<div class="sticker" style="right:56px;top:${top}px;width:200px;height:200px"><span class="p serif">${money(o.price)}</span><span class="s">${o.set ? 'both sofas' : 'free delivery'}</span></div>`
+    return page(
+      `.half{position:absolute;left:0;width:1080px;height:600px;object-fit:cover}
+      .rule{position:absolute;left:0;right:0;top:600px;height:6px}
+      .title{position:absolute;left:56px;top:56px;max-width:640px;padding:20px 28px 24px;border-radius:24px;background:rgb(255 255 255 / .92);box-shadow:0 10px 26px rgb(0 0 0 / .18)}
+      .title p{font:600 26px/1 Figtree,sans-serif;color:#8E1B2E;letter-spacing:.03em}
+      .title h2{margin-top:10px;font-size:64px;line-height:1;color:#22171A}
+      ${STICKER_CSS}
+      .sticker .p{font-size:${Math.max(a.price, b.price) >= 1000 ? 58 : 72}px;line-height:1}
+      .sticker .s{font-size:19px}
+      .pill{position:absolute;left:56px;display:flex;flex-direction:column;gap:6px;padding:14px 24px;border-radius:18px;background:#fff;color:#22171A;font:600 30px/1 Figtree,sans-serif;box-shadow:0 6px 16px rgb(0 0 0 / .25)}
+      .pill small{font:500 22px/1 Figtree,sans-serif;color:#5E4F52}
+      .note{position:absolute;right:56px;padding:10px 20px;border-radius:999px;background:rgb(34 23 26 / .75);color:#fff;font:500 24px/1.2 Figtree,sans-serif}
+      .strip{position:absolute;left:56px;right:56px;top:1236px;display:flex;justify-content:space-between;align-items:center}
+      .strip .d{display:flex;flex-direction:column;gap:18px}
+      .strip svg{color:#E9CC7B}
+      .pl{flex:none}`,
+      `${half(a, 0)}
+      <div class="rule goldbg"></div>
+      ${half(b, 606)}
+      <div class="title"><p>${sizeKicker(ctx, i)}</p><h2 class="serif">${nb(g.label)}</h2></div>
+      ${tag(a, 56)}${tag(b, 662)}
+      <div class="strip"><div class="d"><span class="chip">${icon.ruler}${esc(g.common)}</span><span class="chip">${icon.truck}Free delivery · pay when it’s in your room</span></div>
+      <div class="pl">${plan(g.layout, { w: 230, h: 140, line: '#E9CC7B', fill: 'rgba(233,204,123,.12)', text: '#F2E4E6', font: 18 })}</div></div>`,
+      'wine',
+    )
+  },
   fabrics(ctx) {
     const f = ctx.fabrics
     return page(

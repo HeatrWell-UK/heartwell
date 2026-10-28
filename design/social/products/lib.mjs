@@ -222,6 +222,26 @@ export const STEPS = [
 
 const NOISE = `url("data:image/svg+xml,${encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(#n)'/></svg>")}")`
 
+// The frame slides are drawn for. 'post' is the 3:4 slide (1080 x 1440) for
+// posting by hand from the Instagram app. 'social' is 4:5 (1080 x 1350), what
+// Instagram's publishing API accepts (4:5 to 1.91:1) and what Facebook shows
+// whole: the 3:4 design scaled to fit on velvet and stone grounds (the ground
+// fills the sides), and trimmed top and bottom on the bold style's full-bleed
+// photos, with its top labels moved clear of the new edge.
+let FRAME = 'post'
+export const setFrame = (f) => {
+  FRAME = f
+}
+export const frameHeight = () => (FRAME === 'social' ? 1350 : H)
+const fitCss = (bodyClass) => {
+  if (FRAME !== 'social') return ''
+  if (bodyClass === 'wine')
+    return `.fit{position:absolute;left:0;top:-45px;width:${W}px;height:${H}px}
+.fit>.title,.fit>.sticker,.fit>h2,.fit>.k,.fit>.lead{margin-top:26px}
+.fit>.sub{margin-top:18px}`
+  return `.fit{position:absolute;left:0;top:0;width:${W}px;height:${H}px;transform-origin:50% 0;transform:scale(${1350 / H})}`
+}
+
 /**
  * One slide. Facebook trims tall photos to 4:5 in the feed, so words stay
  * between 45 px and 1395 px from the top.
@@ -230,7 +250,7 @@ export const page = (css, body, bodyClass = '') => `<!doctype html><meta charset
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=block" rel="stylesheet">
 <style>
-html,body{margin:0;width:${W}px;height:${H}px;overflow:hidden;-webkit-font-smoothing:antialiased}
+html,body{margin:0;width:${W}px;height:${frameHeight()}px;overflow:hidden;-webkit-font-smoothing:antialiased}
 *{box-sizing:border-box} p,h1,h2,h3,ol,ul{margin:0}
 body{position:relative;font-family:Figtree,sans-serif;color:#22171A;background:#fff}
 .serif{font-family:Gloock,serif;font-weight:400}
@@ -245,7 +265,8 @@ body{position:relative;font-family:Figtree,sans-serif;color:#22171A;background:#
 .chip svg{width:38px;height:38px;flex:none}
 .pinked{clip-path:${PINKED}}
 ${css}
+${fitCss(bodyClass)}
 </style>
 <body class="${bodyClass}">
-${body}
+${FRAME === 'social' ? `<div class="fit">${body}</div>` : body}
 </body>`

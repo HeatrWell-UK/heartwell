@@ -24,9 +24,11 @@ import { spawnSync } from 'node:child_process'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { tmpdir } from 'node:os'
+import { createHash } from 'node:crypto'
+import { createRequire } from 'node:module'
 import { COPY } from './copy.mjs'
 import { STYLES, ROTATION } from './styles.mjs'
-import { ROOT, W, H, SITE, PHONE, money, sentence, layoutOf, headline, measurements, swatches } from './lib.mjs'
+import { ROOT, W, SITE, PHONE, money, sentence, layoutOf, headline, measurements, swatches, setFrame, frameHeight } from './lib.mjs'
 
 const OUT = join(ROOT, 'design/social/products/out')
 const CHROME = process.env.CHROME_PATH ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe'
@@ -200,19 +202,25 @@ function context(range, copy) {
 
 // ---------------------------------------------------------------- slides and their alt text
 
-function slidesFor(ctx, style) {
+/** grouped: one slide per size even in the bold style (both options on it), for Instagram's 10-slide carousels. */
+function slidesFor(ctx, style, { grouped = false } = {}) {
   const { range, copy, groups } = ctx
   const room = 'in a panelled room with a red velvet alcove'
   const detail = copy.altDetail ? ` ${copy.altDetail}` : ''
+  // Alt text keeps proper names whole ("Chesterfield", "Leather Aire", "UK"): only a phrase's first letter is lowered.
+  const lowFirst = (s) => (/^(Chesterfield|Leather Aire|UK|LED|Bluetooth|USB|U-|L-)/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1))
+  const say = (s) => lowFirst(String(s ?? '')).replace(/\bleather aire\b/gi, 'Leather Aire').replace(/\b(armed )?u-shape/gi, (m, a) => `${a ? 'armed ' : ''}U-shape`).replace(/\bl-shape/gi, 'L-shape')
+  const tagline = copy.tagline.split(' · ').map((t, i) => (i ? lowFirst(t) : t)).join(', ')
+  const offer = groups.length === 1 ? `a ${lower(groups[0].label)} for ${money(ctx.from)}` : `${groups.length} sizes from ${money(ctx.from)}`
   const slides = [
     {
       name: 'cover',
       html: style.cover(ctx),
-      alt: `${range.name} from Heartwell: ${groups.length} ${groups.length === 1 ? 'size' : 'sizes'} from ${money(ctx.from)}. ${copy.tagline.replace(/ · /g, ', ')}. Free delivery to most postcodes; pay nothing until it arrives.`,
+      alt: `${range.name} from Heartwell: ${offer}. ${tagline}. Free delivery to most postcodes; pay nothing until it arrives.`,
     },
   ]
   if (copy.details?.length) {
-    slides.push({ name: 'details', html: style.details(ctx), alt: `Close-ups of the ${range.name}: ${copy.details.map((d) => lower(d.label)).join(', ')}.` })
+    slides.push({ name: 'details', html: style.details(ctx), alt: `Close-ups of the ${range.name}: ${copy.details.map((d) => lowFirst(d.label)).join(', ')}.` })
   }
   // Every size drawn to scale earns its slide from three sizes up; with two, the size slides say it.
   if (groups.length > 2) {
@@ -223,12 +231,13 @@ function slidesFor(ctx, style) {
     })
   }
   const optionAlt = (g, o) =>
-    `${range.name} ${lower(g.label)}${g.options.length > 1 ? `, ${lower(o.label)}` : ''}, in ${lower(o.colour)} ${lower(o.material)}${detail}, ${room}. ${measurements(o.piece, ctx.pieces)}. ${money(o.price)}${o.set ? ' for both sofas' : ''}.${o.note ? ` ${o.note}.` : ''}`
+    `${range.name} ${say(lower(g.label))}${g.options.length > 1 ? `, ${say(lower(o.label))}` : ''}, in ${say(lower(o.colour))} ${say(lower(o.material))}${detail}, ${room}. ${measurements(o.piece, ctx.pieces)}. ${money(o.price)}${o.set ? ' for both sofas' : ''}.${o.note ? ` ${o.note}.` : ''}`
   const slug = (s) => lower(s).replace(/\+/g, '-').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  if (style.perPiece) {
+  if (style.perPiece && !grouped) {
     for (const g of groups) for (const o of g.options) slides.push({ name: slug(`${g.size} ${g.options.length > 1 ? o.label : ''}`), html: style.piece(ctx, g, o), alt: optionAlt(g, o) })
   } else {
-    groups.forEach((g, i) => slides.push({ name: slug(g.size), html: style.size(ctx, g, i + 1), alt: g.options.map((o) => optionAlt(g, o)).join(' ') }))
+    const draw = style.perPiece ? style.group.bind(style) : style.size.bind(style)
+    groups.forEach((g, i) => slides.push({ name: slug(g.size), html: draw(ctx, g, i + 1), alt: g.options.map((o) => optionAlt(g, o)).join(' ') }))
   }
   if (ctx.madeToOrder && ctx.fabrics.count) {
     slides.push({
@@ -254,18 +263,7 @@ function slidesFor(ctx, style) {
 
 function postText(ctx, styleName, files) {
   const { range, copy } = ctx
-  const data = {
-    range,
-    sizes: ctx.groups.map((g) => ({ size: g.size, label: g.label, from: g.from })),
-    money,
-    from: money(ctx.from),
-    fabrics: ctx.fabrics.count,
-    samePrice: ctx.fabrics.samePrice,
-    shown: ctx.fabrics.shown,
-    madeToOrder: ctx.madeToOrder,
-    colours: ctx.colours,
-    link: `https://${SITE}/ranges/${range.slug}?utm_source=facebook&utm_medium=social&utm_campaign=range-${range.slug}`,
-  }
+  const data = captionData(ctx)
   return [
     `${range.name}: post kit (${styleName} style), made ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`,
     `Prices are the shop's prices on that day. Re-make the slides after a price change.`,
@@ -285,6 +283,22 @@ function postText(ctx, styleName, files) {
   ].join('\n')
 }
 
+function captionData(ctx) {
+  const { range } = ctx
+  return {
+    range,
+    sizes: ctx.groups.map((g) => ({ size: g.size, label: g.label, from: g.from })),
+    money,
+    from: money(ctx.from),
+    fabrics: ctx.fabrics.count,
+    samePrice: ctx.fabrics.samePrice,
+    shown: ctx.fabrics.shown,
+    madeToOrder: ctx.madeToOrder,
+    colours: ctx.colours,
+    link: `https://${SITE}/ranges/${range.slug}?utm_source=facebook&utm_medium=social&utm_campaign=range-${range.slug}`,
+  }
+}
+
 // ---------------------------------------------------------------- render
 
 function render(htmlFile, pngFile) {
@@ -295,7 +309,7 @@ function render(htmlFile, pngFile) {
       '--disable-gpu',
       '--hide-scrollbars',
       '--force-device-scale-factor=1',
-      `--window-size=${W},${H}`,
+      `--window-size=${W},${frameHeight()}`,
       '--virtual-time-budget=15000',
       `--user-data-dir=${join(tmpdir(), 'hw-social-chrome')}`,
       `--screenshot=${pngFile}`,
@@ -341,10 +355,80 @@ async function build(slug, styleName, preview, textOnly) {
   console.log(`${ctx.range.name} (${styleName}): ${files.length} slides and post.txt in ${dir}`)
 }
 
+// ---------------------------------------------------------------- for publishing (--social)
+//
+// 4:5 JPEGs in out/<range>/social/, and manifest.json: the Instagram carousel
+// (10 slides at most, the API's limit: the bold style turns to a slide per
+// size, then the sizes, fabrics and close-ups slides go, in that order), the
+// Facebook post (every slide), their captions and each slide's alt text.
+// Each slide is drawn once and named by its content, so the two share files.
+
+const IG_MAX = 10
+const sharp = createRequire(join(ROOT, 'package.json'))('sharp')
+
+async function buildSocial(slug, styleName, number, textOnly) {
+  setFrame('social')
+  const copy = COPY[slug]
+  const style = STYLES[styleName]
+  const ctx = context(await loadRange(slug), copy)
+  const fb = slidesFor(ctx, style)
+  let ig = fb
+  if (ig.length > IG_MAX) {
+    if (style.perPiece) ig = slidesFor(ctx, style, { grouped: true })
+    for (const name of ['sizes', 'fabrics', 'details']) if (ig.length > IG_MAX) ig = ig.filter((s) => s.name !== name)
+  }
+  if (ig.length > IG_MAX) throw new Error(`${slug}: ${ig.length} slides for Instagram, ${IG_MAX} at most`)
+
+  const dir = join(OUT, slug, 'social')
+  if (!textOnly) {
+    rmSync(dir, { recursive: true, force: true })
+    mkdirSync(join(dir, 'html'), { recursive: true })
+    const urls = [...new Set([...fb, ...ig].flatMap((s) => s.html.match(/https:\/\/res\.cloudinary\.com\/[^"')\s]+/g) ?? []))]
+    await Promise.all(urls.map((u) => fetch(u).then((r) => r.arrayBuffer()).catch(() => null)))
+  }
+  const made = new Map()
+  const fileFor = async (s) => {
+    const key = createHash('sha1').update(s.html).digest('hex').slice(0, 8)
+    if (made.has(key)) return made.get(key)
+    const base = `${String(number).padStart(2, '0')}-${slug}-${s.name}-${key}`
+    if (textOnly) {
+      // Captions and alt text only: the slide must already be drawn (same content, same name).
+      if (!existsSync(join(dir, `${base}.jpg`))) throw new Error(`${slug}: ${base}.jpg isn't drawn yet (prices or words on the slide changed?): run --social without --text`)
+      made.set(key, `${base}.jpg`)
+      return `${base}.jpg`
+    }
+    const html = join(dir, 'html', `${base}.html`)
+    const png = join(dir, 'html', `${base}.png`)
+    writeFileSync(html, s.html)
+    render(html, png)
+    await sharp(png).jpeg({ quality: 90, mozjpeg: true }).toFile(join(dir, `${base}.jpg`))
+    made.set(key, `${base}.jpg`)
+    process.stdout.write(`  ${base}.jpg\n`)
+    return `${base}.jpg`
+  }
+  const list = async (slides) => {
+    const out = []
+    for (const s of slides) out.push({ file: await fileFor(s), alt: s.alt })
+    return out
+  }
+  const data = captionData(ctx)
+  const manifest = {
+    number,
+    slug,
+    name: ctx.range.name,
+    style: styleName,
+    made: new Date().toISOString(),
+    instagram: { caption: copy.instagram(data), slides: await list(ig) },
+    facebook: { caption: copy.facebook(data), slides: await list(fb) },
+  }
+  writeFileSync(join(dir, 'manifest.json'), JSON.stringify(manifest, null, 2))
+  console.log(`${ctx.range.name} (${styleName}): Instagram ${manifest.instagram.slides.length}, Facebook ${manifest.facebook.slides.length} slides, ${made.size} images in ${dir}`)
+}
+
 const args = process.argv.slice(2)
 const arg = args[0]
 if (!arg) {
-  console.error('Usage: node design/social/products/build.mjs <range-slug|all> [--style velvet|bold|editorial] [--text]')
+  console.error('Usage: node design/social/products/build.mjs <range-slug|all> [--style velvet|bold|editorial] [--text] [--social]')
   process.exit(1)
 }
 const styleFlag = args.indexOf('--style')
@@ -352,5 +436,6 @@ const order = Object.keys(COPY)
 for (const slug of arg === 'all' ? order : [arg]) {
   const turn = COPY[slug]?.style ?? ROTATION[order.indexOf(slug) % ROTATION.length]
   const chosen = styleFlag > -1 ? args[styleFlag + 1] : turn
-  await build(slug, chosen, chosen !== turn, args.includes('--text'))
+  if (args.includes('--social')) await buildSocial(slug, chosen, order.indexOf(slug) + 1, args.includes('--text'))
+  else await build(slug, chosen, chosen !== turn, args.includes('--text'))
 }
