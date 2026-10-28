@@ -18,7 +18,7 @@ import {
 const detailImage = (ctx, d, w) => closeUp(ctx.photoOf(d.photo, d.colour), d, w)
 const n = (ctx) => ctx.groups.length
 /** Escaped, with hyphenated words kept whole ("Armed U-shape" never breaks after "U-"). */
-const nb = (s) => esc(s).replace(/(\S+-\S+)/g, '<span style="white-space:nowrap">$1</span>')
+export const nb = (s) => esc(s).replace(/(\S+[-–]\S+)/g, '<span style="white-space:nowrap">$1</span>')
 /** "Ashton · size 2 of 5", or "Harrison · made to order" when there's one size. */
 const sizeKicker = (ctx, i) => `${esc(ctx.range.name)} · ${n(ctx) > 1 ? `size ${i} of ${n(ctx)}` : ctx.madeToOrder ? 'made to order' : 'ready made'}`
 /** A long measurement line leaves no room for the delivery chip beside it (the cover and ordering slides say it anyway). */
@@ -202,7 +202,7 @@ const velvet = {
       `<div class="wrap">
         <img class="logo" src="${LOGO_ON_DARK}" alt="">
         <h2 class="serif foil">Nothing to pay until it’s in your room</h2>
-        <ol class="steps">${STEPS.map((s, i) => `<li><span class="num serif goldbg">${i + 1}</span><span>${esc(s)}</span></li>`).join('')}</ol>
+        <ol class="steps">${STEPS.map((s, i) => `<li><span class="num serif goldbg">${i + 1}</span><span>${nb(s)}</span></li>`).join('')}</ol>
         <div class="contact"><p class="wa">${icon.chat}WhatsApp ${esc(PHONE)}</p><p class="visit">Showroom in Burnley, by appointment · ${SITE}</p></div>
       </div>`,
       'velvet',
@@ -377,7 +377,7 @@ const bold = {
       `<img class="photo" src="${band(ctx.coverImage, 1080, 560, 0.45)}" alt="">
       <div class="fade"></div>
       <h2 class="serif foil">Nothing to pay until it’s in your room</h2>
-      <ol class="steps">${STEPS.map((s, i) => `<li><b class="foil">${i + 1}</b>${esc(s)}</li>`).join('')}</ol>
+      <ol class="steps">${STEPS.map((s, i) => `<li><b class="foil">${i + 1}</b>${nb(s)}</li>`).join('')}</ol>
       <span class="wa goldbg">${icon.chat}WhatsApp ${esc(PHONE)}</span>
       <p class="visit">Showroom in Burnley, by appointment · ${SITE}</p>`,
       'wine',
@@ -523,7 +523,7 @@ const editorial = {
       `<div class="wrap">
         <img class="logo" src="${LOGO_ON_LIGHT}" alt="">
         <h2 class="serif">Nothing to pay until it’s in your room</h2>
-        <ol class="steps">${STEPS.map((s, i) => `<li><span class="num serif">${i + 1}</span><span>${esc(s)}</span></li>`).join('')}</ol>
+        <ol class="steps">${STEPS.map((s, i) => `<li><span class="num serif">${i + 1}</span><span>${nb(s)}</span></li>`).join('')}</ol>
         <div class="contact"><p class="wa">${icon.chat}${esc(PHONE)}</p><p class="visit">Showroom in Burnley<br>by appointment</p></div>
       </div>`,
       'stone',

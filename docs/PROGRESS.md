@@ -51,6 +51,16 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 29 October 2026 — Three posts to pin at the top of Instagram
+- **Owner's request:** three more posts to pin on Instagram, with the contact details and anything else useful, designed like the range posts.
+- **Done:** `node design/social/products/pinned.mjs` (3:4 PNGs, `post.txt` and a zip per post) and `--social` (4:5 JPEGs and `manifest.json` for the publishing API), in `design/social/products/out/pinned/` (git-ignored). One post in each look:
+  - **1 Start here** (velvet, 5 slides): welcome with "to pay today £0"; how ordering works; delivery (map of mainland Britain with Burnley marked, the six charged areas and their prices, no Monday deliveries, islands and NI by quote); good to know (pay on delivery, check before you pay, 1-year guarantee, 14 days, made to order, extras with prices); find your sofa (site, WhatsApp, showroom).
+  - **2 All our sofas** (bold, 5 slides): all 18 ranges with a photo and their from-price, in three groups (every size, 5 seater corners, recliners), then how to order.
+  - **3 Talk to us** (editorial, 4 slides): phone and WhatsApp, email, site and address; the showroom (address, Monday to Friday 9am to 5pm, by appointment a day ahead); fabric samples (up to 5 for £5, taken off the sofa); five questions people ask.
+- Every fact is read from the shop when the slides are made: delivery areas, extras and the sample limit from the database; phone, address and hours from `src/config/contact.ts`; the samples fee from `src/config/samples.ts`; prices and photos from the live catalogue. Re-make them after any of those change.
+- Number ranges ("2–4 working days") no longer break at the dash on the ordering slides (`nb` in `styles.mjs`).
+- **Not published:** the owner pins them; publishing through Composio waits for their word.
+
 ### 28 October 2026 — All 18 range posts published on Instagram and Facebook
 - **Owner's request:** post every range on Instagram (@heartwellsofa) and the Heartwell Sofa Facebook Page through the Composio connection, in reverse order (18 Windsor first, 1 Ashton last, so Ashton tops the grid), with captions, alt text, and music if suitable.
 - **Done:** 36 posts, all live and in order; every post's ID and link is in `design/social/products/published.json`. Instagram: 131 slides with alt text on each, captions with working hashtags (checked on the published posts). Facebook: 147 photos, every slide (Verona 20, Sims 13, Salone 12), Facebook captions with the tagged range link. Prices from the shop on 28 October.
