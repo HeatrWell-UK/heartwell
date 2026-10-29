@@ -32,7 +32,7 @@ export function OurRanges({ ranges, total }: { ranges: RangeSummary[]; total: nu
             <RangeCard
               range={r}
               reveal
-              photoClassName={i === 0 ? 'lg:aspect-[5/6]' : undefined}
+              photoClassName={i === 0 ? 'lg:aspect-[5/6] lg:[--arch-v:41.667%]' : undefined}
               sizes={
                 i === 0
                   ? '(min-width: 1200px) 576px, (min-width: 1024px) 48vw, (min-width: 640px) 42vw, 72vw'

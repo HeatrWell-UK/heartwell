@@ -12,7 +12,7 @@ const listFormat = new Intl.ListFormat('en-GB', { type: 'conjunction' })
  * The shape categories in the tree's order, each with the owner's photo in an
  * arch like the hero's alcoves and its top-view plan, then a velvet arch for
  * everything. Fabric and leather aren't shapes, so they're named on that tile
- * instead. Photos settle in their arches as they scroll in (.hw-niche).
+ * instead. Photos settle in their arches as they scroll in (.hw-settle).
  */
 export function ShopByShape({ tree, department, listing }: { tree: CategoryNode[]; department: CategoryNode; listing: ListingProduct[] }) {
   const shapes = tree.filter((c) => c.parentId === department.id && hasShapePlan(c.slug)).sort((a, b) => a.sort - b.sort)
@@ -34,7 +34,7 @@ export function ShopByShape({ tree, department, listing }: { tree: CategoryNode[
           return (
             <li key={c.id}>
               <Link href={categoryHref(tree, c)} className="group flex flex-col gap-3 text-ink no-underline hover:text-ink">
-                <span className="hw-niche bg-stone">
+                <span className="hw-niche hw-settle bg-stone">
                   {c.imageUrl && (
                     <WhenNear className="absolute inset-0">
                       <Image

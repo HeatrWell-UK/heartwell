@@ -268,6 +268,8 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
     --foot: 14px;
   }
   .hw-alcove.hw-arcade-main { aspect-ratio: 5 / 6; }
+  /* A range's cover is wider (a set, a corner): the middle alcove squares up so its arms aren't cut. */
+  .hw-alcove.hw-alcove-square { aspect-ratio: 1 / 1.04; }
   @media (min-width: 1024px) {
     .hw-alcove.hw-arcade-main { --rim: 4px; }
   }
@@ -382,14 +384,21 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
       rgb(26 3 8 / 0.3);
   }
 
-  /* An arch-topped photo frame, 4:5, its top a half circle (Shop by shape). */
+  /*
+   * An arch-topped photo frame like the hero's alcoves, its top a half circle:
+   * 4:5 (Shop by shape) or square (.hw-niche-square: every product and range
+   * photo). --arch-v is the top's height as a share of the frame's (half its
+   * width), so a frame with another shape sets its own.
+   */
   .hw-niche {
     position: relative;
     display: block;
     aspect-ratio: 4 / 5;
     overflow: hidden;
-    border-radius: 50% 50% 16px 16px / 40% 40% 16px 16px;
+    --arch-v: 40%;
+    border-radius: 50% 50% 16px 16px / var(--arch-v) var(--arch-v) 16px 16px;
   }
+  .hw-niche-square { aspect-ratio: 1; --arch-v: 50%; }
   /* Its gold hairline, drawn over the photo; stronger under the pointer. */
   .hw-niche::after {
     content: '';
@@ -403,6 +412,12 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
   .hw-velvet.hw-niche::after { box-shadow: inset 0 0 0 1px rgb(233 204 123 / 0.55); }
   a:hover > .hw-niche::after,
   a.hw-niche:hover::after { box-shadow: inset 0 0 0 2px #B58A2F; }
+
+  /* The gold line a velvet header stands on (category and ranges pages). */
+  .hw-gold-edge {
+    border-bottom: 1px solid #B58A2F;
+    border-image: linear-gradient(90deg, transparent, #B58A2F 12%, #F2DC9C 50%, #B58A2F 88%, transparent) 1;
+  }
 }
 
 /*
@@ -417,12 +432,15 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
  *     medallion is stamped on last. The promise and the button are there
  *     within half a second; all is still by 1.9 s. Never loops; the photo is
  *     never hidden (it's the page's largest paint), only dimmed.
- *  2. Scroll-linked, so the visitor drives them: range photos open out of an
- *     alcove arch as they come into view (.hw-arch), shape photos settle in
- *     their arches (.hw-niche), and the gold thread between the paying steps
- *     draws itself (.hw-thread-draw). Browsers without scroll-driven
- *     animations (older iPhones, Firefox) simply show the finished page:
- *     decoration only, so no fallback script.
+ *     Every alcove lights the same way (the range page's gallery, the small
+ *     alcove in category headers).
+ *  2. Scroll-linked, so the visitor drives them: on the home page, shape and
+ *     range photos settle in their arches as they come into view (.hw-settle;
+ *     not in the shop's grids, where a photo must look the same however far
+ *     it's scrolled), and the gold thread between the paying steps draws itself
+ *     (.hw-thread-draw). Browsers without scroll-driven animations (older
+ *     iPhones, Firefox) simply show the finished page: decoration only, so no
+ *     fallback script.
  */
 @keyframes hw-settle {
   from { scale: 1.06; }
@@ -445,10 +463,6 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
 }
 @keyframes hw-stamp {
   from { opacity: 0; scale: 1.45; rotate: -26deg; }
-}
-@keyframes hw-arch-open {
-  from { clip-path: inset(10% 9% 0 9% round 48% 48% 18px 18px); }
-  to { clip-path: inset(0 0 0 0 round 18px 18px 18px 18px); }
 }
 @keyframes hw-arch-zoom {
   from { scale: 1.12; }
@@ -477,29 +491,16 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
     .hw-alcove-floor > * { animation: hw-arrive 0.6s 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
     @supports ((animation-timeline: view()) and (animation-range: entry)) {
-      /* A shape's photo settles in its arch as it scrolls in. */
-      .hw-niche { view-timeline: --hw-niche block; }
-      .hw-niche img {
+      /* A photo settles in its arch as it scrolls in (home page). */
+      .hw-settle { view-timeline: --hw-settle block; }
+      .hw-settle img {
         animation: hw-arch-zoom linear both;
-        animation-timeline: --hw-niche;
+        animation-timeline: --hw-settle;
         animation-range: entry 0% cover 55%;
       }
-
-      /* A photo opening out of the alcove's arch as it scrolls in. */
-      .hw-arch {
-        view-timeline: --hw-arch block;
-        animation: hw-arch-open linear both;
-        animation-timeline: --hw-arch;
-        animation-range: entry 0% entry 100%;
-      }
-      .hw-arch img {
-        animation: hw-arch-zoom linear both;
-        animation-timeline: --hw-arch;
-        animation-range: entry 0% cover 60%;
-      }
-      /* In a row people swipe sideways (phones), the arch opens as each card slides in. */
+      /* In a row people swipe sideways (phones), each settles as it slides in. */
       @media (max-width: 1023px) {
-        .hw-rail .hw-arch { view-timeline: --hw-arch inline; }
+        .hw-rail .hw-settle { view-timeline: --hw-settle inline; }
       }
 
       /* The gold thread between paying steps draws as the steps scroll by. */

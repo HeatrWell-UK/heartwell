@@ -24,7 +24,7 @@ export function RangeCard({
   range: RangeSummary
   sizes: string
   eager?: boolean
-  /** Open the photo out of the alcove's arch as it scrolls in (the home page; globals.css .hw-arch). */
+  /** Let the photo settle in its arch as it scrolls in (the home page; globals.css .hw-settle). */
   reveal?: boolean
   /** The photo frame's shape when it isn't square (the home page's featured range). */
   photoClassName?: string
@@ -44,7 +44,7 @@ export function RangeCard({
   return (
     // A container: narrow cards (two across a phone) stack the price under the name; wider ones set it beside.
     <Link href={`/ranges/${r.slug}`} className="group @container flex flex-col gap-3 text-ink no-underline hover:text-ink">
-      <span className={cn('relative block aspect-square overflow-hidden rounded-[18px] bg-stone', reveal && 'hw-arch', photoClassName)}>
+      <span className={cn('hw-niche hw-niche-square bg-stone', reveal && 'hw-settle', photoClassName)}>
         {image ? (
           eager ? (
             image

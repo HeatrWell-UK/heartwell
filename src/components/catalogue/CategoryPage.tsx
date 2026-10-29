@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { ButtonLink } from '@/components/ui/Button'
+import { VelvetHeader } from './VelvetHeader'
 import { CatalogueControls, FilterPanel } from './CatalogueControls'
 import { ProductGrid } from './ProductTile'
 import { ShapePlan } from './ShapePlan'
@@ -88,23 +88,21 @@ export async function CategoryPage({ params, searchParams }: CategoryRouteProps)
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd([...crumbs.map((c) => ({ name: c.name, path: c.href })), { name: title, path }], SITE_URL)) }}
       />
-      <Breadcrumbs items={crumbs} />
       <WhatsAppTopic message={`Hi Heartwell, I'm looking at your ${titleInSentence} and have a question: ${SITE_URL}${path}`} context="sticky-category" />
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 pt-2 lg:gap-7 lg:px-6 lg:pt-4">
-        <header className="flex items-end justify-between gap-8">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-[34px] leading-[1.08] lg:text-[52px]">{title}</h1>
-            {from !== null && (
-              <p className="text-[16px] text-slate lg:text-[17px]">
-                {products.length} {products.length === 1 ? noun : `${noun}s`}, from <span className="font-semibold text-ink">{formatPrice(from)}</span>
-              </p>
-            )}
-            {/* On phones the introduction waits at the bottom, so the sofas come first. */}
-            {intro && <p className="hidden max-w-[44rem] pt-1 text-[17px] leading-relaxed text-slate lg:block">{intro}</p>}
-          </div>
-          <ShapePlan slug={node.slug} width={132} className="mb-2 hidden shrink-0 text-velvet lg:block" />
-        </header>
-
+      <VelvetHeader
+        crumbs={crumbs}
+        title={title}
+        intro={intro}
+        photo={node.imageUrl}
+        aside={<ShapePlan slug={node.slug} width={132} className="mb-2 hidden shrink-0 text-gold-pale lg:block" />}
+      >
+        {from !== null && (
+          <p className="text-[16px] text-on-wine lg:text-[17px]">
+            {products.length} {products.length === 1 ? noun : `${noun}s`}, from <span className="font-semibold text-white">{formatPrice(from)}</span>
+          </p>
+        )}
+      </VelvetHeader>
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 pt-5 lg:gap-7 lg:px-6 lg:pt-8">
         <ShapeRail tree={tree} node={node} />
 
         <div className="lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10">

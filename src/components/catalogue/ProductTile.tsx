@@ -25,7 +25,8 @@ function badgeFor(p: ListingProduct): string | null {
 }
 
 /**
- * A product in a grid: photo with a badge and the save heart, the range's
+ * A product in a grid: photo in an arch like the home page's alcoves, with a
+ * badge on its floor and the save heart beside its shoulder, the range's
  * name with the size underneath (said once), the price it starts from and its
  * colours. A piece on a deal shows its was-price struck through, and the
  * percentage off is its one label. `eager` for the first row, so the page's
@@ -51,7 +52,7 @@ export function ProductTile({ product: p, eager = false, defer = false }: { prod
   return (
     <div className="relative flex flex-col gap-2">
       <Link href={`/products/${p.slug}`} className="group flex flex-col gap-2 text-ink no-underline hover:text-ink">
-        <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
+        <span className="hw-niche hw-niche-square bg-stone">
           {image ? (
             defer ? (
               <WhenNear className="absolute inset-0">{image}</WhenNear>
@@ -67,7 +68,7 @@ export function ProductTile({ product: p, eager = false, defer = false }: { prod
           {badge && (
             <span
               className={cn(
-                'absolute left-2 top-2 rounded-full px-2.5 py-1 text-[12px] font-semibold leading-none',
+                'absolute bottom-2.5 left-2.5 rounded-full px-2.5 py-1 text-[12px] font-semibold leading-none shadow-sm',
                 deal ? 'bg-gold-pale text-wine' : 'bg-white/95 text-velvet',
               )}
             >
@@ -93,14 +94,15 @@ export function ProductTile({ product: p, eager = false, defer = false }: { prod
         </span>
         {p.colours.length > 0 && (
           <span className="flex items-center gap-1" aria-label={`Colours: ${p.colours.map((c) => c.name).join(', ')}`} role="img">
-            {p.colours.slice(0, 4).map((c) => (
-              <span key={c.name} className="size-3 rounded-full ring-1 ring-black/15" style={{ backgroundColor: c.hex ?? '#F5F1EF' }} />
+            {p.colours.slice(0, 4).map((c, i) => (
+              <span key={`${c.name}-${i}`} className="size-3 rounded-full ring-1 ring-black/15" style={{ backgroundColor: c.hex ?? '#F5F1EF' }} />
             ))}
             {p.colours.length > 4 && <span className="text-[12px] text-slate">+{p.colours.length - 4}</span>}
           </span>
         )}
       </div>
-      <SaveButton slug={p.slug} sku={null} noun={p.typeName.toLowerCase()} name={p.title} className="right-1 top-1 size-11" iconSize={18} />
+      {/* In the corner beside the arch's shoulder. */}
+      <SaveButton slug={p.slug} sku={null} noun={p.typeName.toLowerCase()} name={p.title} className="right-0 top-0 size-11 ring-1 ring-line" iconSize={18} />
     </div>
   )
 }
