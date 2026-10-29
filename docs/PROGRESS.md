@@ -51,6 +51,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 31 October 2026 — The lit gallery on the product page
+- **Owner's request:** the product page next, in the same gallery look.
+- **Done:** the photos now sit on a velvet stage, a full-width band on phones and a rounded panel beside the buy box on desktops. The breadcrumb is at its top, and the photos swipe inside a gold-rimmed alcove that lights up as the page opens. The colour name is on a plate at the alcove's foot, and the save heart sits by the arch's shoulder. Dots are gold on velvet; desktop thumbnails are small arches. "You might also like" cards are arched too.
+- **Unchanged on purpose:** everything that decides an order (price, welcome offer, the receipt, colours, fabrics, sizes, back styles, buttons, sticky buy bar) stays on white, as before. No tracking, prices or basket logic changed.
+- **Checked:** lint, types, 533 tests, leak check, WebAssembly webpack build. Screenshots of Ashton 3+2 (one photo) and the Verona family set (two photos) on phone and desktop.
+
 ### 31 October 2026 — The lit gallery on range, category and ranges pages
 - **Owner's request:** bring the home page's gallery look to the category and range pages next.
 - **Range pages:** each range is now its own gallery on lit velvet:

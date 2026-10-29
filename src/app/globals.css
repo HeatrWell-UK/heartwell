@@ -343,35 +343,54 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
     white-space: nowrap;
   }
 
-  /* The plate under each alcove, like a label on a gallery wall. Phones hide it (read out instead): the alcoves only peek out there. */
+  /*
+   * The plate under an alcove, like a label on a gallery wall, straddling its
+   * foot: a gallery's side alcoves (.hw-plaque) and the product photo's colour
+   * (.hw-plate). Phones hide the side alcoves' plates (read out instead): those
+   * alcoves only peek out there.
+   */
+  .hw-plate,
   .hw-plaque {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
+    left: 50%;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    max-width: calc(100% - 24px);
+    translate: -50% 58%;
+    padding: 7px 16px 8px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #52101B, #3A0A12);
+    box-shadow: inset 0 0 0 1px rgb(233 204 123 / 0.55), 0 8px 16px -8px rgb(20 2 6 / 0.8);
+    text-align: center;
   }
-  @media (min-width: 640px) {
+  .hw-plaque { max-width: none; }
+  @media (max-width: 639px) {
     .hw-plaque {
-      left: 50%;
-      bottom: 0;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      width: auto;
-      height: auto;
-      overflow: visible;
-      clip-path: none;
-      translate: -50% 58%;
-      padding: 7px 16px 8px;
-      border-radius: 6px;
-      background: linear-gradient(180deg, #52101B, #3A0A12);
-      box-shadow: inset 0 0 0 1px rgb(233 204 123 / 0.55), 0 8px 16px -8px rgb(20 2 6 / 0.8);
-      text-align: center;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
+  }
+
+  /*
+   * An alcove that takes its height from what's inside (the product page's
+   * swipeable photos): the rim is its padding, and the scrolling row inside is
+   * rounded to the same arch.
+   */
+  .hw-alcove.hw-alcove-flow { aspect-ratio: auto; padding: var(--rim); }
+  .hw-alcove-scroll {
+    position: relative;
+    border-radius: calc(50cqw - var(--rim)) calc(50cqw - var(--rim)) calc(var(--foot) - var(--rim)) calc(var(--foot) - var(--rim));
+  }
+  @media (min-width: 1024px) {
+    .hw-alcove.hw-alcove-flow { --rim: 4px; --foot: 18px; }
   }
 
   /* The gold floor line the alcoves stand on, with a pool of their light on it. */

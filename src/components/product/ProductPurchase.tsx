@@ -66,12 +66,15 @@ export function ProductPurchase({
   adAmount,
   offers,
   plans,
+  crumbs,
   children,
 }: {
   product: PurchaseProduct
   initialVariantId: string | null
   initialFabric: ChosenFabric | null
   plans: SizePlans
+  /** Where the piece sits in the shop, shown at the top of the photos' velvet stage. */
+  crumbs?: ReactNode
   /** What an ad visitor’s offer takes off this piece (its tier's amount). */
   adAmount: number
   /** The welcome offer, the minimum order, and the ad offer's code and amounts. */
@@ -162,18 +165,24 @@ export function ProductPurchase({
 
   return (
     <>
-      <div className="mx-auto max-w-[1200px] lg:grid lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-12 lg:px-6">
+      <div className="mx-auto max-w-[1200px] lg:grid lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-12 lg:px-6 lg:pt-4">
+        {/* The photos on a velvet stage, in their lit alcove: a band across phones, a panel beside the buy box on desktops. */}
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <Gallery
-            key={variant?.id ?? 'none'}
-            images={images}
-            priority
-            caption={variant?.colourName ? [variant.colourName, variant.materialLabel].filter(Boolean).join(' ') : null}
-            overlay={<SaveButton slug={p.slug} sku={variant?.sku ?? null} noun={noun} />}
-          />
+          <div className="hw-velvet hw-gold-edge overflow-hidden px-4 pb-8 lg:rounded-[var(--radius-panel)] lg:border-b-0 lg:px-8 lg:pb-9">
+            {crumbs}
+            <div className={crumbs ? 'pt-1' : 'pt-5'}>
+              <Gallery
+                key={variant?.id ?? 'none'}
+                images={images}
+                priority
+                caption={variant?.colourName ? [variant.colourName, variant.materialLabel].filter(Boolean).join(' ') : null}
+                overlay={<SaveButton slug={p.slug} sku={variant?.sku ?? null} noun={noun} className="right-1 top-1 size-11" />}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-col px-4 pt-4 lg:px-0 lg:pt-0">
+        <div className="flex flex-col px-4 pt-5 lg:px-0 lg:pt-2">
           <div className="flex flex-col gap-3">
             {(p.madeToOrder || p.madeInUk) && (
               <div className="flex flex-wrap gap-2">

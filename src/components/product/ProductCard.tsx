@@ -12,7 +12,7 @@ export function ProductCard({ product }: { product: ProductCardView }) {
   const deal = dealFor(product.price, product.wasPrice)
   return (
     <Link href={`/products/${product.slug}`} className="flex flex-col gap-2 text-ink no-underline hover:text-ink">
-      <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
+      <span className="hw-niche hw-niche-square bg-stone">
         {product.image ? (
           // Fixed width: one 1× and one 2× file (168 px on phones, 270 px in the desktop grid).
           <WhenNear className="block size-full">

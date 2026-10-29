@@ -8,6 +8,10 @@ import { cn } from '@/lib/cn'
 /**
  * Swipeable photos (native scroll snapping, so it moves with the finger and
  * needs no library). The first photo is the page's main image and loads first.
+ *
+ * Revision 4: the photos swipe inside a gold-rimmed alcove like the home
+ * page's (globals.css .hw-alcove-flow), shown on velvet by the page, with the
+ * colour on a plate at its foot and arch-topped thumbnails on desktops.
  */
 export function Gallery({
   images,
@@ -62,18 +66,20 @@ export function Gallery({
 
   return (
     <section aria-label="Photos" className="relative">
-      <div className="relative">
+      <div className="hw-alcove hw-alcove-flow">
+        <span aria-hidden="true" className="hw-alcove-glow" />
+        <span aria-hidden="true" className="hw-alcove-rim" />
         {images.length === 0 ? (
-          <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 bg-stone text-slate lg:rounded-[var(--radius-panel)]">
+          <div className="hw-alcove-scroll flex aspect-square w-full flex-col items-center justify-center gap-2 overflow-hidden bg-stone text-slate">
             <ImageIcon aria-hidden="true" size={40} />
             <span className="text-[15px]">Photo coming soon</span>
           </div>
         ) : (
-          <ul ref={listRef} className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain lg:rounded-[var(--radius-panel)]">
+          <ul ref={listRef} className="hw-alcove-scroll no-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain">
             {images.map((img, i) => (
               <li
                 key={img.src}
-                className="relative aspect-square w-full shrink-0 snap-center bg-stone"
+                className="relative aspect-square w-full shrink-0 snap-center bg-alcove"
                 aria-label={images.length > 1 ? `Photo ${i + 1} of ${images.length}` : undefined}
               >
                 {(i === 0 || showRest) && (
@@ -83,7 +89,7 @@ export function Gallery({
                     fill
                     priority={priority && i === 0}
                     fetchPriority={priority && i === 0 ? 'high' : undefined}
-                    sizes="(min-width: 1200px) 620px, (min-width: 1024px) 52vw, 100vw"
+                    sizes="(min-width: 1200px) 540px, (min-width: 1024px) 45vw, calc(100vw - 32px)"
                     className="object-cover"
                   />
                 )}
@@ -91,14 +97,11 @@ export function Gallery({
             ))}
           </ul>
         )}
+        <span aria-hidden="true" className="hw-alcove-line" />
 
         {overlay}
 
-        {caption && (
-          <span className="pointer-events-none absolute bottom-3 left-3 max-w-[calc(100%-24px)] truncate rounded-full bg-wine-deep/85 px-3 py-1 text-[13px] font-semibold text-white">
-            {caption}
-          </span>
-        )}
+        {caption && <span className="hw-plate pointer-events-none truncate text-[14px] font-semibold leading-tight text-gold-pale">{caption}</span>}
 
         {images.length > 1 && (
           <>
@@ -129,7 +132,7 @@ export function Gallery({
 
       {/* Desktops: every photo as a thumbnail, loaded once the main photo has had the connection to itself. */}
       {images.length > 1 && (
-        <ul className="hidden gap-3 pt-3 lg:flex lg:flex-wrap" aria-label="Choose a photo">
+        <ul className="hidden gap-3 pt-9 lg:flex lg:flex-wrap lg:justify-center" aria-label="Choose a photo">
           {images.map((img, i) => (
             <li key={img.src}>
               <button
@@ -141,11 +144,11 @@ export function Gallery({
                   go(i)
                 }}
                 className={cn(
-                  'relative block size-[76px] overflow-hidden rounded-[12px] bg-stone',
-                  i === index ? 'ring-2 ring-velvet ring-offset-2' : 'opacity-80 hover:opacity-100',
+                  'hw-niche hw-niche-square w-[72px] bg-alcove',
+                  i === index ? 'ring-2 ring-gold-pale ring-offset-2 ring-offset-wine' : 'opacity-75 hover:opacity-100',
                 )}
               >
-                {(i === 0 || showRest) && <Image src={img.src} alt="" width={76} height={76} className="size-full object-cover" />}
+                {(i === 0 || showRest) && <Image src={img.src} alt="" width={72} height={72} className="size-full object-cover" />}
               </button>
             </li>
           ))}
@@ -154,7 +157,7 @@ export function Gallery({
 
       {/* The dots are buttons too (24px targets), so every photo is one tap away without swiping. */}
       {images.length > 1 && (
-        <div className="flex justify-center pt-1.5 lg:hidden">
+        <div className="flex justify-center pt-7 lg:hidden">
           {images.map((img, i) => (
             <button
               key={img.src}
@@ -167,7 +170,7 @@ export function Gallery({
               }}
               className="flex h-6 min-w-6 items-center justify-center px-[3px]"
             >
-              <span className={cn('h-1.5 rounded-full transition-[width] duration-200', i === index ? 'w-5 bg-velvet' : 'w-1.5 bg-[#DCCFD0]')} />
+              <span className={cn('h-1.5 rounded-full transition-[width] duration-200', i === index ? 'w-5 bg-gold-pale' : 'w-1.5 bg-white/35')} />
             </button>
           ))}
         </div>

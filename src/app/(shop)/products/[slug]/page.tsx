@@ -109,8 +109,6 @@ export default async function ProductPage({ params, searchParams }: Props) {
           ]),
         }}
       />
-      <Breadcrumbs items={crumbs} />
-
       <ProductPurchase
         product={purchaseProps(product)}
         initialVariantId={variant?.id ?? null}
@@ -118,6 +116,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         adAmount={tierAmount(product.offerTier, offers.amounts)}
         offers={shopOffers(offers)}
         plans={plans}
+        crumbs={crumbs.length > 0 ? <Breadcrumbs items={crumbs} onVelvet contained /> : null}
       >
         <PostcodeCheck windowLabel={delivery.windowLabel} areas={delivery.areas} noDeliveryDays={delivery.noDeliveryDays} />
         <PromiseRows madeToOrder={product.madeToOrder} />
