@@ -307,10 +307,11 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
   @media (prefers-reduced-motion: no-preference) {
     .hw-hero img { animation: hw-settle 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
     .hw-hero-glow { animation: hw-glow 1.4s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-    .hw-hero-title > span { animation: hw-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-    .hw-hero-title > span:nth-child(1) { animation-delay: 0.35s; }
-    .hw-hero-title > span:nth-child(2) { animation-delay: 0.6s; }
-    .hw-hero-floor > * { animation: hw-arrive 0.7s 1s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hw-hero-title > span { animation: hw-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hw-hero-title > span:nth-child(1) { animation-delay: 0.2s; }
+    .hw-hero-title > span:nth-child(2) { animation-delay: 0.4s; }
+    /* The button people came for: on its way within half a second, settled by 1.1 s. */
+    .hw-hero-floor > * { animation: hw-arrive 0.6s 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
     @supports ((animation-timeline: view()) and (animation-range: entry)) {
       /* A photo opening out of the alcove's arch as it scrolls in. */
