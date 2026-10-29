@@ -14,7 +14,7 @@ import {
 import { normaliseQuery, searchCatalogue } from '@/lib/catalogue/search'
 import { homeRanges, homeSwatches, isShowcaseColour } from '@/lib/home/picks'
 import type { RangeSummary } from '@/lib/catalogue/listing'
-import { planExtent, planFrame, planSummary, rangeSizes, sizeLabel, SET_GAP_CM } from '@/lib/catalogue/range-sizes'
+import { planExtent, planFrame, planSummary, rangeSizes, sizeLabel, sizePhotos, SET_GAP_CM } from '@/lib/catalogue/range-sizes'
 import type { ListingProduct } from '@/lib/catalogue/listing-types'
 
 const node = (id: string, slug: string, parentId: string | null, sort = 1): CategoryNode => ({
@@ -278,6 +278,22 @@ describe('a range page’s sizes', () => {
       ['Scattered back', 'v-sb-arm', 249],
     ])
     expect(sizes[2]!.options).toEqual([{ style: 'High back', slug: 'v-hb-u', price: 899, from: false }])
+  })
+
+  it('gives each size its own photo for the alcoves beside the cover, skipping the cover and repeats', () => {
+    const shot = (name: string) => `https://res.cloudinary.com/x/${name}.jpg`
+    const photographed = [
+      product('v-hb-arm', { sort: 0, axis1Value: 'Armchair', axis2Value: 'High Back', image: shot('cover') }),
+      product('v-sb-arm', { sort: 1, axis1Value: 'Armchair', axis2Value: 'Scattered Back', image: shot('armchair') }),
+      product('v-hb-2', { sort: 2, axis1Value: '2 Seater', axis2Value: 'High Back', image: shot('armchair') }),
+      product('v-hb-u', { sort: 4, axis1Value: 'Armed U-Shape', axis2Value: 'High Back', image: shot('u') }),
+      product('v-hb-3', { sort: 3, axis1Value: '3 Seater', axis2Value: 'High Back', image: null }),
+    ]
+    const photos = sizePhotos(photographed, rangeSizes(photographed), shot('cover'))
+    expect(photos.map((p) => [p.size.label, p.image])).toEqual([
+      ['Armchair', shot('armchair')],
+      ['Armed U-shape', shot('u')],
+    ])
   })
 
   it('leaves the style off in a range with only one', () => {

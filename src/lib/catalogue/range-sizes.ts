@@ -63,6 +63,24 @@ export function rangeSizes(products: ListingProduct[]): RangeSize[] {
   })
 }
 
+/**
+ * A photo for each size that has one of its own, in the range's order: not the
+ * range's cover and not one another size already shows (some sizes share a
+ * photo). For the alcoves beside a range's cover.
+ */
+export function sizePhotos(products: ListingProduct[], sizes: RangeSize[], cover: string | null): { size: RangeSize; image: string }[] {
+  const used = new Set(cover ? [cover] : [])
+  const photos: { size: RangeSize; image: string }[] = []
+  for (const size of sizes) {
+    const slugs = new Set(size.options.map((o) => o.slug))
+    const image = products.find((p) => slugs.has(p.slug) && p.image && !used.has(p.image))?.image
+    if (!image) continue
+    used.add(image)
+    photos.push({ size, image })
+  }
+  return photos
+}
+
 /** Space left between the two pieces of a set, in centimetres. */
 export const SET_GAP_CM = 20
 /** Depth a drawing assumes when it isn't known (never labelled as a measurement). */

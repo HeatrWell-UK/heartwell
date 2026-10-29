@@ -51,6 +51,22 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 31 October 2026 — The lit gallery on range, category and ranges pages
+- **Owner's request:** bring the home page's gallery look to the category and range pages next.
+- **Range pages:** each range is now its own gallery on lit velvet:
+  - the name large in gold, with its sizes and fabrics;
+  - its cover in the middle alcove, with a gold "from £429" coin and "Choose a size" on the floor;
+  - its other sizes in alcoves either side, each with its own photo, named on a plate with its price, each a link to that size;
+  - under the gold floor line, its words, colours and "Ask about" on WhatsApp.
+
+  It reads like the range's Instagram cover. One-size ranges (Harrison) stand alone in their alcove.
+- **Category pages and the ranges page:** a velvet header with the name in gold, how many there are and the lowest price, the introduction on desktops, and a small lit alcove with the category's photo. The rail, filters and grid stay on white below.
+- **Every product and range photo in the shop is in an arch** with a fine gold line, echoing the alcove in each photo. Labels moved to the photo's floor, and the save heart sits by the arch's shoulder (still 44 px). The same applies to search results and the home page's ranges.
+- **Code:** the gallery is one component now (`src/components/catalogue/Arcade.tsx`) shared by the home hero and range pages; `VelvetHeader` for listings; `sizePhotos` picks each size's photo (tested). The scroll "settle" is home-only; grids stay still.
+- **Also fixed:** product tiles keyed colours by name, so a piece with two colours both called Grey made React warn on category pages.
+- **Checked:** lint, types, 533 tests, leak check, WebAssembly webpack build; screenshots of Ashton and Harrison, Corner sofas and the ranges page at phone, tablet and desktop sizes.
+- **Suggestion:** the first tile on Corner sofas is Hannah Electric in a pink colourway (a tile shows the piece's first colourway, in its set order, that has a photo). If the owner would rather lead with grey, putting the grey colourway first changes it.
+
 ### 30 October 2026 — Home page revision 4: "the lit gallery"
 - **Owner's request:** keep the colours and fonts, but the home page (above all the hero) looked too bland; "completely redesign it, a new concept and amaze me", home page only.
 - **The concept:** every one of the owner's photos stands the furniture in the same velvet alcove with a gold rim, so the hero lines those alcoves up along a lit velvet wall like a gallery, and they light up one after another as the page opens. It speaks the same language as the owner's social posts (velvet, gold lettering, arched gold frames, a gold seal), which they liked. Spec in `docs/DESIGN.md`, "The home page (revision 4)".

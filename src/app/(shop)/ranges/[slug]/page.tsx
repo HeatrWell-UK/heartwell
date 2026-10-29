@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { CaretRightIcon, RulerIcon } from '@phosphor-icons/react/ssr'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
+import { AlcoveFloor, Arcade, Medallion } from '@/components/catalogue/Arcade'
 import { RangeCard, rangeSizeCount } from '@/components/catalogue/RangeCard'
 import { ScalePlan } from '@/components/catalogue/ScalePlan'
 import { buttonClasses } from '@/components/ui/Button'
@@ -13,7 +13,7 @@ import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
 import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 import { formatPrice } from '@/lib/format'
 import { getFabricLibrary, getListing, rangesFrom, type RangeSummary } from '@/lib/catalogue/listing'
-import { planFrame, planSummary, rangeSizes, type RangeSize } from '@/lib/catalogue/range-sizes'
+import { planFrame, planSummary, rangeSizes, sizePhotos, type RangeSize } from '@/lib/catalogue/range-sizes'
 import { homeRanges } from '@/lib/home/picks'
 import { breadcrumbJsonLd, jsonLdString } from '@/lib/product/seo'
 import { SITE_URL } from '@/config/site'
@@ -52,10 +52,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const orFormat = new Intl.ListFormat('en-GB', { type: 'disjunction' })
 const numberWords = ['no', 'one', 'two', 'three', 'four', 'five', 'six']
 
+/** "£749", or "from £699" when the size comes in more than one back style or colour. */
+function sizePrice(s: RangeSize): string {
+  const price = Math.min(...s.options.map((o) => o.price))
+  return `${s.options.length > 1 || s.options.some((o) => o.from) ? 'from ' : ''}${formatPrice(price)}`
+}
+
 /**
- * A range: its own room photo and words first, then every size drawn to one
- * scale with its price in each back style, so the choice is which size fits
- * the room. Colours and fabrics are chosen on the size's own page.
+ * A range, as a gallery on lit velvet (docs/DESIGN.md, revision 4): its name
+ * in gold, its cover in the middle alcove with the price it starts from, its
+ * other sizes' photos either side, and its own words under the floor. Then
+ * every size drawn to one scale with its price in each back style, so the
+ * choice is which size fits the room. Colours and fabrics are chosen on the
+ * size's own page.
  */
 export default async function RangePage({ params }: Props) {
   const [{ range, ranges }, fabrics, delivery] = await Promise.all([
@@ -81,56 +90,68 @@ export default async function RangePage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd([{ name: 'Ranges', path: '/ranges' }, { name: range.name, path: `/ranges/${range.slug}` }], SITE_URL)) }}
       />
-      <Breadcrumbs items={[{ name: 'Ranges', href: '/ranges' }]} />
+      <WhatsAppTopic message={`Hi Heartwell, I have a question about the ${range.name} range: ${SITE_URL}/ranges/${range.slug}`} context="sticky-range" />
 
-      <header className="mx-auto grid max-w-[1200px] gap-6 lg:grid-cols-[6fr_5fr] lg:items-center lg:gap-14 lg:px-6 lg:pt-4">
-        <div className="relative aspect-square overflow-hidden bg-stone lg:rounded-[24px]">
-          {range.image && (
-            <Image
-              src={range.image}
-              alt={range.imageAlt}
-              fill
-              loading="eager"
-              fetchPriority="high"
-              sizes="(min-width: 1200px) 620px, (min-width: 1024px) 52vw, 100vw"
-              className="object-cover"
-            />
-          )}
-        </div>
-        <div className="flex flex-col gap-5 px-4 lg:px-0">
-          <h1 className="text-[44px] leading-none lg:text-[64px]">{range.name}</h1>
-          {range.description && <p className="text-[17px] leading-relaxed text-body-dark lg:text-lg">{range.description}</p>}
-          <p className="text-[16px] leading-relaxed text-slate">
+      {/* The range's own gallery: its cover in the middle alcove, its other sizes either side, its words under the floor. */}
+      <header className="hw-gallery hw-velvet text-white">
+        <Breadcrumbs items={[{ name: 'Ranges', href: '/ranges' }]} onVelvet />
+        <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-2.5 px-4 pt-1 text-center lg:gap-3 lg:pt-2">
+          <h1 className="hw-gallery-title text-[clamp(2.75rem,13vw,4.5rem)] leading-none lg:text-[min(6vw,5.5rem)]">
+            <span className="text-gold-lit block pb-[0.08em]">{range.name}</span>
+          </h1>
+          <p className="max-w-[34rem] text-[15px] leading-snug text-on-wine sm:text-[17px]">
             {sizeWord}
-            {styles.length > 1 && ` in ${numberWords[styles.length] ?? styles.length} back styles`}, from{' '}
-            <span className="font-semibold text-ink">{formatPrice(range.price)}</span>.{' '}
+            {styles.length > 1 && ` in ${numberWords[styles.length] ?? styles.length} back styles`}.{' '}
             {range.madeToOrder && fabricCount > 0
               ? `Made to order in the colours shown or any of our ${fabricCount} fabrics.`
               : 'In the colours shown.'}
           </p>
-          {range.colours.length > 0 && (
-            <ul className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Colours">
-              {range.colours.map((c) => (
-                <li key={c.name} className="flex items-center gap-1.5 text-[15px]">
-                  <span aria-hidden="true" className="size-4 rounded-full ring-1 ring-black/15" style={{ backgroundColor: c.hex ?? '#F5F1EF' }} />
-                  {c.name}
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="flex flex-col gap-3 pt-1 sm:flex-row">
-            <a href="#sizes" className={buttonClasses({ block: true, className: 'sm:w-auto' })}>
+        </div>
+
+        <Arcade
+          main={{ src: range.image, alt: range.imageAlt, sizes: '(min-width: 1680px) 400px, (min-width: 1024px) 24vw, (min-width: 640px) 39vw, 80vw' }}
+          side={sizePhotos(range.products, sizes, range.image).map(({ size, image }) => ({
+            key: size.key,
+            href: `/products/${size.options[0]!.slug}`,
+            image,
+            title: size.label,
+            detail: sizePrice(size),
+          }))}
+          sideLabel={`More sizes of ${range.name}`}
+          square
+          className="mt-6 sm:mt-8 lg:mt-7"
+        >
+          <Medallion label="from" value={formatPrice(range.price)} />
+          <AlcoveFloor>
+            <a href="#sizes" className={buttonClasses({ className: 'px-9 shadow-[0_10px_24px_-10px_rgb(40_8_14/0.8)]' })}>
               Choose a size
             </a>
-            <WhatsAppTopic message={`Hi Heartwell, I have a question about the ${range.name} range: ${SITE_URL}/ranges/${range.slug}`} context="sticky-range" />
-            <WhatsAppButton
-              message={`Hi Heartwell, I have a question about the ${range.name} range.`}
-              context="range"
-              className={buttonClasses({ variant: 'secondary', block: true, className: 'sm:w-auto' })}
-            >
-              <WhatsAppGlyph />
-              Ask about {range.name}
-            </WhatsAppButton>
+          </AlcoveFloor>
+        </Arcade>
+
+        <div className="hw-floor">
+          <div className="mx-auto grid max-w-[1200px] gap-6 px-4 pb-8 pt-7 sm:pt-12 lg:grid-cols-[3fr_2fr] lg:gap-16 lg:px-6 lg:pb-12 lg:pt-14">
+            {range.description && <p className="max-w-[40rem] text-[17px] leading-relaxed text-on-wine lg:text-lg">{range.description}</p>}
+            <div className="flex flex-col gap-5">
+              {range.colours.length > 0 && (
+                <ul className="flex flex-wrap gap-x-4 gap-y-2" aria-label="Colours">
+                  {range.colours.map((c) => (
+                    <li key={c.name} className="flex items-center gap-1.5 text-[15px] text-on-wine">
+                      <span aria-hidden="true" className="size-4 rounded-full ring-1 ring-white/40" style={{ backgroundColor: c.hex ?? '#F5F1EF' }} />
+                      {c.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <WhatsAppButton
+                message={`Hi Heartwell, I have a question about the ${range.name} range.`}
+                context="range"
+                className={buttonClasses({ variant: 'onWineOutline', block: true, className: 'sm:w-auto sm:self-start' })}
+              >
+                <WhatsAppGlyph />
+                Ask about {range.name}
+              </WhatsAppButton>
+            </div>
           </div>
         </div>
       </header>

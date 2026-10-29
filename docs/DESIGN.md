@@ -1,6 +1,6 @@
 # Heartwell — Design system
 
-Status: **revision 3, live on every customer page** (Phase 18C, 15–16 October 2026, in five parts: the home page and the shop's frame (R1); category, range, search and saved pages (R2); the product page (R3); basket, checkout and order pages (R4); content pages, page not found and errors (R5)). **The home page is on revision 4, "the lit gallery"** (30 October 2026). Revision 2 was approved on 3 October 2026. The admin keeps the sister shop's admin design with Heartwell branding (CLAUDE.md), so it shares only the display face.
+Status: **revision 3, live on every customer page** (Phase 18C, 15–16 October 2026, in five parts: the home page and the shop's frame (R1); category, range, search and saved pages (R2); the product page (R3); basket, checkout and order pages (R4); content pages, page not found and errors (R5)). **The home page is on revision 4, "the lit gallery"** (30 October 2026), and so are the range, category and ranges pages and every product and range photo in the shop's grids (31 October 2026). Revision 2 was approved on 3 October 2026. The admin keeps the sister shop's admin design with Heartwell branding (CLAUDE.md), so it shares only the display face.
 Revision 2 preview: https://claude.ai/artifact/EDNrBLMoJGDt8MR2NtuR5y · source: `design/canvas/project/*.dc.html` · logo files: `design/logo/` · logo build scripts: `design/logo-work/`
 
 Direction name: **Red Velvet and Gold**, revision 3: **the velvet alcove**. Deep velvet red for every action, metallic gold for the finishing touches, white and soft stone behind everything. Phone first, built for the Facebook and Instagram in-app browsers.
@@ -105,7 +105,25 @@ The owner liked the colours and fonts but found the home page, and above all the
 
 The header gains a row of categories on desktops (with Ranges, and All sofas from 1280 px); the footer puts the logo and contact details, the link columns and the newsletter side by side on desktops.
 
+## Range, category and ranges pages (revision 4, 31 October 2026)
+
+The owner asked for the home page's gallery look on the category and range pages too.
+
+- **Range pages: the range's own gallery** (`src/app/(shop)/ranges/[slug]/page.tsx`, built from the home page's `Arcade` in `src/components/catalogue/Arcade.tsx`). On lit velvet:
+  - the breadcrumb, then the range's name large in gold-lit Gloock, with how many sizes and back styles and "made to order in the colours shown or any of our 70 fabrics";
+  - its cover in the middle alcove, squared up (`square`) so a set or corner isn't cut, with a gold medallion "from £429" and "Choose a size" on its floor (it jumps to the sizes drawn to scale);
+  - either side, up to four of its other sizes, each with its own photo (`sizePhotos`: never the cover, never a photo another size already shows), named on a plate with its price ("5 seater corner, from £699"), each a link to that size;
+  - under the gold floor line, the range's own words, its colours, and "Ask about Ashton" on WhatsApp.
+
+  It's the range's social post cover, as a page. A range with one size stands alone in its alcove.
+- **Category pages and the ranges page: a velvet header** (`VelvetHeader`): the breadcrumb, the name in gold, "34 sofas, from £479", the introduction on desktops (phones still get it at the foot of the page, so the sofas come first) and a small lit alcove holding the owner's photo for the category (the featured range's on the ranges page; the top-view plan in gold when a category has no photo). It stands on a gold line, then the shape rail, filters and grid continue on white.
+- **Every product and range photo in an arch** (`.hw-niche-square`): the frame's half-circle top answers the photo's own alcove, with a fine gold line that turns stronger under the pointer. On product tiles the label (made to order, electric recliner, a deal) sits on the photo's floor, and the save heart sits beside the arch's shoulder. The home page's featured range keeps its 5:6 arch on desktops (`--arch-v` sets the top's height for another shape).
+- **Motion:** each alcove lights the same way as the home page's. In the shop's grids the photos stay still: a photo there must look the same however far it's scrolled. The settle-on-scroll (`.hw-settle`) is for the home page only.
+
 ## Category, range, search and saved pages (revision 3, part R2)
+
+The headers and photo frames below were replaced by revision 4 (above); the rest still holds.
+
 
 - **Product tiles** (category pages, search): the photo with one label (electric, reclining or made to order) and the save heart; then the **range's name in Gloock** with the size underneath, said once ("Ashton" over "3+2 seater, high back", never the size twice); the price it starts from and the colours. Sizes are written in sentence case with commas ("Armed U-shape", "4 seater corner 2c1, high back").
 - **Category pages**: the name in sentence case, "31 sofas, from £479", and on desktops the introduction with the category's top-view plan drawn large beside it. On phones the introduction moves to "About …" at the bottom so the sofas come first, the **shape rail** (every category with its plan, the current one in gold tint, centred on load) lets people hop between shapes, and the filter and sort bar stays pinned to the top while the grid scrolls (the Filter button turns gold when filters are on). Desktops use the header's category row instead of the rail; it underlines the page you're on.

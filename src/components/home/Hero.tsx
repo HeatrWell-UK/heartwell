@@ -1,6 +1,5 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import { CalendarCheckIcon, HandCoinsIcon } from '@phosphor-icons/react/ssr'
+import { AlcoveFloor, Arcade, Medallion } from '@/components/catalogue/Arcade'
 import { ButtonLink } from '@/components/ui/Button'
 import { PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
@@ -24,12 +23,10 @@ import { HeroOffer } from './HeroOffer'
 const ROOM = 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792009391/Main-Hero-Background-Image.jpg'
 const ROOM_ALT = 'A grey sofa with cream cushions in a red velvet alcove, in a panelled room with a herringbone oak floor'
 
-// The photos are square and cropped to each arch (object-fit: cover), so each is shown a little wider than its alcove.
+// The photo is square and cropped to the 5:6 arch (object-fit: cover), so it's shown a little wider than its alcove.
 const ROOM_SIZES = '(min-width: 1680px) 454px, (min-width: 1024px) 27vw, (min-width: 640px) 44vw, 92vw'
-const SIDE_SIZES = ['(min-width: 1024px) 21vw, (min-width: 640px) 28vw, 50vw', '(min-width: 1024px) 21vw, (min-width: 640px) 28vw, 50vw', '17vw', '17vw']
 
 export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[]; windowLabel: string | null; welcome: WelcomeSettings }) {
-  const side = ranges.slice(0, 4)
   return (
     <section aria-labelledby="hero-title" className="hw-gallery hw-velvet text-white">
       <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-2.5 px-4 pt-7 text-center sm:pt-10 lg:gap-3 lg:pt-9">
@@ -41,48 +38,19 @@ export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[];
         </p>
       </div>
 
-      <div className="hw-arcade mt-6 sm:mt-8 lg:mt-7">
-        <div className="hw-alcove hw-arcade-main">
-          <span aria-hidden="true" className="hw-alcove-glow" />
-          <span aria-hidden="true" className="hw-alcove-rim" />
-          <span className="hw-alcove-photo">
-            <Image src={ROOM} alt={ROOM_ALT} fill sizes={ROOM_SIZES} loading="eager" fetchPriority="high" />
-            <span aria-hidden="true" className="hw-alcove-dim" />
-          </span>
-          <span aria-hidden="true" className="hw-alcove-line" />
-          <p className="hw-medallion">
-            <span className="text-[13px] font-semibold lg:text-[14px]">To pay today</span>
-            <span className="font-display text-[44px] lg:text-[52px]">£0</span>
-          </p>
-          <div className="hw-alcove-floor">
-            <ButtonLink href="/sofas" className="px-9 shadow-[0_10px_24px_-10px_rgb(40_8_14/0.8)]">
-              Shop sofas
-            </ButtonLink>
-          </div>
-        </div>
-
-        {side.length > 0 && (
-          <ul className="hw-arcade-side" aria-label="Some of our ranges">
-            {side.map((r, i) => (
-              <li key={r.slug}>
-                <Link href={`/ranges/${r.slug}`} className="hw-alcove group text-white no-underline hover:text-white">
-                  <span aria-hidden="true" className="hw-alcove-glow" />
-                  <span aria-hidden="true" className="hw-alcove-rim" />
-                  <span className="hw-alcove-photo">
-                    {r.image && <Image src={r.image} alt="" fill sizes={SIDE_SIZES[i]} />}
-                    <span aria-hidden="true" className="hw-alcove-dim" />
-                  </span>
-                  <span aria-hidden="true" className="hw-alcove-line" />
-                  <span className="hw-plaque">
-                    <span className="text-gold-lit font-display text-[18px] leading-none lg:text-[20px]">{r.name}</span>{' '}
-                    <span className="text-[13px] leading-none text-on-wine-muted">from {formatPrice(r.price)}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <Arcade
+        main={{ src: ROOM, alt: ROOM_ALT, sizes: ROOM_SIZES }}
+        side={ranges.slice(0, 4).map((r) => ({ key: r.slug, href: `/ranges/${r.slug}`, image: r.image, title: r.name, detail: `from ${formatPrice(r.price)}` }))}
+        sideLabel="Some of our ranges"
+        className="mt-6 sm:mt-8 lg:mt-7"
+      >
+        <Medallion label="To pay today" value="£0" />
+        <AlcoveFloor>
+          <ButtonLink href="/sofas" className="px-9 shadow-[0_10px_24px_-10px_rgb(40_8_14/0.8)]">
+            Shop sofas
+          </ButtonLink>
+        </AlcoveFloor>
+      </Arcade>
 
       {/* Today, in three facts, under the floor the alcoves stand on. */}
       <div className="hw-floor">
