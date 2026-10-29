@@ -1,4 +1,6 @@
+import Image from 'next/image'
 import { ScissorsIcon } from '@phosphor-icons/react/ssr'
+import { WhenNear } from '@/components/ui/WhenNear'
 import { ButtonLink } from '@/components/ui/Button'
 import Link from 'next/link'
 import { FEATURES } from '@/config/features'
@@ -8,9 +10,10 @@ import { homeSwatches } from '@/lib/home/picks'
 
 /**
  * "Your sofa, in your fabric": the wine section with a card of pinked swatches,
- * named the way the fabric picker names them (colours only, nothing to load).
- * Phones read heading, swatches, then the actions; desktops put the swatches
- * beside the words.
+ * named the way the fabric picker names them: each the fabric's own photo (the
+ * colour shows until it loads), lifting a little when touched, like a sample
+ * picked up. Phones read heading, swatches, then the actions; desktops put the
+ * swatches beside the words.
  */
 export function FabricStory({ collections }: { collections: FabricCollection[] }) {
   const total = collections.reduce((n, c) => n + c.fabrics.length, 0)
@@ -40,7 +43,16 @@ export function FabricStory({ collections }: { collections: FabricCollection[] }
         >
           {swatches.slice(0, phone).map((f, i) => (
             <li key={f.code} className={`flex flex-col items-center gap-2 ${onDesktop.has(i) ? '' : 'lg:hidden'}`}>
-              <span aria-hidden="true" className="pinked block aspect-square w-full" style={{ backgroundColor: f.hex }} />
+              {/* The lift is on the outer span: the pinked edge would clip its shadow. */}
+              <span aria-hidden="true" className="hw-swatch block w-full">
+                <span className="pinked relative block aspect-square w-full overflow-hidden" style={{ backgroundColor: f.hex }}>
+                  {f.image && (
+                    <WhenNear className="absolute inset-0">
+                      <Image src={f.image} alt="" fill sizes="(min-width: 1024px) 96px, 23vw" className="object-cover" />
+                    </WhenNear>
+                  )}
+                </span>
+              </span>
               <span className="text-center text-[13px] leading-tight text-on-wine-muted">{f.name}</span>
             </li>
           ))}

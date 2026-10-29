@@ -245,6 +245,115 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
 }
 
 /*
+ * Motion (revision 3.1, owner 29 October 2026: "too dull and static"). CSS
+ * only, and only for people whose device doesn't ask for less motion. Two
+ * kinds, both from the room in the photos:
+ *
+ *  1. The hero lights up once as the page opens: the photo settles, the gold
+ *     lines rise into the alcove one after the other, the button arrives last.
+ *     Never loops; the photo itself is never hidden (it's the page's largest
+ *     paint).
+ *  2. Scroll-linked, so the visitor drives them: photos open out of an alcove
+ *     arch as they come into view (.hw-arch), and the gold thread between the
+ *     paying steps draws itself (.hw-thread-draw). Browsers without
+ *     scroll-driven animations (older iPhones, Firefox) simply show the
+ *     finished page: decoration only, so no fallback script.
+ */
+@keyframes hw-settle {
+  from { scale: 1.06; }
+}
+@keyframes hw-rise {
+  from { opacity: 0; translate: 0 0.35em; }
+}
+@keyframes hw-glow {
+  from { opacity: 0; scale: 0.7; }
+}
+@keyframes hw-arrive {
+  from { opacity: 0; translate: 0 12px; }
+}
+@keyframes hw-arch-open {
+  from { clip-path: inset(10% 9% 0 9% round 48% 48% 18px 18px); }
+  to { clip-path: inset(0 0 0 0 round 18px 18px 18px 18px); }
+}
+@keyframes hw-arch-zoom {
+  from { scale: 1.12; }
+}
+@keyframes hw-draw-down {
+  from { scale: 1 0; }
+}
+@keyframes hw-draw-across {
+  from { scale: 0 1; }
+}
+
+@layer components {
+  /* The warm light behind the headline, as if the alcove's lamp came on. */
+  .hw-hero-glow {
+    position: absolute;
+    left: 50%;
+    top: 34.5%;
+    width: 70cqw;
+    aspect-ratio: 2 / 1;
+    translate: -50% -50%;
+    background: radial-gradient(closest-side, rgb(242 220 156 / 0.28), rgb(233 204 123 / 0.1) 55%, transparent);
+    pointer-events: none;
+  }
+  @media (min-width: 640px) {
+    .hw-hero-glow { top: 36%; width: 46cqw; }
+  }
+  @media (min-width: 1024px) {
+    .hw-hero-glow { width: 32cqw; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hw-hero img { animation: hw-settle 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hw-hero-glow { animation: hw-glow 1.4s 0.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hw-hero-title > span { animation: hw-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .hw-hero-title > span:nth-child(1) { animation-delay: 0.35s; }
+    .hw-hero-title > span:nth-child(2) { animation-delay: 0.6s; }
+    .hw-hero-floor > * { animation: hw-arrive 0.7s 1s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+    @supports ((animation-timeline: view()) and (animation-range: entry)) {
+      /* A photo opening out of the alcove's arch as it scrolls in. */
+      .hw-arch {
+        view-timeline: --hw-arch block;
+        animation: hw-arch-open linear both;
+        animation-timeline: --hw-arch;
+        animation-range: entry 0% entry 100%;
+      }
+      .hw-arch img {
+        animation: hw-arch-zoom linear both;
+        animation-timeline: --hw-arch;
+        animation-range: entry 0% cover 60%;
+      }
+      /* In a row people swipe sideways (phones), the arch opens as each card slides in. */
+      @media (max-width: 1023px) {
+        .hw-rail .hw-arch { view-timeline: --hw-arch inline; }
+      }
+
+      /* The gold thread between paying steps draws as the steps scroll by. */
+      .hw-thread-draw {
+        transform-origin: top;
+        animation: hw-draw-down linear both;
+        animation-timeline: view();
+        animation-range: entry 40% cover 55%;
+      }
+      @media (min-width: 1024px) {
+        .hw-thread-draw { transform-origin: left; animation-name: hw-draw-across; }
+      }
+    }
+  }
+
+  /* A fabric swatch picked up: it lifts and turns a little, as a sample does in the hand. */
+  .hw-swatch { transition: translate 0.25s ease, rotate 0.25s ease, filter 0.25s ease; }
+  .hw-swatch:hover,
+  .hw-swatch:active { translate: 0 -5px; rotate: -3deg; filter: drop-shadow(0 8px 10px rgb(20 2 6 / 0.45)); }
+  @media (prefers-reduced-motion: reduce) {
+    .hw-swatch:hover,
+    .hw-swatch:active { translate: none; rotate: none; }
+  }
+}
+
+/*
  * A stone panel with an inset line, like the moulded wall panels in the
  * photos. Used sparingly: one or two panels a page.
  */

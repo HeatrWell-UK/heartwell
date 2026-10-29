@@ -25,10 +25,20 @@ export function OurRanges({ ranges, total }: { ranges: RangeSummary[]; total: nu
         </Link>
       </div>
 
-      <ul className="no-scrollbar flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 lg:grid lg:grid-cols-4 lg:gap-x-6 lg:gap-y-10 lg:overflow-visible lg:px-0">
-        {ranges.map((r) => (
-          <li key={r.slug} className="w-[72%] shrink-0 snap-start sm:w-[42%] lg:w-auto">
-            <RangeCard range={r} sizes="(min-width: 1200px) 280px, (min-width: 1024px) 23vw, (min-width: 640px) 42vw, 72vw" />
+      {/* On desktops the first range (the owner's featured one) takes a 2×2 block, so the grid has a lead instead of nine equal tiles. */}
+      <ul className="hw-rail no-scrollbar flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 lg:grid lg:grid-cols-4 lg:gap-x-6 lg:gap-y-10 lg:overflow-visible lg:px-0">
+        {ranges.map((r, i) => (
+          <li key={r.slug} className={i === 0 ? 'w-[72%] shrink-0 snap-start sm:w-[42%] lg:col-span-2 lg:row-span-2 lg:w-auto' : 'w-[72%] shrink-0 snap-start sm:w-[42%] lg:w-auto'}>
+            <RangeCard
+              range={r}
+              reveal
+              photoClassName={i === 0 ? 'lg:aspect-[5/6]' : undefined}
+              sizes={
+                i === 0
+                  ? '(min-width: 1200px) 576px, (min-width: 1024px) 48vw, (min-width: 640px) 42vw, 72vw'
+                  : '(min-width: 1200px) 280px, (min-width: 1024px) 23vw, (min-width: 640px) 42vw, 72vw'
+              }
+            />
           </li>
         ))}
       </ul>

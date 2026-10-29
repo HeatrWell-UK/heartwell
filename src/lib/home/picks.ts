@@ -17,6 +17,8 @@ export interface HomeSwatch {
   name: string
   hex: string
   collection: string
+  /** The fabric's own photo (Cloudinary heartwell/fabrics), when it has one; the colour shows until it loads. */
+  image: string | null
 }
 
 function hsl(hex: string): { h: number; s: number; l: number } | null {
@@ -46,6 +48,8 @@ export function isShowcaseColour(hex: string): boolean {
   if (s < 0.12) return true // greys, creams, blacks
   if (h >= 60 && h < 200) return false // greens, teals and turquoise
   if ((h >= 290 || h < 12) && l > 0.55) return false // pinks
+  // Strong reds and aubergines: their photos read pink or coral (29 October 2026), and the velvet red is the page's own.
+  if ((h >= 330 || h < 12) && s > 0.3) return false
   if (h >= 12 && h < 50 && s > 0.55) return false // oranges and mustard
   return true
 }
@@ -57,7 +61,9 @@ const distance = (a: string, b: string) => {
 }
 
 /** Just what picking swatches needs, so the product page's fabric collections work too. */
-type SwatchSource = Pick<FabricCollection, 'name'> & { fabrics: Pick<FabricCollection['fabrics'][number], 'code' | 'name' | 'hex'>[] }
+type SwatchSource = Pick<FabricCollection, 'name'> & {
+  fabrics: (Pick<FabricCollection['fabrics'][number], 'code' | 'name' | 'hex'> & { image?: string | null })[]
+}
 
 /** Up to `count` distinct showcase colours across the collections, light to dark, spread evenly. */
 export function homeSwatches(collections: SwatchSource[], count = 16): HomeSwatch[] {
@@ -67,7 +73,7 @@ export function homeSwatches(collections: SwatchSource[], count = 16): HomeSwatc
       const hex = f.hex?.toUpperCase()
       if (!hex || !/^#[0-9A-F]{6}$/.test(hex) || !isShowcaseColour(hex)) continue
       if (pool.some((p) => p.name === f.name || distance(p.hex, hex) < 18)) continue
-      pool.push({ code: f.code, name: f.name, hex, collection: c.name })
+      pool.push({ code: f.code, name: f.name, hex, collection: c.name, image: f.image ?? null })
     }
   }
   pool.sort((a, b) => (hsl(b.hex)?.l ?? 0) - (hsl(a.hex)?.l ?? 0))

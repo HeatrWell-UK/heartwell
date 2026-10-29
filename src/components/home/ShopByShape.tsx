@@ -11,7 +11,8 @@ const listFormat = new Intl.ListFormat('en-GB', { type: 'conjunction' })
 /**
  * The shape categories in the tree's order, each with the owner's photo and
  * its top-view plan, then a last tile for everything. Fabric and leather
- * aren't shapes, so they're named on that tile instead.
+ * aren't shapes, so they're named on that tile instead. Photos open out of the
+ * alcove's arch as they scroll in (.hw-arch).
  */
 export function ShopByShape({ tree, department, listing }: { tree: CategoryNode[]; department: CategoryNode; listing: ListingProduct[] }) {
   const shapes = tree.filter((c) => c.parentId === department.id && hasShapePlan(c.slug)).sort((a, b) => a.sort - b.sort)
@@ -33,10 +34,16 @@ export function ShopByShape({ tree, department, listing }: { tree: CategoryNode[
           return (
             <li key={c.id}>
               <Link href={categoryHref(tree, c)} className="group flex flex-col gap-3 text-ink no-underline hover:text-ink">
-                <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
+                <span className="hw-arch relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
                   {c.imageUrl && (
                     <WhenNear className="absolute inset-0">
-                      <Image src={c.imageUrl} alt="" fill sizes="(min-width: 1200px) 180px, (min-width: 1024px) 15vw, (min-width: 640px) 31vw, 47vw" className="object-cover" />
+                      <Image
+                        src={c.imageUrl}
+                        alt=""
+                        fill
+                        sizes="(min-width: 1200px) 180px, (min-width: 1024px) 15vw, (min-width: 640px) 31vw, 47vw"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                      />
                     </WhenNear>
                   )}
                 </span>

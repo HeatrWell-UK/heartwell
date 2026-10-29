@@ -19,7 +19,8 @@ const alsoTrue = [
 /**
  * How paying works, on a stone panel with an inset line like the wall
  * panelling in the photos. A true sequence, so it's numbered; the numbers
- * carry the gold, joined by a gold line (down on phones, across on desktops).
+ * carry the gold, joined by a gold line (down on phones, across on desktops)
+ * that draws itself as the steps scroll by (globals.css, .hw-thread-draw).
  */
 export function HowPayingWorks() {
   return (
@@ -36,16 +37,16 @@ export function HowPayingWorks() {
               {i < steps.length - 1 && (
                 <span
                   aria-hidden="true"
-                  className="hw-thread absolute -bottom-5 left-5 top-12 w-px lg:bottom-auto lg:left-12 lg:top-5 lg:h-px lg:w-[calc(100%_-_1rem)]"
+                  className="hw-thread hw-thread-draw absolute -bottom-5 left-[23px] top-14 w-0.5 lg:bottom-auto lg:left-14 lg:top-6 lg:h-0.5 lg:w-[calc(100%_-_1.5rem)]"
                 />
               )}
               <span
                 aria-hidden="true"
-                className="bg-gold-sheen relative flex size-10 shrink-0 items-center justify-center rounded-full font-display text-[20px] text-wine"
+                className="bg-gold-sheen relative flex size-12 shrink-0 items-center justify-center rounded-full font-display text-[24px] text-wine shadow-[0_6px_14px_-6px_rgb(74_13_23/0.55)]"
               >
                 {i + 1}
               </span>
-              <div className="flex flex-col gap-1 pt-1.5 lg:pt-0">
+              <div className="flex flex-col gap-1 pt-2.5 lg:pt-0">
                 <span className="text-[18px] font-semibold leading-snug">
                   <span className="sr-only">Step {i + 1}: </span>
                   {s.title}
