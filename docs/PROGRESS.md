@@ -54,7 +54,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 ### 29 October 2026 — Home page revision 3.1: the alcove comes alive
 - **Owner's request:** "The website looks too dull and static", so redesign the home page and make it look better, starting there.
 - **Done** (spec in `docs/DESIGN.md`, "The home page (revision 3.1)" and "Motion"):
-  - **Hero:** on load the alcove's light comes up behind the lettering, the two lines rise in turn and "Shop sofas" arrives; once, about 1.8 s, then still.
+  - **Hero:** on load the alcove's light comes up behind the lettering, the two lines rise in turn and "Shop sofas" arrives (settled by 1.1 s, so people from ads can tap it at once); once, then still.
   - **Today strip** on wine under the hero: To pay today £0, this week's real delivery window, and the welcome offer with its real time left while it's live, otherwise "Pay the driver". The old line and WhatsApp button under the hero went (the floating button does that).
   - **Arch reveals:** shape and range photos open from the alcove's arch as they scroll into view (sideways in the phone rail), and the gold thread in "Nothing to pay" draws itself.
   - **Ranges:** the first range is featured at twice the size on desktops; nine ranges, so the grid stays full.

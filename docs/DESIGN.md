@@ -165,7 +165,7 @@ In answer to the customer: basket sheet slides up (260 ms); accordions and selec
 
 On its own, since revision 3.1 (owner, 29 October 2026: the site felt "too dull and static"), and only on the home page:
 
-- **Once, on load**: the hero settles (the photo eases from 106% to full size), the alcove's light comes up, the two lines rise in turn and the button arrives. About 1.8 s in all, then still.
+- **Once, on load**: the hero settles (the photo eases from 106% to full size), the alcove's light comes up, the two lines rise in turn and the button arrives (on its way within half a second, settled by 1.1 s, so it never keeps anyone waiting). The photo's settle is the longest part, 1.8 s, then all is still.
 - **Tied to scrolling**: photos of shapes and ranges open from the arch of the alcove to a rounded square, with a slight zoom; the gold thread draws itself. They move with the finger and stop when it stops, so nothing plays by itself. Built with CSS scroll-driven animations (`animation-timeline`), only where the browser supports them; elsewhere the page is simply still.
 
 Rules: CSS only (no scripts, no libraries); only `transform`-family properties, opacity and clip-path, so it stays smooth in the Facebook and Instagram browsers; every animation sits inside `prefers-reduced-motion: no-preference`, so reduced motion shows the finished page; no loops, no parallax on text, nothing that delays reading or tapping. The welcome offer's time left is the only countdown, and only because the offer really ends then.
