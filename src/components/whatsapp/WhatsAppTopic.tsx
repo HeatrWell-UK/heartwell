@@ -14,6 +14,8 @@ let entries: Entry[] = []
 let nextId = 1
 const listeners = new Set<() => void>()
 const changed = () => listeners.forEach((l) => l())
+// One empty list, so React sees the same server snapshot on every call.
+const NONE: Entry[] = []
 
 const store = {
   subscribe(onChange: () => void) {
@@ -21,7 +23,7 @@ const store = {
     return () => listeners.delete(onChange)
   },
   getSnapshot: () => entries,
-  getServerSnapshot: () => [] as Entry[],
+  getServerSnapshot: () => NONE,
 }
 
 /** The topic a page has set for this address, or null. */

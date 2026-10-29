@@ -9,7 +9,7 @@ import type { FabricCollection } from '@/lib/catalogue/listing'
 import { homeSwatches } from '@/lib/home/picks'
 
 /**
- * "Your sofa, in your fabric": the wine section with a card of pinked swatches,
+ * "Your sofa, in your fabric": the velvet section with a card of pinked swatches,
  * named the way the fabric picker names them: each the fabric's own photo (the
  * colour shows until it loads), lifting a little when touched, like a sample
  * picked up. Phones read heading, swatches, then the actions; desktops put the
@@ -25,7 +25,7 @@ export function FabricStory({ collections }: { collections: FabricCollection[] }
   const onDesktop = new Set(Array.from({ length: desktop }, (_, i) => Math.round((i * (phone - 1)) / Math.max(1, desktop - 1))))
 
   return (
-    <section aria-labelledby="fabrics" className="mt-14 bg-wine text-white lg:mt-24">
+    <section aria-labelledby="fabrics" className="hw-velvet mt-14 text-white lg:mt-24">
       <div className="mx-auto grid max-w-[1200px] gap-8 px-4 py-14 lg:grid-cols-[5fr_6fr] lg:grid-rows-[auto_1fr] lg:gap-x-16 lg:gap-y-6 lg:px-6 lg:py-20">
         <div className="flex flex-col gap-5 lg:col-start-1 lg:row-start-1">
           <h2 id="fabrics" className="text-gold-lit text-[32px] leading-[1.1] lg:text-[46px]">

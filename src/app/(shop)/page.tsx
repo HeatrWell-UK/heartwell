@@ -21,10 +21,9 @@ export const revalidate = 300
 export const metadata: Metadata = { alternates: { canonical: '/' } }
 
 /**
- * The home page (docs/DESIGN.md, revision 3.1): the owner's room with the
- * promise lit in its alcove and today's facts under it, how paying works,
- * shapes, ranges, fabrics, where we deliver and the showroom, then the
- * questions people ask.
+ * The home page (docs/DESIGN.md, revision 4): the gallery of lit alcoves with
+ * the promise and today's facts, what you pay and when, shapes, ranges,
+ * fabrics, where we deliver and the showroom, then the questions people ask.
  */
 export default async function HomePage() {
   const [tree, listing, fabrics, delivery, offers] = await Promise.all([
@@ -37,12 +36,13 @@ export default async function HomePage() {
   const sofas = tree.find((c) => c.slug === 'sofas' && c.parentId === null) ?? tree.find((c) => c.parentId === null)
   const fabricCount = fabrics.reduce((n, c) => n + c.fabrics.length, 0)
   const ranges = rangesFrom(listing)
+  const windowLabel = delivery?.windowLabel ?? null
 
   return (
     <div className="pb-16 lg:pb-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString([organizationJsonLd(SITE_URL), websiteJsonLd(SITE_URL)]) }} />
-      <Hero windowLabel={delivery?.windowLabel ?? null} welcome={offers.welcome} />
-      <HowPayingWorks />
+      <Hero ranges={homeRanges(ranges, 4)} windowLabel={windowLabel} welcome={offers.welcome} />
+      <HowPayingWorks windowLabel={windowLabel} />
       {sofas && <ShopByShape tree={tree} department={sofas} listing={listing} />}
       <OurRanges ranges={homeRanges(ranges, 9)} total={ranges.length} />
       <FabricStory collections={fabrics} />
