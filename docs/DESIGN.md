@@ -87,15 +87,17 @@ Each one stands for something, and each is used sparingly.
 - **The alcove.** On the home page the headline is set inside the velvet alcove of the owner's photo, in gold (`text-gold-lit`, lighter stops so every part of each letter keeps over 5:1 on the velvet), and the main button stands on the oak floor. Positions are measured from the photo, in container units, so the layout is identical at every width (`.hw-hero` in `globals.css` records the measurements). Phones use the square original in a 7:8 frame; from 640 px the room is widened to 2:1 with Cloudinary's generative fill (`home-hero-wide`, made once and stored). A different hero photo needs its alcove measured again.
 - **The wall panel.** A stone panel with an inset hairline, like the moulded panels on the walls in the photos (`.hw-panel`). One or two per page, for the content that matters most (on the home page: how paying works).
 - **The gold thread.** A thin gold line joining numbered steps, down on phones and across on desktops (`.hw-thread`). Only for real sequences.
-- **Velvet grounds.** Wine sections with gold headings: one per page at most (on the home page: the fabrics).
+- **Velvet grounds.** Wine sections with gold headings: one per page at most (on the home page: the fabrics). The home page also has the thin "today" strip under the hero, which is facts, not a section.
 
-## The home page (revision 3)
+## The home page (revision 3.1, 29 October 2026)
 
-1. **Hero**: the owner's room, the promise in the alcove ("Choose it today. Pay when it's home."), "Shop sofas" on the floor; under it one line on delivery and payment and "Ask us on WhatsApp".
-2. **Nothing to pay until it's in your room**: the three ordering steps on a wall panel with the gold thread; underneath, the guarantee, the 14 days and the person who checks every order.
-3. **Shop by shape**: the owner's category photos with the top-view plans beside each name and how many there are to choose from; a velvet tile for everything.
-4. **Our ranges**: one card per range (photo, name, sizes, made to order, from-price, colours), featured ranges first; a row to swipe on phones, a grid on desktops.
-5. **Your sofa, in your fabric** (velvet ground): a swatch card of pinked swatches with their names, full rows only, light to dark, never green, pink or orange (the owner's rule; `isShowcaseColour`); samples and "See all 70 fabrics".
+The owner found revision 3 "too dull and static", so 3.1 keeps the layout and brings the alcove to life (see Motion).
+
+1. **Hero**: the owner's room, the promise in the alcove ("Choose it today. Pay when it's home."), "Shop sofas" on the floor. On load the alcove's light comes up behind the lettering, the two lines rise in turn and the button arrives (`.hw-hero-glow`, `.hw-hero-title`, `.hw-hero-floor`). Under it the **today strip** on wine: **To pay today £0** (gold-lit Gloock), this week's real delivery window ("Order today, at your door: Tue 3 – Wed 4 November") and the welcome offer while it's live (amount and the real time left, from `useWelcome`), otherwise "Pay the driver, in cash or by bank transfer". The old line and WhatsApp button under the hero went: the floating WhatsApp button does that job.
+2. **Nothing to pay until it's in your room**: the three ordering steps on a wall panel with the gold thread, which draws itself as the panel scrolls in (`.hw-thread-draw`); larger gold numbers; underneath, the guarantee, the 14 days and the person who checks every order.
+3. **Shop by shape**: the owner's category photos with the top-view plans beside each name and how many there are to choose from; a velvet tile for everything. Photos open from the alcove's arch as they come into view (`.hw-arch`).
+4. **Our ranges**: one card per range (photo, name, sizes, made to order, from-price, colours), featured ranges first; a row to swipe on phones (each card opens from the arch as it slides in), a grid on desktops with the **first range featured** at twice the size (nine ranges, so the grid stays full).
+5. **Your sofa, in your fabric** (velvet ground): a swatch card of pinked swatches showing **each fabric's own photo** (its colour shows until the photo loads), lifting like a picked-up sample when touched (`.hw-swatch`); full rows only, light to dark, never green, pink or orange, and no strong reds or aubergines either, since their photos read pink or coral (the owner's rule; `isShowcaseColour`); samples and "See all 70 fabrics".
 6. **Free delivery across mainland Britain**: a drawn map of the free-delivery area (mainland Great Britain and Anglesey, from about 240 coastline points; `scripts/build-britain-outline.mjs`) with the Burnley showroom marked by a gold heart; the instant postcode check; how to visit the showroom.
 7. **Questions people ask**: heading beside the answers on desktops.
 
@@ -139,7 +141,7 @@ The header gains a row of categories on desktops (with Ranges, and All sofas fro
 
 ## The system in one breath
 
-White and stone grounds; velvet for every action; wine for the one dark band a page may have; gold as a gradient on numbers, rims and lettering on velvet, never behind small text. Gloock for names, headings and prices, Figtree for everything people read and tap. Shapes from the owner's room: the alcove (the home hero, the empty alcove), the wall panel (`.hw-panel`, one or two a page), the gold thread and numbers for real sequences, top-view plans drawn to scale for sizes. One bold moment a page; everything else quiet.
+White and stone grounds; velvet for every action; wine for the one dark band a page may have; gold as a gradient on numbers, rims and lettering on velvet, never behind small text. Gloock for names, headings and prices, Figtree for everything people read and tap. Shapes from the owner's room: the alcove (the home hero, the empty alcove), the wall panel (`.hw-panel`, one or two a page), the gold thread and numbers for real sequences, top-view plans drawn to scale for sizes. One bold moment a page; everything else quiet. The home page's alcove comes alive once on load and opens its arches as you scroll (revision 3.1), and stays still with reduced motion.
 
 ## Components (as drawn in the revision 2 preview)
 
@@ -159,7 +161,14 @@ Line icons, 24 px grid, 1.75 px stroke, rounded caps and joins, in velvet on lig
 
 ## Motion
 
-Only in answer to the customer: basket sheet slides up (260 ms); accordions and selections 150–200 ms. Nothing animates on its own (revision 3 keeps this: the hero is striking because of the photo and the lettering, not movement). `prefers-reduced-motion` turns slides off.
+In answer to the customer: basket sheet slides up (260 ms); accordions and selections 150–200 ms; photos grow a little under the pointer; fabric swatches lift when touched.
+
+On its own, since revision 3.1 (owner, 29 October 2026: the site felt "too dull and static"), and only on the home page:
+
+- **Once, on load**: the hero settles (the photo eases from 106% to full size), the alcove's light comes up, the two lines rise in turn and the button arrives. About 1.8 s in all, then still.
+- **Tied to scrolling**: photos of shapes and ranges open from the arch of the alcove to a rounded square, with a slight zoom; the gold thread draws itself. They move with the finger and stop when it stops, so nothing plays by itself. Built with CSS scroll-driven animations (`animation-timeline`), only where the browser supports them; elsewhere the page is simply still.
+
+Rules: CSS only (no scripts, no libraries); only `transform`-family properties, opacity and clip-path, so it stays smooth in the Facebook and Instagram browsers; every animation sits inside `prefers-reduced-motion: no-preference`, so reduced motion shows the finished page; no loops, no parallax on text, nothing that delays reading or tapping. The welcome offer's time left is the only countdown, and only because the offer really ends then.
 
 ## Voice
 

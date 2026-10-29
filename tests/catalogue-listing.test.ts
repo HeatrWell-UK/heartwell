@@ -234,8 +234,9 @@ describe('home page swatches', () => {
   })
 
   it('leaves out greens, pinks and oranges, the owner’s rule for the shop’s own pages', () => {
-    for (const hex of ['#012724', '#047379', '#66B6CC', '#DA6E8A', '#D8B7BF', '#E07E49', '#825018']) expect(isShowcaseColour(hex)).toBe(false)
-    for (const hex of ['#D2C9B6', '#855F48', '#133A68', '#83030F', '#281A32', '#050505', '#949190']) expect(isShowcaseColour(hex)).toBe(true)
+    // Strong reds and aubergines (#83030F, #30040A) photograph pink or coral, so they stay off the home page's swatches.
+    for (const hex of ['#012724', '#047379', '#66B6CC', '#DA6E8A', '#D8B7BF', '#E07E49', '#825018', '#83030F', '#30040A', '#CC092F']) expect(isShowcaseColour(hex)).toBe(false)
+    for (const hex of ['#D2C9B6', '#855F48', '#133A68', '#2F201E', '#281A32', '#050505', '#949190']) expect(isShowcaseColour(hex)).toBe(true)
   })
 
   it('keeps one of each name and near-identical colour, light to dark, spread evenly', () => {

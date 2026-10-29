@@ -4,6 +4,7 @@ import { ImageIcon } from '@phosphor-icons/react/ssr'
 import { Price } from '@/components/ui/Price'
 import { WhenNear } from '@/components/ui/WhenNear'
 import type { RangeSummary } from '@/lib/catalogue/listing'
+import { cn } from '@/lib/cn'
 
 /** Sizes, not pieces: a range can offer each size with two back styles. */
 export const rangeSizeCount = (r: RangeSummary) => new Set(r.products.map((p) => p.axis1Value ?? p.slug)).size
@@ -13,13 +14,37 @@ export const rangeSizeCount = (r: RangeSummary) => new Set(r.products.map((p) =>
  * order, the price it starts from and its colours. Used on the home page, the
  * ranges page and under each range.
  */
-export function RangeCard({ range: r, sizes, eager = false }: { range: RangeSummary; sizes: string; eager?: boolean }) {
+export function RangeCard({
+  range: r,
+  sizes,
+  eager = false,
+  reveal = false,
+  photoClassName,
+}: {
+  range: RangeSummary
+  sizes: string
+  eager?: boolean
+  /** Open the photo out of the alcove's arch as it scrolls in (the home page; globals.css .hw-arch). */
+  reveal?: boolean
+  /** The photo frame's shape when it isn't square (the home page's featured range). */
+  photoClassName?: string
+}) {
   const count = rangeSizeCount(r)
-  const image = r.image && <Image src={r.image} alt={r.imageAlt} fill loading={eager ? 'eager' : undefined} fetchPriority={eager ? 'high' : undefined} sizes={sizes} className="object-cover" />
+  const image = r.image && (
+    <Image
+      src={r.image}
+      alt={r.imageAlt}
+      fill
+      loading={eager ? 'eager' : undefined}
+      fetchPriority={eager ? 'high' : undefined}
+      sizes={sizes}
+      className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+    />
+  )
   return (
     // A container: narrow cards (two across a phone) stack the price under the name; wider ones set it beside.
     <Link href={`/ranges/${r.slug}`} className="group @container flex flex-col gap-3 text-ink no-underline hover:text-ink">
-      <span className="relative block aspect-square overflow-hidden rounded-[18px] bg-stone">
+      <span className={cn('relative block aspect-square overflow-hidden rounded-[18px] bg-stone', reveal && 'hw-arch', photoClassName)}>
         {image ? (
           eager ? (
             image
