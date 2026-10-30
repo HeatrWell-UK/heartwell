@@ -9,6 +9,10 @@
 // signed for: { asset_folder: "heartwell/social/posts", use_filename: true,
 // unique_filename: false, overwrite: true, tags: "heartwell-social" }.
 // The signature lasts about an hour.
+//
+// Once a post is live, Instagram and Facebook keep their own copies, so the
+// uploads can be deleted (everything tagged heartwell-social) along with
+// out/social-urls.json; that was done on 30 October 2026.
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
 import { join, basename } from 'node:path'
