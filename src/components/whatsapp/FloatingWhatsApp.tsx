@@ -9,8 +9,9 @@
 // A velvet circle with a gold rim and the WhatsApp mark (green only in the
 // mark, as everywhere on the site); on wide screens it says what it does. It
 // rides above whatever is fixed to the bottom of the screen (the cookie
-// question, the product page's buy bar) through --hw-cover-bottom, and sits
-// inside #page, so the menu and sheets cover it and make it inert.
+// question) through --hw-cover-bottom, and sits inside #page, so the menu and
+// sheets cover it and make it inert. On a product page the buy bar carries
+// WhatsApp itself, so this one steps aside there (globals.css, [data-buy-bar]).
 
 import { usePathname } from 'next/navigation'
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
@@ -43,6 +44,7 @@ export function FloatingWhatsApp() {
 
   return (
     <div
+      data-floating-whatsapp=""
       className="pointer-events-none fixed right-4 z-30 print:hidden lg:right-6"
       style={{ bottom: 'max(calc(16px + env(safe-area-inset-bottom)), calc(var(--hw-cover-bottom, 0px) + 12px))' }}
     >

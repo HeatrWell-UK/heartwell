@@ -2,7 +2,9 @@
 
 // The cookie question, answered in one tap: "Reject all" and "Accept all" look
 // exactly the same (equal weight, as the UK rules expect), with "Choose" for
-// anyone who wants to pick. It sits at the bottom and never blocks the page.
+// anyone who wants to pick. It sits at the bottom and never blocks the page,
+// and it's kept short (audit A1: it covered 28% of a phone's first screen,
+// over the product's name and price).
 
 import { useId, useRef, useState } from 'react'
 import { useBottomCover } from '@/lib/ui/bottom-cover'
@@ -25,31 +27,30 @@ export function ConsentBanner({ onChoose }: { onChoose: () => void }) {
       aria-labelledby={`${id}-title`}
       // Hidden before the first paint when a choice is already stored (see consentFlagScript).
       data-consent-banner=""
-      className="fixed inset-x-0 bottom-0 z-[60] border-t border-line bg-white px-4 pb-[calc(16px+env(safe-area-inset-bottom))] pt-4 shadow-[var(--shadow-overlay)] print:hidden"
+      className="fixed inset-x-0 bottom-0 z-[60] border-t border-line bg-white px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 shadow-[var(--shadow-overlay)] print:hidden lg:pb-4 lg:pt-4"
     >
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-3 lg:flex-row lg:items-center lg:gap-8">
-        <div className="flex flex-col gap-1">
-          <h2 id={`${id}-title`} className="font-sans text-base font-semibold">
-            Cookies
-          </h2>
-          <p className="text-[15px] leading-snug text-slate">
-            May we use cookies to see how the site is used and to measure our Facebook and Instagram ads? Your basket works either way.{' '}
-            <Link href="/cookies" className="font-semibold underline underline-offset-2">
-              More about cookies
-            </Link>
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-col gap-2">
-          <div className="grid grid-cols-2 gap-2">
-            <button type="button" onClick={() => saveConsent(NONE)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
-              Reject all
-            </button>
-            <button type="button" onClick={() => saveConsent(ALL)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
-              Accept all
-            </button>
-          </div>
-          <button type="button" onClick={onChoose} className="min-h-11 text-[15px] font-semibold text-velvet underline underline-offset-2">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-2.5 lg:flex-row lg:items-center lg:gap-8">
+        <h2 id={`${id}-title`} className="sr-only">
+          Cookies
+        </h2>
+        <p className="text-[14px] leading-snug text-slate lg:text-[15px]">
+          <strong className="font-semibold text-ink">Cookies?</strong> We&rsquo;d like to measure our Facebook and Instagram ads and see how the site is used. Your
+          basket works either way.{' '}
+          <button type="button" onClick={onChoose} className="font-semibold text-velvet underline underline-offset-2">
             Choose what to allow
+          </button>{' '}
+          or read{' '}
+          <Link href="/cookies" className="font-semibold underline underline-offset-2">
+            more about cookies
+          </Link>
+          .
+        </p>
+        <div className="grid shrink-0 grid-cols-2 gap-2 lg:w-[320px]">
+          <button type="button" onClick={() => saveConsent(NONE)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+            Reject all
+          </button>
+          <button type="button" onClick={() => saveConsent(ALL)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+            Accept all
           </button>
         </div>
       </div>

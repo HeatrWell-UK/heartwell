@@ -29,7 +29,8 @@ import { dealFor, dealLabel } from '@/lib/catalogue/deal'
 import { homeSwatches } from '@/lib/home/picks'
 import { bestOffer, welcomeOff, type ShopOffers } from '@/lib/offers/welcome'
 import type { Layout } from '@/lib/product/measurements'
-import { InfoIcon } from '@phosphor-icons/react'
+import { Medallion } from '@/components/catalogue/Arcade'
+import { InfoIcon, TruckIcon } from '@phosphor-icons/react'
 
 export type PurchaseProduct = Pick<
   ProductPageData,
@@ -67,6 +68,7 @@ export function ProductPurchase({
   offers,
   plans,
   crumbs,
+  deliveryWindow,
   children,
 }: {
   product: PurchaseProduct
@@ -75,6 +77,8 @@ export function ProductPurchase({
   plans: SizePlans
   /** Where the piece sits in the shop, shown at the top of the photos' velvet stage. */
   crumbs?: ReactNode
+  /** When most orders placed today arrive: "Tue 3 – Thu 5 November". */
+  deliveryWindow: string | null
   /** What an ad visitor’s offer takes off this piece (its tier's amount). */
   adAmount: number
   /** The welcome offer, the minimum order, and the ad offer's code and amounts. */
@@ -166,48 +170,63 @@ export function ProductPurchase({
   return (
     <>
       <div className="mx-auto max-w-[1200px] lg:grid lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-12 lg:px-6 lg:pt-4">
-        {/* The photos on a velvet stage, in their lit alcove: a band across phones, a panel beside the buy box on desktops. */}
+        {/*
+          The photos on a velvet stage, in their lit alcove: a band across phones, a panel beside the buy box on desktops.
+          On phones it's kept tight (audit A1), so the name and price are on the first screen under it, and the
+          "To pay today £0" coin stands on the photo's floor.
+        */}
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <div className="hw-velvet hw-gold-edge overflow-hidden px-4 pb-8 lg:rounded-[var(--radius-panel)] lg:border-b-0 lg:px-8 lg:pb-9">
+          <div className="hw-velvet hw-gold-edge overflow-hidden px-4 pb-5 lg:rounded-[var(--radius-panel)] lg:border-b-0 lg:px-8 lg:pb-9">
             {crumbs}
-            <div className={crumbs ? 'pt-1' : 'pt-5'}>
+            <div className={crumbs ? 'pt-0.5 lg:pt-1' : 'pt-4 lg:pt-5'}>
               <Gallery
                 key={variant?.id ?? 'none'}
                 images={images}
                 priority
                 caption={variant?.colourName ? [variant.colourName, variant.materialLabel].filter(Boolean).join(' ') : null}
-                overlay={<SaveButton slug={p.slug} sku={variant?.sku ?? null} noun={noun} className="right-1 top-1 size-11" />}
+                overlay={
+                  <>
+                    <SaveButton slug={p.slug} sku={variant?.sku ?? null} noun={noun} className="right-1 top-1 size-11" />
+                    {variant && <Medallion label="To pay today" value="£0" small />}
+                  </>
+                }
               />
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col px-4 pt-5 lg:px-0 lg:pt-2">
+        <div className="flex flex-col px-4 pt-3.5 lg:px-0 lg:pt-2">
           <div className="flex flex-col gap-3">
-            {(p.madeToOrder || p.madeInUk) && (
-              <div className="flex flex-wrap gap-2">
-                {p.madeToOrder && <Badge>Made to order</Badge>}
-                {p.madeInUk && <Badge>Made in the UK</Badge>}
-              </div>
-            )}
-            {/* "Salone" over "5 seater corner": the same name and size the tiles use; the full title is still the heading's text. */}
-            <h1 className="flex flex-col gap-1.5">
-              <span className="text-[40px] leading-none lg:text-[52px]">{heading.name}</span>
-              {heading.detail && <span className="font-sans text-[17px] leading-snug tracking-normal text-slate">{heading.detail}</span>}
-            </h1>
-            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5 pt-1">
-              {deal && <span className="sr-only">Now </span>}
-              <Price amount={price} className="text-[34px] leading-none" />
-              {deal && (
-                <>
-                  <s className="font-display text-[21px] leading-none text-slate decoration-[1.5px]">
-                    <span className="sr-only">, was </span>
-                    {formatPrice(deal.was)}
-                  </s>
-                  <span className="self-center rounded-full bg-gold-pale px-2.5 py-1 text-[13px] font-semibold leading-none text-wine">{dealLabel(deal, formatPrice)}</span>
-                </>
-              )}
-              <span className="text-[15px] font-semibold text-velvet">Free delivery for most postcodes</span>
+            {/*
+              "Salone" over "5 seater corner": the same name and size the tiles use; the full title is still the heading's text.
+              The price stands beside the name (audit A1), so both are on a phone's first screen above the buy bar.
+            */}
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="flex min-w-0 flex-col gap-1.5">
+                <span className={cn('leading-none', heading.name.length > 12 ? 'text-[32px] lg:text-[44px]' : 'text-[40px] lg:text-[52px]')}>{heading.name}</span>
+                {heading.detail && <span className="font-sans text-[17px] leading-snug tracking-normal text-slate">{heading.detail}</span>}
+              </h1>
+              <p className="flex shrink-0 flex-col items-end gap-1.5 pt-0.5 text-right">
+                {deal && <span className="sr-only">Now </span>}
+                <Price amount={price} className="text-[34px] leading-none lg:text-[40px]" />
+                {deal && (
+                  <span className="flex items-center gap-2">
+                    <s className="font-display text-[19px] leading-none text-slate decoration-[1.5px]">
+                      <span className="sr-only">, was </span>
+                      {formatPrice(deal.was)}
+                    </s>
+                    <span className="rounded-full bg-gold-pale px-2.5 py-1 text-[13px] font-semibold leading-none text-wine">{dealLabel(deal, formatPrice)}</span>
+                  </span>
+                )}
+              </p>
+            </div>
+            {/* Delivery, with this week's real dates: what people from ads ask first. */}
+            <p className="flex items-start gap-2.5 text-[15px] leading-snug">
+              <TruckIcon aria-hidden="true" size={22} className="shrink-0 text-velvet" />
+              <span className="flex flex-col">
+                <span className="font-semibold text-velvet">Free delivery for most postcodes</span>
+                {deliveryWindow && <span className="text-slate">Usually with you {deliveryWindow}</span>}
+              </span>
             </p>
             {showWelcome && <WelcomePanel state={welcome} amount={welcomeAmount} hours={offers.welcome.hours} noun={noun} />}
             {/* What's paid when: the shop's whole promise, in two lines. */}
@@ -229,8 +248,15 @@ export function ProductPurchase({
             {!showWelcome && <OfferStrip amount={Math.min(adAmount, price)} noun={noun} code={offers.code} />}
           </div>
 
+          {(p.madeToOrder || p.madeInUk) && (
+            <div className="flex flex-wrap gap-2 pt-5">
+              {p.madeToOrder && <Badge>Made to order</Badge>}
+              {p.madeInUk && <Badge>Made in the UK</Badge>}
+            </div>
+          )}
+
           {p.variants.length > 0 && (
-            <fieldset className="mt-6 flex flex-col gap-3">
+            <fieldset className="mt-5 flex flex-col gap-3">
               <legend className="pb-3 text-[15px]">
                 <span className="font-semibold">Colour: </span>
                 <span className="text-slate">{fabric ? `${fabric.fabric.name}, ${fabric.collection.name}` : (variant?.colourName ?? 'As shown')}</span>
@@ -379,9 +405,18 @@ export function ProductPurchase({
         </div>
       </div>
 
-      {/* The floating WhatsApp button asks about this piece, in the colour or fabric chosen. */}
+      {/* The floating WhatsApp button asks about this piece, in the colour or fabric chosen (it steps aside for the buy bar's own). */}
       <WhatsAppTopic message={waMessage} context="sticky-product" productId={p.id} variantId={variant?.id} productName={p.title} />
-      {variant && <StickyBuyBar price={price} onAdd={addToBasket} watch={addRef} />}
+      {variant && (
+        <StickyBuyBar
+          price={price}
+          onAdd={addToBasket}
+          watch={addRef}
+          name={heading.name}
+          detail={[heading.detail, option].filter(Boolean).join(' · ') || null}
+          whatsApp={{ message: waMessage, context: 'sticky-product', productId: p.id, variantId: variant.id, productName: p.title, noun }}
+        />
+      )}
       <AddedSheet item={added} offers={offers} onClose={() => setAdded(null)} />
       {p.madeToOrder && (
         <FabricSheet

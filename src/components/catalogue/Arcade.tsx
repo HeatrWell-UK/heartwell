@@ -79,12 +79,22 @@ export function Arcade({
   )
 }
 
-/** A gold coin on the middle alcove: "To pay today £0", "from £429". Longer figures are set smaller, so they stay inside it. */
-export function Medallion({ label, value }: { label: string; value: string }) {
-  const size = value.length <= 2 ? 'text-[44px] lg:text-[52px]' : value.length <= 4 ? 'text-[34px] lg:text-[40px]' : 'text-[27px] lg:text-[32px]'
+/**
+ * A gold coin on the middle alcove: "To pay today £0", "from £429". Longer
+ * figures are set smaller, so they stay inside it. `small` for the product
+ * page's photo, where it sits on the floor at the alcove's foot.
+ */
+export function Medallion({ label, value, small = false }: { label: string; value: string; small?: boolean }) {
+  const size = small
+    ? 'text-[30px] lg:text-[36px]'
+    : value.length <= 2
+      ? 'text-[44px] lg:text-[52px]'
+      : value.length <= 4
+        ? 'text-[34px] lg:text-[40px]'
+        : 'text-[27px] lg:text-[32px]'
   return (
-    <p className="hw-medallion">
-      <span className="text-[13px] font-semibold lg:text-[14px]">{label}</span>
+    <p className={cn('hw-medallion', small && 'hw-medallion-sm')}>
+      <span className={cn('font-semibold', small ? 'text-[11px] lg:text-[12px]' : 'text-[13px] lg:text-[14px]')}>{label}</span>
       <span className={cn('font-display leading-none', size)}>{value}</span>
     </p>
   )

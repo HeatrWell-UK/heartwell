@@ -103,6 +103,33 @@ export function Gallery({
 
         {caption && <span className="hw-plate pointer-events-none truncate text-[14px] font-semibold leading-tight text-gold-pale">{caption}</span>}
 
+        {/*
+          Phones: the dots sit on the photo's floor, just above the plate, so a piece with several photos
+          takes no more height than one with a single photo (audit A1). They're buttons too (24px targets),
+          so every photo is one tap away without swiping.
+        */}
+        {images.length > 1 && (
+          <div className="absolute inset-x-0 bottom-[26px] z-[2] flex justify-center lg:hidden">
+            <div className="flex rounded-full bg-[rgb(26_3_8/0.5)] px-1">
+              {images.map((img, i) => (
+                <button
+                  key={img.src}
+                  type="button"
+                  aria-label={`Photo ${i + 1} of ${images.length}`}
+                  aria-current={i === index ? 'true' : undefined}
+                  onClick={() => {
+                    setShowRest(true)
+                    go(i)
+                  }}
+                  className="flex h-6 min-w-6 items-center justify-center px-[3px]"
+                >
+                  <span className={cn('h-1.5 rounded-full transition-[width] duration-200', i === index ? 'w-5 bg-gold-pale' : 'w-1.5 bg-white/60')} />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {images.length > 1 && (
           <>
             <button
@@ -153,27 +180,6 @@ export function Gallery({
             </li>
           ))}
         </ul>
-      )}
-
-      {/* The dots are buttons too (24px targets), so every photo is one tap away without swiping. */}
-      {images.length > 1 && (
-        <div className="flex justify-center pt-7 lg:hidden">
-          {images.map((img, i) => (
-            <button
-              key={img.src}
-              type="button"
-              aria-label={`Photo ${i + 1} of ${images.length}`}
-              aria-current={i === index ? 'true' : undefined}
-              onClick={() => {
-                setShowRest(true)
-                go(i)
-              }}
-              className="flex h-6 min-w-6 items-center justify-center px-[3px]"
-            >
-              <span className={cn('h-1.5 rounded-full transition-[width] duration-200', i === index ? 'w-5 bg-gold-pale' : 'w-1.5 bg-white/35')} />
-            </button>
-          ))}
-        </div>
       )}
     </section>
   )
