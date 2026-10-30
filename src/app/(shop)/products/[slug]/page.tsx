@@ -116,7 +116,8 @@ export default async function ProductPage({ params, searchParams }: Props) {
         adAmount={tierAmount(product.offerTier, offers.amounts)}
         offers={shopOffers(offers)}
         plans={plans}
-        crumbs={crumbs.length > 0 ? <Breadcrumbs items={crumbs} onVelvet contained /> : null}
+        crumbs={crumbs.length > 0 ? <Breadcrumbs items={crumbs} onVelvet contained dense /> : null}
+        deliveryWindow={delivery.windowLabel}
       >
         <PostcodeCheck windowLabel={delivery.windowLabel} areas={delivery.areas} noDeliveryDays={delivery.noDeliveryDays} />
         <PromiseRows madeToOrder={product.madeToOrder} />

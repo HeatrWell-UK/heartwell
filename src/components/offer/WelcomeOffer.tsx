@@ -101,34 +101,31 @@ function TimeForReaders({ state, hours }: { state: WelcomeState; hours: number }
 }
 
 /**
- * Product pages: the offer on this piece, with the countdown. Rendered on the
- * server too (time unknown, dashes), so it never pushes the page down when the
- * time arrives; it goes only for a visitor whose offer has ended.
+ * Product pages: the offer on this piece, with the countdown, in one row by
+ * the price (audit A1: it was a 180 px panel pushing the options down on
+ * phones). Rendered on the server too (time unknown, dashes), so it never
+ * pushes the page down when the time arrives; it goes only for a visitor whose
+ * offer has ended. The end time in words is for screen readers and the title.
  */
 export function WelcomePanel({ state, amount, hours, noun, className }: { state: WelcomeState; amount: number; hours: number; noun: string; className?: string }) {
   if (state.kind === 'none') return null
   return (
     <section
       aria-label="Welcome offer"
-      className={cn('flex flex-col gap-3 rounded-[16px] bg-gold-tint px-4 py-3.5 shadow-[inset_0_0_0_1px_rgba(181,138,47,.45)] sm:flex-row sm:items-center sm:justify-between', className)}
+      title={state.kind === 'live' ? `Ends ${endTimeText(state.ends)}` : undefined}
+      className={cn('flex items-center justify-between gap-2.5 rounded-[14px] bg-gold-tint py-2 pl-3 pr-2 shadow-[inset_0_0_0_1px_rgba(181,138,47,.45)]', className)}
     >
-      <p className="flex gap-3 text-[15px] leading-snug">
-        <HeartIcon aria-hidden="true" size={22} weight="fill" className="mt-0.5 shrink-0 text-gold-dark" />
-        <span className="flex flex-col gap-0.5">
-          <strong className="font-semibold text-ink">
-            Welcome offer: {formatPrice(amount)} off this {noun}
+      <p className="flex min-w-0 items-center gap-2 leading-snug">
+        <HeartIcon aria-hidden="true" size={18} weight="fill" className="hidden shrink-0 text-gold-dark min-[400px]:block" />
+        <span className="flex min-w-0 flex-col">
+          <strong className="text-[15px] font-semibold text-ink">
+            {formatPrice(amount)} off this {noun}
           </strong>
-          <span className="text-slate">
-            Taken off at checkout, no code needed.
-            {state.kind === 'live' && <span className="block text-[13px]">Ends {endTimeText(state.ends)}.</span>}
-          </span>
+          <span className="text-[13px] text-slate">Welcome offer, no code needed</span>
           <TimeForReaders state={state} hours={hours} />
         </span>
       </p>
-      <span className="flex items-center gap-2 self-start pl-[34px] sm:self-center sm:pl-0">
-        <span className="text-[13px] font-semibold text-wine sm:hidden">Ends in</span>
-        <Countdown state={state} />
-      </span>
+      <Countdown state={state} size="sm" />
     </section>
   )
 }

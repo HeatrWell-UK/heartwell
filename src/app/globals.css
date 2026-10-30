@@ -180,6 +180,9 @@ html:has(dialog.hw-sheet[open]) { overflow: hidden; }
 html { scroll-padding-bottom: calc(var(--hw-cover-bottom, 0px) + 80px); }
 body { padding-bottom: var(--hw-cover-bottom, 0px); }
 
+/* The product page's buy bar carries WhatsApp, so the floating button steps aside there (from the first paint). */
+#page:has([data-buy-bar]) [data-floating-whatsapp] { display: none; }
+
 /* A stored cookie choice hides the server-drawn banner before the first paint (consentFlagScript). */
 html[data-consent='set'] [data-consent-banner] { display: none; }
 
@@ -332,6 +335,11 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
   }
   @media (min-width: 1024px) {
     .hw-medallion { width: 120px; right: -9%; }
+  }
+  /* The product photo's coin: smaller, on the oak floor at the alcove's right foot, clear of the furniture and the colour plate. */
+  .hw-medallion.hw-medallion-sm { width: 82px; right: -8px; bottom: 7%; gap: 1px; }
+  @media (min-width: 1024px) {
+    .hw-medallion.hw-medallion-sm { width: 100px; right: -16px; }
   }
   /* The button stands on the oak floor of the room photo. */
   .hw-alcove-floor {

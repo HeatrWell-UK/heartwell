@@ -71,6 +71,8 @@ export const POLICIES = {
 
 /** The one sentence in the bar at the top of every page. */
 export const ANNOUNCEMENT = 'Free delivery to most postcodes. Pay nothing until it arrives.'
+/** The same on phones, short enough for one line (audit A1). */
+export const ANNOUNCEMENT_SHORT = 'Free delivery to most postcodes · Pay on delivery'
 
 /** Default meta description. */
 export const META_DESCRIPTION =
