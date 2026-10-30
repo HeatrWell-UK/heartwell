@@ -865,6 +865,16 @@ Not wanted (owner): a registered company or legal details on the site, Meta Busi
 - **Phone test:** a new visit shows the panel and the countdown on a product page; the basket takes £20 per piece off and won't check out under £399; a was-price set in the admin shows struck through with the % off.
 - **Done means:** the database gives every order exactly one offer and refuses website orders under the minimum; the countdown matches the database's end time and never restarts.
 
+### Audit fixes A1–A4 (whole-site audit, 31 October 2026)
+
+- **Goal:** the site at its best on phones and for ads, above all the product page where every catalogue ad lands. Findings and evidence in `docs/AUDIT.md`.
+- **A1 — Product page first screen and buying on phones:** a tighter photo stage and a one-line announcement, so the name, price and "£0 to pay today" are on the first screen at 375 × 667; the sticky buy bar whenever the main button is off screen (with a WhatsApp icon, and no floating button over the page's controls); the real delivery dates by the price; the welcome offer as one compact row; a shorter cookie banner with equal choices. Check at 375 × 667, 390 × 664 (Instagram's browser) and 360 × 740.
+- **A2 — Product photos:** close-ups cut from each photo (the crops measured in `design/social/products/copy.mjs`), the fabric's swatch photo and the drawn top view as extra gallery photos; full-screen view with pinch to zoom; the extra photos in the Meta and Google feeds (`additional_image_link`).
+- **A3 — Search and listings:** product titles and headings built from the piece's data with "sofa" and the cover (`docs/KEYWORDS.md` updated); `og:type` product; the home page's colour-only link; tiles lead with a colourway that passes the showcase rule; tile labels that differ (electric, deal, ready made).
+- **A4 — Caching for ad traffic:** product and category pages prerendered and cached, with the variant, fabric and filters read without making the page dynamic; `x-nextjs-cache: HIT` and faster first byte on the live site.
+- **Prompts:** `Audit step A<n>. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/AUDIT.md, then build step A<n> (…).` (full prompts in `docs/AUDIT.md`).
+- **Owner:** the Meta ad account, an address finder key, the open search steps, Google reviews, and a check on made-to-order returns (`docs/AUDIT.md`, "What only the owner can do").
+
 ---
 
 ### Later phases (after launch, one prompt each, in suggested order)
