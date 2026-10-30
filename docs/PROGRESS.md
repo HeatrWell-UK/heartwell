@@ -51,6 +51,11 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 30 October 2026 — Social slides removed from Cloudinary
+- **Owner's request:** delete the uploaded post slides from Cloudinary. They were there only because the Instagram and Facebook publishing APIs fetch images from a public address; both keep their own copies once a post is live.
+- **Done:** all 172 (158 range slides, 14 pinned) deleted from `heartwell/social/posts` (tag `heartwell-social`), cache cleared; Cloudinary now has none. Checked: the old addresses return 404, and the published Facebook post still shows all its photos from Facebook. `out/social-urls.json` removed, so `upload.mjs` uploads afresh next time.
+- **From now on:** upload, publish, check the posts, then delete the uploads.
+
 ### 31 October 2026 — The lit gallery on the product page
 - **Owner's request:** the product page next, in the same gallery look.
 - **Done:** the photos now sit on a velvet stage, a full-width band on phones and a rounded panel beside the buy box on desktops. The breadcrumb is at its top, and the photos swipe inside a gold-rimmed alcove that lights up as the page opens. The colour name is on a plate at the alcove's foot, and the save heart sits by the arch's shoulder. Dots are gold on velvet; desktop thumbnails are small arches. "You might also like" cards are arched too.
