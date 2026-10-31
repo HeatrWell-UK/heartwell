@@ -22,7 +22,7 @@ Phase 20, 18 October 2026. Every page Google can index has a search it's written
 | `/sofas/armchairs-and-footstools` | armchair and footstool to match sofa | reclining armchair | same |
 | `/ranges` | sofa ranges | | `src/app/(shop)/ranges/page.tsx` |
 | `/ranges/<range>` | "<range> sofa", "<range> corner sofa", "<range> sofa dimensions" | what colours, high back or scatter back, made to order, delivery, can I see it | `src/app/(shop)/ranges/[slug]/page.tsx`, answers in `src/lib/seo/answers.ts` |
-| `/products/<piece>` | the piece by name and size ("roma recliner sofa 3+2 dimensions", "orlando electric recliner sofa") | how big, cover and colours, delivery, paying, fit, returns, extras | product title and description (database), answers in `src/lib/seo/answers.ts` |
+| `/products/<piece>` | the piece by name, size, "sofa" and cover ("ashton corner sofa", "grey velvet corner sofa", "roma recliner sofa 3+2 dimensions", "orlando electric recliner sofa") | how big, cover and colours, delivery, paying, fit, returns, extras | page title built from the piece's data ("Ashton 5 Seater Corner Sofa, High Back, Grey Plush Velvet": `src/lib/product/naming.ts`, audit A3) unless the product has its own SEO title (Admin); the heading's second line says "5 seater corner sofa, high back"; description (database); answers in `src/lib/seo/answers.ts`. The product's own title (orders, OrderFlow, feeds) is unchanged |
 | `/fabrics` | sofa fabrics, plush velvet colours | | `src/app/(shop)/fabrics/page.tsx` |
 | `/fabric-samples` | sofa fabric samples | | `src/app/(shop)/fabric-samples/page.tsx` |
 

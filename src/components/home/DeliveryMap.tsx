@@ -35,7 +35,10 @@ export function DeliveryMap({ delivery }: { delivery: DeliveryInfo | null }) {
           {charges && (
             <>
               {PROMISES.delivery.chargedAreas} pay {charges} and take {PROMISES.delivery.chargedTiming} (
-              <Link href="/delivery-and-returns#areas">see the areas</Link>).{' '}
+              <Link href="/delivery-and-returns#areas" className="underline">
+                see the areas
+              </Link>
+              ).{' '}
             </>
           )}
           Northern Ireland and the islands are delivered by arrangement. {delivery ? deliveryDaysText(delivery.noDeliveryDays) : ''}

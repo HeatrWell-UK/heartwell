@@ -7,6 +7,7 @@ import { categoryHref, childrenOf, type CategoryNode } from './tree'
 import type { ListingProduct } from './listing-types'
 import type { Piece } from './clean'
 import { measurementLayout } from '@/lib/product/measurements'
+import { leadColourway } from './lead'
 
 /** Cache tag the admin revalidates when the catalogue changes (Phase 12). */
 export const CATALOGUE_TAG = 'catalogue'
@@ -63,7 +64,7 @@ export const getListing = unstable_cache(
       const type = one(p.type)
       const range = one(p.range)
       const variants = [...p.variants].sort(bySort)
-      const shown = variants.find((v) => v.image_url) ?? variants[0]
+      const shown = leadColourway(variants, (v) => ({ sku: v.sku, hex: v.colour_hex, image: v.image_url }))
       return {
         slug: p.slug,
         title: p.title,
@@ -101,7 +102,7 @@ export const getListing = unstable_cache(
       }
     })
   },
-  ['listing-v4'],
+  ['listing-v5'],
   { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
 )
 
