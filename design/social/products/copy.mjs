@@ -16,13 +16,15 @@
 //   short       the name on the covers when the range's name is long ("Michigan Electric Recliner" → "Michigan")
 //   cover       the piece whose photo leads the post; coverColour picks its colour
 //   tagline     the line under the name (velvet cover, alt text); sub: the editorial cover's line
-//   details     close-ups: a square {x, y, s} of a piece's original 1254 px photo (colour optional), with a label
+//   details     close-ups, from src/content/close-ups.ts (merged in at the end of this file)
 //   detailsLine the sentence under the close-ups
 //   callouts    labels on the bold cover's photo: the dot and the label's top-left, in px on the 1080 px photo
 //   coverTile   the editorial cover's second photo and its label (default: a size away from the cover's)
 //   photoNotes  something in a photo that doesn't come with the piece, said on the photo ("slug" or "slug|Colour")
 //   optionSubs  a line under a piece's name (what a set holds)
 //   altDetail   a detail for every photo's alt text
+
+import { CLOSE_UPS } from '../../../src/content/close-ups.ts'
 
 const WHATSAPP = '07460 669864'
 const NUMBERS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
@@ -68,11 +70,6 @@ export const COPY = {
     cover: 'ashton-high-back-u-shape',
     tagline: 'Plush velvet · Deep-buttoned · Made in the UK',
     sub: 'Plush velvet, deep-buttoned, made in the UK',
-    details: [
-      { label: 'Deep-buttoned arms', photo: 'ashton-high-back-2-seater', x: 60, y: 600, s: 330 },
-      { label: 'Polished chrome feet', photo: 'ashton-high-back-2-seater', x: 70, y: 820, s: 240 },
-      { label: 'Plush velvet with a soft sheen', photo: 'ashton-high-back-2-seater', x: 330, y: 500, s: 300 },
-    ],
     detailsLine: 'Every cushion included, and made to order in the UK.',
     callouts: [
       { label: 'Plush velvet', dot: [540, 470], pill: [440, 290] },
@@ -131,11 +128,6 @@ export const COPY = {
     cover: 'verona-scattered-back-5-seater-corner',
     tagline: 'Scrolled arms · Full or scattered back · Made in the UK',
     sub: 'Scrolled arms, a full or scattered back, made in the UK',
-    details: [
-      { label: 'Scrolled arms', photo: 'verona-high-back-2-seater', x: 40, y: 560, s: 340 },
-      { label: 'Scattered back of loose cushions', photo: 'verona-scattered-back-2-seater', x: 440, y: 400, s: 360 },
-      { label: 'Soft textured fabric', photo: 'verona-high-back-2-seater', x: 300, y: 640, s: 240 },
-    ],
     detailsLine: 'Every cushion included, and made to order in the UK.',
     callouts: [
       { label: 'Scrolled arms', dot: [235, 650], pill: [40, 820] },
@@ -160,11 +152,6 @@ export const COPY = {
     coverColour: 'Black',
     tagline: 'Manual reclining · Leather Aire or fabric · Ready made',
     sub: 'Reclines by hand, in Leather Aire or fabric',
-    details: [
-      { label: 'Pull the lever to recline', photo: 'roma-recliner-manual-armchair', x: 250, y: 620, s: 240 },
-      { label: 'Padded arms', photo: 'roma-recliner-manual-armchair', x: 780, y: 560, s: 300 },
-      { label: 'Leather Aire, soft and leather-look', photo: 'roma-recliner-manual-armchair', x: 360, y: 400, s: 330 },
-    ],
     detailsLine: 'No cables or plugs to find room for.',
     ...post({
       hook: (d) => `Recline by hand, no plugs or cables. Roma starts at ${d.from}.`,
@@ -180,11 +167,6 @@ export const COPY = {
     cover: 'salone-armed-u-shape',
     tagline: 'Plush velvet · Chrome feet · Made in the UK',
     sub: 'Seven shapes on polished chrome feet',
-    details: [
-      { label: 'Plush velvet cushions', photo: 'salone-2-seater', x: 600, y: 480, s: 300 },
-      { label: 'Polished chrome feet', photo: 'salone-2-seater', x: 140, y: 760, s: 220 },
-      { label: 'Clean, square arms', photo: 'salone-2-seater', x: 880, y: 560, s: 300 },
-    ],
     detailsLine: 'Every cushion included, and made to order in the UK.',
     altDetail: 'on polished chrome feet',
     ...post({
@@ -201,11 +183,6 @@ export const COPY = {
     cover: 'sims-high-back-5-seater-corner',
     tagline: 'Channel-stitched arms · High or scattered back · Made in the UK',
     sub: 'Channel-stitched arms, a high or scattered back',
-    details: [
-      { label: 'Channel-stitched arms', photo: 'sims-high-back-3-2-seater', x: 30, y: 570, s: 300 },
-      { label: 'Plush velvet', photo: 'sims-high-back-3-2-seater', x: 300, y: 500, s: 260 },
-      { label: 'Loose scatter cushions', photo: 'sims-scattered-back-3-2-seater', x: 150, y: 560, s: 330 },
-    ],
     detailsLine: 'Every cushion included, and made to order in the UK.',
     callouts: [
       { label: 'Channel-stitched arms', dot: [110, 660], pill: [40, 830] },
@@ -228,11 +205,6 @@ export const COPY = {
     cover: 'nova-electric-recliner-corner',
     tagline: 'Electric reclining · Tech leather · USB and cup holders',
     sub: 'Electric reclining in tech leather that wipes clean',
-    details: [
-      { label: 'Reclines at the touch of a button', photo: 'nova-electric-recliner-3-2-seater', x: 120, y: 520, s: 360 },
-      { label: 'Tech leather that wipes clean', photo: 'nova-electric-recliner-2-seater', x: 300, y: 520, s: 260 },
-      { label: 'Cup holders and storage', photo: 'nova-electric-recliner-2-seater', x: 470, y: 600, s: 300 },
-    ],
     detailsLine: 'USB ports, cup holders and storage built in.',
     ...post({
       hook: (d) => `Recline at the touch of a button, with USB ports and cup holders built in. Nova starts at ${d.from}.`,
@@ -248,11 +220,6 @@ export const COPY = {
     cover: 'malibu-high-back-3-seater',
     tagline: 'High back · Natural colours · Made in the UK',
     sub: 'A high back and calm, natural colours',
-    details: [
-      { label: 'Bolster and scatter cushions', photo: 'malibu-high-back-2-seater', x: 250, y: 500, s: 340 },
-      { label: 'Deep-buttoned base', photo: 'malibu-high-back-2-seater', x: 380, y: 740, s: 260 },
-      { label: 'Stud trim and turned feet', photo: 'malibu-high-back-2-seater', x: 100, y: 760, s: 260 },
-    ],
     detailsLine: 'Every cushion included, and made to order in the UK.',
     // The oatmeal corner photo has a buttoned footstool in front; no Malibu footstool is sold.
     photoNotes: { 'malibu-high-back-5-seater-corner|Oatmeal': 'Footstool not included' },
@@ -270,11 +237,6 @@ export const COPY = {
     cover: 'lily-5-seater-corner',
     tagline: 'Round bolsters · Plump cushions · Made in the UK',
     sub: 'Round bolsters and plump cushions',
-    details: [
-      { label: 'Pleated arms and round bolsters', photo: 'lily-3-seater', x: 60, y: 540, s: 330 },
-      { label: 'Deep, plump back cushions', photo: 'lily-3-seater', x: 360, y: 440, s: 300 },
-      { label: 'Soft, generous seats', photo: 'lily-3-seater', x: 300, y: 600, s: 260 },
-    ],
     detailsLine: 'A sofa for sinking into, made to order in the UK.',
     callouts: [
       { label: 'Round bolsters', dot: [875, 610], pill: [640, 820] },
@@ -297,11 +259,6 @@ export const COPY = {
     coverColour: 'Grey',
     tagline: 'Electric reclining · LED lights · Speakers and wireless charging',
     sub: 'Electric reclining, LED lights and Bluetooth speakers',
-    details: [
-      { label: 'Cup holders and wireless charging', photo: 'michigan-electric-recliner-2-seater', x: 620, y: 560, s: 300 },
-      { label: 'Bluetooth speakers', photo: 'michigan-electric-recliner-2-seater', x: 500, y: 360, s: 280 },
-      { label: 'LED lights along the base', photo: 'michigan-electric-recliner-2-seater', x: 600, y: 790, s: 300 },
-    ],
     detailsLine: 'Adjustable headrests, USB and USB-C, and a storage console.',
     ...post({
       hook: (d) => `LED lights, speakers and wireless charging, in a sofa that reclines. Michigan starts at ${d.from}.`,
@@ -318,11 +275,6 @@ export const COPY = {
     cover: 'hannah-electric-3-2-seater',
     tagline: 'Electric reclining · USB and cup holders · Soft micro fabric',
     sub: 'Electric reclining in soft micro fabric',
-    details: [
-      { label: 'Reclines at the touch of a button', photo: 'hannah-electric-3-2-seater', x: 440, y: 480, s: 300 },
-      { label: 'Cup holders built in', photo: 'hannah-electric-3-2-seater', x: 780, y: 470, s: 260 },
-      { label: 'Soft micro fabric', photo: 'hannah-electric-3-2-seater', x: 30, y: 540, s: 300 },
-    ],
     detailsLine: 'Cup holders and USB ports, all within reach.',
     ...post({
       hook: (d) => `Electric reclining, cup holders and USB ports, in soft micro fabric. Hannah, from ${d.from}.`,
@@ -339,11 +291,6 @@ export const COPY = {
     cover: 'rio-chesterfield-5-seater-corner',
     tagline: 'Chesterfield arms · Deep buttoning · Made in the UK',
     sub: 'Chesterfield scroll arms and deep buttoning',
-    details: [
-      { label: 'Chesterfield scroll arms', photo: 'rio-chesterfield-2-seater', x: 60, y: 540, s: 340 },
-      { label: 'Deep buttoning', photo: 'rio-chesterfield-2-seater', x: 420, y: 760, s: 240 },
-      { label: 'Dark wooden feet', photo: 'rio-chesterfield-2-seater', x: 890, y: 820, s: 240 },
-    ],
     detailsLine: 'Foam seats, fibre-filled backs, and made to order in the UK.',
     callouts: [
       { label: 'Chesterfield scroll arms', dot: [150, 650], pill: [40, 830] },
@@ -365,11 +312,6 @@ export const COPY = {
     cover: 'harrison-scattered-back-5-seater-corner',
     tagline: 'Stud-trimmed arms · Foam seats · Made in the UK',
     sub: 'A 5 seater corner with stud-trimmed curved arms',
-    details: [
-      { label: 'Curved arms with stud trim', photo: 'harrison-scattered-back-5-seater-corner', x: 60, y: 560, s: 320 },
-      { label: 'Foam seat cushions', photo: 'harrison-scattered-back-5-seater-corner', x: 250, y: 600, s: 260 },
-      { label: 'Fibre-filled back cushions', photo: 'harrison-scattered-back-5-seater-corner', x: 380, y: 480, s: 300 },
-    ],
     detailsLine: 'Made to order in the UK.',
     ...post({
       hook: (d) => `A 5 seater corner with stud-trimmed curved arms, for ${d.from}. This is Harrison.`,
@@ -385,11 +327,6 @@ export const COPY = {
     cover: 'oakland-scattered-back-5-seater-corner',
     tagline: 'Faux leather · Rolled arms with studs · Made in the UK',
     sub: 'Faux leather with rolled, stud-trimmed arms',
-    details: [
-      { label: 'Rolled arms with stud trim', photo: 'oakland-scattered-back-5-seater-corner', x: 20, y: 540, s: 300 },
-      { label: 'Dark wooden feet', photo: 'oakland-scattered-back-5-seater-corner', x: 860, y: 700, s: 200 },
-      { label: 'Faux leather that wipes clean', photo: 'oakland-scattered-back-5-seater-corner', x: 400, y: 520, s: 280 },
-    ],
     detailsLine: 'Foam seats, fibre-filled backs, and made to order in the UK.',
     ...post({
       hook: (d) => `Faux leather, rolled arms and studs: Oakland is a 5 seater corner for ${d.from}.`,
@@ -405,11 +342,6 @@ export const COPY = {
     cover: 'olympia-scattered-back-5-seater-corner',
     tagline: 'Navy velvet · Deep-buttoned scroll arms · Chrome feet',
     sub: 'Deep-buttoned scroll arms on chrome feet',
-    details: [
-      { label: 'Deep-buttoned scroll arms', photo: 'olympia-scattered-back-5-seater-corner', x: 20, y: 540, s: 320 },
-      { label: 'Chrome feet', photo: 'olympia-scattered-back-5-seater-corner', x: 140, y: 760, s: 200 },
-      { label: 'Plush velvet', photo: 'olympia-scattered-back-5-seater-corner', x: 260, y: 480, s: 260 },
-    ],
     detailsLine: 'Foam seats, fibre-filled backs, and made to order in the UK.',
     callouts: [
       { label: 'Deep-buttoned scroll arms', dot: [85, 568], pill: [40, 760] },
@@ -430,11 +362,6 @@ export const COPY = {
     cover: 'ruby-scattered-back-5-seater-corner',
     tagline: 'Chrome stud trim · Chrome feet · Made in the UK',
     sub: 'Square arms edged in chrome studs',
-    details: [
-      { label: 'Square arms with chrome studs', photo: 'ruby-scattered-back-5-seater-corner', x: 30, y: 560, s: 300 },
-      { label: 'Chrome feet', photo: 'ruby-scattered-back-5-seater-corner', x: 120, y: 740, s: 200 },
-      { label: 'Fibre-filled back cushions', photo: 'ruby-scattered-back-5-seater-corner', x: 440, y: 480, s: 260 },
-    ],
     detailsLine: 'Made to order in the UK.',
     ...post({
       hook: (d) => `Square arms edged in chrome studs. Ruby is a 5 seater corner for ${d.from}.`,
@@ -450,11 +377,6 @@ export const COPY = {
     cover: 'shannon-scattered-back-5-seater-corner',
     tagline: 'Faux leather arms · Fabric seats · Chrome feet',
     sub: 'Faux leather arms and fabric seats',
-    details: [
-      { label: 'Faux leather arms', photo: 'shannon-scattered-back-5-seater-corner', x: 20, y: 580, s: 300 },
-      { label: 'Chrome feet', photo: 'shannon-scattered-back-5-seater-corner', x: 130, y: 770, s: 200 },
-      { label: 'Fabric seats, fibre-filled backs', photo: 'shannon-scattered-back-5-seater-corner', x: 300, y: 560, s: 260 },
-    ],
     detailsLine: 'Made to order in the UK.',
     ...post({
       hook: (d) => `Faux leather where hands rest, soft fabric where you sit. Shannon is a 5 seater corner for ${d.from}.`,
@@ -470,11 +392,6 @@ export const COPY = {
     cover: 'tango-scattered-back-5-seater-corner',
     tagline: 'Scrolled faux leather arms · Two-tone · Made in the UK',
     sub: 'Scrolled faux leather arms in a two-tone finish',
-    details: [
-      { label: 'Scrolled faux leather arms', photo: 'tango-scattered-back-5-seater-corner', x: 20, y: 540, s: 300 },
-      { label: 'Two-tone fabric and faux leather', photo: 'tango-scattered-back-5-seater-corner', x: 300, y: 560, s: 280 },
-      { label: 'Fibre-filled back cushions', photo: 'tango-scattered-back-5-seater-corner', x: 420, y: 440, s: 260 },
-    ],
     detailsLine: 'Foam seats, fibre-filled backs, and made to order in the UK.',
     callouts: [
       { label: 'Scrolled faux leather arms', dot: [135, 568], pill: [40, 760] },
@@ -495,11 +412,6 @@ export const COPY = {
     cover: 'windsor-scattered-back-5-seater-corner',
     tagline: 'Chesterfield arms · Cream chenille · Made in the UK',
     sub: 'Deep-buttoned Chesterfield arms, in cream',
-    details: [
-      { label: 'Deep-buttoned Chesterfield arms', photo: 'windsor-scattered-back-5-seater-corner', x: 20, y: 560, s: 320 },
-      { label: 'Dark wooden feet', photo: 'windsor-scattered-back-5-seater-corner', x: 900, y: 740, s: 200 },
-      { label: 'Cream chenille', photo: 'windsor-scattered-back-5-seater-corner', x: 300, y: 480, s: 260 },
-    ],
     detailsLine: 'Foam seats, fibre-filled backs, and made to order in the UK.',
     ...post({
       hook: (d) => `Deep-buttoned Chesterfield arms, in cream. Windsor is a 5 seater corner for ${d.from}.`,
@@ -510,3 +422,6 @@ export const COPY = {
     }),
   },
 }
+
+// The close-ups are the site's own (the product page's gallery and the feeds use them too).
+for (const [slug, details] of Object.entries(CLOSE_UPS)) if (COPY[slug]) COPY[slug].details = details

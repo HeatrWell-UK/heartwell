@@ -131,6 +131,15 @@ function describe(layout: Layout, noun: string): string {
   }
 }
 
+/** The drawing on its own, labelled for screen readers (also the last of the product's photos). */
+export function TopView({ layout, noun, className }: { layout: Layout; noun: string; className?: string }) {
+  return (
+    <svg viewBox="0 0 340 220" width="100%" role="img" aria-label={describe(layout, noun)} className={className}>
+      <Drawing layout={layout} />
+    </svg>
+  )
+}
+
 export function Measurements({
   shape,
   noun,
@@ -160,9 +169,7 @@ export function Measurements({
     <div className="flex flex-col">
       {layout ? (
         <div className="rounded-[14px] bg-white p-4">
-          <svg viewBox="0 0 340 220" width="100%" role="img" aria-label={describe(layout, noun)} className="mx-auto block max-w-md">
-            <Drawing layout={layout} />
-          </svg>
+          <TopView layout={layout} noun={noun} className="mx-auto block max-w-md" />
           {layout.kind === 'set' ? (
             <ul className="mt-2 flex flex-col gap-1 border-t border-line-soft pt-3 text-[15px]">
               {layout.pieces.map((p) => {

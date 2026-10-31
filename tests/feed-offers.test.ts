@@ -28,6 +28,7 @@ function product(over: Partial<FeedProductRow> = {}): FeedProductRow {
     googleCategory: 'Furniture > Sofas',
     metaCategory: 'Furniture > Sofas',
     rangeName: 'Roma',
+    rangeSlug: null,
     categoryPath: ['Sofas', 'Fabric sofas'],
     offerTier: 'HIGH',
     variants: [
@@ -120,6 +121,31 @@ describe('catalogue feed', () => {
     expect(first!.imageLink).toBe('https://res.cloudinary.com/demo/image/upload/c_pad,b_rgb:F5F1EF,w_1080,h_1080,f_jpg,q_auto/v1/heartwell/grey.jpg')
     expect(first!.additionalImageLinks).toHaveLength(2)
     expect(first!.additionalImageLinks[0]).toContain('w_1080,h_1080')
+  })
+
+  it('adds the range’s close-ups of the item’s own colourway: enlarged for Meta, at their own size for Google', () => {
+    const photo = (colour: string, material: string) => `https://res.cloudinary.com/demo/image/upload/v1/sims-${colour}-${material}.png`.toLowerCase()
+    const variant = (sku: string, colour: string, material: string) => ({ id: `id-${sku}`, sku, colourName: colour, materialLabel: material, priceAdjustment: 0, image: photo(colour, material) })
+    // The close-ups are cut from the 3+2's photos; the corner gets them too.
+    const source = product({ slug: 'sims-high-back-3-2-seater', rangeSlug: 'sims', gallery: [], variants: [variant('S32-G', 'Grey', 'Plush Velvet'), variant('S32-K', 'Black', 'Plush Velvet')] })
+    const corner = product({
+      id: '22222222-2222-4222-8222-222222222222',
+      slug: 'sims-high-back-5-seater-corner',
+      rangeSlug: 'sims',
+      gallery: [],
+      variants: [variant('SC-G', 'Grey', 'Plush Velvet'), variant('SC-S', 'Silver', 'Fabric')],
+    })
+    const { items } = buildFeed([source, corner], SITE)
+    const grey = items.find((i) => i.id === 'id-SC-G')!
+    // Channel-stitched arms and plush velvet (the scattered back's cushions belong to the other back style).
+    expect(grey.closeUps).toHaveLength(2)
+    expect(grey.closeUps[0]!.meta).toBe('https://res.cloudinary.com/demo/image/upload/c_crop,x_30,y_570,w_300,h_300/c_scale,w_1080,f_jpg,q_auto/v1/sims-grey-plush velvet.png')
+    expect(grey.closeUps[0]!.google).toBe('https://res.cloudinary.com/demo/image/upload/c_crop,x_30,y_570,w_300,h_300/f_jpg,q_auto/v1/sims-grey-plush velvet.png')
+    // No photo of the 3+2 in silver fabric, so no close-up: an ad never shows another colour.
+    expect(items.find((i) => i.id === 'id-SC-S')!.closeUps).toEqual([])
+    const xml = metaFeedXml(items, SITE)
+    expect(xml).toContain('c_crop,x_30,y_570,w_300,h_300/c_scale,w_1080')
+    expect(googleFeedXml(items, SITE)).toContain('c_crop,x_30,y_570,w_300,h_300/f_jpg,q_auto')
   })
 
   it('leaves out a colour with no photo of its own, but lets a single colourway use the gallery', () => {

@@ -30,6 +30,7 @@ import { homeSwatches } from '@/lib/home/picks'
 import { bestOffer, welcomeOff, type ShopOffers } from '@/lib/offers/welcome'
 import type { Layout } from '@/lib/product/measurements'
 import { Medallion } from '@/components/catalogue/Arcade'
+import { gallerySlides } from '@/lib/product/gallery'
 import { InfoIcon, TruckIcon } from '@phosphor-icons/react'
 
 export type PurchaseProduct = Pick<
@@ -46,6 +47,7 @@ export type PurchaseProduct = Pick<
   | 'siblings'
   | 'fabrics'
   | 'gallery'
+  | 'closeUps'
   | 'range'
   | 'offerTier'
   | 'axis1Value'
@@ -67,6 +69,7 @@ export function ProductPurchase({
   adAmount,
   offers,
   plans,
+  topView,
   crumbs,
   deliveryWindow,
   children,
@@ -75,6 +78,8 @@ export function ProductPurchase({
   initialVariantId: string | null
   initialFabric: ChosenFabric | null
   plans: SizePlans
+  /** This piece's top view with its measurements, the photos' last slide. */
+  topView: { layout: Layout; height: number | null } | null
   /** Where the piece sits in the shop, shown at the top of the photos' velvet stage. */
   crumbs?: ReactNode
   /** When most orders placed today arrive: "Tue 3 – Thu 5 November". */
@@ -119,14 +124,22 @@ export function ProductPurchase({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewedId])
 
-  const images = useMemo(() => {
-    const alt = (colour: string | null) => (colour ? `${p.title} in ${colour.toLowerCase()}` : p.title)
-    const list = [
-      ...(variant?.image ? [{ src: variant.image, alt: alt(variant.colourName) }] : []),
-      ...p.gallery.map((src) => ({ src, alt: alt(variant?.colourName ?? null) })),
-    ]
-    return list.filter((img, i) => list.findIndex((x) => x.src === img.src) === i)
-  }, [p.title, p.gallery, variant])
+  // The photos: this colourway's, the chosen fabric's, the others, the close-ups and the top view (audit A2).
+  const slides = useMemo(
+    () =>
+      gallerySlides({
+        title: p.title,
+        rangeName: p.range?.name ?? p.title,
+        variant,
+        gallery: p.gallery,
+        fabric: fabric ? { name: fabric.fabric.name, collection: fabric.collection.name, image: fabric.fabric.image } : null,
+        closeUps: p.closeUps,
+        topView,
+      }),
+    [p.title, p.range, p.gallery, p.closeUps, variant, fabric, topView],
+  )
+  // Straight to the fabric's own photo once one is chosen here (not when a link opens on one).
+  const [fabricPicked, setFabricPicked] = useState(false)
 
   const colourName = fabric ? null : (variant?.colourName ?? null)
   const sizes = sizeOptions(p.siblings, p.slug, colourName, fabric?.fabric.code ?? null)
@@ -180,10 +193,11 @@ export function ProductPurchase({
             {crumbs}
             <div className={crumbs ? 'pt-0.5 lg:pt-1' : 'pt-4 lg:pt-5'}>
               <Gallery
-                key={variant?.id ?? 'none'}
-                images={images}
+                key={`${variant?.id ?? 'none'}-${fabric?.fabric.code ?? ''}`}
+                slides={slides}
+                start={fabricPicked && fabric?.fabric.image ? 1 : 0}
+                noun={noun}
                 priority
-                caption={variant?.colourName ? [variant.colourName, variant.materialLabel].filter(Boolean).join(' ') : null}
                 overlay={
                   <>
                     <SaveButton slug={p.slug} sku={variant?.sku ?? null} noun={noun} className="right-1 top-1 size-11" />
@@ -280,6 +294,7 @@ export function ProductPurchase({
                         chosen.current = true
                         setVariantId(v.id)
                         setFabric(null)
+                        setFabricPicked(false)
                       }}
                     />
                     <span className="size-full rounded-full shadow-[inset_0_0_0_1px_rgba(34,23,26,.2)]" style={{ backgroundColor: v.colourHex ?? '#F5F1EF' }} />
@@ -427,6 +442,7 @@ export function ProductPurchase({
           onChoose={(choice) => {
             chosen.current = true
             setFabric(choice)
+            setFabricPicked(true)
             setFabricsOpen(false)
           }}
           rangeName={p.range?.name ?? p.title}
