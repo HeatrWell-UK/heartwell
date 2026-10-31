@@ -48,7 +48,7 @@ export function DeliveryMap({ delivery }: { delivery: DeliveryInfo | null }) {
       <BritainMap className="mx-auto w-[64%] max-w-[300px] lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:w-full lg:max-w-[330px] lg:self-center" />
 
       <div className="flex flex-col gap-8 lg:col-start-2 lg:row-start-2">
-        {delivery && <PostcodeCheck windowLabel={delivery.windowLabel} areas={delivery.areas} noDeliveryDays={delivery.noDeliveryDays} className="" />}
+        {delivery && <PostcodeCheck delivery={delivery} noDeliveryDays={delivery.noDeliveryDays} className="" />}
 
         {a && (
           <div className="flex flex-col gap-4 border-t border-line pt-7">

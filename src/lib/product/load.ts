@@ -3,7 +3,7 @@ import { unstable_cache } from 'next/cache'
 import { createPublicClient } from '@/lib/supabase/public'
 import { cloudinaryVideo } from '@/lib/videos'
 import { CATALOGUE_TAG, getCategories } from '@/lib/catalogue/listing'
-import { deliveryWindow, earliestPreferredDate, latestPreferredDate } from '@/lib/delivery/window'
+import { deliveryWindow, earliestPreferredDate, latestPreferredDate, londonToday } from '@/lib/delivery/window'
 import type { DeliverySettings } from '@/lib/delivery/pricing'
 import type { DeliveryArea } from '@/lib/delivery/areas'
 import { fromPrice } from '@/lib/catalogue/pricing'
@@ -219,10 +219,22 @@ async function areaDeliveries(s: Awaited<ReturnType<typeof loadDeliverySettings>
   }))
 }
 
-/** Delivery prices and today's delivery window (worked out per request, so the dates are always today's). */
+/**
+ * Delivery prices and today's delivery window. Cached pages carry the day the
+ * dates are for and the rules behind them, so the browser can bring them up to
+ * date (src/lib/delivery/fresh.ts).
+ */
 export async function getDeliveryInfo(now = new Date()): Promise<DeliveryInfo> {
   const s = await loadDeliverySettings()
   return {
+    day: londonToday(now).toISOString().slice(0, 10),
+    settings: {
+      delivery_min_working_days: s.delivery_min_working_days,
+      delivery_max_working_days: s.delivery_max_working_days,
+      preferred_date_min_days: s.preferred_date_min_days,
+      preferred_date_max_days: s.preferred_date_max_days,
+      no_delivery_days: s.no_delivery_days,
+    },
     windowLabel: deliveryWindow(s, now).label,
     minDays: s.delivery_min_working_days,
     maxDays: s.delivery_max_working_days,

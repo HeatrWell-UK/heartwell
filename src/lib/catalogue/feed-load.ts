@@ -16,7 +16,7 @@ const bySort = <T extends { sort: number }>(a: T, b: T) => a.sort - b.sort
 
 const FIELDS = `
   id, slug, title, description, highlights, base_price, made_to_order, origin, specifications, sort,
-  width_cm, depth_cm, height_cm, side_a_cm, side_b_cm, gallery_images, axis1_value, primary_category_id,
+  width_cm, depth_cm, height_cm, side_a_cm, side_b_cm, gallery_images, axis1_value, axis2_value, primary_category_id,
   type:product_types(name, google_product_category, meta_product_category),
   range:ranges(name, slug),
   tier:offer_product_tiers(tier),
@@ -55,6 +55,8 @@ export const getFeedProducts = unstable_cache(
           size: { width_cm: p.width_cm, depth_cm: p.depth_cm, height_cm: p.height_cm, side_a_cm: p.side_a_cm, side_b_cm: p.side_b_cm },
           gallery: p.gallery_images,
           axis1Value: p.axis1_value,
+          axis2Value: p.axis2_value,
+          shape: typeof specs.shape === 'string' ? specs.shape : null,
           typeName: type.name,
           googleCategory: type.google_product_category,
           metaCategory: type.meta_product_category,
@@ -77,7 +79,7 @@ export const getFeedProducts = unstable_cache(
       ]
     })
   },
-  ['feed-products-v2'],
+  ['feed-products-v3'],
   { revalidate: 900, tags: [CATALOGUE_TAG] },
 )
 

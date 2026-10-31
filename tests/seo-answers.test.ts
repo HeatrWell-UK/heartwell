@@ -7,6 +7,8 @@ import type { DeliveryInfo, ProductPageData, VariantView } from '@/lib/product/t
 import { POLICIES } from '@/config/promises'
 
 const DELIVERY: DeliveryInfo = {
+  day: '2026-10-16',
+  settings: { delivery_min_working_days: 2, delivery_max_working_days: 4, preferred_date_min_days: 3, preferred_date_max_days: 30, no_delivery_days: [1] },
   windowLabel: 'Tue 20 – Thu 22 October',
   minDays: 2,
   maxDays: 4,

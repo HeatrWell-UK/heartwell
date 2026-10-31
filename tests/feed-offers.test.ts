@@ -24,6 +24,8 @@ function product(over: Partial<FeedProductRow> = {}): FeedProductRow {
     size: { width_cm: 210, depth_cm: 95, height_cm: 90, side_a_cm: null, side_b_cm: null },
     gallery: [`${CLOUD}/room.jpg`, `${CLOUD}/side.jpg`],
     axis1Value: '3 Seater',
+    axis2Value: null,
+    shape: 'straight',
     typeName: 'Sofa',
     googleCategory: 'Furniture > Sofas',
     metaCategory: 'Furniture > Sofas',
@@ -116,6 +118,21 @@ describe('catalogue feed', () => {
     })
   })
 
+  it('titles each item as people search, with its own colourway, and keeps its ID', () => {
+    const ashton = product({
+      title: 'Ashton 5 Seater Corner High Back',
+      rangeName: 'Ashton',
+      axis1Value: '5 Seater Corner',
+      axis2Value: 'High Back',
+      shape: 'corner',
+      variants: [{ ...product().variants[0]!, colourName: 'Grey', materialLabel: 'Plush Velvet' }],
+    })
+    const [item] = buildFeed([ashton], SITE).items
+    expect(item).toMatchObject({ id: ashton.variants[0]!.id, title: 'Ashton 5 Seater Corner Sofa, High Back, Grey Plush Velvet' })
+    const hannah = product({ title: 'Hannah Electric Corner', rangeName: 'Hannah Electric', axis1Value: 'Corner', shape: 'corner', categoryPath: ['Sofas', 'Electric Recliners'] })
+    expect(buildFeed([hannah], SITE).items[0]!.title).toBe('Hannah Electric Recliner Corner Sofa, Grey')
+  })
+
   it('uses square 1080 photos and the gallery as extra images', () => {
     const [first] = buildFeed([product()], SITE).items
     expect(first!.imageLink).toBe('https://res.cloudinary.com/demo/image/upload/c_pad,b_rgb:F5F1EF,w_1080,h_1080,f_jpg,q_auto/v1/heartwell/grey.jpg')
@@ -195,7 +212,7 @@ describe('catalogue feed', () => {
     expect(xml).toContain('<g:availability>in stock</g:availability>')
     expect(xml).toContain('<g:price>699.00 GBP</g:price>')
     expect(xml).toContain('<g:brand>Heartwell</g:brand>')
-    expect(xml).toContain('<g:title>Roma &amp; Co &lt;3 Seater&gt;, Grey</g:title>')
+    expect(xml).toContain('<g:title>Roma &amp; Co &lt;3 Seater Sofa&gt;, Grey</g:title>')
     expect(xml).toContain('<g:custom_label_0>Roma &quot;Plush&quot;</g:custom_label_0>')
     // Delivery is charged in a few postcode areas, so the feed claims no shipping price.
     expect(xml).not.toContain('<g:shipping>')

@@ -32,6 +32,7 @@ import type { Layout } from '@/lib/product/measurements'
 import { Medallion } from '@/components/catalogue/Arcade'
 import { gallerySlides } from '@/lib/product/gallery'
 import { withNoun } from '@/lib/product/naming'
+import { useTodaysDelivery, type DeliveryDates } from '@/lib/delivery/fresh'
 import { InfoIcon, TruckIcon } from '@phosphor-icons/react'
 
 export type PurchaseProduct = Pick<
@@ -73,7 +74,7 @@ export function ProductPurchase({
   plans,
   topView,
   crumbs,
-  deliveryWindow,
+  delivery,
   children,
 }: {
   product: PurchaseProduct
@@ -84,14 +85,15 @@ export function ProductPurchase({
   topView: { layout: Layout; height: number | null } | null
   /** Where the piece sits in the shop, shown at the top of the photos' velvet stage. */
   crumbs?: ReactNode
-  /** When most orders placed today arrive: "Tue 3 – Thu 5 November". */
-  deliveryWindow: string | null
+  /** When most orders placed today arrive ("Tue 3 – Thu 5 November"), brought up to today in the browser. */
+  delivery: DeliveryDates
   /** What an ad visitor’s offer takes off this piece (its tier's amount). */
   adAmount: number
   /** The welcome offer, the minimum order, and the ad offer's code and amounts. */
   offers: ShopOffers
   children: ReactNode
 }) {
+  const deliveryWindow = useTodaysDelivery(delivery).windowLabel
   const basket = useBasket()
   const [variantId, setVariantId] = useState(initialVariantId)
   const [fabric, setFabric] = useState<ChosenFabric | null>(initialFabric)

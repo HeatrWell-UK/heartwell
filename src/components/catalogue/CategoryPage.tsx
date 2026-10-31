@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { ButtonLink } from '@/components/ui/Button'
 import { VelvetHeader } from './VelvetHeader'
-import { CatalogueControls, FilterPanel } from './CatalogueControls'
-import { ProductGrid } from './ProductTile'
+import { CategoryListing } from './CategoryListing'
 import { ShapePlan } from './ShapePlan'
 import { ShapeRail } from './ShapeRail'
 import { formatPrice } from '@/lib/format'
@@ -13,39 +11,47 @@ import { QuestionList } from '@/components/content/QuestionList'
 import { categoryGuides, categoryQuestions } from '@/content/categories'
 import { getDeliveryInfo } from '@/lib/product/load'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
-import { activeChips, applyFilters, facetsFor, hasFilters, listingHref, parseListing, sortProducts } from '@/lib/catalogue/filters'
 import { categoryHref, resolveCategory, subtreeIds, trail } from '@/lib/catalogue/tree'
 import { breadcrumbJsonLd, jsonLdString } from '@/lib/product/seo'
 import { SITE_URL } from '@/config/site'
 import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 
+// Cached (audit A4): the routes are built ahead and rebuilt at most every five
+// minutes, and nothing here reads the address's query. Filters and sorting are
+// worked out in the browser (CategoryListing); a filtered address serves this
+// same page, whose canonical link points search engines at the plain one.
 export type CategoryRouteProps = {
   params: Promise<{ department: string; category?: string }>
-  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 const paragraphs = (text: string | null) => (text ?? '').split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
 
-export async function categoryMetadata({ params, searchParams }: CategoryRouteProps): Promise<Metadata> {
+export async function categoryMetadata({ params }: CategoryRouteProps): Promise<Metadata> {
   const { department, category } = await params
   const tree = await getCategories()
   const node = resolveCategory(tree, department, category)
   if (!node) return {}
-  const { filters, sort } = parseListing(await searchParams)
-  const filtered = hasFilters(filters) || sort !== 'recommended'
   return {
     title: node.seoTitle ?? node.name,
     description: node.seoDescription ?? paragraphs(node.description)[0] ?? undefined,
     alternates: { canonical: categoryHref(tree, node) },
-    // Filtered and sorted versions point search engines at the plain page.
-    ...(filtered ? { robots: { index: false, follow: true } } : {}),
   }
 }
 
-export async function CategoryPage({ params, searchParams }: CategoryRouteProps) {
-  const [{ department, category }, query, tree, listing, fabrics, delivery] = await Promise.all([
+/** Every department and category, for building them ahead. */
+export async function categoryParams(level: 'department' | 'category'): Promise<{ department: string; category?: string }[]> {
+  const tree = await getCategories()
+  return tree.flatMap((node) => {
+    const [, department, category] = categoryHref(tree, node).split('/')
+    if (!department) return []
+    if (level === 'department') return category ? [] : [{ department }]
+    return category ? [{ department, category }] : []
+  })
+}
+
+export async function CategoryPage({ params }: CategoryRouteProps) {
+  const [{ department, category }, tree, listing, fabrics, delivery] = await Promise.all([
     params,
-    searchParams,
     getCategories(),
     getListing(),
     getFabricLibrary(),
@@ -57,16 +63,13 @@ export async function CategoryPage({ params, searchParams }: CategoryRouteProps)
   const path = categoryHref(tree, node)
   const inside = subtreeIds(tree, node.id)
   const products = listing.filter((p) => p.categoryIds.some((id) => inside.has(id)))
-  const { filters, sort } = parseListing(query)
-  const shown = sortProducts(applyFilters(products, filters), sort)
-  const facets = facetsFor(products, filters)
-  const chips = activeChips(path, filters, sort)
+  // What the grid and filters need in the browser (not the range's introduction or the drawings).
+  const forGrid = products.map((p) => ({ ...p, rangeDescription: null, categoryIds: [], plan: null }))
   const crumbs = trail(tree, node)
     .slice(0, -1)
     .map((c) => ({ name: sentenceCase(c.name), href: categoryHref(tree, c) }))
   const [intro, ...more] = paragraphs(node.description)
   const noun = products.every((p) => p.typeSlug === 'sofa') ? 'sofa' : 'piece'
-  const controls = { path, facets, filters, sort, chips, count: shown.length, noun }
   const from = products.length ? Math.min(...products.map((p) => p.price)) : null
   const title = sentenceCase(node.name)
   const titleInSentence = /^[A-Z]-/.test(title) ? title : title.charAt(0).toLowerCase() + title.slice(1)
@@ -105,31 +108,7 @@ export async function CategoryPage({ params, searchParams }: CategoryRouteProps)
       <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 pt-5 lg:gap-7 lg:px-6 lg:pt-8">
         <ShapeRail tree={tree} node={node} />
 
-        <div className="lg:grid lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10">
-          <aside aria-label="Filters" className="hidden lg:block">
-            <div className="sticky top-6">
-              <FilterPanel {...controls} />
-            </div>
-          </aside>
-          <div className="flex flex-col gap-5">
-            <CatalogueControls {...controls} />
-            {/* Said out loud whenever it changes; seen only once filters narrow the list (the header gives the total). */}
-            <p className={hasFilters(filters) ? 'text-[15px] text-slate lg:hidden' : 'sr-only'} aria-live="polite">
-              {shown.length} {shown.length === 1 ? noun : `${noun}s`}
-            </p>
-            {shown.length > 0 ? (
-              <ProductGrid products={shown} />
-            ) : (
-              <div className="flex flex-col items-start gap-3 rounded-[var(--radius-card)] bg-stone p-5">
-                <p className="font-semibold">Nothing matches all of those filters.</p>
-                <p className="text-[15px] text-slate">Try taking one off, or start again.</p>
-                <ButtonLink href={listingHref(path, filters, sort, 'clear')} variant="secondary" size="sm">
-                  Clear filters
-                </ButtonLink>
-              </div>
-            )}
-          </div>
-        </div>
+        <CategoryListing products={forGrid} path={path} noun={noun} />
 
         {(more.length > 0 || intro) && (
           <section aria-labelledby="about-category" className={`mt-8 max-w-[46rem] border-t border-line pt-8 ${more.length === 0 ? 'lg:hidden' : ''}`}>

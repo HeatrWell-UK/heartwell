@@ -6,6 +6,7 @@ import type { Piece, Shape } from '@/lib/catalogue/clean'
 import type { OfferTier } from '@/lib/offers/paid'
 import type { DeliveryArea } from '@/lib/delivery/areas'
 import type { CloseUpSource } from './close-ups'
+import type { WindowSettings } from '@/lib/delivery/window'
 
 /** A charged delivery area with today's window ("Sat 24 – Tue 27 October") and first day a customer may pick. */
 export interface AreaDelivery extends DeliveryArea {
@@ -115,6 +116,10 @@ export interface ProductPageData {
 }
 
 export interface DeliveryInfo {
+  /** The UK day (YYYY-MM-DD) the dates below are for. */
+  day: string
+  /** The rules behind the dates, so a cached page can work out today's in the browser. */
+  settings: WindowSettings
   /** "Tue 6 – Thu 8 October". */
   windowLabel: string
   minDays: number

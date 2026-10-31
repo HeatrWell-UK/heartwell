@@ -1,8 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useId, useState, useTransition } from 'react'
+import { useId, useState, type MouseEvent } from 'react'
 import { FadersHorizontalIcon, XIcon } from '@phosphor-icons/react'
 import { Sheet } from '@/components/ui/Sheet'
 import { cn } from '@/lib/cn'
@@ -16,24 +14,30 @@ interface Props {
   chips: Chip[]
   count: number
   noun: string
+  /** Shows the listing at this address (the filters change in the browser: CategoryListing). */
+  go: (href: string) => void
 }
 
 /**
  * Filters and sorting. Each tick updates the address straight away (so a
- * filtered page can be shared) and the counts follow. On phones the filters
- * open in a sheet with a "Show" button; on desktop they sit beside the grid.
+ * filtered page can be shared) and the grid and counts follow at once. On
+ * phones the filters open in a sheet with a "Show" button; on desktop they sit
+ * beside the grid.
  */
 export function CatalogueControls(props: Props) {
-  const { path, filters, sort, chips, count, noun } = props
-  const router = useRouter()
+  const { path, filters, sort, chips, count, noun, go } = props
   const [open, setOpen] = useState(false)
-  const [pending, startTransition] = useTransition()
   const sortId = useId()
-  const go = (href: string) => startTransition(() => router.replace(href, { scroll: false }))
   const active = chips.length
+  // Real links (they can be opened in a new tab), handled here for a normal click.
+  const follow = (href: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+    e.preventDefault()
+    go(href)
+  }
 
   return (
-    <div className="contents lg:flex lg:flex-col lg:gap-3" aria-busy={pending}>
+    <div className="contents lg:flex lg:flex-col lg:gap-3">
       {/* On phones the bar stays at the top of the screen while the sofas scroll under it. */}
       <div className="sticky top-0 z-20 -mx-4 flex items-center justify-between gap-3 border-b border-line-soft bg-white/95 px-4 py-2 backdrop-blur-sm lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
         <button
@@ -73,35 +77,34 @@ export function CatalogueControls(props: Props) {
         <ul className="flex flex-wrap items-center gap-2" aria-label="Filters in use">
           {chips.map((c) => (
             <li key={c.href}>
-              <Link
+              <a
                 href={c.href}
-                scroll={false}
-                replace
+                onClick={follow(c.href)}
                 className="flex min-h-9 items-center gap-1.5 rounded-full bg-gold-tint px-3 text-sm font-semibold text-velvet no-underline"
               >
                 {c.label}
                 <XIcon aria-hidden="true" size={14} weight="bold" />
                 <span className="sr-only">(remove)</span>
-              </Link>
+              </a>
             </li>
           ))}
           <li>
-            <Link href={listingHref(path, filters, sort, 'clear')} scroll={false} replace className="text-sm font-semibold">
+            <a href={listingHref(path, filters, sort, 'clear')} onClick={follow(listingHref(path, filters, sort, 'clear'))} className="text-sm font-semibold">
               Clear all
-            </Link>
+            </a>
           </li>
         </ul>
       )}
 
       <Sheet open={open} onClose={() => setOpen(false)} title="Filter">
-        <FilterPanel {...props} go={go} />
+        <FilterPanel {...props} />
         <div className="sticky bottom-0 -mx-4 mt-4 border-t border-line bg-white px-4 pt-3">
           <button
             type="button"
             onClick={() => setOpen(false)}
             className="min-h-14 w-full rounded-full bg-velvet-sheen text-[17px] font-semibold text-white"
           >
-            {pending ? 'Updating…' : `Show ${count} ${count === 1 ? noun : `${noun}s`}`}
+            {`Show ${count} ${count === 1 ? noun : `${noun}s`}`}
           </button>
         </div>
       </Sheet>
@@ -110,10 +113,7 @@ export function CatalogueControls(props: Props) {
 }
 
 /** The filter groups themselves: in the phone sheet, and beside the grid on desktop. */
-export function FilterPanel({ path, facets, filters, sort, go }: Props & { go?: (href: string) => void }) {
-  const router = useRouter()
-  const [, startTransition] = useTransition()
-  const navigate = go ?? ((href: string) => startTransition(() => router.replace(href, { scroll: false })))
+export function FilterPanel({ path, facets, filters, sort, go: navigate }: Props) {
   const base = useId()
 
   if (facets.length === 0) return <p className="text-[15px] text-slate">Nothing to filter here.</p>

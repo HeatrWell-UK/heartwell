@@ -8,7 +8,7 @@ import { areaForPostcode } from '@/lib/delivery/areas'
 import { deliveryDaysText } from '@/lib/delivery/window'
 import { formatPrice } from '@/lib/format'
 import { postcodeOutcome, type PostcodeOutcome } from '@/lib/product/helpers'
-import type { AreaDelivery } from '@/lib/product/types'
+import { useTodaysDelivery, type DeliveryDates } from '@/lib/delivery/fresh'
 
 /**
  * "Check delivery to your postcode": answered instantly on the phone (the same
@@ -19,13 +19,14 @@ import type { AreaDelivery } from '@/lib/product/types'
 const noSubscription = () => () => {}
 
 interface Props {
-  windowLabel: string
-  areas: AreaDelivery[]
+  /** The dates as the page was built; brought up to today in the browser. */
+  delivery: DeliveryDates
   noDeliveryDays: number[]
   className?: string
 }
 
-export function PostcodeCheck({ windowLabel, areas, noDeliveryDays, className = 'mt-6' }: Props) {
+export function PostcodeCheck({ delivery, noDeliveryDays, className = 'mt-6' }: Props) {
+  const { windowLabel, areas } = useTodaysDelivery(delivery)
   const id = useId()
   // The postcode checked last time on this device, read once storage is available.
   const remembered = useSyncExternalStore(noSubscription, recallPostcode, () => '')

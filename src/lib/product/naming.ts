@@ -2,8 +2,8 @@
 // title names its size ("Ashton 5 Seater Corner High Back") but never says
 // "sofa", which is what people type ("ashton corner sofa", "grey velvet corner
 // sofa"). These add the word, and the cover, from the piece's own data, for the
-// page's title and heading only: the product's title in the database (orders,
-// OrderFlow, the feeds) stays as it is.
+// page's title and heading and the feeds' titles (owner, 31 October 2026); the
+// product's title in the database (orders, OrderFlow, emails) stays as it is.
 
 import type { Shape } from '@/lib/catalogue/clean'
 
@@ -47,12 +47,7 @@ export function coverWords(variants: { colourName: string | null; materialLabel:
 /** About what Google shows of a title before the " | Heartwell" the layout adds. */
 export const SEARCH_TITLE_MAX = 60
 
-/**
- * The page title: "Ashton 5 Seater Corner Sofa, High Back, Grey Plush Velvet".
- * The noun goes after the size, the back style after a comma, then the cover
- * while it fits. An electric recliner the title doesn't call a recliner says so.
- */
-export function searchTitle(p: {
+export interface NamedPiece {
   title: string
   typeName: string
   shape: Shape | string | null
@@ -60,8 +55,25 @@ export function searchTitle(p: {
   axis2Value: string | null
   rangeName: string | null
   recliner: boolean
-  variants: { colourName: string | null; materialLabel: string | null }[]
-}): string {
+}
+
+/**
+ * The page title: "Ashton 5 Seater Corner Sofa, High Back, Grey Plush Velvet":
+ * the piece's name (searchName), then the cover while it fits.
+ */
+export function searchTitle(p: NamedPiece & { variants: { colourName: string | null; materialLabel: string | null }[] }): string {
+  const t = searchName(p)
+  const cover = coverWords(p.variants)
+  const full = cover ? `${t}, ${cover}` : t
+  return full.length <= SEARCH_TITLE_MAX ? full : t
+}
+
+/**
+ * "Ashton 5 Seater Corner Sofa, High Back": the noun after the size, the back
+ * style after a comma. An electric recliner the title doesn't call a recliner
+ * says so. The feeds add the item's own colourway to it.
+ */
+export function searchName(p: NamedPiece): string {
   let t = words(p.title)
   if (p.recliner && !/recliner/i.test(t) && p.rangeName && t.startsWith(p.rangeName)) t = `${p.rangeName} Recliner${t.slice(p.rangeName.length)}`
   if (!NOUNS.test(t)) {
@@ -73,7 +85,5 @@ export function searchTitle(p: {
     const back = words(p.axis2Value)
     if (t.endsWith(` ${back}`)) t = `${t.slice(0, -back.length - 1)}, ${back}`
   }
-  const cover = coverWords(p.variants)
-  const full = cover ? `${t}, ${cover}` : t
-  return full.length <= SEARCH_TITLE_MAX ? full : t
+  return t
 }
