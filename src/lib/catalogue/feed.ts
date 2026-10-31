@@ -23,6 +23,7 @@ import { squareImageUrl } from '@/lib/product/seo'
 import { productHref } from '@/lib/product/helpers'
 import { CATALOGUE_CAMPAIGN, META_AD_TAGS, type OfferTier } from '@/lib/offers/paid'
 import { closeUpSources, feedCloseUps, type CloseUpPhoto } from '@/lib/product/close-ups'
+import { searchName } from '@/lib/product/naming'
 
 export interface FeedVariantRow {
   id: string
@@ -48,6 +49,10 @@ export interface FeedProductRow {
   gallery: string[]
   /** "3 Seater", "Corner": the range's size option. */
   axis1Value: string | null
+  /** "High Back": the range's back style, if it has one. */
+  axis2Value: string | null
+  /** "corner", "set" (specifications.shape). */
+  shape: string | null
   typeName: string
   googleCategory: string | null
   metaCategory: string | null
@@ -136,9 +141,23 @@ export function footprint(s: SizeFields): FeedItem['dimensions'] {
   return { width: w, length: d, height: h }
 }
 
-function itemTitle(p: FeedProductRow, v: FeedVariantRow): string {
+/**
+ * "Ashton 5 Seater Corner Sofa, High Back, Grey Plush Velvet": the name people
+ * search for (audit A3, owner 31 October 2026: the same as the page's title)
+ * with the item's own colourway. The item's ID never changes with it.
+ */
+export function itemTitle(p: FeedProductRow, v: FeedVariantRow): string {
+  const name = searchName({
+    title: p.title,
+    typeName: p.typeName,
+    shape: p.shape,
+    axis1Value: p.axis1Value,
+    axis2Value: p.axis2Value,
+    rangeName: p.rangeName,
+    recliner: p.categoryPath.some((c) => /recliner/i.test(c)),
+  })
   const option = [v.colourName, v.materialLabel].filter(Boolean).join(' ')
-  return clip(option ? `${p.title}, ${option}` : p.title, TITLE_MAX)
+  return clip(option ? `${name}, ${option}` : name, TITLE_MAX)
 }
 
 /**
