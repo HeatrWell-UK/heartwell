@@ -91,6 +91,8 @@ export interface FeedItem {
   /** Its footprint and height in centimetres, for Google (product_width, product_length, product_height). */
   dimensions: { width: number | null; length: number | null; height: number | null }
   highlights: string[]
+  /** "Colour: Grey. Cover: Plush Velvet. Size: …": added to Google's description only. */
+  details: string
 }
 
 export type LeftOutReason = 'no-photo' | 'no-price'
@@ -180,6 +182,28 @@ export function itemDescription(p: FeedProductRow, v: FeedVariantRow): string {
   return clip(lines.join('\n\n'), DESCRIPTION_MAX)
 }
 
+/**
+ * The details Google asks to find in a description (Merchant Center, 31
+ * October 2026: colour, cover and the measurements), from the piece's own
+ * data only: nothing we don't know, such as a seat height or frame.
+ */
+export function itemDetails(p: FeedProductRow, v: FeedVariantRow): string {
+  const parts: string[] = []
+  if (v.colourName) parts.push(`Colour: ${v.colourName}.`)
+  const cover = v.materialLabel ?? p.material
+  if (cover) parts.push(`Cover: ${cover}.`)
+  const { width, length, height } = footprint(p.size)
+  const depth = p.size.depth_cm
+  const sizes = [
+    width ? `${width} cm wide` : null,
+    length && length !== depth ? `${length} cm long` : null,
+    depth ? `${depth} cm deep` : null,
+    height ? `${height} cm high` : null,
+  ].filter(Boolean)
+  if (sizes.length) parts.push(`Size: ${sizes.join(', ')}.`)
+  return parts.join(' ')
+}
+
 /** Feed items for every colourway that can be shown, and what was left out. */
 export function buildFeed(products: FeedProductRow[], siteUrl: string): { items: FeedItem[]; leftOut: LeftOut[] } {
   const items: FeedItem[] = []
@@ -231,6 +255,7 @@ export function buildFeed(products: FeedProductRow[], siteUrl: string): { items:
         ],
         dimensions: footprint(p.size),
         highlights: p.highlights.slice(0, HIGHLIGHTS_MAX).map((h) => clip(h, HIGHLIGHT_MAX)),
+        details: itemDetails(p, v),
       })
     }
     // Meta groups colourways by item_group_id; a product with one item in the feed has no group.
@@ -343,7 +368,8 @@ export function googleFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('id', i.id),
         tag('item_group_id', i.itemGroupId),
         tag('title', i.title),
-        tag('description', i.description),
+        // The details Google looks for first, then the piece's own words (Meta's description is unchanged).
+        tag('description', i.details ? clip(`${i.details}\n\n${i.description}`, DESCRIPTION_MAX) : i.description),
         tag('availability', 'in_stock'),
         tag('condition', 'new'),
         tag('price', money(i.price)),

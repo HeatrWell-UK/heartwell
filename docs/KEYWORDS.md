@@ -36,14 +36,14 @@ Range names are trade names other UK shops use too (Verona, Roma, Orlando, Nova,
 | `/delivery-and-returns` | sofa delivery and returns, sofa delivery charges | delivery to devon, cornwall, scotland |
 | `/faq` | questions about paying on delivery, delivery, returns | |
 | `/will-it-fit` | will a sofa fit through my door | will my sofa fit through the door calculator |
-| `/guides/how-paying-on-delivery-works` | cash on delivery sofas, pay on delivery sofas | sofa cash on delivery scam, sofa no deposit, sofa without card |
+| `/guides/how-paying-on-delivery-works` | pay on delivery sofas, cash on delivery sofas | sofa cash on delivery scam, sofa no deposit, sofa without card |
 | `/guides/how-long-does-sofa-delivery-take` | how long does sofa delivery take | sofa next day delivery, sofas delivered in 7 days |
 | `/guides/choosing-the-right-size-sofa` | what size sofa do I need | what size sofa for a 12x12 room |
 | `/guides/measuring-for-a-corner-sofa` | how to measure for a corner sofa | |
 | `/guides/left-or-right-hand-corner-sofa` | left or right hand corner sofa | what does 2c1 mean, 1c2 corner sofa |
-| `/guides/high-back-or-scatter-back-sofa` | scatter back vs high back sofa, scatter back vs full back sofa, what is a scatter back sofa | scatter back sofa vs standard back, scatter back sofa pros and cons |
+| `/guides/high-back-or-scatter-back-sofa` | scatter back sofa vs standard back, what is a scatter back sofa, scatter back vs full back sofa | scatter back vs high back sofa, scatter back sofa pros and cons |
 | `/guides/electric-or-manual-recliner` | electric vs manual recliner sofa | are electric or manual recliners better |
-| `/guides/tech-leather-and-leather-aire` | what is tech leather, is air leather real leather | what is leather aire, leather aire material, tech leather vs leather |
+| `/guides/tech-leather-and-leather-aire` | what is leather aire, leather aire material, air leather, what is tech leather | is air leather real leather, tech leather vs leather |
 | `/guides/choosing-a-sofa-fabric` | best sofa fabric for pets, is velvet good for a sofa | best sofa fabric for kids, chenille or velvet |
 | `/guides/what-made-to-order-means` | made to order sofa uk | how long do made to order sofas take |
 | `/guides/getting-ready-for-delivery-day` | sofa delivery day checklist | |
@@ -67,6 +67,15 @@ Not indexed on purpose: basket, saved, checkout, search, order and confirm links
 - **Brand:** "heartwell sofa" on Google mostly shows "Hartwell" sofas from other shops; the Facebook page appears as "Heartwell Sofa | Brimington". Changing the page's location to Burnley helps.
 - **Bing:** nothing indexed yet (Bing Webmaster Tools isn't set up).
 - **Merchant Center:** 121 products, 120 under review; the account is held only by a missing business address.
+
+## Second results (31 October 2026, 15 days after launch)
+
+- **Search Console, 28 days:** 6 clicks, 196 impressions (54 on 27 October), average position 20.7, 44 searches. All the clicks are still the home page (22 impressions, position 6.7: name searches, which Google hides from the query list). Page one without clicks yet: "what is tech leather" 6.3, "corner sofa dimensions guide" 7, "what is leatheraire" 7, "scatter back sofa vs standard back" 9.3, "pay on delivery sofas" 9.8, "leather aire material" 10, "what is leather aire" 10.6. Most impressions: the scatter back guide (56, position 13.6) and the tech leather guide (45, 10.6). Range and category searches ("windsor sofa", "3+2 sofa set", "electric recliner corner sofa") sit at 60 to 90: big shops own them, and they need the product pages indexed and time.
+- **Google still shows the guides' titles from before 27 October** (not re-read yet). Refined again with the words people type: "Scatter back vs standard back sofa (high or full back)", "What is Leather Aire (air leather)? Tech leather explained" (the Leather Aire section now says what it is), "Pay on delivery sofas: how cash on delivery works".
+- **Indexing:** 48 indexed, 78 "discovered, not yet crawled" (nearly all products, eight range pages, some categories and guides), the report as of the crawl errors. **The server errors stopped on 24 October** (the last ones were `?_rsc=` preloads, before robots.txt blocked them on 27 October), so crawling can recover. Indexing requested on 31 October for the Ashton, Sims and Salone U-shapes, the Verona and Malibu corners, the Nova and Hannah recliner corners, the Roma 3 seater, the left-or-right corner guide and "Will it fit?". The Ashton 5 seater corner was already indexed.
+- **Merchant Center:** the business address was the last setup step (done 31 October, owner's go-ahead), so the 121 products held "Under review" can now be reviewed and shown in free listings. Merchant Center also added a "Found by Google" source (0 products; it only adds products missing from the feed). Google asked for colour, depth, length, seat height, frame material and fabric type in recliners' descriptions: Google's feed descriptions now start with the colour, cover and measurements (we don't know seat heights or frames, so they're not claimed).
+- **Bing:** two guides indexed (was nothing); no Bing Webmaster Tools yet (owner).
+- **Public Google:** "heartwell sofa" shows the Care guide (2nd) and Contact (4th) but other shops' "Hartwell" sofas around them; product pages appear with prices once indexed (Verona 3 Seater £399, Lily 3 Seater £449).
 
 ## Next
 

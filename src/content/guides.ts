@@ -32,9 +32,10 @@ export interface Guide {
 export const GUIDES: Guide[] = [
   {
     slug: 'how-paying-on-delivery-works',
-    title: 'Cash on delivery sofas: how paying on delivery works',
+    // Search Console, 31 October 2026: shown for "pay on delivery sofas" (position 9.8); the home page leads for "cash on delivery".
+    title: 'Pay on delivery sofas: how cash on delivery works',
     summary: 'No deposit, no card: you pay the driver in cash or by bank transfer once your sofa is in your room. Here’s each step, and how to buy cash on delivery safely.',
-    updated: '2026-10-18',
+    updated: '2026-10-31',
     published: '2026-10-12',
     sections: [
       {
@@ -421,10 +422,11 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'high-back-or-scatter-back-sofa',
-    // Search Console, 27 October 2026: shown for "scatter back vs fullback sofa", "scatter back sofa vs standard back", "what is a scatter back sofa".
-    title: 'Scatter back vs high back (full back) sofa',
-    summary: 'What is a scatter back sofa? Loose back cushions for a softer, relaxed look. A high back (full or standard back) has fixed cushions and a tailored shape. Which suits you.',
-    updated: '2026-10-18',
+    // Search Console, 27 and 31 October 2026: shown most for "scatter back sofa vs standard back" (position 9.3), then
+    // "what is a scatter back sofa", "scatter back vs fullback sofa".
+    title: 'Scatter back vs standard back sofa (high or full back)',
+    summary: 'What is a scatter back sofa? Loose back cushions for a softer, relaxed look. A standard back (high or full back) has fixed cushions and a tailored shape. Which suits you.',
+    updated: '2026-10-31',
     sections: [
       {
         id: 'difference',
@@ -598,10 +600,11 @@ export const GUIDES: Guide[] = [
   },
   {
     slug: 'tech-leather-and-leather-aire',
-    // Search Console, 27 October 2026: shown for "what is tech leather", "is air leather real leather", "what is leather aire".
-    title: 'What is tech leather? Is air leather real leather?',
-    summary: 'Tech leather and Leather Aire (air leather) are leather-look fabrics, not real leather. What each one is, how it feels, wears and cleans, so you know what you’re buying.',
-    updated: '2026-10-23',
+    // Search Console, 27 and 31 October 2026: Leather Aire searches lead ("what is leather aire", "leather aire material",
+    // "air leather", "what is aire leather"), then "what is tech leather" (position 6.3).
+    title: 'What is Leather Aire (air leather)? Tech leather explained',
+    summary: 'Leather Aire (air leather) and tech leather are leather-look fabrics, not real leather. What each one is made of, how it feels, wears and cleans, so you know what you’re buying.',
+    updated: '2026-10-31',
     published: '2026-10-18',
     sections: [
       {
@@ -625,7 +628,12 @@ export const GUIDES: Guide[] = [
       {
         id: 'aire',
         heading: 'Leather Aire',
-        blocks: [{ p: 'A soft leather-look material, sometimes called air leather. Our Roma recliners come in it, or in grey fabric.' }],
+        blocks: [
+          {
+            p: 'Leather Aire, also called air leather or leather air, is a man-made, leather-look upholstery material: a soft polyurethane (PU) finish on a fabric backing. It’s made to breathe a little more than ordinary faux leather (the “air” in the name), so it feels softer and less sticky in a warm room. It isn’t real leather, and it wipes clean like the other leather-look covers.',
+          },
+          { p: 'Our Roma recliners come in Leather Aire in several colours, or in grey fabric.' },
+        ],
       },
       {
         id: 'faux',

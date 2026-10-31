@@ -234,6 +234,13 @@ describe('catalogue feed', () => {
     expect(xml).not.toMatch(/confirm-order|track-order|\/order\/|HW-1\d{5}/)
   })
 
+  it('starts Google’s description with the colour, cover and measurements it asks for, and leaves Meta’s alone', () => {
+    const [item] = buildFeed([product({ material: 'Plush velvet' })], SITE).items
+    expect(item!.details).toBe('Colour: Grey. Cover: Plush velvet. Size: 210 cm wide, 95 cm deep, 90 cm high.')
+    expect(googleFeedXml([item!], SITE)).toContain('<g:description>Colour: Grey. Cover: Plush velvet. Size: 210 cm wide, 95 cm deep, 90 cm high.\n\nRoma 3 Seater Sofa in Grey')
+    expect(metaFeedXml([item!], SITE)).toContain('<g:description>Roma 3 Seater Sofa in Grey')
+  })
+
   it('gives Google its own version (Google’s spellings, measurements, no Meta tags)', () => {
     const xml = googleFeedXml(buildFeed([product({ highlights: ['Foam seat cushions'] })], SITE).items, SITE)
     expect(xml).toContain('<g:availability>in_stock</g:availability>')
