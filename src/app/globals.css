@@ -168,8 +168,28 @@
   }
 }
 
-/* The page doesn't scroll behind an open sheet. */
-html:has(dialog.hw-sheet[open]) { overflow: hidden; }
+/* The product's photos full screen (src/components/product/PhotoViewer.tsx), on the darkest wine. */
+@layer components {
+  dialog.hw-viewer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: #16040A;
+    color: #ffffff;
+    overscroll-behavior: contain;
+  }
+  dialog.hw-viewer::backdrop { background: #16040A; }
+}
+
+/* The page doesn't scroll behind an open sheet or the photo viewer. */
+html:has(dialog.hw-sheet[open]),
+html:has(dialog.hw-viewer[open]) { overflow: hidden; }
 
 /*
  * Room for whatever is fixed to the bottom of the screen (the cookie question,

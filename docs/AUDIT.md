@@ -104,7 +104,7 @@ One prompt each, in this order. Each ends with did / need / check / next, as usu
 | Step | What it fixes | Why first |
 | --- | --- | --- |
 | **A1** ✅ 31 Oct | Product page first screen and buying on phones: tighter stage, name, price and "£0 today" on the first screen, sticky buy bar whenever the main button is off screen (with WhatsApp in it, no floating button there), delivery dates by the price, a compact welcome offer row, a smaller cookie banner | Every ad lands here |
-| **A2** | Product photos: close-ups, the fabric swatch and the drawn top view as extra photos, full-screen zoom, the extra photos in the Meta and Google feeds | Trust, and better catalogue ads |
+| **A2** ✅ 31 Oct | Product photos: close-ups, the fabric swatch and the drawn top view as extra photos, full-screen zoom, the extra photos in the Meta and Google feeds | Trust, and better catalogue ads |
 | **A3** | Search and listings: product titles and headings with "sofa" and the cover, `og:type` product, the home link, tile colourways by the showcase rule, useful tile labels | Search clicks and a cleaner shop |
 | **A4** | Speed under ad traffic: product and category pages cached, the variant and filters read without making the page dynamic | Faster landings, safe under bursts |
 

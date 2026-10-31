@@ -11,6 +11,9 @@
 // A colourway without its own photo is left out rather than shown with a
 // photo of another colour, unless it's the product's only colourway. The
 // admin lists what's left out and why.
+//
+// Extra photos: the product's gallery, then the range's close-ups (audit A2,
+// src/content/close-ups.ts) cut from the item's own colourway only.
 
 import { BRAND } from '@/config/brand'
 import { PROMISES } from '@/config/promises'
@@ -19,6 +22,7 @@ import { unitPrice } from './pricing'
 import { squareImageUrl } from '@/lib/product/seo'
 import { productHref } from '@/lib/product/helpers'
 import { CATALOGUE_CAMPAIGN, META_AD_TAGS, type OfferTier } from '@/lib/offers/paid'
+import { closeUpSources, feedCloseUps, type CloseUpPhoto } from '@/lib/product/close-ups'
 
 export interface FeedVariantRow {
   id: string
@@ -48,6 +52,8 @@ export interface FeedProductRow {
   googleCategory: string | null
   metaCategory: string | null
   rangeName: string | null
+  /** Its range's slug: the key to the range's close-ups. */
+  rangeSlug: string | null
   /** Top level first: ["Sofas", "Corner sofas"]. */
   categoryPath: string[]
   offerTier: OfferTier | null
@@ -64,6 +70,11 @@ export interface FeedItem {
   link: string
   imageLink: string
   additionalImageLinks: string[]
+  /**
+   * Close-ups of this colourway. Meta wants every photo at least 500 px, so its
+   * copy is enlarged to 1080; Google asks for photos at their own size.
+   */
+  closeUps: { meta: string; google: string }[]
   colour: string | null
   material: string | null
   size: string | null
@@ -154,8 +165,12 @@ export function itemDescription(p: FeedProductRow, v: FeedVariantRow): string {
 export function buildFeed(products: FeedProductRow[], siteUrl: string): { items: FeedItem[]; leftOut: LeftOut[] } {
   const items: FeedItem[] = []
   const leftOut: LeftOut[] = []
+  const bySlug = new Map(products.map((p) => [p.slug, p]))
+  const photosOf = (slug: string): CloseUpPhoto[] =>
+    (bySlug.get(slug)?.variants ?? []).flatMap((v) => (v.image ? [{ colour: v.colourName, material: v.materialLabel, src: v.image }] : []))
   for (const p of products) {
     const ready: FeedItem[] = []
+    const sources = closeUpSources(p.rangeSlug, p.slug, photosOf)
     for (const v of p.variants) {
       const price = unitPrice(p.basePrice, v.priceAdjustment)
       const photo = v.image ?? (p.variants.length === 1 ? (p.gallery[0] ?? null) : null)
@@ -168,6 +183,10 @@ export function buildFeed(products: FeedProductRow[], siteUrl: string): { items:
         skip('no-price')
         continue
       }
+      const extra = p.gallery.filter((g) => g !== photo).slice(0, EXTRA_IMAGES_MAX)
+      const shown = { colour: v.colourName, material: v.materialLabel }
+      const meta = feedCloseUps(sources, shown, () => 'c_scale,w_1080,f_jpg,q_auto')
+      const google = feedCloseUps(sources, shown, () => 'f_jpg,q_auto')
       ready.push({
         id: v.id,
         itemGroupId: p.id,
@@ -176,10 +195,8 @@ export function buildFeed(products: FeedProductRow[], siteUrl: string): { items:
         price,
         link: `${siteUrl}${productHref(p.slug, v.sku)}`,
         imageLink: squareImageUrl(photo),
-        additionalImageLinks: p.gallery
-          .filter((g) => g !== photo)
-          .slice(0, EXTRA_IMAGES_MAX)
-          .map(squareImageUrl),
+        additionalImageLinks: extra.map(squareImageUrl),
+        closeUps: meta.slice(0, EXTRA_IMAGES_MAX - extra.length).map((m, n) => ({ meta: m, google: google[n]! })),
         colour: v.colourName,
         material: v.materialLabel ?? p.material,
         size: p.axis1Value,
@@ -274,6 +291,7 @@ export function metaFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('link', catalogueLink(i.link)),
         tag('image_link', i.imageLink),
         ...i.additionalImageLinks.map((src) => tag('additional_image_link', src)),
+        ...i.closeUps.map((c) => tag('additional_image_link', c.meta)),
         tag('brand', BRAND.name),
         tag('color', i.colour),
         tag('material', i.material),
@@ -313,6 +331,7 @@ export function googleFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('link', i.link),
         tag('image_link', i.imageLink),
         ...i.additionalImageLinks.map((src) => tag('additional_image_link', src)),
+        ...i.closeUps.map((c) => tag('additional_image_link', c.google)),
         tag('brand', BRAND.name),
         // Made for us under our own name: there's no barcode or maker's part number.
         tag('identifier_exists', 'no'),

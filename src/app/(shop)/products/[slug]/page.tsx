@@ -19,6 +19,7 @@ import { getDeliveryInfo, getProductPage } from '@/lib/product/load'
 import { getCategories, getListing, sentenceCase } from '@/lib/catalogue/listing'
 import { categoryHref, trail } from '@/lib/catalogue/tree'
 import { pickFabric, pickVariant } from '@/lib/product/helpers'
+import { measurementLayout } from '@/lib/product/measurements'
 import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
 import type { ProductPageData } from '@/lib/product/types'
 import { tierAmount } from '@/lib/offers/paid'
@@ -33,8 +34,8 @@ const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v
 
 /** Only what the interactive part needs, so the page sends the browser no more than that. */
 function purchaseProps(p: ProductPageData): PurchaseProduct {
-  const { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value } = p
-  return { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, range, offerTier, axis1Value, axis2Value }
+  const { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, closeUps, range, offerTier, axis1Value, axis2Value } = p
+  return { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, closeUps, range, offerTier, axis1Value, axis2Value }
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
@@ -98,6 +99,10 @@ export default async function ProductPage({ params, searchParams }: Props) {
     }),
   )
 
+  // The same drawing as "Will it fit?" below, as the photos' last slide.
+  const layout = measurementLayout(product.shape, product.dimensions, product.pieces)
+  const topView = layout ? { layout, height: product.dimensions.height_cm } : null
+
   return (
     <article className="pb-14">
       <script
@@ -116,6 +121,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         adAmount={tierAmount(product.offerTier, offers.amounts)}
         offers={shopOffers(offers)}
         plans={plans}
+        topView={topView}
         crumbs={crumbs.length > 0 ? <Breadcrumbs items={crumbs} onVelvet contained dense /> : null}
         deliveryWindow={delivery.windowLabel}
       >

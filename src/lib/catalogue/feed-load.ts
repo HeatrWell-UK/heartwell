@@ -18,7 +18,7 @@ const FIELDS = `
   id, slug, title, description, highlights, base_price, made_to_order, origin, specifications, sort,
   width_cm, depth_cm, height_cm, side_a_cm, side_b_cm, gallery_images, axis1_value, primary_category_id,
   type:product_types(name, google_product_category, meta_product_category),
-  range:ranges(name),
+  range:ranges(name, slug),
   tier:offer_product_tiers(tier),
   variants:product_variants(id, sku, colour_name, material_label, price_adjustment, image_url, sort, is_active)
 `
@@ -59,6 +59,7 @@ export const getFeedProducts = unstable_cache(
           googleCategory: type.google_product_category,
           metaCategory: type.meta_product_category,
           rangeName: one(p.range)?.name ?? null,
+          rangeSlug: one(p.range)?.slug ?? null,
           categoryPath: pathOf(p.primary_category_id),
           offerTier: (one(p.tier)?.tier ?? null) as OfferTier | null,
           variants: [...p.variants]
@@ -76,7 +77,7 @@ export const getFeedProducts = unstable_cache(
       ]
     })
   },
-  ['feed-products-v1'],
+  ['feed-products-v2'],
   { revalidate: 900, tags: [CATALOGUE_TAG] },
 )
 

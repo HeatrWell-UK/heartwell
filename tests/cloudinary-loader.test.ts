@@ -21,6 +21,12 @@ describe('cloudinaryLoader', () => {
     expect(cloudinaryLoader({ src, width: 640 })).toBe(src)
   })
 
+  it('sizes a close-up after its crop, never wider than the square', () => {
+    const src = `${BASE}c_crop,x_60,y_600,w_330,h_330/v123/heartwell/sofa.png`
+    expect(cloudinaryLoader({ src, width: 256 })).toBe(`${BASE}c_crop,x_60,y_600,w_330,h_330/f_auto,c_limit,w_256,q_auto/v123/heartwell/sofa.png`)
+    expect(cloudinaryLoader({ src, width: 1080 })).toBe(`${BASE}c_crop,x_60,y_600,w_330,h_330/f_auto,c_limit,w_330,q_auto/v123/heartwell/sofa.png`)
+  })
+
   it('leaves local files alone', () => {
     expect(cloudinaryLoader({ src: '/brand/hw-logo.webp', width: 640 })).toBe('/brand/hw-logo.webp')
   })

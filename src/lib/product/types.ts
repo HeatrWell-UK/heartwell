@@ -5,6 +5,7 @@ import type { SizeFields } from '@/lib/catalogue/display'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
 import type { OfferTier } from '@/lib/offers/paid'
 import type { DeliveryArea } from '@/lib/delivery/areas'
+import type { CloseUpSource } from './close-ups'
 
 /** A charged delivery area with today's window ("Sat 24 – Tue 27 October") and first day a customer may pick. */
 export interface AreaDelivery extends DeliveryArea {
@@ -91,6 +92,8 @@ export interface ProductPageData {
   seoTitle: string | null
   seoDescription: string | null
   gallery: string[]
+  /** The range's close-ups that apply to this piece, with the photos each may be cut from (audit A2). */
+  closeUps: CloseUpSource[]
   specs: SpecRow[]
   /** Leather-look and other non-fabric covers get different care advice. */
   coverKind: 'fabric' | 'other'

@@ -10,6 +10,7 @@ import { fromPrice } from '@/lib/catalogue/pricing'
 import type { Piece, Shape } from '@/lib/catalogue/clean'
 import type { OfferTier } from '@/lib/offers/paid'
 import { specRows, type SpecField } from './specs'
+import { closeUpSources, type CloseUpPhoto } from './close-ups'
 import type { AreaDelivery, DeliveryInfo, FabricCollectionView, ProductCardView, ProductPageData, SiblingView, VariantView } from './types'
 
 /** Cache tag for shop settings; the catalogue's is CATALOGUE_TAG. The admin revalidates both (Phase 12). */
@@ -50,7 +51,9 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     p.range
       ? db
           .from('products')
-          .select('slug, axis1_value, axis2_value, base_price, made_to_order, sort, variants:product_variants(sku, colour_name, price_adjustment, sort)')
+          .select(
+            'slug, axis1_value, axis2_value, base_price, made_to_order, sort, variants:product_variants(sku, colour_name, material_label, price_adjustment, image_url, is_active, sort)',
+          )
           .eq('range_id', p.range.id)
           .order('sort')
           .order('slug')
@@ -85,6 +88,12 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     madeToOrder: s.made_to_order,
     variants: [...s.variants].sort(bySort).map((v) => ({ sku: v.sku, colourName: v.colour_name, priceAdjustment: v.price_adjustment })),
   }))
+
+  // Close-ups are cut from a piece of the same range, so its photos come with the sizes above.
+  const photosOf = (pieceSlug: string): CloseUpPhoto[] =>
+    [...(siblings?.data?.find((s) => s.slug === pieceSlug)?.variants ?? [])]
+      .sort(bySort)
+      .flatMap((v) => (v.is_active && v.image_url ? [{ colour: v.colour_name, material: v.material_label, src: v.image_url }] : []))
 
   const fabricViews: FabricCollectionView[] = (fabrics?.data ?? [])
     .map((c) => ({
@@ -137,6 +146,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     seoTitle: p.seo_title,
     seoDescription: p.seo_description,
     gallery: p.gallery_images,
+    closeUps: closeUpSources(p.range?.slug ?? null, p.slug, photosOf),
     specs: specRows(p.type.spec_fields as unknown as SpecField[], specs, { madeToOrder: p.made_to_order, madeInUk: p.origin === 'uk' }),
     coverKind: /leather|pvc|vinyl/i.test(material) ? 'other' : 'fabric',
     range: p.range ? { slug: p.range.slug, name: p.range.name, axis1Name: p.range.axis1_name, axis2Name: p.range.axis2_name } : null,
@@ -159,7 +169,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
   }
 }
 
-export const getProductPage = unstable_cache(loadProductPage, ['product-page-v4'],{ revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
+export const getProductPage = unstable_cache(loadProductPage, ['product-page-v5'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
 
 const loadDeliverySettings = unstable_cache(
   async () => {
