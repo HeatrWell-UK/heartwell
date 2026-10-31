@@ -106,7 +106,7 @@ One prompt each, in this order. Each ends with did / need / check / next, as usu
 | **A1** ✅ 31 Oct | Product page first screen and buying on phones: tighter stage, name, price and "£0 today" on the first screen, sticky buy bar whenever the main button is off screen (with WhatsApp in it, no floating button there), delivery dates by the price, a compact welcome offer row, a smaller cookie banner | Every ad lands here |
 | **A2** ✅ 31 Oct | Product photos: close-ups, the fabric swatch and the drawn top view as extra photos, full-screen zoom, the extra photos in the Meta and Google feeds | Trust, and better catalogue ads |
 | **A3** ✅ 31 Oct | Search and listings: product titles and headings with "sofa" and the cover, `og:type` product, the home link, tile colourways by the showcase rule, useful tile labels | Search clicks and a cleaner shop |
-| **A4** | Speed under ad traffic: product and category pages cached, the variant and filters read without making the page dynamic | Faster landings, safe under bursts |
+| **A4** ✅ 31 Oct | Speed under ad traffic: product and category pages cached, the variant and filters read without making the page dynamic | Faster landings, safe under bursts |
 
 The planned **search results check** (from 1 November) can run before or after A3; **Meta ads Stage 0** follows once the owner has the ad account.
 
@@ -128,10 +128,31 @@ Audit step A3. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md, docs/AUDIT.md and
 Audit step A4. Read CLAUDE.md, docs/PLAN.md, docs/PROGRESS.md and docs/AUDIT.md, then build step A4 (cache product and category pages).
 ```
 
-## What only the owner can do
+## What only the owner can do (the full list, after A1–A4)
 
-1. **Meta ad account** in the Heartwell Sofa business, with the dataset and catalogue assigned, Instagram connected and WhatsApp Business on 07460 669864 (`docs/META-ADS.md`, Stage 0). Then say "ad account ready".
-2. **Address finder key**: sign up with getAddress.io or Ideal Postcodes, then in Hostinger add `ADDRESS_LOOKUP_PROVIDER` (`getaddress` or `ideal-postcodes`) and `ADDRESS_LOOKUP_KEY`, and redeploy.
-3. **Still open from before:** the Merchant Center business address, Bing Webmaster Tools, letting GPTBot and Meta's AI crawler in on Hostinger, the feed fetch hourly in Commerce Manager.
-4. **Reviews:** ask delivered customers for a Google review on the Business Profile as well as the site's own request.
-5. **Returns on made-to-order pieces:** a quick check with an adviser (section 7).
+Everything the audit leaves to the owner, in the order that helps most. Steps for each; say the words in quotes when one is done.
+
+**For ads**
+
+1. **Meta ad account** (about an hour, `docs/META-ADS.md` Stage 0): business.facebook.com → Settings → Accounts → Ad accounts → Add → Create a new ad account. Name Heartwell, time zone Europe/London, currency GBP (neither can change later), "My business", yourself with full control. Then: a card in Billing with a spending limit; Settings → Data sources → Datasets → Heartwell → Add assets → the new ad account, and the same for Catalogues → Heartwell Products; Instagram @heartwellsofa added and connected to the ad account; WhatsApp Business on 07460 669864 linked to the Facebook page; the page's location Burnley. Then say **"ad account ready"**.
+2. **Catalogue fetched hourly** (2 minutes): Commerce Manager → Heartwell Products → Data sources → the feed → Settings → Schedule → **Hourly**, so ad prices and the new titles and close-ups stay in step with the site.
+
+**For checkout on phones**
+
+3. **Address finder key** (10 minutes): sign up at getAddress.io (or Ideal Postcodes) and copy the API key. Hostinger → Websites → heartwellsofa.co.uk → the Node.js app → Environment variables: add `ADDRESS_LOOKUP_PROVIDER` = `getaddress` (or `ideal-postcodes`) and `ADDRESS_LOOKUP_KEY` = the key, then redeploy. Checkout then finds the address from the postcode. Say **"address key added"** and I'll check it live.
+
+**For search**
+
+4. **Merchant Center business address** (5 minutes): Merchant Center → Settings → Business info → address Unit 4, Blacker Street, Burnley BB10 2AF. Until then the account stays held and the free Google Shopping listings don't show.
+5. **Bing Webmaster Tools** (5 minutes): bing.com/webmasters → sign in with a Microsoft account → **Import from Google Search Console**. The site and sitemap come across; ChatGPT and Copilot search read Bing.
+6. **Let GPTBot and Meta's AI crawler in** (2 minutes): Hostinger's CDN answers them with 429. Hostinger → the website → Security (or CDN) → bot protection / AI crawlers → allow GPTBot and meta-externalagent.
+
+**For trust**
+
+7. **Google reviews**: Google Business Profile → Ask for reviews → share the link with every delivered customer (the site already emails its own review request after delivery).
+8. **Returns on made-to-order pieces**: a quick check with a consumer-law adviser (Citizens Advice's business service or Business Companion from Trading Standards) on whether sofas made in a colour or fabric from the shop's own range count as made to the customer's specification (section 7). Nothing changes until you say.
+9. **Optional, sharper close-ups**: a few real close-up photos from the makers (an arm, the feet, the fabric, per range). They go into the same list (`src/content/close-ups.ts`) and replace the cut-outs.
+
+**Still open from before the audit**
+
+10. Prices for the Lily 2 Seater and the Verona Cuddle Chair (both hidden until priced), UptimeRobot (`docs/MONITORING.md`) and the OrderFlow tidy-up.
