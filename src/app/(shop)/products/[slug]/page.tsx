@@ -20,7 +20,8 @@ import { getCategories, getListing, sentenceCase } from '@/lib/catalogue/listing
 import { categoryHref, trail } from '@/lib/catalogue/tree'
 import { pickFabric, pickVariant } from '@/lib/product/helpers'
 import { measurementLayout } from '@/lib/product/measurements'
-import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, shareImageUrl } from '@/lib/product/seo'
+import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, productSearchTitle, shareImageUrl } from '@/lib/product/seo'
+import { unitPrice } from '@/lib/catalogue/pricing'
 import type { ProductPageData } from '@/lib/product/types'
 import { tierAmount } from '@/lib/offers/paid'
 import { getOfferSettings, shopOffers } from '@/lib/offers/server'
@@ -34,8 +35,8 @@ const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v
 
 /** Only what the interactive part needs, so the page sends the browser no more than that. */
 function purchaseProps(p: ProductPageData): PurchaseProduct {
-  const { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, closeUps, range, offerTier, axis1Value, axis2Value } = p
-  return { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, closeUps, range, offerTier, axis1Value, axis2Value }
+  const { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, closeUps, range, offerTier, axis1Value, axis2Value, shape } = p
+  return { id, slug, title, typeName, basePrice, wasPrice, madeToOrder, madeInUk, variants, siblings, fabrics, gallery, closeUps, range, offerTier, axis1Value, axis2Value, shape }
 }
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
@@ -44,14 +45,16 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (!product) return {}
   const variant = pickVariant(product.variants, first((await searchParams).variant))
   const image = shareImageUrl(variant?.image ?? product.gallery[0] ?? null)
-  const title = product.seoTitle ?? product.title
+  const title = productSearchTitle(product)
   const description = productDescription(product)
+  // Shared as a product with its price (the page adds og:type, which Next's metadata can't say).
+  const share = { locale: OPEN_GRAPH_BASE.locale, siteName: OPEN_GRAPH_BASE.siteName }
   return {
     title,
     description,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
-      ...OPEN_GRAPH_BASE,
+      ...share,
       title,
       description,
       url: `/products/${product.slug}`,
@@ -105,6 +108,10 @@ export default async function ProductPage({ params, searchParams }: Props) {
 
   return (
     <article className="pb-14">
+      {/* React moves these into the head: a link to the page previews as a product, with the colourway's price. */}
+      <meta property="og:type" content="product" />
+      <meta property="product:price:amount" content={unitPrice(product.basePrice, variant?.priceAdjustment ?? 0).toFixed(2)} />
+      <meta property="product:price:currency" content="GBP" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

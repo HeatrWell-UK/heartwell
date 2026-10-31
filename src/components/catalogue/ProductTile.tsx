@@ -17,10 +17,15 @@ export function sizeLine(p: Pick<ListingProduct, 'axis1Value' | 'axis2Value'>): 
   return parts.map((part, i) => (i === 0 ? part : part.charAt(0).toLowerCase() + part.slice(1))).join(', ')
 }
 
+/**
+ * A label only where it tells pieces apart (audit A3): nearly everything is
+ * made to order, so that says nothing on a tile (the product page says it).
+ * Ready-made pieces are the few that come with 14 days to change your mind.
+ */
 function badgeFor(p: ListingProduct): string | null {
   if (p.reclining === 'Electric') return 'Electric recliner'
   if (p.reclining) return 'Reclining'
-  if (p.madeToOrder) return 'Made to order'
+  if (!p.madeToOrder) return 'Ready made'
   return null
 }
 

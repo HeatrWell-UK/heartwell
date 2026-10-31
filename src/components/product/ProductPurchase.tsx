@@ -31,6 +31,7 @@ import { bestOffer, welcomeOff, type ShopOffers } from '@/lib/offers/welcome'
 import type { Layout } from '@/lib/product/measurements'
 import { Medallion } from '@/components/catalogue/Arcade'
 import { gallerySlides } from '@/lib/product/gallery'
+import { withNoun } from '@/lib/product/naming'
 import { InfoIcon, TruckIcon } from '@phosphor-icons/react'
 
 export type PurchaseProduct = Pick<
@@ -52,6 +53,7 @@ export type PurchaseProduct = Pick<
   | 'offerTier'
   | 'axis1Value'
   | 'axis2Value'
+  | 'shape'
 >
 
 /** A size's top view and seats, keyed by the product's slug, for the size cards. */
@@ -160,11 +162,12 @@ export function ProductPurchase({
   const offer = bestOffer(welcome.kind === 'live' ? welcomeAmount : 0, adOff)
   const offerOff = offer.amount
 
-  const sizeText = p.axis1Value ? [p.axis1Value, p.axis2Value].filter((v): v is string => Boolean(v)).map(sizeLabel) : []
+  // "5 seater corner sofa, high back": the size with the word people search for (audit A3).
+  const sizeText = p.axis1Value ? [withNoun(p.axis1Value, p.shape, p.typeName), p.axis2Value].filter((v): v is string => Boolean(v)).map(sizeLabel) : []
   const heading =
     p.range && sizeText.length > 0
       ? { name: p.range.name, detail: sizeText.map((t, i) => (i ? t.charAt(0).toLowerCase() + t.slice(1) : t)).join(', ') }
-      : { name: p.title, detail: null }
+      : { name: withNoun(p.title, p.shape, p.typeName), detail: null }
 
   const addToBasket = () => {
     if (!variant) return

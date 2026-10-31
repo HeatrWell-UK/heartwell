@@ -11,6 +11,7 @@ import type { Piece, Shape } from '@/lib/catalogue/clean'
 import type { OfferTier } from '@/lib/offers/paid'
 import { specRows, type SpecField } from './specs'
 import { closeUpSources, type CloseUpPhoto } from './close-ups'
+import { leadColourway } from '@/lib/catalogue/lead'
 import type { AreaDelivery, DeliveryInfo, FabricCollectionView, ProductCardView, ProductPageData, SiblingView, VariantView } from './types'
 
 /** Cache tag for shop settings; the catalogue's is CATALOGUE_TAG. The admin revalidates both (Phase 12). */
@@ -68,7 +69,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     p.category
       ? db
           .from('products')
-          .select('slug, title, base_price, was_price, sort, range_id, variants:product_variants(colour_name, price_adjustment, image_url, sort)')
+          .select('slug, title, base_price, was_price, sort, range_id, variants:product_variants(sku, colour_name, colour_hex, price_adjustment, image_url, sort)')
           .eq('primary_category_id', p.category.id)
           .neq('slug', slug)
           .order('sort')
@@ -112,7 +113,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
     if (seenRanges.has(key) || relatedViews.length >= 8) continue
     seenRanges.add(key)
     const vs = [...r.variants].sort(bySort)
-    const shown = vs.find((v) => v.image_url) ?? vs[0]
+    const shown = leadColourway(vs, (v) => ({ sku: v.sku, hex: v.colour_hex, image: v.image_url }))
     const adjustments = vs.map((v) => v.price_adjustment)
     relatedViews.push({
       slug: r.slug,
@@ -169,7 +170,7 @@ async function loadProductPage(slug: string): Promise<ProductPageData | null> {
   }
 }
 
-export const getProductPage = unstable_cache(loadProductPage, ['product-page-v5'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
+export const getProductPage = unstable_cache(loadProductPage, ['product-page-v6'], { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] })
 
 const loadDeliverySettings = unstable_cache(
   async () => {

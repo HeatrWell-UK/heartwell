@@ -7,6 +7,7 @@ import { POLICIES, PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
 import { fromPrice, unitPrice } from '@/lib/catalogue/pricing'
 import { productHref } from './helpers'
+import { searchTitle } from './naming'
 import type { ProductPageData } from './types'
 
 const CLOUDINARY_PLAIN = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/
@@ -26,6 +27,22 @@ export function shareImageUrl(src: string | null): string | null {
   if (!src) return null
   const m = CLOUDINARY_PLAIN.exec(src)
   return m ? `${m[1]}c_pad,b_rgb:F5F1EF,w_1200,h_630,f_jpg,q_auto/${m[2]}` : src
+}
+
+/** The page's title: the owner's search title when set, else one with "sofa" and the cover (src/lib/product/naming.ts). */
+export function productSearchTitle(p: ProductPageData): string {
+  if (p.seoTitle) return p.seoTitle
+  const recliner = [p.category?.slug, p.category?.parent?.slug].some((s) => s?.includes('recliner'))
+  return searchTitle({
+    title: p.title,
+    typeName: p.typeName,
+    shape: p.shape,
+    axis1Value: p.axis1Value,
+    axis2Value: p.axis2Value,
+    rangeName: p.range?.name ?? null,
+    recliner,
+    variants: p.variants,
+  })
 }
 
 export function productPrice(p: ProductPageData): number {

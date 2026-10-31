@@ -3,6 +3,7 @@
 
 import { classifyDeliveryPostcode, outwardCode, type PostcodeReason } from '@/lib/delivery/postcode'
 import { unitPrice } from '@/lib/catalogue/pricing'
+import { leadColourway } from '@/lib/catalogue/lead'
 import type { FabricCollectionView, FabricView, SiblingView, VariantView } from './types'
 
 /** "Blue, Plush Soft Velvet (PL09)": how a chosen fabric is named everywhere. */
@@ -21,7 +22,7 @@ export function pickVariant(variants: VariantView[], requested: string | undefin
     const match = variants.find((v) => v.sku.toLowerCase() === wanted || v.id.toLowerCase() === wanted)
     if (match) return match
   }
-  return variants.find((v) => v.image) ?? variants[0] ?? null
+  return leadColourway(variants, (v) => ({ sku: v.sku, hex: v.colourHex, image: v.image }))
 }
 
 export function pickFabric(collections: FabricCollectionView[], code: string | undefined) {
