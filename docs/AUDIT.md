@@ -143,7 +143,7 @@ Everything the audit leaves to the owner, in the order that helps most. Steps fo
 
 **For search**
 
-4. **Merchant Center business address** (5 minutes): Merchant Center → Settings → Business info → address Unit 4, Blacker Street, Burnley BB10 2AF. Until then the account stays held and the free Google Shopping listings don't show.
+4. ~~**Merchant Center business address**~~ ✅ done on 31 October (search results check, with the owner's go-ahead): the account's setup is complete and the products can now be reviewed for free listings.
 5. **Bing Webmaster Tools** (5 minutes): bing.com/webmasters → sign in with a Microsoft account → **Import from Google Search Console**. The site and sitemap come across; ChatGPT and Copilot search read Bing.
 6. **Let GPTBot and Meta's AI crawler in** (2 minutes): Hostinger's CDN answers them with 429. Hostinger → the website → Security (or CDN) → bot protection / AI crawlers → allow GPTBot and meta-externalagent.
 
