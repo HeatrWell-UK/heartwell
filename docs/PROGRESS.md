@@ -51,6 +51,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 2 November 2026 — Meta ad account checked; product sets made; no ads yet (owner's decision)
+- **Owner:** used their own ad account (moved into Heartwell Sofa) and said "ad account ready"; then **"Don't make any ads until I say so"**, leaning to £40 a day, all to the website, with their own edited post.
+- **Checked with the Meta connector:** ad account in Heartwell Sofa (GBP, Europe/London, card, active), the Heartwell dataset assigned, @heartwellsofa connected, the Heartwell Sofa page in the business, the catalogue eligible for catalogue ads with 100% of product events matched. Meta also lists the sister shop's catalogue for this account and recommends it: always pick "Heartwell Products". One catalogue check fails only because no customer confirmed an order in the last 7 days.
+- **Made (spend nothing):** four product sets (all £399 and over: can be ordered alone 68, corners and U-shapes 29, recliners 15, 3+2 sets 10) and the "Page and Instagram engaged 365d" audience. The three website audiences need the owner to accept Meta's Custom Audience terms first (`docs/META-ADS.md`).
+- **Not made:** any campaign, ad set or ad.
+
 ### 31 October 2026 — Search results check (Search Console, Merchant Center, Google and Bing)
 - **Owner's request:** run the search results check (signed in to Google in the built-in browser for it).
 - **What the search engines show:** in `docs/KEYWORDS.md`, "Second results". In short: 196 impressions in 28 days (54 on 27 October), clicks still only from name searches; guides on page one for Leather Aire, tech leather, scatter back and pay on delivery searches but no clicks yet; 78 pages (nearly all products) still waiting to be crawled; the server errors stopped on 24 October; Bing has two guides.

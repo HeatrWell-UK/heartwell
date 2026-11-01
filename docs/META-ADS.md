@@ -12,9 +12,12 @@ Owner, 27 October 2026: start Meta ads now (this replaces the 17 October order "
 | Domain verification (heartwellsofa.co.uk) | Done at go-live (DNS TXT) |
 | Catalogue "Heartwell Products" | 121 items (75 products), fetched daily from the site, 0 errors, connected to the dataset (100% product match) |
 | Website for ad visitors | Ad links and URL parameters (Admin → Ad links); the ad offer (£50/£30/£20 by piece, 7 days) and the welcome offer (£20 off each piece, 48 hours); minimum order £399; WhatsApp button on every page; pay on delivery |
-| **Ad account** | **Missing.** None belongs to the Heartwell business; the sister business's accounts must never be used |
-| **Instagram** | **Not confirmed** as connected to the business |
-| **WhatsApp Business on 07460 669864** | **Not confirmed** |
+| **Ad account** | **Ready (2 November 2026):** the owner's own GBP, Europe/London account, moved into Heartwell Sofa, with a card; the Heartwell dataset assigned. Its two old campaigns (paused, from before Heartwell) stay paused. **Meta also offers it the sister shop's catalogue and even recommends it: always choose "Heartwell Products"** |
+| **Instagram** | Ready: @heartwellsofa connected to the ad account |
+| **Catalogue product sets** | Made 2 November: "Can be ordered alone (£399 and over)" 68 pieces, "Corner and U-shape sofas" 29, "Recliners (electric and manual)" 15, "3+2 sofa sets" 10 (all £399 and over; they follow price changes) |
+| **Audiences** | "Page and Instagram engaged 365d" made. The website audiences (visitors 30d, viewed or added to basket 14d, ordered 180d) wait for the owner to accept Meta's Custom Audience terms once: facebook.com/customaudiences/app/tos/ with the ad account |
+| **Ads** | **None yet. The owner decides when and what (2 November: no ads until they say so).** Leaning to £40 a day, all to the website, with the owner's own edited post |
+| **WhatsApp Business on 07460 669864** | **Not confirmed** (only needed for WhatsApp chat ads, not planned for now) |
 
 ## Stage 0: before the first ad
 
