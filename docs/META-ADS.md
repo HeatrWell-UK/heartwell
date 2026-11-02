@@ -19,6 +19,21 @@ Owner, 27 October 2026: start Meta ads now (this replaces the 17 October order "
 | **Ads** | **None yet. The owner decides when and what (2 November: no ads until they say so).** Leaning to £40 a day, all to the website, with the owner's own edited post |
 | **WhatsApp Business on 07460 669864** | **Not confirmed** (only needed for WhatsApp chat ads, not planned for now) |
 
+## The agreed plan (owner, 2–3 November 2026)
+
+This replaces Stage 1's two campaigns below where they differ.
+
+- **Who does what:** ChatGPT makes the creatives from the owner's own photos, one range at a time, with prompts I write; I check every creative against the real photos (the sofa must not be redrawn) and build and launch through the Meta connector, paused until the owner says "publish". Premium videos are made from the real photos (the `design/ads/made-your-way` pipeline), not AI video.
+- **Hero range: Rio Chesterfield** (2 seater £399 to 3+2 and corner £699), the shop's symbol.
+- **One campaign, Sales, website, two ad sets with their own budgets (£50 a day):**
+  1. **Rio Chesterfield, £30 a day:** hero image, close-ups (buttoning, scroll arms, feet), a sizes-and-prices carousel, a "pay nothing upfront" ad, and a premium Rio video.
+  2. **The collection, £20 a day:** one carousel (Ashton, Verona, Lily, Oakland, Windsor, Ruby, each card to its range page), three single images (e.g. Ashton, Windsor, Oakland), the "Your sofa, your way" video, and one catalogue ad.
+  3. **Later (about two weeks in):** a follow-up catalogue ad set (about £10 a day) for people who viewed or added to basket, once that audience reaches about 1,000.
+- **Optimise for:** add to basket for the first two weeks; Purchase once there are 10–15 confirmed orders a week.
+- **The money:** each sale leaves about £100 (owner); ad visitors get £20 off on every piece in these ranges (standard tier, or the welcome offer), so about **£80 per ad sale**. Break-even is £80 per confirmed order; the target is £50 or less.
+- **The test:** 14 days, about £700, with a campaign spending limit of £700 so it can't overspend. After it: over £80 per confirmed order, stop and rethink; £50–80, change creatives; under £50, raise budgets about 20% every 3–4 days.
+- **Not advertised:** Bishop (not sold on the site); pieces under £399 on their own.
+
 ## Stage 0: before the first ad
 
 ### The owner (about an hour)
