@@ -369,6 +369,23 @@ export function ProductPurchase({
               </ul>
             </nav>
           )}
+          {/* Made to order, so any size or shape can be made (owner, 3 November 2026): the ads say so too. */}
+          {p.madeToOrder && sizes.length > 0 && (
+            <p className="pt-3 text-[14px] leading-snug text-slate">
+              Need another size or shape? It’s made to order, so{' '}
+              <WhatsAppButton
+                message={`Hi Heartwell, could the ${p.range?.name ?? p.title} be made in another size or shape? ${SITE_URL}${productHref(p.slug, variant?.sku, fabric?.fabric.code)}`}
+                context="product-size"
+                productId={p.id}
+                variantId={variant?.id}
+                productName={p.title}
+                className="font-semibold text-velvet"
+              >
+                ask us on WhatsApp
+              </WhatsAppButton>
+              .
+            </p>
+          )}
 
           {backs.length > 0 && (
             <nav aria-label={p.range?.axis2Name ?? 'Style'} className="flex flex-col gap-3 pt-5">
