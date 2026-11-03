@@ -55,6 +55,7 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - **Owner:** offers differ by range; Rio gets **£50 off the 3+2 set and the 5 seater corner** for ad visitors; every sofa can be made in any size, shape and fabric; Rio chrome legs on request. ChatGPT (Windows app, project on `design/ads`) makes the creatives from prompts I write, one at a time; I check them, then the premium Rio video.
 - **Done:** the Rio 3+2 and corner moved to the HIGH offer tier (£50; it applies only to visits from ads). Made-to-order product pages with sizes say "Need another size or shape? It's made to order, so ask us on WhatsApp" (WhatsApp context `product-size`).
 - **Local only (`design/ads/`, git-ignored):** `BRIEF.md` (ChatGPT's brief: the real-photo rule, words, look, sizes, files), `_brand/` (logo PNGs, Gloock and Figtree, 10 real swatches, Rio posts as style examples), `Rio Chesterfield/RIO.md` (facts checked live, which photos to use, creatives R1–R6 and video V1) and `Site photos/`. Five web-downloaded photos in `Raw Pictures/` are not used in ads.
+- **Second try (same day):** the owner disliked R1 made to that brief, so ChatGPT now designs freely from a list of what each ad must say. The sofa comes from cut-outs of the real photos (`Rio Chesterfield/Cut-outs/`, five pieces, BiRefNet). The old brief, `RIO.md` and R1 moved to `.qa/ads/`.
 - **Not made:** any campaign, ad set or ad.
 
 ### 2 November 2026 — Meta ad account checked; product sets made; no ads yet (owner's decision)
