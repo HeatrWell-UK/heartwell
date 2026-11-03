@@ -51,6 +51,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 3 November 2026 — Rio Chesterfield ads: offer, brief and the size line
+- **Owner:** offers differ by range; Rio gets **£50 off the 3+2 set and the 5 seater corner** for ad visitors; every sofa can be made in any size, shape and fabric; Rio chrome legs on request. ChatGPT (Windows app, project on `design/ads`) makes the creatives from prompts I write, one at a time; I check them, then the premium Rio video.
+- **Done:** the Rio 3+2 and corner moved to the HIGH offer tier (£50; it applies only to visits from ads). Made-to-order product pages with sizes say "Need another size or shape? It's made to order, so ask us on WhatsApp" (WhatsApp context `product-size`).
+- **Local only (`design/ads/`, git-ignored):** `BRIEF.md` (ChatGPT's brief: the real-photo rule, words, look, sizes, files), `_brand/` (logo PNGs, Gloock and Figtree, 10 real swatches, Rio posts as style examples), `Rio Chesterfield/RIO.md` (facts checked live, which photos to use, creatives R1–R6 and video V1) and `Site photos/`. Five web-downloaded photos in `Raw Pictures/` are not used in ads.
+- **Not made:** any campaign, ad set or ad.
+
 ### 2 November 2026 — Meta ad account checked; product sets made; no ads yet (owner's decision)
 - **Owner:** used their own ad account (moved into Heartwell Sofa) and said "ad account ready"; then **"Don't make any ads until I say so"**, leaning to £40 a day, all to the website, with their own edited post.
 - **Checked with the Meta connector:** ad account in Heartwell Sofa (GBP, Europe/London, card, active), the Heartwell dataset assigned, @heartwellsofa connected, the Heartwell Sofa page in the business, the catalogue eligible for catalogue ads with 100% of product events matched. Meta also lists the sister shop's catalogue for this account and recommends it: always pick "Heartwell Products". One catalogue check fails only because no customer confirmed an order in the last 7 days.
