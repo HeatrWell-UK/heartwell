@@ -310,11 +310,12 @@ const newProducts = [
   },
   // Bishop (owner, 5 November 2026): a 6 seater U-shape, 180 × 300 × 180 cm,
   // the scattered back in Silver at £649 and the high back in Truffle at £699.
-  // Depth and height to come from the owner. New SKUs in Ashton's pattern.
+  // Depth and height as Verona's corners (owner): 95 deep with the high back,
+  // 90 with the scattered back, 90 high. New SKUs in Ashton's pattern.
   ...[
-    ['bishop-high-back-u-shape', 'High Back', 'BHBU-T', 'Truffle', '#B8A493', 'Bishop-U-Shape-High-Back-Sofa-Truffle', 800, 699, { feet: 'Polished chrome' }],
-    ['bishop-scattered-back-u-shape', 'Scattered Back', 'BSBU-SV', 'Silver', '#9F978F', 'Bishop-U-Shape-Scatter-Back-Sofa-Silver', 801, 649, {}],
-  ].map(([slug, back, sku, colour, hex, img, sort, price, extra]) => ({
+    ['bishop-high-back-u-shape', 'High Back', 'BHBU-T', 'Truffle', '#B8A493', 'Bishop-U-Shape-High-Back-Sofa-Truffle', 800, 699, 95, { feet: 'Polished chrome' }],
+    ['bishop-scattered-back-u-shape', 'Scattered Back', 'BSBU-SV', 'Silver', '#9F978F', 'Bishop-U-Shape-Scatter-Back-Sofa-Silver', 801, 649, 90, {}],
+  ].map(([slug, back, sku, colour, hex, img, sort, price, depth, extra]) => ({
     product: hidden({
       slug,
       title: `Bishop 6 Seater U-Shape ${back}`,
@@ -329,7 +330,7 @@ const newProducts = [
       specifications: { material: 'Fabric', shape: 'u-shape', seats: 6, cushions_included: true, ...extra },
       sort,
       offer_tier: 'STANDARD',
-      ...priced(price, { w: 300, d: null, h: null, a: 180, b: 180 }),
+      ...priced(price, { w: 300, d: depth, h: 90, a: 180, b: 180 }),
     }),
     variants: [{ sku, colour_name: colour, colour_hex: hex, material_label: 'Fabric', image: img }],
   })),
