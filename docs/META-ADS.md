@@ -27,14 +27,14 @@ This replaces Stage 1's two campaigns below where they differ.
 - **Hero range: Rio Chesterfield** (2 seater £399 to 3+2 and corner £699), the shop's symbol.
 - **One campaign, Sales, website, two ad sets with their own budgets (£50 a day):**
   1. **Rio Chesterfield, £30 a day:** hero image, close-ups (buttoning, scroll arms, feet), a sizes-and-prices carousel, a "pay nothing upfront" ad, and a premium Rio video.
-  2. **The collection, £20 a day:** one carousel (Ashton, Verona, Lily, Oakland, Windsor, Ruby, each card to its range page), three single images (e.g. Ashton, Windsor, Oakland), the "Your sofa, your way" video, and one catalogue ad.
+  2. **The collection, £20 a day:** one carousel (Ashton, Verona, Bishop U-shape, Lily, Oakland, Windsor, Ruby, Malibu, each card to its range page; owner, 5 November 2026), three single images (Ashton, Lily, Oakland), the "Your sofa, your way" video, and one catalogue ad.
   3. **Later (about two weeks in):** a follow-up catalogue ad set (about £10 a day) for people who viewed or added to basket, once that audience reaches about 1,000.
 - **Optimise for:** add to basket for the first two weeks; Purchase once there are 10–15 confirmed orders a week.
 - **The money:** each sale leaves about £100 (owner); ad visitors get £20 off on every piece in these ranges (standard tier, or the welcome offer), so about **£80 per ad sale**. Break-even is £80 per confirmed order; the target is £50 or less.
 - **Offers by range (owner, 3 November 2026):** not the same for every sofa. **Rio: £50 off the 3+2 set and the 5 seater corner** for ad visitors (offer tier HIGH since 3 November 2026; the other Rio sizes stay STANDARD). The owner says a Rio sale still leaves about £100 after the £50 off, so the Rio ad set breaks even at about £100 per confirmed order. Made-to-order product pages now say "Need another size or shape? Ask us on WhatsApp" (the owner: every sofa can be made in any size, shape and fabric), and the Rio can have chrome legs on request. Other ranges' offers are set when their creatives are made.
 - **Creatives (owner, 3 November 2026, second try):** ChatGPT designs each ad freely (idea, scene, layout, type); my prompt for each lists only what must be on it. The one fixed point: the sofa is placed from a cut-out of the real photo (`design/ads/<Range>/Cut-outs/`, made locally with BiRefNet), never redrawn, and I compare it with the cut-out before launch. The first, rule-heavy brief and its R1 (rejected by the owner) are kept locally in `.qa/ads/`, with the Rio facts (`RIO.md`).
 - **The test:** 14 days, about £700, with a campaign spending limit of £700 so it can't overspend. After it: over £80 per confirmed order, stop and rethink; £50–80, change creatives; under £50, raise budgets about 20% every 3–4 days.
-- **Not advertised:** Bishop (not sold on the site); pieces under £399 on their own.
+- **Not advertised:** pieces under £399 on their own. Bishop (6 seater U-shape, £649 and £699) is on sale since 5 November 2026 and joins the catalogue and the "Corner and U-shape sofas" set with the feed; it gets a card in the collection carousel (C1).
 
 ## Stage 0: before the first ad
 

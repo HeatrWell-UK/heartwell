@@ -114,6 +114,13 @@ export const RANGE_COPY = {
       'The Verona family set brings together the scattered back 5 seater corner, a cuddle chair and a footstool, all with Verona’s scrolled arms and all in the same fabric: a whole living room in one order.',
     highlights: ['5 seater corner, cuddle chair and footstool', 'Scrolled arms and a scattered back', 'Every cushion included'],
   },
+  // From the owner's photos (5 November 2026): a chaise at each end, a scattered
+  // back in Silver and a high back in Truffle.
+  bishop: {
+    intro:
+      'Bishop is a 6 seater U-shape with a long chaise at each end, so two people can stretch out and there is still room for everyone else. Choose the scattered back, piled with loose cushions to plump and arrange, or the high back, with full back cushions for a neater line.',
+    highlights: ['6 seats with a chaise at each end', 'Scattered back or high back', 'Every cushion included'],
+  },
   footstool: {
     intro: 'A matching footstool with channel-stitched sides: somewhere to rest your feet, or an extra seat when you need one.',
     highlights: ['Channel-stitched sides', 'Matches the Sims range'],
@@ -128,7 +135,14 @@ export function describeProduct(p, colours) {
   if (!copy) return { description: null, highlights: [] }
   const parts = [copy.intro]
   const size = []
-  if (p.side_a_cm && p.side_b_cm) size.push(`It measures ${p.side_a_cm} cm by ${p.side_b_cm} cm`)
+  // A U-shape's back is wider than either side (5 November 2026: its two sides alone undersold it).
+  if (p.side_a_cm && p.side_b_cm && p.width_cm > Math.max(p.side_a_cm, p.side_b_cm))
+    size.push(
+      p.side_a_cm === p.side_b_cm
+        ? `It is ${p.width_cm} cm across the back with two ${p.side_a_cm} cm sides`
+        : `It is ${p.width_cm} cm across the back with sides of ${p.side_a_cm} cm and ${p.side_b_cm} cm`,
+    )
+  else if (p.side_a_cm && p.side_b_cm) size.push(`It measures ${p.side_a_cm} cm by ${p.side_b_cm} cm`)
   else if (p.width_cm) size.push(`It is ${p.width_cm} cm wide`)
   if (p.depth_cm) size.push(`${p.depth_cm} cm deep`)
   if (p.height_cm) size.push(`${p.height_cm} cm high`)
