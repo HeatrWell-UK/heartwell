@@ -15,7 +15,8 @@
 //
 // Owner's decisions (14-15 October 2026): the old "Lily" range is Sims; the
 // beige bolster sofas are Lily; Bishop isn't sold; new pieces stay hidden
-// until the owner sends their prices and sizes.
+// until the owner sends their prices and sizes. Bishop came back on 5 November
+// 2026 as two new pieces with the owner's photos (below), not the old listing.
 
 import { readFileSync, writeFileSync } from 'node:fs'
 import { describeProduct } from './catalogue-copy.mjs'
@@ -97,6 +98,8 @@ const products = base.products
     slugs[p.slug] = slug
     const out = { ...p, slug, title: p.title.replace(/^Lily /, 'Sims ').replace(/ 2c2\b/, ''), gallery_images: [] }
     if (p.range === 'lily') out.range = 'sims'
+    // Every U-shape is listed under U-shaped sofas (the Sims ones weren't until 5 November 2026).
+    if (p.specifications?.shape === 'u-shape') out.categories = [...new Set([...p.categories, 'u-shaped-sofas'])].sort()
     if (p.range === 'rio-chesterfield') {
       // One Rio style only, so no back-style choice.
       out.axis2_value = null
@@ -134,6 +137,7 @@ variants.push({
 ranges.push(
   { slug: 'lily', name: 'Lily', axis1_name: 'Size', axis2_name: null, sort: ranges.length + 1 },
   { slug: 'michigan-electric-recliner', name: 'Michigan Electric Recliner', axis1_name: 'Size', axis2_name: null, sort: ranges.length + 2 },
+  { slug: 'bishop', name: 'Bishop', axis1_name: 'Size', axis2_name: 'Back style', sort: ranges.length + 3 },
 )
 
 const hidden = (p) => ({
@@ -304,6 +308,31 @@ const newProducts = [
     }),
     variants: [{ sku: 'VSET-G', colour_name: 'Grey', colour_hex: '#8A8A8E', material_label: 'Fabric', image: 'Verona-5-seater-corner-cuddle-chair-and-footstool-set' }],
   },
+  // Bishop (owner, 5 November 2026): a 6 seater U-shape, 180 × 300 × 180 cm,
+  // the scattered back in Silver at £649 and the high back in Truffle at £699.
+  // Depth and height to come from the owner. New SKUs in Ashton's pattern.
+  ...[
+    ['bishop-high-back-u-shape', 'High Back', 'BHBU-T', 'Truffle', '#B8A493', 'Bishop-U-Shape-High-Back-Sofa-Truffle', 800, 699, { feet: 'Polished chrome' }],
+    ['bishop-scattered-back-u-shape', 'Scattered Back', 'BSBU-SV', 'Silver', '#9F978F', 'Bishop-U-Shape-Scatter-Back-Sofa-Silver', 801, 649, {}],
+  ].map(([slug, back, sku, colour, hex, img, sort, price, extra]) => ({
+    product: hidden({
+      slug,
+      title: `Bishop 6 Seater U-Shape ${back}`,
+      product_type: 'sofa',
+      range: 'bishop',
+      primary_category: 'u-shaped-sofas',
+      categories: ['corner-sofas', 'fabric-sofas', 'u-shaped-sofas'],
+      axis1_value: '6 Seater U-Shape',
+      axis2_value: back,
+      origin: 'uk',
+      made_to_order: true,
+      specifications: { material: 'Fabric', shape: 'u-shape', seats: 6, cushions_included: true, ...extra },
+      sort,
+      offer_tier: 'STANDARD',
+      ...priced(price, { w: 300, d: null, h: null, a: 180, b: 180 }),
+    }),
+    variants: [{ sku, colour_name: colour, colour_hex: hex, material_label: 'Fabric', image: img }],
+  })),
 ]
 for (const n of newProducts) {
   products.push(n.product)

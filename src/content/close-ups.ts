@@ -124,4 +124,13 @@ export const CLOSE_UPS: Record<string, CloseUp[]> = {
     { label: 'Dark wooden feet', photo: 'windsor-scattered-back-5-seater-corner', x: 900, y: 740, s: 200 },
     { label: 'Cream chenille', photo: 'windsor-scattered-back-5-seater-corner', x: 300, y: 480, s: 260, material: 'Chenille' },
   ],
+  // The two backs are different colours and feet, so each is cut from its own photo.
+  bishop: [
+    { label: 'Loose scatter cushions', photo: 'bishop-scattered-back-u-shape', x: 420, y: 440, s: 320, piece: 'scattered-back' },
+    { label: 'A chaise at each end', photo: 'bishop-scattered-back-u-shape', x: 20, y: 620, s: 360, piece: 'scattered-back' },
+    { label: 'Soft patterned fabric', photo: 'bishop-scattered-back-u-shape', x: 500, y: 600, s: 240, piece: 'scattered-back', material: 'Fabric' },
+    { label: 'Full back cushions', photo: 'bishop-high-back-u-shape', x: 440, y: 460, s: 320, piece: 'high-back' },
+    { label: 'A chaise at each end', photo: 'bishop-high-back-u-shape', x: 30, y: 620, s: 380, piece: 'high-back' },
+    { label: 'Polished chrome feet', photo: 'bishop-high-back-u-shape', x: 260, y: 740, s: 220, piece: 'high-back' },
+  ],
 }
