@@ -27,7 +27,7 @@ This replaces Stage 1's two campaigns below where they differ.
 - **Hero range: Rio Chesterfield** (2 seater £399 to 3+2 and corner £699), the shop's symbol.
 - **One campaign, Sales, website, two ad sets with their own budgets (£50 a day):**
   1. **Rio Chesterfield, £30 a day:** hero image, close-ups (buttoning, scroll arms, feet), a sizes-and-prices carousel, a "pay nothing upfront" ad, and a premium Rio video.
-  2. **The collection, £20 a day:** one carousel (Ashton, Verona, Lily, Oakland, Windsor, Ruby, each card to its range page), three single images (e.g. Ashton, Windsor, Oakland), the "Your sofa, your way" video, and one catalogue ad.
+  2. **The collection, £20 a day:** one carousel (Ashton, Verona, Bishop U-shape, Lily, Oakland, Windsor, Ruby, Malibu, each card to its range page; owner, 5 November 2026), three single images (Ashton, Lily, Oakland), the "Your sofa, your way" video, and one catalogue ad.
   3. **Later (about two weeks in):** a follow-up catalogue ad set (about £10 a day) for people who viewed or added to basket, once that audience reaches about 1,000.
 - **Optimise for:** add to basket for the first two weeks; Purchase once there are 10–15 confirmed orders a week.
 - **The money:** each sale leaves about £100 (owner); ad visitors get £20 off on every piece in these ranges (standard tier, or the welcome offer), so about **£80 per ad sale**. Break-even is £80 per confirmed order; the target is £50 or less.
