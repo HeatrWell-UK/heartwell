@@ -31,9 +31,9 @@ export const PROMISES = {
   },
   guarantee: {
     label: '1-year guarantee',
-    sub: 'Frame and springs',
-    short: '1-year frame and springs guarantee',
-    long: 'Every sofa carries a 1-year guarantee covering structural faults in the frame and springs.',
+    sub: 'Frame and foam',
+    short: '1-year frame and foam guarantee',
+    long: 'Every sofa carries a 1-year guarantee covering faults in the frame and foam.',
   },
   returns: {
     label: '14 days to change your mind',
@@ -65,7 +65,7 @@ export const POLICIES = {
   damageReportHours: 24,
   /** Charged when a booked delivery is missed and the trip has to be made again. */
   missedDeliveryCharge: 50,
-  /** Frame and springs guarantee, in years. */
+  /** Frame and foam guarantee, in years. */
   guaranteeYears: 1,
 } as const
 

@@ -217,7 +217,7 @@ export default async function DeliveryAndReturnsPage() {
         repair or replace it, or refund you if that doesn’t work. We collect faulty items free.
       </p>
       <p>
-        On top of that, every sofa has a {POLICIES.guaranteeYears}-year guarantee on the frame and springs. It doesn’t cover normal wear, accidental damage,
+        On top of that, every sofa has a {POLICIES.guaranteeYears}-year guarantee on the frame and foam. It doesn’t cover normal wear, accidental damage,
         marks and stains, or fading from sunlight. See the <Link href="/care-guide">care guide</Link> to keep it looking its best.
       </p>
       <p>

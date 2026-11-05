@@ -125,7 +125,7 @@ export function faqGroups(facts: FaqFacts | null, extras: { fabricCount: number;
         {
           id: 'guarantee',
           q: 'What does the guarantee cover?',
-          a: `Every sofa has a ${POLICIES.guaranteeYears}-year guarantee on the frame and springs, on top of your legal rights. It doesn’t cover normal wear, accidental damage or fading from sunlight.`,
+          a: `Every sofa has a ${POLICIES.guaranteeYears}-year guarantee on the frame and foam, on top of your legal rights. It doesn’t cover normal wear, accidental damage or fading from sunlight.`,
         },
       ],
     },
