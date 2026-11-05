@@ -106,6 +106,8 @@ export const CLOSE_UPS: Record<string, CloseUp[]> = {
     { label: 'Rolled arms with stud trim', photo: 'oakland-scattered-back-5-seater-corner', x: 20, y: 540, s: 300 },
     { label: 'Dark wooden feet', photo: 'oakland-scattered-back-5-seater-corner', x: 860, y: 700, s: 200 },
     { label: 'Faux leather that wipes clean', photo: 'oakland-scattered-back-5-seater-corner', x: 400, y: 520, s: 280, material: 'Faux Leather' },
+    { label: 'Full back cushions', photo: 'oakland-high-back-3-seater', x: 400, y: 500, s: 300, piece: 'high-back' },
+    { label: 'Buttoned front panel', photo: 'oakland-high-back-3-seater', x: 480, y: 700, s: 280, piece: 'high-back' },
   ],
   olympia: [
     { label: 'Deep-buttoned scroll arms', photo: 'olympia-scattered-back-5-seater-corner', x: 20, y: 540, s: 320 },

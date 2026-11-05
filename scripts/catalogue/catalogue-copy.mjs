@@ -41,10 +41,11 @@ export const RANGE_COPY = {
       'Harrison is a 5 seater corner with curved arms trimmed in studs, foam seat cushions that keep their shape and fibre-filled back cushions you can sink into.',
     highlights: ['Curved arms with stud trim', 'Foam-filled seat cushions', 'Fibre-filled scatter back'],
   },
+  // The 2 and 3 seater and the 3+2 joined the corner on 5 November 2026 (owner).
   oakland: {
     intro:
-      'Oakland is a 5 seater corner in faux leather, with rolled arms finished in studs and dark wooden feet. The seat cushions are foam filled and the back cushions fibre filled.',
-    highlights: ['Faux leather, easy to wipe clean', 'Rolled arms with stud trim', 'Dark wooden feet'],
+      'Oakland is faux leather, with rolled arms finished in studs and dark wooden feet. The seat cushions are foam filled and the back cushions fibre filled. It comes as a 2 or 3 seater and a 3+2 set with a high back, or as a 5 seater corner with a scattered back.',
+    highlights: ['Faux leather, easy to wipe clean', 'Rolled arms with stud trim', 'Dark wooden feet', 'From a 2 seater to a 5 seater corner'],
   },
   olympia: {
     intro:
