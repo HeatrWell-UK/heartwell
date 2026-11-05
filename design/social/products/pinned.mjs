@@ -263,7 +263,7 @@ function startHere(f) {
 
 function allSofas(f) {
   const groups = [
-    { key: 'sizes', title: 'In every size', sub: 'From a 2 seater or an armchair to a U-shape. Prices from:', slugs: ['ashton', 'verona', 'salone', 'sims', 'malibu', 'lily', 'rio-chesterfield'] },
+    { key: 'sizes', title: 'In every size', sub: 'From a 2 seater or an armchair to a U-shape. Prices from:', slugs: ['ashton', 'verona', 'salone', 'sims', 'malibu', 'lilly', 'rio-chesterfield'] },
     { key: 'corners', title: '5 seater corners', sub: 'Room for everyone, made to order in the UK.', slugs: ['harrison', 'oakland', 'olympia', 'ruby', 'shannon', 'tango', 'windsor'] },
     { key: 'recliners', title: 'Recliners', sub: 'Electric or by hand, ready made.', slugs: ['roma-recliner', 'nova-electric-recliner', 'michigan-electric-recliner', 'hannah-electric'] },
   ]

@@ -17,6 +17,9 @@
 // beige bolster sofas are Lily; Bishop isn't sold; new pieces stay hidden
 // until the owner sends their prices and sizes. Bishop came back on 5 November
 // 2026 as two new pieces with the owner's photos (below), not the old listing.
+// Also 5 November 2026: Lily is spelt Lilly, the two U-shapes the sister list
+// calls Lily (and Heartwell called Sims) are Lilly's, and the owner's photo files
+// are named to match (RENAMED).
 
 import { readFileSync, writeFileSync } from 'node:fs'
 import { describeProduct } from './catalogue-copy.mjs'
@@ -48,8 +51,30 @@ const photos = new Map(
 function key(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '')
 }
+// Photos renamed in Cloudinary on 5 November 2026: the name the reference (or
+// this file, before) used, and the file's name now. The Sims photos were called
+// Lily, after the sister list's name for that range.
+const RENAMED = new Map(
+  [
+    ['Lily-3-and-2-seater-high-back-sofa-1', 'Lilly-3-2-Seater-Sofa-Beige'],
+    ['Lily-U-Shape-Grey', 'Lilly-U-Shape-Sofa-Grey'],
+    ['Lily-U-Shape-Navy-Black', 'Lilly-U-Shape-Sofa-Black'],
+    ['Lily-U-Shape-Navy-Blue', 'Lilly-U-Shape-Sofa-Navy-Blue'],
+    ['Lily-U-Shape-Navy-Beige', 'Lilly-Armed-U-Shape-Sofa-Beige'],
+    ['Lily-U-Shape-Navy-Cream', 'Lilly-Armed-U-Shape-Sofa-Cream'],
+    ...['Beige', 'Black', 'Grey', 'Navy-Blue'].flatMap((c) => [
+      [`Lily-3-2-Seater-Corner-High-Back-Sofa-${c}`, `Sims-3-2-Seater-High-Back-Sofa-${c}`],
+      [`Lily-3-2-Seater-Corner-Scatter-Back-Sofa-${c}`, `Sims-3-2-Seater-Scatter-Back-Sofa-${c}`],
+      [`Lily-5-Seater-Corner-High-Back-Sofa-${c}`, `Sims-5-Seater-Corner-High-Back-Sofa-${c}`],
+      [`Lily-5-Seater-Corner-Scatter-Back-Sofa-${c}`, `Sims-5-Seater-Corner-Scatter-Back-Sofa-${c}`],
+    ]),
+    ['Lily-5-Seater-Corner-High-Back-Sofa-Silver', 'Sims-5-Seater-Corner-High-Back-Sofa-Silver'],
+    ['Lily-Footstool-Grey', 'Sims-Footstool-Grey'],
+    ['Lily-Footstool-Navy-Blue', 'Sims-Footstool-Navy-Blue'],
+  ].map(([from, to]) => [key(from), to]),
+)
 function photo(name) {
-  const url = photos.get(key(name))
+  const url = photos.get(key(RENAMED.get(key(name)) ?? name))
   if (!url) problems.push(`no photo called ${name}`)
   return url ?? null
 }
@@ -78,6 +103,8 @@ const GALLERIES = {
   'michigan-electric-recliner-3-seater': ['Michigan-Electric-Recliner-3-Seater-Black-Leather-Gallery1'],
   'michigan-electric-recliner-corner': ['Michigan-Electric-Recliner-5-Seater-Corner-Grey-Leather-Gallery1'],
   'verona-corner-set': ['Verona-5-seater-corner-cuddle-chair-and-footstool-set-2'],
+  // No new photo of the set yet (5 November 2026): its two sofas' new photos.
+  'lilly-3-2-seater': ['Lilly-3-Seater-Sofa-Beige', 'Lilly-2-Seater-Sofa-Beige'],
 }
 
 // ---------------------------------------------------------------------------
@@ -86,6 +113,8 @@ const GALLERIES = {
 const DROP = new Set(['bishop-u-shaped-scattered-back-sofa'])
 const rename = (slug) =>
   slug
+    .replace(/^lily-high-back-u-shape$/, 'lilly-u-shape')
+    .replace(/^lily-high-back-armed-u-shape$/, 'lilly-armed-u-shape')
     .replace(/^lily-footstool$/, 'sims-footstool')
     .replace(/^lily-/, 'sims-')
     .replace(/^rio-chesterfield-scattered-back-5-seater-corner-2c2$/, 'rio-chesterfield-5-seater-corner')
@@ -104,6 +133,10 @@ const products = base.products
       // One Rio style only, so no back-style choice.
       out.axis2_value = null
       out.title = 'Rio Chesterfield 5 Seater Corner'
+    }
+    if (slug.startsWith('lilly-')) {
+      // Lilly's U-shapes (owner, 5 November 2026): Lilly has no back-style choice.
+      Object.assign(out, { range: 'lilly', title: `Lilly ${p.axis1_value}`, axis2_value: null, primary_category: 'u-shaped-sofas' })
     }
     return out
   })
@@ -124,18 +157,18 @@ variants.push({
   colour_hex: '#B9BBBE',
   material_label: 'Fabric',
   price_adjustment: 0,
-  image_url: photo('Lily-5-Seater-Corner-High-Back-Sofa-Silver'),
+  image_url: photo('Sims-5-Seater-Corner-High-Back-Sofa-Silver'),
   sort: 5,
   is_active: true,
 })
 
 // ---------------------------------------------------------------------------
 // New pieces: hidden until the owner sends prices and sizes. The owner's price
-// list (23 October 2026, migration owner_price_list) priced 12 of the 14; Lily
+// list (23 October 2026, migration owner_price_list) priced 12 of the 14; Lilly
 // 2 Seater and the Verona Cuddle Chair stay hidden until they're priced.
 
 ranges.push(
-  { slug: 'lily', name: 'Lily', axis1_name: 'Size', axis2_name: null, sort: ranges.length + 1 },
+  { slug: 'lilly', name: 'Lilly', axis1_name: 'Size', axis2_name: null, sort: ranges.length + 1 },
   { slug: 'michigan-electric-recliner', name: 'Michigan Electric Recliner', axis1_name: 'Size', axis2_name: null, sort: ranges.length + 2 },
   { slug: 'bishop', name: 'Bishop', axis1_name: 'Size', axis2_name: 'Back style', sort: ranges.length + 3 },
 )
@@ -177,20 +210,21 @@ const rioShared = Object.fromEntries(
 )
 
 const newProducts = [
-  // Lily is made to order in the UK (owner's price list).
+  // Lilly is made to order in the UK (owner's price list). The owner's new
+  // photos (5 November 2026); the 3+2 keeps its photo until there's a new one.
   ...[
-    ['lily-2-seater', '2 Seater', 2, 'Lily-2-seater-high-back-sofa-1', 'LL2-BG', 20, ['fabric-sofas'], null],
-    ['lily-3-seater', '3 Seater', 3, 'Lily-3-seater-high-back-sofa-1', 'LL3-BG', 30, ['fabric-sofas'], priced(449, { w: 195, d: 90, h: 95 })],
-    ['lily-3-2-seater', '3+2 Seater', 5, 'Lily-3-and-2-seater-high-back-sofa-1', 'LL32-BG', 35, sofaCats('3-2-sofa-sets'), priced(749, { w: 195, d: 90, h: 95, pieces: setPieces(195, 168, 90, 95) })],
-    ['lily-5-seater-corner', '5 Seater Corner', 5, 'Lily-5-seater-corner-high-back-sofa-1', 'LL5C-BG', 65, sofaCats('corner-sofas'), priced(749, { w: 240, d: 90, h: 95, a: 240, b: 240 })],
+    ['lilly-2-seater', '2 Seater', 2, 'Lilly-2-Seater-Sofa-Beige', 'LL2-BG', 20, ['fabric-sofas'], null],
+    ['lilly-3-seater', '3 Seater', 3, 'Lilly-3-Seater-Sofa-Beige', 'LL3-BG', 30, ['fabric-sofas'], priced(449, { w: 195, d: 90, h: 95 })],
+    ['lilly-3-2-seater', '3+2 Seater', 5, 'Lilly-3-2-Seater-Sofa-Beige', 'LL32-BG', 35, sofaCats('3-2-sofa-sets'), priced(749, { w: 195, d: 90, h: 95, pieces: setPieces(195, 168, 90, 95) })],
+    ['lilly-5-seater-corner', '5 Seater Corner', 5, 'Lilly-5-Seater-Corner-Sofa-Beige', 'LL5C-BG', 65, sofaCats('corner-sofas'), priced(749, { w: 240, d: 90, h: 95, a: 240, b: 240 })],
   ].map(([slug, size, seats, img, sku, sort, cats, sale]) => {
     const { pieces, ...onSale } = sale ?? {}
     return {
       product: hidden({
         slug,
-        title: `Lily ${size}`,
+        title: `Lilly ${size}`,
         product_type: 'sofa',
-        range: 'lily',
+        range: 'lilly',
         primary_category: cats.includes('corner-sofas') ? 'corner-sofas' : cats.includes('3-2-sofa-sets') ? '3-2-sofa-sets' : 'fabric-sofas',
         categories: cats,
         axis1_value: size,
@@ -350,8 +384,8 @@ for (const p of products) p.gallery_images = (GALLERIES[p.slug] ?? []).map(photo
 
 const CATEGORY_PHOTO = {
   sofas: '3_2-Seater-Category',
-  'corner-sofas': 'Lily-5-Seater-Corner-High-Back-Sofa-Navy-Blue',
-  'u-shaped-sofas': 'Lily-U-Shape-Navy-Cream',
+  'corner-sofas': 'Sims-5-Seater-Corner-High-Back-Sofa-Navy-Blue',
+  'u-shaped-sofas': 'Lilly-Armed-U-Shape-Sofa-Cream',
   '3-2-sofa-sets': '3_2-Seater',
   'fabric-sofas': 'Fabric-Sofa-Category',
   'leather-sofas': 'Leather-Category',

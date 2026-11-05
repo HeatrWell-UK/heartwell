@@ -69,10 +69,18 @@ export const CLOSE_UPS: Record<string, CloseUp[]> = {
     { label: 'Deep-buttoned base', photo: 'malibu-high-back-2-seater', x: 380, y: 740, s: 260 },
     { label: 'Stud trim and turned feet', photo: 'malibu-high-back-2-seater', x: 100, y: 760, s: 260 },
   ],
-  lily: [
-    { label: 'Pleated arms and round bolsters', photo: 'lily-3-seater', x: 60, y: 540, s: 330 },
-    { label: 'Deep, plump back cushions', photo: 'lily-3-seater', x: 360, y: 440, s: 300 },
-    { label: 'Soft, generous seats', photo: 'lily-3-seater', x: 300, y: 600, s: 260 },
+  // The owner's new photos (5 November 2026). The sofas and corner ("seater" in
+  // the slug) and each U-shape are cut from photos of their own.
+  lilly: [
+    { label: 'Round bolsters at each arm', photo: 'lilly-3-seater', x: 240, y: 540, s: 330, piece: 'seater' },
+    { label: 'Channel-stitched arms', photo: 'lilly-5-seater-corner', x: 920, y: 620, s: 300, piece: 'seater' },
+    { label: 'Channel-stitched base', photo: 'lilly-3-seater', x: 420, y: 640, s: 300, piece: 'seater' },
+    { label: 'Round bolsters and contrast piping', photo: 'lilly-u-shape', x: 260, y: 640, s: 320, piece: 'lilly-u-shape' },
+    { label: 'Channel-stitched arms and base', photo: 'lilly-u-shape', x: 0, y: 720, s: 380, piece: 'lilly-u-shape' },
+    { label: 'Plush velvet', photo: 'lilly-u-shape', x: 420, y: 760, s: 300, piece: 'lilly-u-shape', material: 'Plush Velvet' },
+    { label: 'Channel-stitched arms and round bolsters', photo: 'lilly-armed-u-shape', x: 0, y: 560, s: 300, piece: 'armed-u-shape' },
+    { label: 'Channel-stitched base', photo: 'lilly-armed-u-shape', x: 800, y: 720, s: 300, piece: 'armed-u-shape' },
+    { label: 'Plush velvet', photo: 'lilly-armed-u-shape', x: 300, y: 620, s: 260, piece: 'armed-u-shape', material: 'Plush Velvet' },
   ],
   'michigan-electric-recliner': [
     { label: 'Cup holders and wireless charging', photo: 'michigan-electric-recliner-2-seater', x: 620, y: 560, s: 300 },
