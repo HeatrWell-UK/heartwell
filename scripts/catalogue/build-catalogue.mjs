@@ -384,7 +384,7 @@ const OFFER_TIER = {
   'rio-chesterfield-5-seater-corner': 'HIGH',
 }
 const PRICE = {
-  // 5 November 2026 (migration price_changes).
+  // 5 November 2026 (migration 20261105144530_price_changes).
   'ashton-high-back-5-seater-corner': 699,
   'ashton-high-back-3-2-seater': 699,
   'ashton-high-back-u-shape': 1099,
