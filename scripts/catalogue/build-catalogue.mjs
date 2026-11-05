@@ -204,10 +204,12 @@ const setPieces = (three, two, d, h) => [
   { label: '2 Seater', width_cm: two, depth_cm: d, height_cm: h },
 ]
 const sofaCats = (...extra) => [...new Set(['fabric-sofas', ...extra])].sort()
-// The new Rio sizes share the corner's materials, arms, feet and cushions.
-const rioShared = Object.fromEntries(
-  Object.entries(products.find((p) => p.slug === 'rio-chesterfield-5-seater-corner').specifications).filter(([k]) => !['pieces', 'shape', 'seats'].includes(k)),
-)
+// New sizes share their range's corner's materials, arms, feet and cushions.
+const sharedSpecs = (corner) =>
+  Object.fromEntries(Object.entries(products.find((p) => p.slug === corner).specifications).filter(([k]) => !['pieces', 'shape', 'seats'].includes(k)))
+const rioShared = sharedSpecs('rio-chesterfield-5-seater-corner')
+// The owner's prices for Oakland's new sofas (5 November 2026).
+const OAKLAND_PRICE = { 2: 429, 3: 479, '3+2': 599 }
 
 const newProducts = [
   // Lilly is made to order in the UK (owner's price list). The owner's new
@@ -368,6 +370,34 @@ const newProducts = [
     }),
     variants: [{ sku, colour_name: colour, colour_hex: hex, material_label: 'Fabric', image: img }],
   })),
+  // Oakland's high back sofas (owner, 5 November 2026, with their photos), in
+  // the corner's tan faux leather. New SKUs in Ashton's pattern.
+  ...[
+    ['oakland-high-back-2-seater', '2 Seater', 2, 'Oakland-2-Seater-High-Back-Sofa-Tan', 'OKHB2-T', 20, ['leather-sofas'], priced(OAKLAND_PRICE['2'], { w: 168, d: 90, h: 90 })],
+    ['oakland-high-back-3-seater', '3 Seater', 3, 'Oakland-3-Seater-High-Back-Sofa-Tan', 'OKHB3-T', 30, ['leather-sofas'], priced(OAKLAND_PRICE['3'], { w: 198, d: 90, h: 90 })],
+    ['oakland-high-back-3-2-seater', '3+2 Seater', 5, 'Oakland-3-2-Seater-High-Back-Sofa-Tan', 'OKHB32-T', 35, ['3-2-sofa-sets', 'leather-sofas'], priced(OAKLAND_PRICE['3+2'], { w: 198, d: 90, h: 90, pieces: setPieces(198, 168, 90, 90) })],
+  ].map(([slug, size, seats, img, sku, sort, cats, sale]) => {
+    const { pieces, ...onSale } = sale
+    return {
+      product: hidden({
+        slug,
+        title: `Oakland ${size} High Back`,
+        product_type: 'sofa',
+        range: 'oakland',
+        primary_category: cats[0],
+        categories: cats,
+        axis1_value: size,
+        axis2_value: 'High Back',
+        origin: 'uk',
+        made_to_order: true,
+        specifications: { ...sharedSpecs('oakland-scattered-back-5-seater-corner'), shape: pieces ? 'set' : 'straight', seats, ...(pieces ? { pieces } : {}) },
+        sort,
+        offer_tier: 'STANDARD',
+        ...onSale,
+      }),
+      variants: [{ sku, colour_name: 'Tan', colour_hex: '#B0693F', material_label: 'Faux Leather', image: img }],
+    }
+  }),
 ]
 for (const n of newProducts) {
   products.push(n.product)
