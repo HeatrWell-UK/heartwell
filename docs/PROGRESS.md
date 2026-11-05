@@ -51,6 +51,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 5 November 2026 — Owner's price changes (Ashton, Lilly, Malibu)
+- **Database (migration `20261105144530_price_changes`, the owner's request):** Ashton 5 seater corner high back £749 → **£699**, 3+2 high back £749 → **£699**, U-shape high back £1,149 → **£1,099**, 5 seater corner scattered back £699 → **£679**, 3+2 scattered back £699 → **£679**, U-shape scattered back £1,099 → **£1,049**; Lilly 5 seater corner £749 → **£649**, 3+2 £749 → **£649**, U-shape £879 → **£799**, Armed U-shape £949 → **£899**; Malibu 5 seater corner £749 → **£649**, 3+2 £749 → **£659**. All in `product_price_log`. No was-prices (the old prices were charged for under 28 days). Orders already placed keep their prices; the Meta and Google feeds carry the new ones at their next fetch.
+- **Catalogue build:** `PRICE` and `OFFER_TIER` in `build-catalogue.mjs` hold the owner's changes since the price list, including the Rio 3+2 and corner's HIGH offer tier from 3 November, which the build didn't have yet.
+- **Social posts:** the Ashton, Lilly and Malibu carousels show the old prices; re-make them before they're posted again.
+- **Oakland 2 seater, 3 seater and 3+2:** photos uploaded (`heartwell/Product Images/Oakland Sofa`) and the pieces written, kept aside in a local git stash (`oakland-wip`) until the owner sends their prices.
+
 ### 5 November 2026 — Lily is Lilly; the U-shapes move from Sims; new Lilly photos; photo files renamed
 - **Owner's request:** replace the Lily photos with three new ones (5 seater corner and two straight sofas), rename Lily to **Lilly**, move the Sims U-shape and Sims Armed U-shape into Lilly, and rename everything to match, Cloudinary file names included.
 - **Database (migration `20261105135730_lilly_range`, applied with the owner's go-ahead):** the range is **Lilly** (`/ranges/lilly`); its pieces are Lilly 2 Seater (still hidden until priced), 3 Seater, 3+2 Seater, 5 Seater Corner, **U-Shape** (was Sims U-Shape High Back) and **Armed U-Shape** (was Sims Armed U-Shape High Back), at `/products/lilly-…`. The U-shapes have no back-style choice now (Lilly has none) and U-shaped sofas as their main category. Prices, sizes, colours, categories, offer tiers and **SKUs unchanged** (the warehouse and OrderFlow know them); none of these pieces had ever been ordered. New words for Lilly (bolsters, channel-stitched arms and base, sizes up to two U-shapes); Sims no longer mentions U-shapes.
