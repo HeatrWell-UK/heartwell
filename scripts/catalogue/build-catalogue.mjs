@@ -377,6 +377,35 @@ for (const n of newProducts) {
   })
 }
 
+// The owner's changes since the price list, so a rebuild keeps them.
+const OFFER_TIER = {
+  // 3 November 2026: £50 off for ad visitors on the Rio set and corner.
+  'rio-chesterfield-3-2-seater': 'HIGH',
+  'rio-chesterfield-5-seater-corner': 'HIGH',
+}
+const PRICE = {
+  // 5 November 2026 (migration price_changes).
+  'ashton-high-back-5-seater-corner': 699,
+  'ashton-high-back-3-2-seater': 699,
+  'ashton-high-back-u-shape': 1099,
+  'ashton-scattered-back-5-seater-corner': 679,
+  'ashton-scattered-back-3-2-seater': 679,
+  'ashton-scattered-back-u-shape': 1049,
+  'lilly-5-seater-corner': 649,
+  'lilly-3-2-seater': 649,
+  'lilly-u-shape': 799,
+  'lilly-armed-u-shape': 899,
+  'malibu-high-back-5-seater-corner': 649,
+  'malibu-high-back-3-2-seater': 659,
+}
+for (const p of products) {
+  if (OFFER_TIER[p.slug]) p.offer_tier = OFFER_TIER[p.slug]
+  if (PRICE[p.slug]) p.base_price = PRICE[p.slug]
+}
+for (const slug of [...Object.keys(OFFER_TIER), ...Object.keys(PRICE)]) {
+  if (!products.some((p) => p.slug === slug)) problems.push(`no product ${slug} to change`)
+}
+
 for (const p of products) p.gallery_images = (GALLERIES[p.slug] ?? []).map(photo).filter(Boolean)
 
 // ---------------------------------------------------------------------------
