@@ -51,6 +51,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 6 November 2026 — Meta ads published: the Rio ad set is live; the collection, R5 and V1 are stuck in the draft
+- **Owner's go:** "Yes, publish it", after a full recheck (creatives, links, offers on the live site, tracking, catalogue, audiences, excluded areas; AI label off).
+- **Live and approved by Meta:** campaign "Heartwell | Sales | Website | Nov26" (120255251575220416, £700 limit), the Rio ad set (120255251579460416, £30 a day) and five of its ads: R1 Rio 3+2 £50 off, R2 Rio corner £50 off, R3 pay nothing upfront, R4 made your way, R6 details up close.
+- **Not published:** the collection ad set (120255251589740416, £20 a day, C1–C6), R5 (the Rio sizes carousel) and V1 (the premium Rio video). They stay in the Ads Manager draft as "validated" with no errors; two publishes and one retry each through the Meta connector returned "publishing" and nothing happened, and Meta's error and activity logs show nothing. Only the single-image ads went through, so the carousels, the videos, the catalogue ad and the ad set with a catalogue product set are what the connector can't publish. The fix is the owner pressing Publish in Ads Manager, which publishes them or shows Meta's real error. Until then the campaign spends only the Rio ad set's £30 a day.
+- **Docs:** `docs/META-ADS.md` (Ads row).
+
 ### 5 November 2026 — Oakland 2 seater, 3 seater and 3+2 on sale
 - **Owner's request:** add the Oakland 3+2, 3 seater and 2 seater from three new photos; prices £429, £479 and £599.
 - **Database (migration `20261105170735_oakland_sofas`):** **Oakland 2 Seater High Back** (`OKHB2-T`, £429, 168 cm wide), **3 Seater High Back** (`OKHB3-T`, £479, 198 cm) and **3+2 Seater High Back** (`OKHB32-T`, £599, the 198 and 168 cm sofas), all 90 cm deep and 90 cm high like the corner; Tan faux leather with the corner's rolled, stud-trimmed arms, dark wooden feet and cushions; made to order in the UK; under leather-look sofas (the set also under 3+2 sets); standard offer tier. "High back" because the photos show full back cushions (the corner is a scattered back). The sizes are Heartwell's usual 2 and 3 seater widths with the corner's depth and height: the owner didn't give them. The range's words now cover all four pieces.
