@@ -54,6 +54,19 @@ const csp = [
 // The admin also uploads photos straight to Cloudinary (signed by the server).
 const adminCsp = csp.replace("connect-src 'self'", "connect-src 'self' https://api.cloudinary.com")
 
+// Pages whose address changed, sent on permanently (with any ?variant= or ad
+// parameters) so search engines, ads, posts and WhatsApp links still land.
+// 5 November 2026: Lily is spelt Lilly, and the Sims U-shapes are Lilly's.
+const MOVED = [
+  ['/ranges/lily', '/ranges/lilly'],
+  ['/products/lily-2-seater', '/products/lilly-2-seater'],
+  ['/products/lily-3-seater', '/products/lilly-3-seater'],
+  ['/products/lily-3-2-seater', '/products/lilly-3-2-seater'],
+  ['/products/lily-5-seater-corner', '/products/lilly-5-seater-corner'],
+  ['/products/sims-high-back-u-shape', '/products/lilly-u-shape'],
+  ['/products/sims-high-back-armed-u-shape', '/products/lilly-armed-u-shape'],
+]
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
@@ -71,6 +84,9 @@ const nextConfig = {
     loader: 'custom',
     loaderFile: './src/lib/cloudinary-loader.ts',
     remotePatterns: [{ protocol: 'https', hostname: 'res.cloudinary.com' }],
+  },
+  async redirects() {
+    return MOVED.map(([source, destination]) => ({ source, destination, permanent: true }))
   },
   async headers() {
     return [

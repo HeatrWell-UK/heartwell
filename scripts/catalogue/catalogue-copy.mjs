@@ -9,15 +9,17 @@ export const RANGE_COPY = {
       'Ashton is plush velvet with a soft sheen, deep-buttoned arms and polished chrome feet. Choose the high back for a tailored look and head support, or the scattered back for loose cushions you can plump and arrange.',
     highlights: ['Plush velvet with deep-buttoned arms', 'Polished chrome feet', 'High back or scattered back', 'Every cushion included'],
   },
+  // The U-shapes moved to Lilly on 5 November 2026 (owner).
   sims: {
     intro:
-      'Sims has stitched channels running down the front of each arm and a clean, squared shape that suits a modern room. It comes as a high back with fixed cushions or a scattered back with loose ones, from the 3+2 set up to a full U-shape.',
-    highlights: ['Channel-stitched arm fronts', 'High back or scattered back', 'From a 3+2 set to an armed U-shape', 'Every cushion included'],
+      'Sims has stitched channels running down the front of each arm and a clean, squared shape that suits a modern room. It comes as a high back with fixed cushions or a scattered back with loose ones, as a 3+2 set or a 5 seater corner, with a matching footstool.',
+    highlights: ['Channel-stitched arm fronts', 'High back or scattered back', '3+2 sets, corners and a footstool', 'Every cushion included'],
   },
-  lily: {
+  // Spelt Lilly since 5 November 2026 (owner), with the U-shapes and new photos.
+  lilly: {
     intro:
-      'Lily is soft and generous, with plump back cushions, round bolsters at each arm and pleated arm panels. It is a sofa for sinking into at the end of the day.',
-    highlights: ['Round bolster cushions at each arm', 'Pleated arm panels', 'Deep, plump back cushions'],
+      'Lilly is soft and generous, with round bolsters at each arm, channel-stitched arms and base, and plump back cushions to sink into. It comes in sizes from a 3 seater to a 5 seater corner and two U-shapes, so there is one for most rooms.',
+    highlights: ['Round bolster cushions at each arm', 'Channel-stitched arms and base', 'From a 3 seater to a U-shape', 'Every cushion included'],
   },
   verona: {
     intro:

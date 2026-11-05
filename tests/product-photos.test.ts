@@ -41,7 +41,7 @@ describe('the close-ups list', () => {
 
 describe('close-ups on the product page', () => {
   it('leaves out a detail of the other back style', () => {
-    const high = closeUpSources('sims', 'sims-high-back-u-shape', photosOf).map((c) => c.label)
+    const high = closeUpSources('sims', 'sims-high-back-5-seater-corner', photosOf).map((c) => c.label)
     const scattered = closeUpSources('sims', 'sims-scattered-back-5-seater-corner', photosOf).map((c) => c.label)
     expect(high).toEqual(['Channel-stitched arms', 'Plush velvet'])
     expect(scattered).toContain('Loose scatter cushions')
@@ -49,7 +49,7 @@ describe('close-ups on the product page', () => {
   })
 
   it('cuts the square from the colour on show when it was checked there, else from the first colour', () => {
-    const sims = closeUpSources('sims', 'sims-high-back-u-shape', photosOf)
+    const sims = closeUpSources('sims', 'sims-high-back-5-seater-corner', photosOf)
     const black = pickCloseUps(sims, { colour: 'Black', material: 'Plush Velvet' }, false)
     expect(black[0]).toMatchObject({ label: 'Channel-stitched arms', colour: 'Black', src: `${CLOUD}/c_crop,x_30,y_570,w_300,h_300/v1/sims-black.png` })
 
@@ -69,7 +69,7 @@ describe('close-ups on the product page', () => {
     ])
     // The corner isn't a manual recliner: no lever.
     expect(closeUpSources('roma-recliner', 'roma-recliner-corner', photosOf).map((c) => c.label)).not.toContain('Pull the lever to recline')
-    const sims = closeUpSources('sims', 'sims-high-back-u-shape', photosOf)
+    const sims = closeUpSources('sims', 'sims-high-back-5-seater-corner', photosOf)
     expect(pickCloseUps(sims, { colour: 'Grey', material: 'Plush Velvet' }, true).map((c) => c.label)).toEqual(['Channel-stitched arms'])
   })
 
@@ -86,7 +86,7 @@ describe('the product page’s photos', () => {
     variant: { colourName: 'Grey', materialLabel: 'Plush Velvet', image: photo('u-grey') },
     gallery: [photo('u-grey'), photo('u-room')],
     fabric: null,
-    closeUps: closeUpSources('sims', 'sims-high-back-u-shape', photosOf),
+    closeUps: closeUpSources('sims', 'sims-high-back-5-seater-corner', photosOf),
     topView: { layout: { kind: 'u' as const, back: 300, left: 200, right: 200, d: 95 }, height: 88 },
   }
 

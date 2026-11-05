@@ -233,21 +233,23 @@ export const COPY = {
   },
 
   // 8 · bold
-  lily: {
-    cover: 'lily-5-seater-corner',
+  // Lilly since 5 November 2026 (was Lily), with new photos: place the callouts
+  // again on the new cover photo before the next Lilly post.
+  lilly: {
+    cover: 'lilly-5-seater-corner',
     tagline: 'Round bolsters · Plump cushions · Made in the UK',
     sub: 'Round bolsters and plump cushions',
     detailsLine: 'A sofa for sinking into, made to order in the UK.',
     callouts: [
       { label: 'Round bolsters', dot: [875, 610], pill: [640, 820] },
-      { label: 'Pleated arm panels', dot: [100, 640], pill: [40, 880] },
+      { label: 'Channel-stitched arms', dot: [100, 640], pill: [40, 880] },
       { label: 'Plump back cushions', dot: [440, 500], pill: [330, 300] },
     ],
     ...post({
-      hook: (d) => `Round bolsters and plump cushions, made for sinking into. This is Lily, from ${d.from}.`,
-      fbHook: (d) => `Lily: round bolsters and plump cushions, from ${d.from}.`,
+      hook: (d) => `Round bolsters and plump cushions, made for sinking into. This is Lilly, from ${d.from}.`,
+      fbHook: (d) => `Lilly: round bolsters and plump cushions, from ${d.from}.`,
       altHook: 'The sofa for the end of the day.',
-      story: 'Lily is soft and generous, with plump back cushions, round bolsters at each arm and pleated arm panels. It is a sofa for sinking into at the end of the day.',
+      story: 'Lilly is soft and generous, with round bolsters at each arm, channel-stitched arms and base, and plump back cushions to sink into. It comes in sizes from a 3 seater to a 5 seater corner and two U-shapes.',
       tags: '#cosyhome #cornersofa #sofa #livingroomideas #madeintheuk',
     }),
   },

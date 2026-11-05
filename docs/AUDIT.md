@@ -155,4 +155,4 @@ Everything the audit leaves to the owner, in the order that helps most. Steps fo
 
 **Still open from before the audit**
 
-10. Prices for the Lily 2 Seater and the Verona Cuddle Chair (both hidden until priced), UptimeRobot (`docs/MONITORING.md`) and the OrderFlow tidy-up.
+10. Prices for the Lilly 2 Seater and the Verona Cuddle Chair (both hidden until priced), UptimeRobot (`docs/MONITORING.md`) and the OrderFlow tidy-up.
