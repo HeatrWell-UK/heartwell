@@ -51,11 +51,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
-### 6 November 2026 — Meta ads published: the whole campaign is live (£50 a day)
+### 5 November 2026 — Meta ads published: the whole campaign is live (£50 a day)
 - **Owner's go:** "Yes, publish it", after a full recheck (creatives, links, offers on the live site, tracking, catalogue, audiences, excluded areas; AI label off).
 - **First publish:** campaign "Heartwell | Sales | Website | Nov26" (120255251575220416, £700 limit), the Rio ad set (120255251579460416, £30 a day) and R1, R2, R3, R4, R6, approved by Meta. The collection ad set (120255251589740416, £20 a day, C1–C6), R5 and V1 stayed in the draft: the connector's publish said "publishing" with no error and nothing happened.
 - **Why, and the fix:** the owner pressed Publish in Ads Manager and got Meta's error on V1 (`ObjectStorySpecRedundant`: only one of image_url and image_hash). The connector had given the two videos (V1, C5) and every carousel card (R5, C1) both an image link and an image hash. Rebuilt those four creatives with the hash only and swapped them into the draft ads (same copy, links, images and Advantage+ settings all off; each carousel card's Shop now button now opens that card's page instead of the range or home page). The collection ad set then showed a second error: Meta now wants a catalogue product set on the ad, not the ad set. Took it off the ad set (still optimising for Add to basket); the catalogue ad C6 carries it.
 - **Second publish (connector):** all of it went through. Live read-back: both ad sets active, all 13 ads published; R1–R4 and R6 active, R5, V1 and C1–C6 in Meta's review. The old creatives stay unused in the account.
+- **First hour (live about 20:10 to 21:20 UK time):** Meta: £8.69 spent, 807 impressions, 22 link clicks (2.7% of impressions, about 40p a click), 5 landing page views and 2 basket adds (Rio £5.91, 14 clicks; collection £2.78, 8 clicks, both basket adds). GA4 realtime (owner's screenshot): 4 visitors from Durham, York, Manchester, Derby and Birmingham, mostly on the Rio pages; 4 basket adds, 1 checkout started, 1 lead. Meta sees fewer than GA4 because its pixel waits for marketing-cookie consent.
 - **Docs:** `docs/META-ADS.md` (Ads row).
 
 ### 5 November 2026 — Oakland 2 seater, 3 seater and 3+2 on sale
