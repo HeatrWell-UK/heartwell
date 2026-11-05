@@ -184,7 +184,7 @@ function startHere(f) {
   const cards = [
     [icon.pound, 'Pay on delivery', 'Cash or bank transfer to the driver. We never ask for card details.'],
     [extraIcons.eye, 'Check before you pay', 'If anything is wrong, show the driver and we’ll put it right.'],
-    [extraIcons.shield, '1-year guarantee', 'On the frame and springs, on top of your legal rights.'],
+    [extraIcons.shield, '1-year guarantee', 'On the frame and foam, on top of your legal rights.'],
     [extraIcons.undo, '14 days to change your mind', 'On ready-made pieces, from the day they’re delivered.'],
     [icon.swatch, 'Made to order in the UK', `Our fabric sofas, in the colour shown or any of our ${f.fabricCount} fabrics.`],
     [extraIcons.stairs, 'Extras at checkout', `Upstairs from ${money(Number(s.upstairs_first_floor))}, assembly ${money(Number(s.assembly_fee))}, old sofa taken away ${money(Number(s.removal_per_seat))} a seat.`],
@@ -251,7 +251,7 @@ function startHere(f) {
     facebook: [
       'New to Heartwell? Here’s how it works.',
       '',
-      `Choose your sofa, confirm your order, and pay nothing until it’s in your room: cash or bank transfer to the driver. Delivery is free to most of mainland Britain, usually in ${days}. Every sofa has a 1-year guarantee on the frame and springs.`,
+      `Choose your sofa, confirm your order, and pay nothing until it’s in your room: cash or bank transfer to the driver. Delivery is free to most of mainland Britain, usually in ${days}. Every sofa has a 1-year guarantee on the frame and foam.`,
       '',
       `See every sofa: https://${SITE}/?utm_source=facebook&utm_medium=social&utm_campaign=pinned-start-here`,
       `Or message us on WhatsApp: ${PHONE}`,

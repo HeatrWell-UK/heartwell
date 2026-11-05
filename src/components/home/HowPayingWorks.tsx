@@ -2,7 +2,7 @@ import { ArrowsCounterClockwiseIcon, PhoneCallIcon, ShieldCheckIcon } from '@pho
 import { PROMISES } from '@/config/promises'
 
 const alsoTrue = [
-  { Icon: ShieldCheckIcon, text: `${PROMISES.guarantee.label} on the frame and springs` },
+  { Icon: ShieldCheckIcon, text: `${PROMISES.guarantee.label} on the frame and foam` },
   { Icon: ArrowsCounterClockwiseIcon, text: `${PROMISES.returns.label} on ready-made pieces` },
   { Icon: PhoneCallIcon, text: 'A real person checks every order with you' },
 ]

@@ -133,7 +133,7 @@ export default function StyleGuidePage() {
             items={[
               { title: 'Delivery', content: <p>Free to most of mainland Britain.</p>, open: true },
               { title: 'Paying', content: <p>Cash or bank transfer when it arrives.</p> },
-              { title: 'Guarantee', content: <p>1 year on the frame and springs.</p> },
+              { title: 'Guarantee', content: <p>1 year on the frame and foam.</p> },
             ]}
           />
         </div>

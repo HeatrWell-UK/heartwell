@@ -243,7 +243,7 @@ export function customerStatusEmail(
       heading: `Thank you for choosing Heartwell`,
       lines: [
         `We hope you love it. If anything isn’t right, reply to this email and we’ll sort it out.`,
-        `Your frame and springs have a 1-year guarantee. Keep this email as your record of the order.`,
+        `Your frame and foam have a 1-year guarantee. Keep this email as your record of the order.`,
       ],
       showItems: true,
       track: false,

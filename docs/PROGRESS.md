@@ -77,6 +77,11 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 - **Code:** `scripts/catalogue/build-catalogue.mjs` and `catalogue-copy.mjs` write the same rows and words (checked by rebuilding: only the Bishop pieces, the Sims U-shapes' categories and the U-shape size sentences differ from the last build); close-ups for Bishop in `src/content/close-ups.ts`, each cut from its own piece's photo (scatter cushions, chaise end, the patterned fabric; full back cushions, chaise end, chrome feet); a test for the U-shape size sentence.
 - **Meta:** `docs/META-ADS.md` no longer lists Bishop as "not sold"; it reaches the Meta and Google catalogues with the next feed fetch.
 
+### 5 November 2026 — Ad creatives checked; guarantee is frame and foam; Verona gets £20
+- **Checked:** all Meta creatives (Rio R1–R6 and V1, collection C1–C5) against the real sofas and live prices. Sofas all match; fixes sent back to ChatGPT: "Was £699" on R1, R2 and R5 (the Rio has never been sold for less: misleading reference price), R4's chrome feet, Lilly's spelling and the Malibu corner price (£649) on C1.
+- **Owner:** no Heartwell sofa has springs, so the guarantee is on the **frame and foam**. Changed everywhere it was said: `src/config/promises.ts`, FAQ, terms, delivery and returns, care guide, home page, product pages, order email, the social pinned-post builder, `docs/PLAN.md`.
+- **Owner:** Verona gets the £20 offer like the rest of the collection: its 14 pieces without an offer moved to STANDARD (data).
+
 ### 3 November 2026 — Rio Chesterfield ads: offer, brief and the size line
 - **Owner:** offers differ by range; Rio gets **£50 off the 3+2 set and the 5 seater corner** for ad visitors; every sofa can be made in any size, shape and fabric; Rio chrome legs on request. ChatGPT (Windows app, project on `design/ads`) makes the creatives from prompts I write, one at a time; I check them, then the premium Rio video.
 - **Done:** the Rio 3+2 and corner moved to the HIGH offer tier (£50; it applies only to visits from ads). Made-to-order product pages with sizes say "Need another size or shape? It's made to order, so ask us on WhatsApp" (WhatsApp context `product-size`).

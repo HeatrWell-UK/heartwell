@@ -7,7 +7,7 @@ import { PROMISES } from '@/config/promises'
  */
 export function PromiseRows({ madeToOrder }: { madeToOrder: boolean }) {
   const rows = [
-    { icon: ShieldCheckIcon, strong: PROMISES.guarantee.label, text: 'on the frame and springs.' },
+    { icon: ShieldCheckIcon, strong: PROMISES.guarantee.label, text: 'on the frame and foam.' },
     madeToOrder
       ? { icon: ScissorsIcon, strong: 'Made to order for you,', text: 'so the 14-day change-of-mind return doesn’t apply. Faults are always covered.' }
       : { icon: ArrowCounterClockwiseIcon, strong: `${PROMISES.returns.label}.`, text: 'Faults are always covered.' },

@@ -24,7 +24,7 @@ export function HeroOffer({ welcome }: { welcome: WelcomeSettings }) {
           Every sofa
         </dt>
         <dd className="text-[17px] font-semibold leading-snug lg:text-[19px]">{PROMISES.guarantee.label}</dd>
-        <dd className="text-[13px] leading-snug text-on-wine-muted lg:text-[14px]">On the frame and springs</dd>
+        <dd className="text-[13px] leading-snug text-on-wine-muted lg:text-[14px]">On the frame and foam</dd>
       </div>
     )
   }

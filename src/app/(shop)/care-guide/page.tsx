@@ -31,7 +31,7 @@ export default function CareGuidePage() {
       <ul>
         <li>Plump and turn loose seat and back cushions every week, and swap them round now and then, so they wear evenly.</li>
         <li>Sit in different places: favourite spots flatten first.</li>
-        <li>Don’t sit or stand on the arms or the back, and don’t let children jump on the seats: it strains the frame and springs.</li>
+        <li>Don’t sit or stand on the arms or the back, and don’t let children jump on the seats: it strains the frame and foam.</li>
         <li>Keep it at least 30 cm from radiators and fires, and out of strong direct sunlight, which fades and dries every kind of cover.</li>
         <li>When you move it, lift it rather than dragging it by the arms or feet.</li>
       </ul>
@@ -68,7 +68,7 @@ export default function CareGuidePage() {
         <li>Try any cleaning product on a hidden area first. For anything stubborn, a professional upholstery cleaner is the safest choice.</li>
       </ol>
       <Note title="Not covered by the guarantee">
-        The {POLICIES.guaranteeYears}-year guarantee covers the frame and springs. Marks, stains, normal wear and fading from sunlight aren’t covered, so a
+        The {POLICIES.guaranteeYears}-year guarantee covers the frame and foam. Marks, stains, normal wear and fading from sunlight aren’t covered, so a
         little care goes a long way. <Link href="/delivery-and-returns#faults">Faults and the guarantee</Link>.
       </Note>
 

@@ -138,7 +138,7 @@ export default async function TermsPage() {
           it right quickly. This doesn’t limit your legal rights for faults found later.
         </li>
         <li>
-          On top of your legal rights, every sofa has a {POLICIES.guaranteeYears}-year guarantee covering faults in the frame and springs. It doesn’t cover
+          On top of your legal rights, every sofa has a {POLICIES.guaranteeYears}-year guarantee covering faults in the frame and foam. It doesn’t cover
           normal wear and tear, accidental damage, misuse, marks and stains, or fading from sunlight.
         </li>
       </ol>
