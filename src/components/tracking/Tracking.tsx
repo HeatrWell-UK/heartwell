@@ -12,7 +12,7 @@ import { usePathname } from 'next/navigation'
 import { APP_ENV } from '@/config/env'
 import { isPrivatePath, liveAllowed, TRACKING, type TrackingMode } from '@/config/tracking'
 import { parseConsent } from '@/lib/tracking/consent'
-import { captureQa, captureTouch, consentStore, isQaVisit, isStaffDevice, readConsent, sessionFbclid } from '@/lib/tracking/browser'
+import { captureQa, captureTouch, consentStore, isQaVisit, isStaffDevice, noteVisit, readConsent, sessionFbclid } from '@/lib/tracking/browser'
 import { redactedLocation } from '@/lib/tracking/redact'
 import { visitIds } from '@/lib/basket/store'
 import { ConsentBanner, ConsentSettings } from './ConsentBanner'
@@ -76,15 +76,17 @@ export function Tracking({ mode }: { mode: TrackingMode }) {
     return () => window.removeEventListener('hw:consent-open', open)
   }, [])
 
-  // How the visit began (our own statistics, unless switched off).
+  // How the visit began, and each page it views (our own statistics, unless switched off).
   useEffect(() => {
     captureQa()
     if (isStaffDevice() || isQaVisit() || !readConsent().statistics) return
     const visit = visitIds()
     const arrival = captureTouch()
-    if (!visit || !arrival) return
-    const { touch, fbclid } = arrival
-    postAttribution({ visit, touch: { ...touch, at: undefined }, ...(readConsent().marketing && fbclid ? { fbclid } : {}) })
+    if (visit && arrival) {
+      const { touch, fbclid } = arrival
+      postAttribution({ visit, touch: { ...touch, at: undefined }, ...(readConsent().marketing && fbclid ? { fbclid } : {}) })
+    }
+    noteVisit('page_view')
   }, [pathname])
 
   // A later "Accept" adds this visit's ad click to its record.

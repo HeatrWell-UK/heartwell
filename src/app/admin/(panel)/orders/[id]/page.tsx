@@ -6,6 +6,9 @@ import { OrderStatusBadge, SOURCE_LABEL, Tag } from '@/components/admin/OrderBit
 import { CopyButton } from '@/components/admin/ClientButtons'
 import { ActButton } from '@/components/admin/ActButton'
 import { EditOrderPanel } from '@/components/admin/OrderForms'
+import { LinkVisitForm } from '@/components/admin/LinkVisitForm'
+import { VisitCard } from '@/components/admin/VisitFinder'
+import type { FoundVisit } from '@/lib/admin/visits'
 import { getOrder, lineOption, orderPickers } from '@/lib/admin/load-orders'
 import { ALLOWED_MOVES, dualTime, isStatus, NEXT_STEP, stageAheadOfStatus, STATUS_LABEL, statusMessage, whatsAppTo, type OrderStatus } from '@/lib/admin/orders'
 import { toEmailData } from '@/lib/admin/order-view'
@@ -51,8 +54,18 @@ const EVENT_LABEL: Record<string, string> = {
 
 export default async function OrderPage({ params, searchParams }: Props) {
   const [{ id }, sp] = await Promise.all([params, searchParams])
-  const [order, pickers, pushLog] = await Promise.all([getOrder(id), orderPickers(), (await createClient()).rpc('admin_orderflow_log', { p_order_id: id })])
+  const db = await createClient()
+  const [order, pickers, pushLog] = await Promise.all([getOrder(id), orderPickers(), db.rpc('admin_orderflow_log', { p_order_id: id })])
   if (!order) notFound()
+
+  // The website visit behind the order, and whether Meta has its Purchase yet.
+  const [visitResult, purchaseResult] = await Promise.all([
+    order.arrival_id ? db.rpc('find_visits', { p_input: { arrival_id: order.arrival_id, include_tests: true } }) : null,
+    db.from('conversion_outbox').select('status').eq('order_id', order.id).eq('platform', 'meta').eq('event_name', 'Purchase').maybeSingle(),
+  ])
+  const linkedVisit = ((visitResult?.data as { visits?: FoundVisit[] } | null)?.visits ?? [])[0] ?? null
+  const manualOrder = order.source === 'whatsapp' || order.source === 'phone'
+  const purchaseGone = purchaseResult.data?.status === 'sent' || purchaseResult.data?.status === 'sending'
 
   const status = (isStatus(order.status) ? order.status : 'pending_cod') as OrderStatus
   const next = NEXT_STEP[status]
@@ -376,11 +389,23 @@ export default async function OrderPage({ params, searchParams }: Props) {
             order.fbclid && 'Facebook click',
             order.gclid && 'Google click',
             order.whatsapp_reference && `WhatsApp ${order.whatsapp_reference}`,
+            linkedVisit && `website visit ${linkedVisit.reference}`,
           ]
             .filter(Boolean)
-            .join(', ') || 'No tracking recorded (tracking arrives in Phase 14).'}
+            .join(', ') || (manualOrder ? 'Not linked to a website visit yet.' : 'No tracking recorded.')}
           {order.manual_acquisition_source && ` Staff say: ${order.manual_acquisition_source}${order.manual_acquisition_note ? ` (${order.manual_acquisition_note})` : ''}.`}
         </p>
+        {linkedVisit && (
+          <ul className="mt-3">
+            <VisitCard visit={linkedVisit} zone="uk" />
+          </ul>
+        )}
+        {manualOrder &&
+          (purchaseGone ? (
+            <p className="mt-3 text-sm text-zinc-600">Meta has this order’s Purchase, so its website visit stays as it is.</p>
+          ) : (
+            <LinkVisitForm orderId={order.id} current={linkedVisit?.reference ?? ''} isTest={order.is_test} contactHint={order.customer_email || order.customer_phone} />
+          ))}
         <form action={setAttribution} className="mt-3 flex flex-col gap-2 sm:flex-row">
           <input type="hidden" name="id" value={order.id} />
           <label htmlFor="src" className="sr-only">

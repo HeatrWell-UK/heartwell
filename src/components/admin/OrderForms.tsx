@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useId, useState } from 'react'
-import { PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { MagnifyingGlassIcon, PlusIcon, TrashIcon } from '@phosphor-icons/react'
+import { VisitFinder } from '@/components/admin/VisitFinder'
 import { formatPrice } from '@/lib/format'
 import type { PickerFabric, PickerVariant } from '@/lib/admin/load-orders'
 import { createManualOrder, saveOrderEdit, type FormResult } from '@/app/admin/(panel)/orders/actions'
@@ -220,6 +221,18 @@ export function EditOrderForm({ orderId, initial, initialLines, variants, fabric
   )
 }
 
+/** "Find their website visit": the finder opens on demand (so it starts from the time it's opened). */
+export function FindVisitToggle({ reference, onUse, includeTests, contactHint }: { reference: string; onUse: (reference: string) => void; includeTests: boolean; contactHint: string }) {
+  const [open, setOpen] = useState(false)
+  if (!open)
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-dashed border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-800">
+        <MagnifyingGlassIcon aria-hidden="true" size={16} weight="bold" /> No reference? Find their website visit
+      </button>
+    )
+  return <VisitFinder chosen={reference} onUse={onUse} includeTests={includeTests} contactHint={contactHint} />
+}
+
 /** Taking an order that came in on WhatsApp or by phone. */
 export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { variants: PickerVariant[]; fabrics: PickerFabric[]; initialReference?: string }) {
   const router = useRouter()
@@ -238,7 +251,7 @@ export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { 
       onSubmit={async (e) => {
         e.preventDefault()
         setSaving(true)
-        const r = await createManualOrder({ ...payload(customer, lines), source, whatsAppReference: reference, isTest }).catch(() => ({
+        const r = await createManualOrder({ ...payload(customer, lines), source, reference, isTest }).catch(() => ({
           ok: false as const,
           message: 'Couldn’t reach the server. Try again.',
         }))
@@ -257,14 +270,22 @@ export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { 
             </label>
           ))}
         </div>
-        {source === 'whatsapp' && (
-          <div className="flex flex-col gap-1">
-            <label htmlFor={`${id}-ref`} className={label}>
-              HW-WA reference (from the customer’s first message, if there is one)
-            </label>
-            <input id={`${id}-ref`} value={reference} onChange={(e) => setReference(e.target.value.toUpperCase())} placeholder="HW-WA-…" className={input} autoCapitalize="characters" />
-          </div>
-        )}
+        <div className="flex flex-col gap-1">
+          <label htmlFor={`${id}-ref`} className={label}>
+            Reference: HW-WA from their first WhatsApp message, or HW-V from their website visit
+          </label>
+          <input
+            id={`${id}-ref`}
+            value={reference}
+            onChange={(e) => setReference(e.target.value.toUpperCase().trim())}
+            placeholder={source === 'whatsapp' ? 'HW-WA-… or HW-V-…' : 'HW-V-…'}
+            className={`${input} font-mono`}
+            autoCapitalize="characters"
+            autoComplete="off"
+          />
+          <p className="text-xs text-zinc-500">It tells Meta which advert brought them, so the ads learn from phone and WhatsApp orders too.</p>
+        </div>
+        <FindVisitToggle reference={reference} onUse={(r) => setReference((cur) => (cur === r ? '' : r))} includeTests={isTest} contactHint={customer.email.trim() || customer.phone.trim()} />
       </fieldset>
       <CustomerFields value={customer} onChange={setCustomer} />
       <LinesEditor lines={lines} onChange={setLines} variants={variants} fabrics={fabrics} />

@@ -31,7 +31,7 @@ export default function PrivacyPage() {
     <ContentPage
       title="Privacy notice"
       intro={<p>We collect only what we need to sell and deliver your furniture and to run the shop well, and we never sell your details.</p>}
-      updated="2026-10-13"
+      updated="2026-11-07"
       contents={CONTENTS}
     >
       <h2 id="who">Who we are</h2>
@@ -53,7 +53,8 @@ export default function PrivacyPage() {
       </p>
       <p>
         With your order we also keep how you found us: campaign tags from the link you followed, the page you landed on, the website you came from, and a
-        random ID for your device. It tells us which adverts bring real customers. You can switch this off in <CookieSettingsButton className="font-semibold text-velvet underline underline-offset-2" />.
+        random ID for your device. It tells us which adverts bring real customers. If you order by phone or WhatsApp, we may match your order to your
+        visit in the same way. You can switch this off in <CookieSettingsButton className="font-semibold text-velvet underline underline-offset-2" />.
       </p>
 
       <h2 id="enquiries">Enquiries, samples, reminders and the newsletter</h2>
@@ -94,6 +95,11 @@ export default function PrivacyPage() {
         everything we store on your device.
       </p>
       <p>
+        As part of our own statistics we note the pages you look at and a few things you do (adding to your basket, starting checkout, tapping to call
+        us), against your device’s random ID and the kind of phone or computer and app you’re using (like “iPhone, Instagram app”). When you then ring
+        or message us to order, it lets us find your visit and see which advert brought you. These notes stay with us and are deleted after 90 days.
+      </p>
+      <p>
         Your basket, saved sofas and the postcode you checked stay on your device; we don’t keep them unless you order or ask for a reminder. Like every
         website’s, our host’s servers see your connection’s IP address; we use it briefly to stop abuse, and only add it to your records where this notice
         says so.
@@ -112,8 +118,8 @@ export default function PrivacyPage() {
       </p>
       <p>
         We do this because it’s in our legitimate interest to know which adverts work; you can object, and we’ll stop. If you accepted marketing cookies,
-        we also include your IP address, browser and Meta’s own cookie IDs, which helps Meta match the order. Test orders and cancelled orders are never
-        sent.
+        we also include your IP address, browser and Meta’s own cookie IDs, which helps Meta match the order; for a phone or WhatsApp order we’ve matched
+        to your visit, that’s Meta’s cookie IDs from the visit. Test orders and cancelled orders are never sent.
       </p>
       <p>
         If you arrived from one of our adverts, the shop remembers it for up to a week (two small cookies) so your ad offer applies at checkout. That
@@ -168,6 +174,10 @@ export default function PrivacyPage() {
           <tr>
             <th scope="row">Visit statistics and WhatsApp enquiry records</th>
             <td>26 months</td>
+          </tr>
+          <tr>
+            <th scope="row">Pages viewed and taps on a visit</th>
+            <td>90 days</td>
           </tr>
           <tr>
             <th scope="row">Records of the emails we send you</th>

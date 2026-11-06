@@ -8,6 +8,7 @@
 
 import { CONSENT_COOKIE, isPrivatePath, STAFF_COOKIE } from '@/config/tracking'
 import { visitIds } from '@/lib/basket/store'
+import { visitStepFor, type VisitStep } from '@/lib/attribution/visit'
 import { CONSENT_MAX_AGE, parseConsent, serialiseConsent, type Consent } from './consent'
 import { ga4Params, GA4_NAME, META_CUSTOM, pixelParams, type BrowserEventName, type EventData } from './events'
 
@@ -186,10 +187,37 @@ export function newEventId(): string {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`
 }
 
+// Our own record of the visit ------------------------------------------------------
+
+/**
+ * Notes a step of this visit (a page, a basket add, starting checkout,
+ * tapping Call) in our own statistics, so staff can match a phone or WhatsApp
+ * order to it. Never for staff devices, QA visits or private pages, and not
+ * when the visitor switched our statistics off.
+ */
+export function noteVisit(type: VisitStep, extra: { name?: string; value?: number } = {}) {
+  if (typeof window === 'undefined' || isStaffDevice() || isQaVisit() || isPrivatePath(window.location.pathname)) return
+  if (!readConsent().statistics) return
+  const visit = visitIds()
+  if (!visit) return
+  try {
+    void fetch('/api/visit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({ visit, type, path: window.location.pathname, ...extra }),
+    }).catch(() => {})
+  } catch {
+    // Best effort, like the rest of our statistics.
+  }
+}
+
 /** A funnel event: Pixel, GA4 and the server copy, one event ID. Returns the ID. */
 export function track(name: BrowserEventName, data: EventData = {}): string {
   const eventId = newEventId()
   if (typeof window === 'undefined' || isStaffDevice() || isQaVisit() || isPrivatePath(window.location.pathname)) return eventId
+  const step = visitStepFor(name, data)
+  if (step) noteVisit(step.type, { name: step.name, value: step.value })
   const consent = readConsent()
   const loaded = window.__hwTracking
   try {

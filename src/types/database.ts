@@ -118,6 +118,7 @@ export type Database = {
         Row: {
           arrival_id: string
           created_at: string
+          device: string | null
           fbclid: string | null
           first_touch_campaign: string | null
           first_touch_content: string | null
@@ -140,6 +141,7 @@ export type Database = {
           last_touch_term: string | null
           meta_fbc: string | null
           meta_fbp: string | null
+          reference: string
           referrer: string | null
           session_id: string
           visitor_id: string
@@ -148,6 +150,7 @@ export type Database = {
         Insert: {
           arrival_id: string
           created_at?: string
+          device?: string | null
           fbclid?: string | null
           first_touch_campaign?: string | null
           first_touch_content?: string | null
@@ -170,6 +173,7 @@ export type Database = {
           last_touch_term?: string | null
           meta_fbc?: string | null
           meta_fbp?: string | null
+          reference?: string
           referrer?: string | null
           session_id: string
           visitor_id: string
@@ -178,6 +182,7 @@ export type Database = {
         Update: {
           arrival_id?: string
           created_at?: string
+          device?: string | null
           fbclid?: string | null
           first_touch_campaign?: string | null
           first_touch_content?: string | null
@@ -200,6 +205,7 @@ export type Database = {
           last_touch_term?: string | null
           meta_fbc?: string | null
           meta_fbp?: string | null
+          reference?: string
           referrer?: string | null
           session_id?: string
           visitor_id?: string
@@ -2056,6 +2062,7 @@ export type Database = {
       delete_test_order: { Args: { p_order_id: string }; Returns: Json }
       delivery_area: { Args: { p_postcode: string }; Returns: Json }
       digest_data: { Args: { p_ticket: string }; Returns: Json }
+      find_visits: { Args: { p_input: Json }; Returns: Json }
       health_ping: { Args: never; Returns: Json }
       health_report: {
         Args: { p_problems: Json; p_ticket: string }
@@ -2119,6 +2126,7 @@ export type Database = {
         Args: { p_from: string; p_to: string }
         Returns: boolean
       }
+      link_order_visit: { Args: { p_order_id: string; p_reference: string }; Returns: Json }
       place_manual_order: { Args: { p_input: Json }; Returns: Json }
       place_order: { Args: { p_input: Json }; Returns: Json }
       postcode_from_text: { Args: { p_text: string }; Returns: string }

@@ -7,6 +7,7 @@
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { APP_ENV } from '@/config/env'
+import { deviceLabel } from '@/lib/attribution/device'
 import { CONSENT_COOKIE, STAFF_COOKIE } from '@/config/tracking'
 import { clientIp, rateLimit } from '@/lib/http/rate-limit'
 import { parseConsent } from '@/lib/tracking/consent'
@@ -61,6 +62,8 @@ export async function POST(request: Request) {
       referrer: touch.referrer ?? null,
       initial_product_id: productId ?? null,
       initial_variant_id: variantId ?? null,
+      // "iPhone, Instagram app": enough for staff to pick the visit; the full browser string isn't kept.
+      device: deviceLabel(request.headers.get('user-agent')),
       is_test: APP_ENV !== 'production',
       ...meta,
     })

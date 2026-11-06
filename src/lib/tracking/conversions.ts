@@ -69,6 +69,10 @@ export function buildConversion(row: OutboxRow, siteUrl: string, now = new Date(
           externalId: o.visitor_id,
           // The browser's identifiers only when the customer accepted marketing cookies (D10).
           ...(consented && website ? { ip: o.customer_ip, userAgent: o.customer_user_agent, fbp: o.meta_fbp, fbc: o.meta_fbc } : {}),
+          // A WhatsApp or phone order has Meta's IDs only when staff linked it to a
+          // visit that accepted marketing cookies (they're never saved otherwise):
+          // the ad click that brought the customer. Never staff's own IP or browser.
+          ...(!website ? { fbp: o.meta_fbp, fbc: o.meta_fbc } : {}),
         },
         custom: { value: Number(o.total_amount), contents, numItems: o.items.reduce((n, i) => n + i.quantity, 0) },
       }),

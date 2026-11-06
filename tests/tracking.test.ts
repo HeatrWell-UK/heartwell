@@ -194,6 +194,20 @@ describe('conversions from the outbox', () => {
     if (!('skip' in chat)) expect(chat.payload.action_source).toBe('chat')
   })
 
+  it('gives a phone or WhatsApp order the ad click of the visit staff linked, never staff’s own IP or browser', () => {
+    const linked = buildConversion(row({}, order({ source: 'phone', meta_fbc: 'fb.1.1762430000000.IwAR9', meta_fbp: 'fb.1.2.2' })), 'https://example.test', NOW)
+    const unlinked = buildConversion(row({}, order({ source: 'phone', meta_fbc: null, meta_fbp: null, visitor_id: null })), 'https://example.test', NOW)
+    if ('skip' in linked || 'skip' in unlinked) throw new Error('skipped')
+    expect(linked.payload).toMatchObject({ action_source: 'phone_call', user_data: { fbc: 'fb.1.1762430000000.IwAR9', fbp: 'fb.1.2.2' } })
+    expect(linked.payload).not.toHaveProperty('event_source_url')
+    expect(linked.payload.user_data).not.toHaveProperty('client_ip_address')
+    expect(linked.payload.user_data).not.toHaveProperty('client_user_agent')
+    expect(unlinked.payload.user_data).not.toHaveProperty('fbc')
+    expect(unlinked.payload.user_data).not.toHaveProperty('fbp')
+    expect(unlinked.payload.user_data).not.toHaveProperty('external_id')
+    expect(unlinked.payload.user_data).toHaveProperty('ph')
+  })
+
   it('skips cancelled orders and events Meta would refuse', () => {
     expect(buildConversion(row({}, order({ status: 'cancelled' })), 'https://example.test', NOW)).toEqual({ skip: 'order cancelled' })
     expect(buildConversion(row({}, order({ confirmed_at: '2026-09-20T09:00:00Z' })), 'https://example.test', NOW)).toMatchObject({ skip: expect.stringMatching(/7 days/) })

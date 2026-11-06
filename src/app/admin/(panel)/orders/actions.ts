@@ -11,6 +11,8 @@ import { sendStatusEmail } from '@/lib/checkout/notify'
 import { isUkPhone, formatUkPhone } from '@/lib/checkout/phone'
 import { SMTP_CONFIGURED } from '@/config/email'
 import { sendReviewRequest, type ReviewRequestRow } from '@/lib/leads/notify'
+import { referenceKind } from '@/lib/attribution/visit'
+import type { FoundVisit } from '@/lib/admin/visits'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const field = (form: FormData, name: string) => String(form.get(name) ?? '').trim()
@@ -126,6 +128,13 @@ const MESSAGES: Record<string, string> = {
   UNAVAILABLE_MATERIAL: 'One of the fabrics can’t be found.',
   ORDER_CANCELLED: 'Cancelled orders can’t be edited.',
   NOT_AUTHORISED: 'Please sign in again.',
+  UNKNOWN_VISIT: 'No visit or WhatsApp tap has that reference. Check it, or find the visit again.',
+  BAD_VISIT_REFERENCE: 'That reference isn’t right. It looks like HW-V-261106-K7P2QX or HW-WA-261106-K7P2QX.',
+  PURCHASE_SENT: 'Meta already has this order’s Purchase, so its visit can’t be changed now.',
+  NOT_MANUAL: 'Only WhatsApp and phone orders are linked by hand; website orders know their visit.',
+  NOTHING_TO_FIND: 'Enter a time, or the phone number or email the customer gave before.',
+  BAD_TIME: 'Check the date and time.',
+  BAD_WINDOW: 'Choose how far either side of the time to look.',
 }
 
 export async function saveOrderEdit(id: string, input: unknown): Promise<FormResult> {
@@ -157,7 +166,8 @@ export async function saveOrderEdit(id: string, input: unknown): Promise<FormRes
 
 const Manual = Customer.extend({
   source: z.enum(['whatsapp', 'phone']),
-  whatsAppReference: z.string().trim().max(40),
+  /** HW-WA (from the chat) or HW-V (a website visit found by staff); blank for neither. */
+  reference: z.string().trim().max(40),
   isTest: z.boolean(),
 })
 
@@ -167,6 +177,9 @@ export async function createManualOrder(input: unknown): Promise<FormResult> {
   if (!parsed.success) return { ok: false, message: 'Please check the details: name, a UK phone number, address, postcode and at least one product are needed.' }
   const c = parsed.data
   if (!isUkPhone(c.phone)) return { ok: false, message: MESSAGES.BAD_PHONE! }
+  const reference = c.reference.toUpperCase()
+  const kind = referenceKind(reference)
+  if (kind === 'invalid') return { ok: false, message: MESSAGES.BAD_VISIT_REFERENCE! }
   const { data, error } = await (await createClient()).rpc('place_manual_order', {
     p_input: {
       source: c.source,
@@ -178,7 +191,8 @@ export async function createManualOrder(input: unknown): Promise<FormResult> {
       preferred_delivery_date: c.preferredDate || null,
       special_instructions: c.notes || null,
       delivery_charge: c.deliveryCharge,
-      whatsapp_reference: c.whatsAppReference || null,
+      whatsapp_reference: kind === 'whatsapp' ? reference : null,
+      visit_reference: kind === 'visit' ? reference : null,
       is_test: c.isTest,
       test_reason: c.isTest ? 'marked by staff' : null,
       items: linePayload(c.lines),
@@ -187,6 +201,47 @@ export async function createManualOrder(input: unknown): Promise<FormResult> {
   if (error) return { ok: false, message: MESSAGES[codeOf(error.message)] ?? `Couldn’t save: ${error.message}` }
   revalidatePath('/admin/orders')
   return { ok: true, id: String((data as { id: string }).id) }
+}
+
+// Finding the website visit behind a WhatsApp or phone order ---------------------
+
+const Find = z.object({
+  date: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]),
+  time: z.union([z.literal(''), z.string().regex(/^\d{2}:\d{2}$/)]),
+  zone: z.enum(['uk', 'pk']),
+  minutes: z.number().int().min(5).max(720),
+  adsOnly: z.boolean(),
+  includeTests: z.boolean(),
+  contact: z.string().trim().max(254),
+})
+
+export type FindResult = { ok: true; visits: FoundVisit[] } | { ok: false; message: string }
+
+/** Visits around a time (UK or Pakistan), or matched by the phone or email the customer gave before. */
+export async function findVisits(input: unknown): Promise<FindResult> {
+  if (await adminGuard()) return { ok: false, message: MESSAGES.NOT_AUTHORISED! }
+  const parsed = Find.safeParse(input)
+  if (!parsed.success) return { ok: false, message: MESSAGES.BAD_TIME! }
+  const f = parsed.data
+  const { data, error } = await (await createClient()).rpc('find_visits', {
+    p_input: { date: f.date, time: f.time, zone: f.zone, minutes: f.minutes, ads_only: f.adsOnly, include_tests: f.includeTests, contact: f.contact },
+  })
+  if (error) return { ok: false, message: MESSAGES[codeOf(error.message)] ?? `Couldn’t search: ${error.message}` }
+  return { ok: true, visits: ((data as { visits?: FoundVisit[] } | null)?.visits ?? []) as FoundVisit[] }
+}
+
+/** Links a saved WhatsApp or phone order to a visit (HW-V or HW-WA); blank unlinks. */
+export async function linkOrderVisit(id: string, raw: string): Promise<{ ok: boolean; message: string }> {
+  if (!UUID.test(id)) return { ok: false, message: 'Unknown order.' }
+  if (await adminGuard()) return { ok: false, message: MESSAGES.NOT_AUTHORISED! }
+  const reference = raw.trim().toUpperCase()
+  if (referenceKind(reference) === 'invalid') return { ok: false, message: MESSAGES.BAD_VISIT_REFERENCE! }
+  const { data, error } = await (await createClient()).rpc('link_order_visit', { p_order_id: id, p_reference: reference })
+  if (error) return { ok: false, message: MESSAGES[codeOf(error.message)] ?? `Couldn’t link it: ${error.message}` }
+  revalidatePath(`/admin/orders/${id}`)
+  const linked = data as { reference?: string | null; from_ad?: boolean } | null
+  if (!reference) return { ok: true, message: 'Visit unlinked.' }
+  return { ok: true, message: `Linked to visit ${linked?.reference ?? reference}${linked?.from_ad ? ' (from an ad)' : ''}.` }
 }
 
 // The review email, now -----------------------------------------------------------

@@ -11,8 +11,10 @@ export const dynamic = 'force-dynamic'
 /**
  * An order that came in on WhatsApp or by phone. Prices default to the
  * catalogue, can be agreed per line, and the database works out the totals.
- * With the customer's HW-WA reference, the order is linked to the chat (and
- * the ad that started it, once tracking is on).
+ * With the customer's HW-WA reference, or the HW-V reference of the website
+ * visit staff found (by time, or the phone or email they gave before), the
+ * order is linked to that visit and the ad that brought them, and its Purchase
+ * tells Meta so.
  */
 export default async function NewOrderPage({ searchParams }: { searchParams: Promise<{ wa?: string }> }) {
   const [{ variants, fabrics }, { wa }] = await Promise.all([orderPickers(), searchParams])
