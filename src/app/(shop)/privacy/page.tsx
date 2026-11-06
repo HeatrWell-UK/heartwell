@@ -31,7 +31,7 @@ export default function PrivacyPage() {
     <ContentPage
       title="Privacy notice"
       intro={<p>We collect only what we need to sell and deliver your furniture and to run the shop well, and we never sell your details.</p>}
-      updated="2026-11-07"
+      updated="2026-11-06"
       contents={CONTENTS}
     >
       <h2 id="who">Who we are</h2>
