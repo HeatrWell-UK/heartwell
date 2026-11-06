@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ALLOWED_MOVES, dualTime, NEXT_STEP, searchFilter, stageAheadOfStatus, statusMessage, STATUSES, whatsAppTo } from '@/lib/admin/orders'
 import { toEmailData, type OrderRowForView } from '@/lib/admin/order-view'
-import { addressLine, copyBlock, customerStatusEmail, shortDay } from '@/lib/email/order-emails'
+import { addressLine, copyBlock, customerStatusEmail, shortDay, toCollect } from '@/lib/email/order-emails'
 
 /** public.order_status_allowed, written out exactly as the migration has it. */
 function databaseAllows(from: string, to: string): boolean {
@@ -105,6 +105,7 @@ const row: OrderRowForView = {
   fee_area: 0,
   delivery_total: 50,
   total_amount: 799,
+  deposit_paid: 0,
   order_items: [{ title: 'Sample Corner', custom_title: null, sku: 'SC-1', colour_name: 'Grey', material_code: null, material_name: null, material_collection: null, quantity: 1, unit_price: 749 }],
 }
 
@@ -198,5 +199,39 @@ describe('the copy block (owner’s format, 6 November 2026)', () => {
     expect(addressLine('12 Test Lane, Doncaster, South Yorkshire, DN4 7AA', 'DN4 7AA')).toBe('12 Test Lane, Doncaster, South Yorkshire')
     expect(addressLine('12 Test Lane\nDoncaster DN47AA', 'DN4 7AA')).toBe('12 Test Lane, Doncaster')
     expect(addressLine('1 Leaf Street,, Headingley ,', 'LS6 2AB')).toBe('1 Leaf Street, Headingley')
+  })
+})
+
+describe('a deposit paid before delivery', () => {
+  const withDeposit: OrderRowForView = {
+    ...row,
+    shipping_address: '12 Test Lane',
+    preferred_delivery_date: '2026-11-12',
+    fee_upstairs: 0,
+    delivery_total: 20,
+    total_amount: 769,
+    deposit_paid: 100,
+  }
+  const shop = { email: 'shop@example.test', phoneDisplay: '07460 669864', whatsAppHref: null }
+
+  it('keeps the sale as the total and asks the driver for the rest', () => {
+    const v = toEmailData(withDeposit)
+    expect(v.totalAmount).toBe(769)
+    expect(toCollect(v)).toBe(669)
+    const block = copyBlock(v)
+    expect(block).toContain('Deposit paid: -£100\n\nNotes:')
+    expect(block).toContain('To collect on delivery: £669')
+  })
+
+  it('tells the customer what’s left to pay', () => {
+    const shipped = customerStatusEmail(toEmailData(withDeposit), 'shipped', { trackUrl: 'https://example.test/track-order', shop })
+    expect(shipped.text).toContain('Please have £669 ready')
+    expect(shipped.text).toContain('Deposit paid: -£100')
+    expect(shipped.text).toContain('To pay on delivery: £669')
+    const confirmed = customerStatusEmail(toEmailData(withDeposit), 'confirmed', { trackUrl: '', shop })
+    expect(confirmed.text).toContain('Nothing more to pay until it’s in your room: £669')
+    const none = customerStatusEmail(toEmailData(row), 'confirmed', { trackUrl: '', shop })
+    expect(none.text).toContain('Nothing to pay until it’s in your room: £799')
+    expect(none.text).toContain('To pay today: £0')
   })
 })
