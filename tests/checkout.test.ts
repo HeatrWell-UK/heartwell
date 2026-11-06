@@ -160,7 +160,7 @@ describe('order emails', () => {
     expect(e.text).toContain('To pay on delivery: £1,048')
   })
 
-  it('gives the shop the customer, a WhatsApp ask-to-confirm link and a copy block with SKUs', () => {
+  it('gives the shop the customer, a WhatsApp ask-to-confirm link, SKUs in the list and the copy block', () => {
     const e = shopOrderEmail({ ...emailOrder, isTest: true }, { confirmUrl, adminUrl: 'https://example.test/admin' })
     expect(e.subject).toBe('[TEST] New order HW-100123: £1,008, waiting for the customer to confirm')
     const ask = askToConfirmHref(emailOrder, confirmUrl)!
@@ -168,7 +168,10 @@ describe('order emails', () => {
     expect(decodeURIComponent(ask)).toContain(confirmUrl)
     expect(e.html).toContain(escapeHtml(ask))
     const block = copyBlock(emailOrder)
-    expect(block).toContain('[SC-1]')
+    expect(e.html).toContain('SC-1')
+    expect(block).not.toContain('SC-1')
+    expect(block).toContain('Delivery: Oct 20th')
+    expect(block).toContain('Address: 1 Leaf Street, Headingley\nPostcode: LS6 2AB')
     expect(block).toContain('To collect on delivery: £1,008')
     expect(block).toContain('Notes: Side gate & bins')
     expect(e.html).toContain('Side gate &amp; bins')

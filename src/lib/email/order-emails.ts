@@ -5,7 +5,7 @@
 import { formatPrice } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 import { ukPhoneDigits } from '@/lib/checkout/phone'
-import { POLICIES } from '@/config/promises'
+import { POLICIES, PROMISES } from '@/config/promises'
 import { SITE_URL } from '@/config/site'
 import { button, C, emailFooterText, escapeHtml, firstName, h, layout, link, p, type RenderedEmail } from './layout'
 
@@ -42,6 +42,10 @@ export interface OrderEmailData {
   extras: { label: string; detail?: string; amount: number }[]
   deliveryTotal: number
   totalAmount: number
+  /** When it was placed (orders.created_at), for the copy block. */
+  placedAt?: string | null
+  /** In a delivery area with a slower window (orders.delivery_area). */
+  slowArea?: boolean
 }
 
 export interface ShopContact {
@@ -158,20 +162,60 @@ export function askToConfirmHref(o: Pick<OrderEmailData, 'customerName' | 'custo
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
 }
 
-/** A block the shop can copy into OrderFlow or a message. */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+/** "Nov 6th": a day (YYYY-MM-DD) or a moment (in UK time), the owner's short form for the copy block. */
+export function shortDay(value: string): string {
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? value
+    : new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value))
+  const [, m, d] = day.split('-').map(Number)
+  const n = d ?? 0
+  const suffix = n % 100 >= 11 && n % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][n % 10] ?? 'th')
+  return `${MONTHS[(m ?? 1) - 1]} ${n}${suffix}`
+}
+
+/** The address on one line, without the postcode (it has its own line), however it was typed. */
+export function addressLine(address: string, postcode: string): string {
+  const pc = postcode.replace(/[^0-9A-Za-z]/g, '').toUpperCase()
+  const parts = address
+    .split(/[\n,]+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const last = parts.at(-1)
+  if (last && pc) {
+    // Typed at the end of the address too (alone, or after the county): it has its own line.
+    const rest = last.replace(new RegExp(`\\s*${pc.split('').join('\\s*')}$`, 'i'), '').trim()
+    if (rest !== last) parts.splice(-1, 1, ...(rest ? [rest] : []))
+  }
+  return parts.join(', ')
+}
+
+/**
+ * A block the shop can copy into OrderFlow or a message (owner's format,
+ * 6 November 2026): when it was ordered and when it goes, the customer, the
+ * address with the postcode on its own line, the pieces with their colour or
+ * fabric, extras, notes and what to collect.
+ */
 export function copyBlock(o: OrderEmailData): string {
-  const date = o.preferredDate ? formatDeliveryDate(o.preferredDate) : 'none'
+  const usual = o.slowArea ? PROMISES.delivery.chargedTiming : PROMISES.delivery.timingShort
   return [
-    `Order: ${o.reference}${o.isTest ? ' (TEST)' : ''}`,
+    ...(o.placedAt ? [`Order on: ${shortDay(o.placedAt)}${o.isTest ? ' (TEST ORDER)' : ''}`] : o.isTest ? ['TEST ORDER'] : []),
+    `Delivery: ${o.preferredDate ? shortDay(o.preferredDate) : `${usual} (no day chosen)`}`,
+    '',
     `Name: ${o.customerName}`,
     `Phone: ${o.customerPhone}`,
     `Email: ${o.customerEmail ?? 'not given'}`,
-    `Address: ${o.shippingAddress}, ${o.postcode}`,
-    'Items:',
-    ...o.items.map((i) => `  ${i.quantity} x ${i.title}${i.option ? `, ${i.option}` : ''}${i.sku ? ` [${i.sku}]` : ''} @ ${money(i.unitPrice)}`),
+    '',
+    `Address: ${addressLine(o.shippingAddress, o.postcode)}`,
+    `Postcode: ${o.postcode}`,
+    '',
+    'Order:',
+    // The fabric's code stays off: the colour and fabric names are what the team reads.
+    ...o.items.map((i) => `  ${i.quantity} x ${i.title}${i.option ? `, ${i.option.replace(/\s*\([A-Z0-9-]+\)$/, '')}` : ''} @ ${money(i.unitPrice)}`),
     ...(o.extras.length ? ['Extras:', ...o.extras.map((e) => `  ${e.label}${e.detail ? ` (${e.detail})` : ''}: ${money(e.amount)}`)] : []),
     ...(o.discountAmount > 0 ? [`${offerName(o)}: -${money(o.discountAmount)}`] : []),
-    `Preferred day: ${date}`,
+    '',
     `Notes: ${o.notes ?? 'none'}`,
     `To collect on delivery: ${money(o.totalAmount)}`,
   ].join('\n')

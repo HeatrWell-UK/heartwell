@@ -9,6 +9,7 @@ export interface OrderRowForView {
   id: string
   reference: string | null
   is_test: boolean
+  created_at: string
   customer_name: string
   customer_email: string | null
   customer_phone: string
@@ -77,5 +78,7 @@ export function toEmailData(o: OrderRowForView): OrderEmailData {
     extras,
     deliveryTotal: o.delivery_total,
     totalAmount: o.total_amount,
+    placedAt: o.created_at,
+    slowArea: Boolean(o.delivery_area),
   }
 }
