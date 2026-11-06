@@ -75,6 +75,8 @@ export const lineOption = (i: Pick<AdminOrder['order_items'][number], 'material_
 export interface PickerVariant {
   id: string
   label: string
+  /** The product's name as an order line gets it. */
+  title: string
   price: number
   madeToOrder: boolean
 }
@@ -98,7 +100,7 @@ export async function orderPickers(): Promise<{ variants: PickerVariant[]; fabri
       .flatMap((v) => {
         const p = one(v.product)
         if (!p?.is_active) return []
-        return [{ id: v.id, label: `${p.title} · ${v.colour_name ?? 'as shown'} · ${v.sku}`, price: unitPrice(p.base_price, v.price_adjustment), madeToOrder: p.made_to_order }]
+        return [{ id: v.id, label: `${p.title} · ${v.colour_name ?? 'as shown'} · ${v.sku}`, title: p.title, price: unitPrice(p.base_price, v.price_adjustment), madeToOrder: p.made_to_order }]
       })
       .sort((a, b) => a.label.localeCompare(b.label)),
     fabrics: fabrics.data.map((m) => {

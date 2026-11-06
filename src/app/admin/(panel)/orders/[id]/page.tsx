@@ -266,7 +266,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
               notes: order.special_instructions ?? '',
               deliveryCharge: String(order.delivery_total),
             }}
-            initialLines={order.order_items.map((i) => ({ key: i.id, itemId: i.id, variantId: i.variant_id, materialId: i.material_id, quantity: i.quantity, unitPrice: String(i.unit_price) }))}
+            initialLines={order.order_items.map((i) => ({ key: i.id, itemId: i.id, variantId: i.variant_id, materialId: i.material_id, quantity: i.quantity, unitPrice: String(i.unit_price), customName: i.custom_title ?? '' }))}
           />
         )}
       </div>

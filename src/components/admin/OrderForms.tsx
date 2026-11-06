@@ -16,6 +16,8 @@ export interface LineValue {
   quantity: number
   /** Blank: the catalogue price. */
   unitPrice: string
+  /** Blank: the catalogue name. A staff-only name for this line (a custom size, a set made up for the customer). */
+  customName: string
 }
 
 export interface CustomerValue {
@@ -56,6 +58,25 @@ function LinesEditor({ lines, onChange, variants, fabrics }: { lines: LineValue[
                 </option>
               ))}
             </select>
+            {l.variantId && (
+              <div className="flex flex-col gap-1">
+                <label htmlFor={`${id}-${l.key}-n`} className={label}>
+                  Name on the order (optional)
+                </label>
+                <input
+                  id={`${id}-${l.key}-n`}
+                  value={l.customName}
+                  maxLength={120}
+                  onChange={(e) => set(l.key, { customName: e.target.value })}
+                  placeholder={v?.title ?? 'As in the catalogue'}
+                  className={input}
+                  autoComplete="off"
+                />
+                <p className="text-xs text-zinc-500">
+                  For a custom size or a set made up for them, like “{v?.title ?? 'Rio 3+2 Seater'}, 20 cm longer”. It replaces the name on the order, the delivery note, their emails and OrderFlow; the SKU stays the same.
+                </p>
+              </div>
+            )}
             {v?.madeToOrder && (
               <>
                 <label htmlFor={`${id}-${l.key}-m`} className={label}>
@@ -105,7 +126,7 @@ function LinesEditor({ lines, onChange, variants, fabrics }: { lines: LineValue[
       })}
       <button
         type="button"
-        onClick={() => onChange([...lines, { key: newKey(), itemId: null, variantId: '', materialId: null, quantity: 1, unitPrice: '' }])}
+        onClick={() => onChange([...lines, { key: newKey(), itemId: null, variantId: '', materialId: null, quantity: 1, unitPrice: '', customName: '' }])}
         className="flex min-h-11 items-center justify-center gap-2 rounded-lg border border-dashed border-zinc-300 text-sm font-semibold text-zinc-700"
       >
         <PlusIcon aria-hidden="true" size={16} weight="bold" /> Add a product
@@ -161,7 +182,14 @@ function payload(c: CustomerValue, lines: LineValue[]) {
     deliveryCharge: Number(c.deliveryCharge) || 0,
     lines: lines
       .filter((l) => l.variantId)
-      .map((l) => ({ itemId: l.itemId, variantId: l.variantId, materialId: l.materialId, quantity: l.quantity, unitPrice: l.unitPrice.trim() === '' ? null : Number(l.unitPrice) })),
+      .map((l) => ({
+        itemId: l.itemId,
+        variantId: l.variantId,
+        materialId: l.materialId,
+        quantity: l.quantity,
+        unitPrice: l.unitPrice.trim() === '' ? null : Number(l.unitPrice),
+        customName: l.customName.trim() || null,
+      })),
   }
 }
 
@@ -241,7 +269,7 @@ export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { 
   const [reference, setReference] = useState(initialReference)
   const [isTest, setIsTest] = useState(false)
   const [customer, setCustomer] = useState<CustomerValue>({ name: '', phone: '', email: '', address: '', postcode: '', preferredDate: '', notes: '', deliveryCharge: '0' })
-  const [lines, setLines] = useState<LineValue[]>([{ key: newKey(), itemId: null, variantId: '', materialId: null, quantity: 1, unitPrice: '' }])
+  const [lines, setLines] = useState<LineValue[]>([{ key: newKey(), itemId: null, variantId: '', materialId: null, quantity: 1, unitPrice: '', customName: '' }])
   const [result, setResult] = useState<FormResult | null>(null)
   const [saving, setSaving] = useState(false)
 

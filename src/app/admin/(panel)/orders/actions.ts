@@ -92,6 +92,8 @@ const Line = z.object({
   quantity: z.number().int().min(1).max(99),
   /** Staff may agree a price; blank means the catalogue price. */
   unitPrice: z.number().min(0).max(100000).nullable(),
+  /** Staff may name the line (a custom size, a set made up for the customer); blank means the catalogue name. */
+  customName: z.string().trim().max(120).nullable(),
 })
 
 const Customer = z.object({
@@ -113,6 +115,8 @@ const linePayload = (lines: z.infer<typeof Line>[]) =>
     material_id: l.materialId,
     quantity: l.quantity,
     ...(l.unitPrice !== null ? { unit_price: l.unitPrice.toFixed(2) } : {}),
+    // Always sent, so clearing the name in an edit goes back to the catalogue name.
+    custom_title: l.customName || null,
   }))
 
 export type FormResult = { ok: true; id: string } | { ok: false; message: string }
