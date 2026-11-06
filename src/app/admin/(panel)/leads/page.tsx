@@ -4,7 +4,7 @@ import { ChatCircleTextIcon, EnvelopeSimpleIcon, PhoneIcon, WhatsappLogoIcon } f
 import { ActButton } from '@/components/admin/ActButton'
 import { CopyButton } from '@/components/admin/ClientButtons'
 import { Tag } from '@/components/admin/OrderBits'
-import { basketLines, isLeadTab, LEAD_TABS, leadCounts, loadBaskets, loadEnquiries, loadMessages, loadSamples, loadSubscribers, type LeadTab } from '@/lib/admin/load-leads'
+import { basketLines, isLeadTab, LEAD_TABS, leadCounts, loadBaskets, loadEnquiries, loadMessages, loadSamples, loadSubscribers, type LeadTab, type LeadVisit } from '@/lib/admin/load-leads'
 import { dualTime } from '@/lib/admin/orders'
 import { whatsAppTo } from '@/lib/leads/notify'
 import { CONTACT_TOPICS, type ContactTopic } from '@/lib/leads/topics'
@@ -17,10 +17,10 @@ export const metadata: Metadata = { title: 'Leads' }
 export const dynamic = 'force-dynamic'
 
 const INTRO: Record<LeadTab, string> = {
-  samples: `Ring or WhatsApp to take the ${SAMPLES.fee}, post the samples, then mark them posted.`,
+  samples: `Ring or WhatsApp to take the ${SAMPLES.fee}, post the samples, then mark them posted. If they then order a sofa, use “Take this order” so it's credited to their ad.`,
   messages: 'From the contact form. Reply by email or WhatsApp, then mark it replied.',
   whatsapp: 'Every tap on a WhatsApp button, with the HW-WA reference from the message. Find one by its reference to see where the chat started.',
-  baskets: 'Shoppers who ticked “remind me about my basket” at checkout. Send the one reminder they asked for; leads close themselves if they order.',
+  baskets: 'Shoppers who ticked “remind me about my basket” at checkout. Send the one reminder they asked for; leads close themselves if they order online. If they order by phone or WhatsApp, use “Take this order” so the order is credited to their ad.',
   newsletter: 'People who confirmed they want emails. Only confirmed addresses may be emailed.',
 }
 
@@ -31,6 +31,28 @@ const linkButton = 'flex min-h-11 items-center gap-2 rounded-lg bg-white px-4 te
 
 function Empty({ children }: { children: React.ReactNode }) {
   return <p className="rounded-xl border border-dashed border-zinc-300 bg-white p-6 text-center text-[15px] text-zinc-500">{children}</p>
+}
+
+/** The website visit behind a lead, with a way to start the order already linked to it (and so to its ad). */
+function VisitLine({ visit, ordered }: { visit: LeadVisit | null; ordered: boolean }) {
+  if (!visit)
+    return <p className="text-xs text-zinc-500">No website visit recorded (they may have switched our statistics off). If they order, try New order → Find their website visit by time.</p>
+  return (
+    <div className="flex flex-col gap-2 rounded-lg bg-zinc-50 p-3 ring-1 ring-zinc-200">
+      <p className="text-sm text-zinc-700">
+        Website visit <span className="select-all font-mono font-semibold text-zinc-900">{visit.reference}</span>
+        {visit.fromAd ? ` · from Meta ad${visit.ad ? ` ${visit.ad}` : ''}` : ''}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {!ordered && (
+          <Link href={`/admin/orders/new?visit=${encodeURIComponent(visit.reference)}`} className={linkButton}>
+            Take this order
+          </Link>
+        )}
+        <CopyButton text={visit.reference} label="Copy reference" />
+      </div>
+    </div>
+  )
 }
 
 function ShowAll({ tab, all }: { tab: LeadTab; all: boolean }) {
@@ -81,6 +103,7 @@ async function Samples({ all }: { all: boolean }) {
               ))}
             </ul>
             <p className="text-xs text-zinc-500">Asked {when(s.created_at)}</p>
+            <VisitLine visit={s.visit} ordered={false} />
             <div className="flex flex-wrap gap-2">
               {wa && (
                 <a href={wa} target="_blank" rel="noopener" className={linkButton}>
@@ -239,6 +262,7 @@ async function Baskets({ all }: { all: boolean }) {
             <p className="text-xs text-zinc-500">
               Asked {when(b.created_at)} · by {[b.email_opt_in && 'email', b.whatsapp_opt_in && 'WhatsApp'].filter(Boolean).join(' or ')} · kept until {when(b.expires_at).split(' ').slice(0, 2).join(' ')}
             </p>
+            <VisitLine visit={b.visit} ordered={b.status === 'converted'} />
             {lines.length > 0 && (
               <ul className="flex flex-col gap-0.5 rounded-lg bg-zinc-50 p-3 text-sm">
                 {lines.map((l) => (

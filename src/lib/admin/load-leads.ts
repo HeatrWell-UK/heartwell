@@ -41,17 +41,40 @@ export async function leadCounts(): Promise<Record<LeadTab, number>> {
   }
 }
 
+/** The website visit behind a lead: its HW-V reference, and the ad that brought it, if any. */
+export interface LeadVisit {
+  reference: string
+  fromAd: boolean
+  ad: string | null
+}
+
+/** Visits by arrival or session ID, so a basket reminder or sample request can start an order linked to its ad. */
+async function visitsBy(db: Awaited<ReturnType<typeof createClient>>, column: 'arrival_id' | 'session_id', ids: (string | null)[]): Promise<Map<string, LeadVisit>> {
+  const wanted = [...new Set(ids.filter((id): id is string => Boolean(id)))]
+  if (wanted.length === 0) return new Map()
+  const { data, error } = await db.from('attribution_sessions').select('arrival_id, session_id, reference, last_touch_medium, first_touch_medium, last_touch_content, fbclid').in(column, wanted)
+  throwIf('Visits', error)
+  return new Map(
+    (data ?? []).map((s) => [
+      column === 'arrival_id' ? s.arrival_id : s.session_id,
+      { reference: s.reference, fromAd: s.last_touch_medium === 'paid_social' || s.first_touch_medium === 'paid_social' || Boolean(s.fbclid), ad: s.last_touch_content },
+    ]),
+  )
+}
+
 export async function loadSamples(all: boolean) {
   const db = await createClient()
   let q = db
     .from('sample_requests')
-    .select('id, created_at, customer_name, customer_email, customer_phone, postcode, shipping_address, status, posted_at, is_test, sample_request_items(material_code, material_name, material_collection)')
+    .select('id, created_at, customer_name, customer_email, customer_phone, postcode, shipping_address, status, posted_at, is_test, session_id, sample_request_items(material_code, material_name, material_collection)')
     .order('created_at', { ascending: false })
     .limit(100)
   if (!all) q = q.eq('status', 'pending')
   const { data, error } = await q
   throwIf('Samples', error)
-  return data ?? []
+  const rows = data ?? []
+  const visits = await visitsBy(db, 'session_id', rows.map((r) => r.session_id))
+  return rows.map((r) => ({ ...r, visit: (r.session_id && visits.get(r.session_id)) || null }))
 }
 
 export async function loadMessages(all: boolean) {
@@ -85,13 +108,15 @@ export async function loadBaskets(all: boolean) {
   const db = await createClient()
   let q = db
     .from('basket_reminder_leads')
-    .select('id, created_at, email, phone, email_opt_in, whatsapp_opt_in, basket, status, reminder_sent_at, done_at, expires_at, is_test')
+    .select('id, created_at, email, phone, email_opt_in, whatsapp_opt_in, basket, status, reminder_sent_at, done_at, expires_at, is_test, arrival_id')
     .order('created_at', { ascending: false })
     .limit(100)
   if (!all) q = q.eq('status', 'active')
   const { data, error } = await q
   throwIf('Basket reminders', error)
-  return data ?? []
+  const rows = data ?? []
+  const visits = await visitsBy(db, 'arrival_id', rows.map((r) => r.arrival_id))
+  return rows.map((r) => ({ ...r, visit: visits.get(r.arrival_id) ?? null }))
 }
 
 export async function loadSubscribers() {

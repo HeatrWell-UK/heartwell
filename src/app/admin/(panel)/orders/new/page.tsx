@@ -4,6 +4,7 @@ import { ArrowLeftIcon } from '@phosphor-icons/react/ssr'
 import { ManualOrderForm } from '@/components/admin/OrderForms'
 import { orderPickers } from '@/lib/admin/load-orders'
 import { WA_REFERENCE } from '@/lib/whatsapp/handoff'
+import { VISIT_REFERENCE } from '@/lib/attribution/visit'
 
 export const metadata: Metadata = { title: 'New order' }
 export const dynamic = 'force-dynamic'
@@ -16,10 +17,10 @@ export const dynamic = 'force-dynamic'
  * order is linked to that visit and the ad that brought them, and its Purchase
  * tells Meta so.
  */
-export default async function NewOrderPage({ searchParams }: { searchParams: Promise<{ wa?: string }> }) {
-  const [{ variants, fabrics }, { wa }] = await Promise.all([orderPickers(), searchParams])
-  // From Leads → WhatsApp → "Take this order".
-  const reference = wa && WA_REFERENCE.test(wa.toUpperCase()) ? wa.toUpperCase() : ''
+export default async function NewOrderPage({ searchParams }: { searchParams: Promise<{ wa?: string; visit?: string }> }) {
+  const [{ variants, fabrics }, { wa, visit }] = await Promise.all([orderPickers(), searchParams])
+  // From Leads → "Take this order": WhatsApp taps (HW-WA), basket reminders and samples (HW-V).
+  const reference = wa && WA_REFERENCE.test(wa.toUpperCase()) ? wa.toUpperCase() : visit && VISIT_REFERENCE.test(visit.toUpperCase()) ? visit.toUpperCase() : ''
   return (
     <div className="mx-auto flex max-w-[640px] flex-col gap-4">
       <Link href="/admin/orders" className="flex items-center gap-1.5 self-start text-sm font-semibold text-zinc-600">
