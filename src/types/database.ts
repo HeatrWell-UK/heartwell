@@ -993,7 +993,6 @@ export type Database = {
           customer_phone: string
           customer_user_agent: string | null
           delivered_at: string | null
-          deposit_paid: number
           delivery_area: string | null
           delivery_floor: number
           delivery_has_lift: boolean
@@ -1065,7 +1064,6 @@ export type Database = {
           customer_phone: string
           customer_user_agent?: string | null
           delivered_at?: string | null
-          deposit_paid?: number
           delivery_area?: string | null
           delivery_floor?: number
           delivery_has_lift?: boolean
@@ -1137,7 +1135,6 @@ export type Database = {
           customer_phone?: string
           customer_user_agent?: string | null
           delivered_at?: string | null
-          deposit_paid?: number
           delivery_area?: string | null
           delivery_floor?: number
           delivery_has_lift?: boolean
@@ -2161,7 +2158,6 @@ export type Database = {
         Returns: Json
       }
       run_daily_cleanup: { Args: never; Returns: Json }
-      set_order_deposit: { Args: { p_amount: number; p_order_id: string }; Returns: Json }
       set_order_attribution: {
         Args: { p_note?: string; p_order_id: string; p_source: string }
         Returns: undefined

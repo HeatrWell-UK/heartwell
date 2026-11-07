@@ -17,7 +17,7 @@ import { formatPrice } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 import { floorName } from '@/lib/delivery/pricing'
 import { SITE_URL } from '@/config/site'
-import { addNote, askForReview, changeStatus, deleteTestOrder, setAttribution, setDeposit, setTestFlag } from '../actions'
+import { addNote, askForReview, changeStatus, deleteTestOrder, setAttribution, setTestFlag } from '../actions'
 import { sendToOrderFlow } from '../../settings/orderflow-actions'
 import { pushVerdict, type PushRow } from '@/lib/admin/orderflow'
 import { createClient } from '@/lib/supabase/server'
@@ -36,8 +36,6 @@ const ERRORS: Record<string, string> = {
   BAD_SOURCE: 'Choose a source from the list.',
   ORDER_CANCELLED: 'Cancelled orders can’t be changed.',
   BAD_STATUS_CHANGE: 'That status change isn’t allowed.',
-  BAD_DEPOSIT: 'Enter the deposit in pounds, like 100.',
-  DEPOSIT_TOO_HIGH: 'The deposit can’t be more than the order’s total.',
 }
 const DONE: Record<string, string> = {
   note: 'Note added.',
@@ -45,7 +43,6 @@ const DONE: Record<string, string> = {
   test_on: 'Marked as a test order. It won’t count anywhere.',
   test_off: 'No longer a test order.',
   created: 'Order saved.',
-  deposit: 'Deposit saved. The driver collects the rest.',
 }
 const EVENT_LABEL: Record<string, string> = {
   placed: 'Placed',
@@ -73,7 +70,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const status = (isStatus(order.status) ? order.status : 'pending_cod') as OrderStatus
   const next = NEXT_STEP[status]
   const links = { confirmUrl: `${SITE_URL}/confirm-order/${order.id}`, trackUrl: `${SITE_URL}/track-order` }
-  const msgOrder = { reference: order.reference ?? '', customerName: order.customer_name, customerPhone: order.customer_phone, totalAmount: order.total_amount - order.deposit_paid, cancellationReason: order.cancellation_reason }
+  const msgOrder = { reference: order.reference ?? '', customerName: order.customer_name, customerPhone: order.customer_phone, totalAmount: order.total_amount, cancellationReason: order.cancellation_reason }
   const tell = whatsAppTo(order.customer_phone, statusMessage(msgOrder, status, links))
   const ahead = stageAheadOfStatus({ status: order.status, confirmedAt: order.confirmed_at, processingAt: order.processing_at, shippedAt: order.shipped_at, deliveredAt: order.delivered_at })
   const view = toEmailData(order)
@@ -105,11 +102,6 @@ export default async function OrderPage({ params, searchParams }: Props) {
           {order.is_test && <Tag tone="test">Test{order.test_reason ? `: ${order.test_reason}` : ''}</Tag>}
         </div>
         <p className="font-display text-3xl font-bold tabular-nums">{formatPrice(order.total_amount)}</p>
-        {order.deposit_paid > 0 && (
-          <p className="text-sm text-zinc-600">
-            {formatPrice(order.total_amount - order.deposit_paid)} to collect · deposit of {formatPrice(order.deposit_paid)} paid
-          </p>
-        )}
       </header>
 
       {sp.error && (
@@ -237,32 +229,8 @@ export default async function OrderPage({ params, searchParams }: Props) {
               />
             )}
             {order.delivery_total > 0 && <Row label="Delivery" value={formatPrice(order.delivery_total)} />}
-            {order.deposit_paid > 0 && <Row label="Order total" value={formatPrice(order.total_amount)} />}
-            {order.deposit_paid > 0 && <Row label="Deposit paid" value={`−${formatPrice(order.deposit_paid)}`} />}
-            <Row label="To collect on delivery" value={formatPrice(order.total_amount - order.deposit_paid)} strong />
+            <Row label="To collect on delivery" value={formatPrice(order.total_amount)} strong />
           </dl>
-          {order.status !== 'cancelled' && (
-            <form action={setDeposit} className="flex flex-col gap-1.5">
-              <input type="hidden" name="id" value={order.id} />
-              <label htmlFor="deposit" className="text-sm font-semibold text-zinc-800">
-                Deposit already paid, £
-              </label>
-              <div className="flex gap-2">
-                <input
-                  id="deposit"
-                  name="deposit"
-                  inputMode="decimal"
-                  defaultValue={order.deposit_paid > 0 ? String(order.deposit_paid) : ''}
-                  placeholder="0"
-                  className="min-h-11 w-32 rounded-lg border border-zinc-300 px-3 text-[16px] tabular-nums"
-                />
-                <button type="submit" className="min-h-11 rounded-lg bg-white px-4 text-sm font-semibold ring-1 ring-zinc-300">
-                  Save deposit
-                </button>
-              </div>
-              <p className="text-xs text-zinc-500">The driver, OrderFlow and the customer see what’s left to pay; Meta and Google count the whole sale. Leave the order’s prices as agreed.</p>
-            </form>
-          )}
           {order.delivery_total > 0 && (
             <div className="flex items-start gap-2 rounded-lg bg-zinc-50 p-3 text-sm">
               <TruckIcon aria-hidden="true" size={18} className="mt-0.5 shrink-0 text-zinc-500" />

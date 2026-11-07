@@ -42,8 +42,6 @@ export interface OrderEmailData {
   extras: { label: string; detail?: string; amount: number }[]
   deliveryTotal: number
   totalAmount: number
-  /** Paid before delivery (orders.deposit_paid); the rest is collected on delivery. */
-  depositPaid?: number
   /** When it was placed (orders.created_at), for the copy block. */
   placedAt?: string | null
   /** In a delivery area with a slower window (orders.delivery_area). */
@@ -69,9 +67,6 @@ function money(n: number) {
   return formatPrice(n)
 }
 
-/** What the driver collects: the order's total less any deposit already paid. */
-export const toCollect = (o: { totalAmount: number; depositPaid?: number }) => Math.round((o.totalAmount - (o.depositPaid ?? 0)) * 100) / 100
-
 function itemsTable(o: OrderEmailData, withSku: boolean): string {
   const rows = o.items
     .map(
@@ -88,8 +83,8 @@ ${line('Items', money(o.itemsSubtotal))}
 ${o.discountAmount > 0 ? line(escapeHtml(offerName(o)), `−${money(o.discountAmount)}`) : ''}
 ${line(escapeHtml(o.delivery.label), o.delivery.amount > 0 ? money(o.delivery.amount) : 'Free')}
 ${extras}
-${o.depositPaid ? line('Deposit paid', `−${money(o.depositPaid)}`) : line('To pay today', `<span style="color:${C.velvet};font-weight:bold">£0</span>`)}
-${line('To pay on delivery', money(toCollect(o)), true)}</table>`
+${line('To pay today', `<span style="color:${C.velvet};font-weight:bold">£0</span>`)}
+${line('To pay on delivery', money(o.totalAmount), true)}</table>`
 }
 
 /** "Welcome offer", "Offer (HEARTSOFA)" or "Offer". */
@@ -107,8 +102,8 @@ function itemsText(o: OrderEmailData, withSku: boolean): string {
     ...(o.discountAmount > 0 ? [`${offerName(o)}: -${money(o.discountAmount)}`] : []),
     `${o.delivery.label}: ${o.delivery.amount > 0 ? money(o.delivery.amount) : 'Free'}`,
     ...extras,
-    o.depositPaid ? `Deposit paid: -${money(o.depositPaid)}` : 'To pay today: £0',
-    `To pay on delivery: ${money(toCollect(o))}`,
+    'To pay today: £0',
+    `To pay on delivery: ${money(o.totalAmount)}`,
   ].join('\n')
 }
 
@@ -220,10 +215,9 @@ export function copyBlock(o: OrderEmailData): string {
     ...o.items.map((i) => `  ${i.quantity} x ${i.title}${i.option ? `, ${i.option.replace(/\s*\([A-Z0-9-]+\)$/, '')}` : ''} @ ${money(i.unitPrice)}`),
     ...(o.extras.length ? ['Extras:', ...o.extras.map((e) => `  ${e.label}${e.detail ? ` (${e.detail})` : ''}: ${money(e.amount)}`)] : []),
     ...(o.discountAmount > 0 ? [`${offerName(o)}: -${money(o.discountAmount)}`] : []),
-    ...(o.depositPaid ? [`Deposit paid: -${money(o.depositPaid)}`] : []),
     '',
     `Notes: ${o.notes ?? 'none'}`,
-    `To collect on delivery: ${money(toCollect(o))}`,
+    `To collect on delivery: ${money(o.totalAmount)}`,
   ].join('\n')
 }
 
@@ -277,14 +271,14 @@ export function customerStatusEmail(
     confirmed: {
       subject: `Your Heartwell order ${o.reference} is confirmed`,
       heading: `Your order is confirmed`,
-      lines: [`Thank you, ${firstName(o.customerName)}. We’ll ring you to book your delivery day.`, `Nothing ${o.depositPaid ? 'more ' : ''}to pay until it’s in your room: ${money(toCollect(o))} to the driver, in cash or by bank transfer.`],
+      lines: [`Thank you, ${firstName(o.customerName)}. We’ll ring you to book your delivery day.`, `Nothing to pay until it’s in your room: ${money(o.totalAmount)} to the driver, in cash or by bank transfer.`],
       showItems: true,
       track: true,
     },
     shipped: {
       subject: `Your Heartwell order ${o.reference} is on its way`,
       heading: `Your order is on its way`,
-      lines: [`The driver will ring before arriving.`, `Please have ${money(toCollect(o))} ready for the driver, in cash or by bank transfer, once it’s in your room.`],
+      lines: [`The driver will ring before arriving.`, `Please have ${money(o.totalAmount)} ready for the driver, in cash or by bank transfer, once it’s in your room.`],
       showItems: true,
       track: true,
     },

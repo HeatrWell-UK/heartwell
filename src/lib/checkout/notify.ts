@@ -20,7 +20,7 @@ export async function loadOrderForEmail(id: string): Promise<OrderEmailData | nu
     .select(
       `id, reference, is_test, created_at, customer_name, customer_email, customer_phone, shipping_address, postcode,
        preferred_delivery_date, special_instructions, has_made_to_order, items_subtotal, discount_amount, promotion_code, offer_source,
-       delivery_floor, delivery_has_lift, fee_upstairs, fee_assembly, removal_seats, fee_removal, delivery_area, fee_area, delivery_total, total_amount, deposit_paid,
+       delivery_floor, delivery_has_lift, fee_upstairs, fee_assembly, removal_seats, fee_removal, delivery_area, fee_area, delivery_total, total_amount,
        order_items(position, title, custom_title, sku, colour_name, material_code, material_name, material_collection, quantity, unit_price)`,
     )
     .eq('id', id)
@@ -64,7 +64,6 @@ export async function loadOrderForEmail(id: string): Promise<OrderEmailData | nu
     extras,
     deliveryTotal: o.delivery_total,
     totalAmount: o.total_amount,
-    depositPaid: Number(o.deposit_paid) || 0,
     placedAt: o.created_at,
     slowArea: Boolean(o.delivery_area),
   }

@@ -268,7 +268,6 @@ export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { 
   const [source, setSource] = useState<'whatsapp' | 'phone'>('whatsapp')
   const [reference, setReference] = useState(initialReference)
   const [isTest, setIsTest] = useState(false)
-  const [deposit, setDeposit] = useState('')
   const [customer, setCustomer] = useState<CustomerValue>({ name: '', phone: '', email: '', address: '', postcode: '', preferredDate: '', notes: '', deliveryCharge: '0' })
   const [lines, setLines] = useState<LineValue[]>([{ key: newKey(), itemId: null, variantId: '', materialId: null, quantity: 1, unitPrice: '', customName: '' }])
   const [result, setResult] = useState<FormResult | null>(null)
@@ -280,7 +279,7 @@ export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { 
       onSubmit={async (e) => {
         e.preventDefault()
         setSaving(true)
-        const r = await createManualOrder({ ...payload(customer, lines), source, reference, deposit: Math.max(0, Number(deposit) || 0), isTest }).catch(() => ({
+        const r = await createManualOrder({ ...payload(customer, lines), source, reference, isTest }).catch(() => ({
           ok: false as const,
           message: 'Couldn’t reach the server. Try again.',
         }))
@@ -318,21 +317,11 @@ export function ManualOrderForm({ variants, fabrics, initialReference = '' }: { 
       </fieldset>
       <CustomerFields value={customer} onChange={setCustomer} />
       <LinesEditor lines={lines} onChange={setLines} variants={variants} fabrics={fabrics} />
-      <div className="flex flex-col gap-1">
-        <label htmlFor={`${id}-deposit`} className={label}>
-          Deposit already paid, £ (optional)
-        </label>
-        <input id={`${id}-deposit`} type="number" min={0} step="0.01" inputMode="decimal" value={deposit} onChange={(e) => setDeposit(e.target.value)} placeholder="0" className={input} />
-        <p className="text-xs text-zinc-500">Keep the prices as agreed: the driver and OrderFlow get what’s left to pay, and Meta counts the whole sale.</p>
-      </div>
       <label className="flex items-center gap-3 text-sm font-semibold">
         <input type="checkbox" checked={isTest} onChange={(e) => setIsTest(e.target.checked)} className="size-5 accent-zinc-900" />
         This is a test order (it never counts anywhere)
       </label>
-      <p className="text-sm text-zinc-600">
-        Total about {formatPrice(estimate(lines, variants, customer.deliveryCharge))}
-        {Number(deposit) > 0 && `, so about ${formatPrice(Math.max(0, estimate(lines, variants, customer.deliveryCharge) - Number(deposit)))} to collect on delivery`}; the database works out the final figure.
-      </p>
+      <p className="text-sm text-zinc-600">Total about {formatPrice(estimate(lines, variants, customer.deliveryCharge))}; the database works out the final figure.</p>
       <Result result={result} />
       <button type="submit" disabled={saving} className="min-h-12 rounded-lg bg-zinc-900 px-4 font-semibold text-white">
         {saving ? 'Saving…' : 'Save order'}
