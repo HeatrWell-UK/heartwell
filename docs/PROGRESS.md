@@ -52,6 +52,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 7 November 2026 — Meta ads, first two days: the traffic is there; Google Analytics shows only part of it
+- **Owner's worry:** not much website traffic for the budget.
+- **Meta (5 November about 20:10 to 7 November 16:40 UK time):** £89.29 spent; 331 link clicks (about 27p each, 5% of impressions: furniture usually gets about 1%); Meta saw 34 basket adds, 15 checkouts started, 1 purchase. Facebook feed and Reels took £80 of it. Audience Network had 37 of the clicks from 71 impressions for 18p (accidental taps, no page views): harmless at that cost, but it inflates the click count.
+- **Our own visit records** (`attribution_sessions`, everyone except "Reject all"): real ad visits match Meta's clicks (7 November: 134 arrivals, 133 clicks). The 200 "arrivals" on launch evening were mostly Meta's review checks (19:25 to 20:30, before and during approval, almost none with an ad click ID). Since the visit finder went live (6 November 19:35): 140 in-app visits, 16 added to the basket (11%), 10 started checkout; about two thirds viewed one page (normal for social traffic). Best ads: R3 (pay nothing upfront) and C4 (Oakland corner).
+- **Orders from the ads:** 100113, £669, confirmed (WhatsApp, from V1); 100115, £579, website, waiting for the customer to confirm (C4). About £45 of ads per order so far.
+- **Why it looked low:** Google Analytics loads only after "Accept all" (about 4 in 10 ad visitors, judging by how many visits keep their ad click ID, which is saved only with marketing consent), so GA4 and its realtime view show well under half the visits. Meta's landing page views wait for the same consent.
+- **No changes made.** Both ad sets are in Meta's learning phase; edits restart it.
+
 ### 6 November 2026 — Finding the website visit behind a phone or WhatsApp order
 - **Owner's request:** customers often ring, or WhatsApp without the HW-WA reference (a saved number, a basket reminder, samples), so their order can't be credited to the ad. Staff need to find the visit by roughly when it happened, see what the customer did on the site, and link its reference to the manual order so Meta learns from it.
 - **Found on the way:** the 15 WhatsApp enquiries so far carried the visitor ID only, no ad tags or Meta click IDs, so even orders taken with an HW-WA reference would have shown "No tracking recorded" and told Meta nothing about the ad. Fixed: a reference now copies its visit's tags and IDs.
