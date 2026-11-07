@@ -63,6 +63,20 @@ export async function setAttribution(form: FormData) {
   redirect(back(id, { done: 'source' }))
 }
 
+/** A deposit paid before delivery: the driver collects the rest; Meta and Google still see the whole sale. */
+export async function setDeposit(form: FormData) {
+  const id = field(form, 'id')
+  if (!UUID.test(id)) redirect('/admin/orders')
+  if (await adminGuard()) redirect('/login')
+  const raw = field(form, 'deposit').replace(/[£,\s]/g, '')
+  const amount = raw === '' ? 0 : Number(raw)
+  if (!Number.isFinite(amount) || amount < 0) redirect(back(id, { error: 'BAD_DEPOSIT' }))
+  const { error } = await (await createClient()).rpc('set_order_deposit', { p_order_id: id, p_amount: Math.round(amount * 100) / 100 })
+  if (error) redirect(back(id, { error: codeOf(error.message) }))
+  revalidatePath('/admin/orders')
+  redirect(back(id, { done: 'deposit' }))
+}
+
 export async function addNote(form: FormData) {
   const id = field(form, 'id')
   if (!UUID.test(id)) redirect('/admin/orders')
@@ -139,6 +153,8 @@ const MESSAGES: Record<string, string> = {
   NOTHING_TO_FIND: 'Enter a time, or the phone number or email the customer gave before.',
   BAD_TIME: 'Check the date and time.',
   BAD_WINDOW: 'Choose how far either side of the time to look.',
+  BAD_DEPOSIT: 'Enter the deposit in pounds, like 100.',
+  DEPOSIT_TOO_HIGH: 'The deposit can’t be more than the order’s total.',
 }
 
 export async function saveOrderEdit(id: string, input: unknown): Promise<FormResult> {
@@ -162,6 +178,7 @@ export async function saveOrderEdit(id: string, input: unknown): Promise<FormRes
       items: linePayload(c.lines),
     },
   })
+  if (error?.message.includes('orders_deposit_within_total')) return { ok: false, message: 'The new total would be less than the deposit paid. Lower the deposit on the order page first.' }
   if (error) return { ok: false, message: MESSAGES[codeOf(error.message)] ?? `Couldn’t save: ${error.message}` }
   revalidatePath(`/admin/orders/${id}`)
   revalidatePath('/admin/orders')
@@ -172,6 +189,8 @@ const Manual = Customer.extend({
   source: z.enum(['whatsapp', 'phone']),
   /** HW-WA (from the chat) or HW-V (a website visit found by staff); blank for neither. */
   reference: z.string().trim().max(40),
+  /** Paid before delivery; the driver collects the rest. */
+  deposit: z.number().min(0).max(100000),
   isTest: z.boolean(),
 })
 
@@ -197,6 +216,7 @@ export async function createManualOrder(input: unknown): Promise<FormResult> {
       delivery_charge: c.deliveryCharge,
       whatsapp_reference: kind === 'whatsapp' ? reference : null,
       visit_reference: kind === 'visit' ? reference : null,
+      deposit_paid: c.deposit.toFixed(2),
       is_test: c.isTest,
       test_reason: c.isTest ? 'marked by staff' : null,
       items: linePayload(c.lines),

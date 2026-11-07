@@ -3,7 +3,7 @@ import type { CustomerOrder } from '@/lib/checkout/read'
 import { PayRows } from './PayRows'
 
 /** An order's lines and totals, as the customer sees them after ordering. */
-export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'itemsSubtotal' | 'discountAmount' | 'delivery' | 'extras' | 'totalAmount'> }) {
+export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'itemsSubtotal' | 'discountAmount' | 'delivery' | 'extras' | 'totalAmount' | 'depositPaid'> }) {
   return (
     <div className="flex flex-col gap-3">
       <ul className="flex flex-col divide-y divide-line-soft">
@@ -41,7 +41,13 @@ export function OrderLines({ order }: { order: Pick<CustomerOrder, 'items' | 'it
             <dd>{formatPrice(e.amount)}</dd>
           </div>
         ))}
-        <PayRows total={order.totalAmount} className="mt-1" />
+        {order.depositPaid > 0 && (
+          <div className="flex justify-between">
+            <dt>Deposit paid</dt>
+            <dd>−{formatPrice(order.depositPaid)}</dd>
+          </div>
+        )}
+        <PayRows total={order.totalAmount - order.depositPaid} className="mt-1" />
       </dl>
     </div>
   )

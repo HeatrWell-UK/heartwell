@@ -31,6 +31,7 @@ export interface OrderRowForView {
   fee_area: number
   delivery_total: number
   total_amount: number
+  deposit_paid: number
   order_items: {
     title: string
     custom_title: string | null
@@ -78,6 +79,7 @@ export function toEmailData(o: OrderRowForView): OrderEmailData {
     extras,
     deliveryTotal: o.delivery_total,
     totalAmount: o.total_amount,
+    depositPaid: Number(o.deposit_paid) || 0,
     placedAt: o.created_at,
     slowArea: Boolean(o.delivery_area),
   }

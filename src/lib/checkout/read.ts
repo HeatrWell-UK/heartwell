@@ -27,6 +27,8 @@ export interface CustomerOrder {
   delivery: { label: string; amount: number }
   extras: { label: string; amount: number }[]
   totalAmount: number
+  /** Paid before delivery; the rest is paid to the driver. */
+  depositPaid: number
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -70,6 +72,7 @@ export async function orderForCustomer(id: string): Promise<CustomerOrder | null
     delivery: orderDeliveryLine(o),
     extras,
     totalAmount: n(o.total_amount),
+    depositPaid: n(o.deposit_paid),
   }
 }
 
@@ -84,6 +87,7 @@ export interface TrackedOrder {
   cancelledAt: string | null
   preferredDate: string | null
   totalAmount: number
+  depositPaid: number
   items: CustomerOrder['items']
 }
 
@@ -104,6 +108,7 @@ export async function trackOrder(reference: string, postcode: string): Promise<T
     cancelledAt: s('cancelled_at'),
     preferredDate: s('preferred_delivery_date'),
     totalAmount: n(o.total_amount),
+    depositPaid: n(o.deposit_paid),
     items: itemsFrom(o.items),
   }
 }

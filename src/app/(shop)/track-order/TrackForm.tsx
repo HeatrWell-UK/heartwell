@@ -64,7 +64,7 @@ function Tracked({ order }: { order: Extract<TrackState, { status: 'found' }>['o
       {order.preferredDate && !cancelled && <p className="text-[15px]">Preferred day: {formatDeliveryDate(order.preferredDate)}</p>}
       <p className="flex items-baseline justify-between gap-3 border-t border-line pt-3">
         <span className="text-[17px] font-semibold">To pay on delivery</span>
-        <span className="font-display text-[26px] leading-none">{formatPrice(order.totalAmount)}</span>
+        <span className="font-display text-[26px] leading-none">{formatPrice(order.totalAmount - order.depositPaid)}</span>
       </p>
     </section>
   )

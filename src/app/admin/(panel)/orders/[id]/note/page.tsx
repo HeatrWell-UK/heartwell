@@ -95,7 +95,8 @@ export default async function DeliveryNotePage({ params }: { params: Promise<{ i
 
         <section className="rounded-lg border-2 border-black p-4">
           <p className="text-xs font-bold uppercase tracking-wider">To collect on delivery</p>
-          <p className="font-display text-3xl font-bold">{formatPrice(order.total_amount)}</p>
+          <p className="font-display text-3xl font-bold">{formatPrice(order.total_amount - order.deposit_paid)}</p>
+          {order.deposit_paid > 0 && <p className="text-sm">Order {formatPrice(order.total_amount)}, deposit of {formatPrice(order.deposit_paid)} already paid.</p>}
           <p className="text-sm">Cash or bank transfer, once the furniture is in the room.</p>
         </section>
 

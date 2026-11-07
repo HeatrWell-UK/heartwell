@@ -58,4 +58,4 @@ Notes for their mapping:
 - `delivery_date` (yyyy-MM-dd) is the customer's preferred day when they chose one; it's left out otherwise. There's no delivery slot.
 - `variant` is the colour, or for a made-to-order piece the chosen fabric with its collection and code, e.g. `Blue, Plush Soft Velvet (PL09)`.
 - `product_name` is the warehouse's trade name where one is set, otherwise the shop's name for the piece.
-- `total` includes any delivery extras (upstairs, assembly, removal) and is after any offer; `unit_price` is per piece.
+- `total` includes any delivery extras (upstairs, assembly, removal) and is after any offer and any deposit already paid (since 6 November 2026), so it's what the driver collects; `unit_price` is per piece. A change to the deposit sends the order again.
