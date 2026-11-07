@@ -55,7 +55,8 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 ### 7 November 2026 — The deposit field is live
 - **Owner's go** ("Go ahead") on the deposit migration, which had waited since the push mix-up below. A second dry run first (rolled back): HW-100113 became a £769 sale with a £100 deposit and OrderFlow was still sent £669; every other order's OrderFlow total unchanged.
 - **Applied** as `20261107222529_order_deposit` (the file was renamed from `20261106210000` to the version the database recorded); the code came back with a revert of 21a7e5a. HW-100113 is now a £769 sale, £100 deposit, £669 to collect. Its Purchase (£669, sent 6 November) isn't sent again: that only happens on a status change.
-- **Checks:** types, lint, tests and the WebAssembly build; then the live order page and OrderFlow for HW-100113.
+- **Checks:** types, lint, tests and the WebAssembly build. OrderFlow was sent HW-100113 again by the migration (22:25 UK) and replied 200 "updated" with the same £669; its Purchase wasn't queued again. The customer's track and confirm data now carry the £100 deposit.
+- **GitHub hiccup:** the push returned "Internal Server Error" although the commit landed, and Hostinger wasn't told, so the site didn't rebuild; this note was pushed to start the deploy. If a push ever errors like that, check that the live site really rebuilt.
 
 ### 7 November 2026 — Cookie banner: "Essential only" in place of "Reject all"
 - **Owner's request:** replace "Reject all" with "Essential only", in what it does as well as its name. Owner's choice: Essential only keeps our own visit statistics (as Reject all did), so the visit finder, basket-lead references and our ad numbers still cover those visitors.
