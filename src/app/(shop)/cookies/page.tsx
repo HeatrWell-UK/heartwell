@@ -20,13 +20,15 @@ export default function CookiesPage() {
           your choice at any time in <CookieSettingsButton className="font-semibold text-velvet underline underline-offset-2" />.
         </p>
       }
-      updated="2026-10-12"
+      updated="2026-11-07"
       contents={STORAGE_GROUPS.map((g) => ({ id: g.id, label: g.title }))}
     >
       <p>
-        When you first visit, we ask before Google Analytics or Meta’s Pixel can run, with equal buttons to accept or reject. Our own visit statistics are
-        on unless you switch them off: UK law (the Data (Use and Access) Act 2025) allows a shop to keep statistics for itself this way, as long as it’s
-        easy to say no. More about how we use information is in our <Link href="/privacy">privacy notice</Link>.
+        When you first visit, we ask before Google Analytics or Meta’s Pixel can run, with two equal buttons: Essential only and Accept all. Essential only
+        means what the shop needs plus our own visit statistics, and nothing from Google or Meta; choosing it, or switching them off later, also deletes
+        their cookies from your device. Our own visit statistics are on unless you switch them off in Cookie settings: UK law (the Data (Use and Access)
+        Act 2025) allows a shop to keep statistics for itself this way, as long as it’s easy to say no. More about how we use information is in our{' '}
+        <Link href="/privacy">privacy notice</Link>.
       </p>
       {STORAGE_GROUPS.map((g) => (
         <section key={g.id} aria-labelledby={g.id} className="flex flex-col gap-3">

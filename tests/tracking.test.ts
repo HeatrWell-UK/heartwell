@@ -1,7 +1,17 @@
 import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 import { CONSENT_COOKIE, effectiveMode, isPrivatePath, liveAllowed } from '@/config/tracking'
-import { consentFlagScript, consentForOrder, NO_CHOICE, parseConsent, serialiseConsent } from '@/lib/tracking/consent'
+import {
+  ACCEPT_ALL,
+  consentFlagScript,
+  consentForOrder,
+  cookieDomains,
+  cookiesToClear,
+  ESSENTIAL_ONLY,
+  NO_CHOICE,
+  parseConsent,
+  serialiseConsent,
+} from '@/lib/tracking/consent'
 import { metaEvent, metaUserData, tooOldForMeta } from '@/lib/tracking/meta-event'
 import { anonymousClientId, ga4ClientIdFromCookie, ga4Purchase } from '@/lib/tracking/ga4-event'
 import { redactedLocation, safeSearchTerm } from '@/lib/tracking/redact'
@@ -23,6 +33,25 @@ describe('consent', () => {
     expect(parseConsent('0.m1a1s1.1760000000')).toEqual(NO_CHOICE)
     expect(parseConsent('rubbish')).toEqual(NO_CHOICE)
     expect(NO_CHOICE).toMatchObject({ marketing: false, analytics: false, statistics: true })
+  })
+
+  it('Essential only keeps the shop and our own statistics, with Google and Meta off', () => {
+    expect(serialiseConsent(ESSENTIAL_ONLY, 1_760_000_000)).toBe('1.m0a0s1.1760000000')
+    expect(serialiseConsent(ACCEPT_ALL, 1_760_000_000)).toBe('1.m1a1s1.1760000000')
+    // The same as "Reject all" saved, so nobody who chose that is asked again.
+    expect(parseConsent('1.m0a0s1.1760000000')).toMatchObject(ESSENTIAL_ONLY)
+    expect(NO_CHOICE).toMatchObject(ESSENTIAL_ONLY)
+    expect(consentForOrder(parseConsent(serialiseConsent(ESSENTIAL_ONLY)))).toBe('denied')
+  })
+
+  it('deletes the Google and Meta cookies a choice no longer allows', () => {
+    const names = ['hw-consent', '_fbp', '_fbc', '_ga', '_ga_ABC123', '_gat', 'hw-welcome']
+    expect(cookiesToClear(ESSENTIAL_ONLY, names)).toEqual(['_fbp', '_fbc', '_ga', '_ga_ABC123'])
+    expect(cookiesToClear(ACCEPT_ALL, names)).toEqual([])
+    expect(cookiesToClear({ marketing: false, analytics: true, statistics: true }, names)).toEqual(['_fbp', '_fbc'])
+    expect(cookiesToClear({ marketing: true, analytics: false, statistics: false }, names)).toEqual(['_ga', '_ga_ABC123'])
+    expect(cookieDomains('www.heartwellsofa.co.uk')).toEqual(['www.heartwellsofa.co.uk', 'heartwellsofa.co.uk', 'co.uk'])
+    expect(cookieDomains('localhost')).toEqual([])
   })
 
   it('records the choice on the order', () => {

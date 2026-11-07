@@ -45,7 +45,7 @@ export const STORAGE_GROUPS: StorageGroup[] = [
     id: 'statistics',
     title: 'Our own visit statistics',
     intro:
-      'Which campaigns and pages bring visitors, and which visits lead to orders. Kept by us alone and never used for advertising. On unless you switch them off in Cookie settings; switched off, we stop recording your visits, though the device ID can still link an order or an ad offer to this device.',
+      'Which campaigns and pages bring visitors, and which visits lead to orders. Kept by us alone and never used for advertising. Part of Essential only, and on unless you switch them off in Cookie settings; switched off, we stop recording your visits, though the device ID can still link an order or an ad offer to this device.',
     items: [
       { name: 'hw-visitor', kind: 'local storage', purpose: 'A random ID for this device, linking your visits, ad offer and orders.', lasts: 'Until you clear your browser' },
       { name: 'hw-session', kind: 'session storage', purpose: 'A random ID for this visit.', lasts: 'Until you close the tab' },
@@ -63,7 +63,7 @@ export const STORAGE_GROUPS: StorageGroup[] = [
   {
     id: 'analytics',
     title: 'Google Analytics',
-    intro: `Only if you accept them, and only on ${LIVE_DOMAIN}.`,
+    intro: `Only if you accept them, and only on ${LIVE_DOMAIN}. Essential only, or switching them off later, deletes them.`,
     items: [
       { name: '_ga', kind: 'cookie', purpose: 'Google Analytics: tells visits apart.', lasts: 'Up to 2 years' },
       { name: '_ga_…', kind: 'cookie', purpose: 'Google Analytics: keeps track of a visit.', lasts: 'Up to 2 years' },
@@ -72,7 +72,7 @@ export const STORAGE_GROUPS: StorageGroup[] = [
   {
     id: 'marketing',
     title: 'Facebook and Instagram adverts',
-    intro: `Meta’s Pixel, only if you accept it, and only on ${LIVE_DOMAIN}. It tells Meta which adverts lead to visits and orders.`,
+    intro: `Meta’s Pixel, only if you accept it, and only on ${LIVE_DOMAIN}. It tells Meta which adverts lead to visits and orders. Essential only, or switching it off later, deletes these cookies.`,
     items: [
       { name: '_fbp', kind: 'cookie', purpose: 'Meta: tells visits from this browser apart.', lasts: '3 months' },
       { name: '_fbc', kind: 'cookie', purpose: 'Meta: the advert you clicked, if you came from one.', lasts: '3 months' },

@@ -9,7 +9,7 @@
 import { CONSENT_COOKIE, isPrivatePath, STAFF_COOKIE } from '@/config/tracking'
 import { visitIds } from '@/lib/basket/store'
 import { visitStepFor, type VisitStep } from '@/lib/attribution/visit'
-import { CONSENT_MAX_AGE, parseConsent, serialiseConsent, type Consent } from './consent'
+import { CONSENT_MAX_AGE, cookieDomains, cookiesToClear, parseConsent, serialiseConsent, type Consent, type ConsentChoice } from './consent'
 import { ga4Params, GA4_NAME, META_CUSTOM, pixelParams, type BrowserEventName, type EventData } from './events'
 
 declare global {
@@ -38,8 +38,22 @@ function writeCookie(name: string, value: string, maxAge: number) {
 
 export const readConsent = (): Consent => parseConsent(readCookie(CONSENT_COOKIE))
 
-export function saveConsent(c: Omit<Consent, 'at'>) {
+/** Deletes a cookie wherever it may have been set: host-only and on each parent domain. */
+function deleteCookie(name: string) {
+  for (const domain of ['', ...cookieDomains(window.location.hostname).map((d) => `; Domain=.${d}`)]) {
+    document.cookie = `${name}=; Path=/; Max-Age=0${domain}`
+  }
+}
+
+export function saveConsent(c: ConsentChoice) {
   writeCookie(CONSENT_COOKIE, serialiseConsent(c), CONSENT_MAX_AGE)
+  // Switching Google or Meta off (Essential only, or later in Cookie settings) also removes their cookies.
+  try {
+    const names = document.cookie.split('; ').map((p) => p.slice(0, p.indexOf('=')))
+    for (const name of cookiesToClear(c, names)) deleteCookie(name)
+  } catch {
+    // Never let tidying up stop the choice being saved.
+  }
   window.dispatchEvent(new Event('hw:consent'))
 }
 

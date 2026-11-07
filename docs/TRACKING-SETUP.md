@@ -8,7 +8,7 @@ When you're ready, say so and we'll go through this together, screen by screen (
 
 | What | How |
 | --- | --- |
-| Cookie question | A bar at the bottom with equal **Reject all** / **Accept all**, and **Choose what to allow**. "Cookie settings" in the footer reopens it. |
+| Cookie question | A bar at the bottom with equal **Essential only** / **Accept all**, and **Choose what to allow**. Essential only (since 7 November 2026, in place of Reject all) is the shop plus our own visit statistics; Google Analytics and the Pixel stay off and their cookies are deleted. "Cookie settings" in the footer reopens it. |
 | Meta Pixel | Loads only on heartwellsofa.co.uk with `NEXT_PUBLIC_APP_ENV=production`, after **Accept**, never on order, confirmation, tracking, review or newsletter pages. |
 | Conversions API (server) | A copy of every browser event with the same event ID (Meta counts it once), for visitors who accepted. |
 | Events | PageView, ViewContent (each colour viewed), AddToCart, InitiateCheckout, Contact (WhatsApp or phone tap), Lead (samples, basket reminder), OrderPlaced (custom). |

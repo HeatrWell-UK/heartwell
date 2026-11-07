@@ -1,10 +1,12 @@
 'use client'
 
-// The cookie question, answered in one tap: "Reject all" and "Accept all" look
-// exactly the same (equal weight, as the UK rules expect), with "Choose" for
-// anyone who wants to pick. It sits at the bottom and never blocks the page,
-// and it's kept short (audit A1: it covered 28% of a phone's first screen,
-// over the product's name and price).
+// The cookie question, answered in one tap: "Essential only" and "Accept all"
+// look exactly the same (equal weight, as the UK rules expect), with "Choose"
+// for anyone who wants to pick. Essential only (owner, 7 November 2026, in
+// place of "Reject all") is the shop plus our own visit statistics, and the
+// banner says so. It sits at the bottom and never blocks the page, and it's
+// kept short (audit A1: it covered 28% of a phone's first screen, over the
+// product's name and price).
 
 import { useId, useRef, useState } from 'react'
 import { useBottomCover } from '@/lib/ui/bottom-cover'
@@ -12,10 +14,7 @@ import Link from 'next/link'
 import { Sheet } from '@/components/ui/Sheet'
 import { buttonClasses } from '@/components/ui/Button'
 import { saveConsent } from '@/lib/tracking/browser'
-import type { Consent } from '@/lib/tracking/consent'
-
-const ALL = { marketing: true, analytics: true, statistics: true }
-const NONE = { marketing: false, analytics: false, statistics: true }
+import { ACCEPT_ALL, ESSENTIAL_ONLY, type Consent, type ConsentChoice } from '@/lib/tracking/consent'
 
 export function ConsentBanner({ onChoose }: { onChoose: () => void }) {
   const id = useId()
@@ -34,8 +33,8 @@ export function ConsentBanner({ onChoose }: { onChoose: () => void }) {
           Cookies
         </h2>
         <p className="text-[14px] leading-snug text-slate lg:text-[15px]">
-          <strong className="font-semibold text-ink">Cookies?</strong> We&rsquo;d like to measure our Facebook and Instagram ads and see how the site is used. Your
-          basket works either way.{' '}
+          <strong className="font-semibold text-ink">Cookies?</strong> We&rsquo;d like Google and Meta cookies to measure the site and our ads.{' '}
+          <strong className="font-semibold text-ink">Essential only</strong> covers the shop and our own visit statistics.{' '}
           <button type="button" onClick={onChoose} className="font-semibold text-velvet underline underline-offset-2">
             Choose what to allow
           </button>{' '}
@@ -46,10 +45,10 @@ export function ConsentBanner({ onChoose }: { onChoose: () => void }) {
           .
         </p>
         <div className="grid shrink-0 grid-cols-2 gap-2 lg:w-[320px]">
-          <button type="button" onClick={() => saveConsent(NONE)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
-            Reject all
+          <button type="button" onClick={() => saveConsent(ESSENTIAL_ONLY)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+            Essential only
           </button>
-          <button type="button" onClick={() => saveConsent(ALL)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+          <button type="button" onClick={() => saveConsent(ACCEPT_ALL)} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
             Accept all
           </button>
         </div>
@@ -79,20 +78,22 @@ export function ConsentSettings({ open, onClose, current }: { open: boolean; onC
   const [marketing, setMarketing] = useState(current.marketing)
   const [analytics, setAnalytics] = useState(current.analytics)
   const [statistics, setStatistics] = useState(current.statistics)
-  const save = (c: { marketing: boolean; analytics: boolean; statistics: boolean }) => {
+  const save = (c: ConsentChoice) => {
     saveConsent(c)
     onClose()
   }
   return (
     <Sheet open={open} onClose={onClose} title="Cookie settings">
       <div className="flex flex-col gap-3">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate">Essential</h3>
         <Choice label="Needed for the shop" body="Your basket, saved sofas and checkout. Always on." checked disabled />
         <Choice
           label="Our own visit statistics"
-          body="A note of how you found us (for example, which ad), kept by us only, with no advertising cookies."
+          body="How you found us (for example, which ad) and the pages you view, kept by us only and never used for advertising. Part of Essential only; you can switch it off."
           checked={statistics}
           onChange={setStatistics}
         />
+        <h3 className="pt-2 text-sm font-semibold uppercase tracking-wide text-slate">Only if you allow them</h3>
         <Choice label="Google Analytics" body="Cookies that help us see which pages work, in Google Analytics." checked={analytics} onChange={setAnalytics} />
         <Choice
           label="Facebook and Instagram ads"
@@ -100,13 +101,18 @@ export function ConsentSettings({ open, onClose, current }: { open: boolean; onC
           checked={marketing}
           onChange={setMarketing}
         />
-        <div className="grid grid-cols-2 gap-2 pt-2">
+        <div className="flex flex-col gap-2 pt-2">
           <button type="button" onClick={() => save({ marketing, analytics, statistics })} className={buttonClasses({ variant: 'secondary' })}>
             Save my choices
           </button>
-          <button type="button" onClick={() => save(ALL)} className={buttonClasses({ variant: 'secondary' })}>
-            Accept all
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" onClick={() => save(ESSENTIAL_ONLY)} className={buttonClasses({ variant: 'secondary' })}>
+              Essential only
+            </button>
+            <button type="button" onClick={() => save(ACCEPT_ALL)} className={buttonClasses({ variant: 'secondary' })}>
+              Accept all
+            </button>
+          </div>
         </div>
       </div>
     </Sheet>
