@@ -32,6 +32,11 @@ export function mintReference(now = new Date(), randomBytes: (n: number) => Uint
 /** The reference goes on its own line at the end, apart from what the customer reads. */
 export const withReference = (message: string, reference: string) => `${message}\n\nRef: ${reference}`
 
+/** The product photo's "Need more Photos?" message. The code is the SKU the shop and the warehouse know. */
+export function morePhotosMessage({ title, option, code, url }: { title: string; option: string; code: string | null; url: string }): string {
+  return [`Hi Heartwell, please send me more pictures/videos of "${title}" (${option}).`, ...(code ? [`Product code: ${code}`] : []), url].join('\n')
+}
+
 export type Platform = 'ios-in-app' | 'android-in-app' | 'other'
 
 const IN_APP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|Barcelona/i

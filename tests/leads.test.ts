@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { mintReference, platformOf, REFERENCE_ALPHABET, ukDatePart, WA_REFERENCE, whatsAppLaunch, withReference } from '@/lib/whatsapp/handoff'
+import { mintReference, morePhotosMessage, platformOf, REFERENCE_ALPHABET, ukDatePart, WA_REFERENCE, whatsAppLaunch, withReference } from '@/lib/whatsapp/handoff'
 import { cloudinaryVideo } from '@/lib/videos'
 import { basketReminderEmail, contactShopEmail, newsletterConfirmEmail, reviewRequestEmail, sampleCustomerEmail, sampleShopEmail } from '@/lib/email/lead-emails'
 import { buildStatusChecks, jobRunVerdict, type AdminStatusData } from '@/lib/admin/status'
@@ -30,6 +30,20 @@ describe('WhatsApp references', () => {
 
   it('puts the reference on its own line at the end', () => {
     expect(withReference('Hi Heartwell', 'HW-WA-261007-ABCDEF')).toBe('Hi Heartwell\n\nRef: HW-WA-261007-ABCDEF')
+  })
+})
+
+describe('asking for more photos', () => {
+  const url = 'https://heartwellsofa.co.uk/products/rio-5-seater/RIO-5-GRY'
+
+  it('names the product, its colour and its code, then the page', () => {
+    expect(morePhotosMessage({ title: 'Rio 5 Seater Corner', option: 'Grey', code: 'RIO-5-GRY', url })).toBe(
+      `Hi Heartwell, please send me more pictures/videos of "Rio 5 Seater Corner" (Grey).\nProduct code: RIO-5-GRY\n${url}`,
+    )
+  })
+
+  it('leaves the code line out when no colourway is available', () => {
+    expect(morePhotosMessage({ title: 'Rio 5 Seater Corner', option: 'As shown', code: null, url })).not.toContain('Product code')
   })
 })
 

@@ -14,6 +14,7 @@ import { useBasket } from '@/lib/basket/store'
 import { track } from '@/lib/tracking/browser'
 import { unitPrice } from '@/lib/catalogue/pricing'
 import { backOptions, optionLabel, productHref, sizeOptions } from '@/lib/product/helpers'
+import { morePhotosMessage } from '@/lib/whatsapp/handoff'
 import type { ProductPageData } from '@/lib/product/types'
 import { Gallery } from './Gallery'
 import { SaveButton } from './SaveButton'
@@ -183,7 +184,8 @@ export function ProductPurchase({
     track('AddToCart', { contents: [{ id: variant.id, quantity: 1, item_price: price }], contentName: p.title, value: price })
   }
 
-  const waMessage = `Hi Heartwell, I have a question about the ${p.title} (${option}): ${SITE_URL}${productHref(p.slug, variant?.sku, fabric?.fabric.code)}`
+  const pageUrl = `${SITE_URL}${productHref(p.slug, variant?.sku, fabric?.fabric.code)}`
+  const waMessage = `Hi Heartwell, I have a question about the ${p.title} (${option}): ${pageUrl}`
 
   return (
     <>
@@ -207,6 +209,18 @@ export function ProductPurchase({
                   <>
                     <SaveButton slug={p.slug} sku={variant?.sku ?? null} noun={noun} className="right-1 top-1 size-11" />
                     {variant && <Medallion label="To pay today" value="£0" small />}
+                    {/* Above the phone's dots, on the side away from the coin. */}
+                    <WhatsAppButton
+                      message={morePhotosMessage({ title: p.title, option, code: variant?.sku ?? null, url: pageUrl })}
+                      context="product-photos"
+                      productId={p.id}
+                      variantId={variant?.id}
+                      productName={p.title}
+                      className="absolute bottom-14 left-3 z-[2] inline-flex h-11 items-center gap-1.5 rounded-full bg-white/95 pl-2.5 pr-3.5 text-[14px] font-semibold text-velvet shadow-sm lg:bottom-7 lg:left-5"
+                    >
+                      <WhatsAppGlyph size={20} />
+                      Need more Photos?
+                    </WhatsAppButton>
                   </>
                 }
               />

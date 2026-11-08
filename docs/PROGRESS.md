@@ -52,6 +52,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 9 November 2026 — "Need more Photos?" on the product photo
+- **Owner's request:** a button on the product photo that opens WhatsApp with a message asking for more pictures and videos of that product, with its reference code.
+- **The button** sits at the bottom left of the photo (`ProductPurchase.tsx`, through the Gallery's overlay), above the phone's dots and away from the "To pay today" coin. The owner's wording is kept as written, capital P included.
+- **The message** (`morePhotosMessage` in `src/lib/whatsapp/handoff.ts`) names the product and colour or fabric, then "Product code:" with the SKU, the page's link and, as on every WhatsApp button, the `Ref: HW-WA-…` line. It follows the colour or fabric chosen on the page.
+- **Counts like every other WhatsApp button:** a WhatsApp enquiry in Admin → Leads (from "product-photos") and Meta's Contact event.
+- **Checks:** types, lint, tests, the WebAssembly build, and the built page at phone and desktop widths. Not tapped, because a tap saves a real enquiry.
+
 ### 7 November 2026 — The deposit field is live
 - **Owner's go** ("Go ahead") on the deposit migration, which had waited since the push mix-up below. A second dry run first (rolled back): HW-100113 became a £769 sale with a £100 deposit and OrderFlow was still sent £669; every other order's OrderFlow total unchanged.
 - **Applied** as `20261107222529_order_deposit` (the file was renamed from `20261106210000` to the version the database recorded); the code came back with a revert of 21a7e5a. HW-100113 is now a £769 sale, £100 deposit, £669 to collect. Its Purchase (£669, sent 6 November) isn't sent again: that only happens on a status change.
