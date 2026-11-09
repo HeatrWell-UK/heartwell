@@ -2,13 +2,17 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useId, useRef, useState } from 'react'
-import { CheckCircleIcon, CheckIcon, WarningCircleIcon, XIcon } from '@phosphor-icons/react'
+import { useEffect, useId, useRef, useState } from 'react'
+import { CheckCircleIcon, WarningCircleIcon, XIcon } from '@phosphor-icons/react'
+import { FabricTile } from '@/components/fabrics/FabricTile'
+import { FabricViewer } from '@/components/fabrics/FabricViewer'
+import { FABRIC_GRID, FABRIC_TILE_SIZES } from '@/components/fabrics/grid'
 import { Button } from '@/components/ui/Button'
 import { Field, TextArea, TextInput } from '@/components/ui/Field'
 import { SAMPLES } from '@/config/samples'
 import { visitIds } from '@/lib/basket/store'
 import { track } from '@/lib/tracking/browser'
+import { useBottomCover } from '@/lib/ui/bottom-cover'
 import { cn } from '@/lib/cn'
 import { requestSamples, type SampleField } from './actions'
 
@@ -31,11 +35,35 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
   const [error, setError] = useState<{ message: string; field?: SampleField } | null>(null)
   const [done, setDone] = useState(false)
   const errorRef = useRef<HTMLDivElement>(null)
+  // The fabric open large, as its place in `all`.
+  const [viewing, setViewing] = useState<number | null>(null)
+  const sendRef = useRef<HTMLElement>(null)
+  const barRef = useRef<HTMLDivElement>(null)
+  const [sendInView, setSendInView] = useState(false)
 
   const all = collections.flatMap((c) => c.fabrics.map((f) => ({ ...f, collection: c.name })))
   const full = chosen.length >= limit
-  const toggle = (fabricId: string) => setChosen((list) => (list.includes(fabricId) ? list.filter((x) => x !== fabricId) : list.length >= limit ? list : [...list, fabricId]))
+  const toggle = (fabricId: string) => {
+    setChosen((list) => (list.includes(fabricId) ? list.filter((x) => x !== fabricId) : list.length >= limit ? list : [...list, fabricId]))
+    setError((e) => (e?.field === 'fabrics' ? null : e))
+  }
   const fieldError = (f: SampleField) => (error?.field === f ? error.message : undefined)
+
+  // Once something is chosen, a bar at the foot of the screen leads on to the address (the list is long on phones).
+  useEffect(() => {
+    const el = sendRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(([entry]) => setSendInView(Boolean(entry?.isIntersecting)), { rootMargin: '0px 0px -25% 0px' })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  const showBar = chosen.length > 0 && !sendInView && !done
+  useBottomCover('samples-bar', barRef, showBar)
+  const goToAddress = () => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    sendRef.current?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+    document.getElementById(`${id}-send`)?.focus({ preventScroll: true })
+  }
 
   if (done) {
     return (
@@ -81,6 +109,7 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
   }
 
   return (
+    <>
     <form onSubmit={submit} noValidate className="flex flex-col gap-10">
       <section aria-labelledby={`${id}-choose`} className="flex flex-col gap-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -96,43 +125,31 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
             <WarningCircleIcon aria-hidden="true" size={20} /> {fieldError('fabrics')}
           </p>
         )}
-        {collections.map((c) => (
-          <fieldset key={c.slug} className="flex flex-col gap-3">
-            <legend className="mb-3 font-display text-lg">{c.name}</legend>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-x-2 gap-y-3">
-              {c.fabrics.map((f) => {
-                const on = chosen.includes(f.id)
-                const off = full && !on
-                return (
-                  <label
-                    key={f.id}
-                    className={cn(
-                      'relative flex cursor-pointer flex-col items-center gap-1.5 rounded-xl p-1.5 text-center has-[:focus-visible]:shadow-[var(--shadow-focus)]',
-                      on && 'bg-gold-tint',
-                      off && 'cursor-not-allowed opacity-45',
-                    )}
-                  >
-                    <input type="checkbox" className="sr-only" checked={on} disabled={off} onChange={() => toggle(f.id)} />
-                    <span className={cn('pinked relative block aspect-square w-full max-w-20 overflow-hidden', on && 'ring-2 ring-velvet ring-offset-2')} style={{ backgroundColor: f.hex ?? '#F5F1EF' }}>
-                      {f.image && <Image src={f.image} alt="" width={80} height={80} className="size-full object-cover" />}
-                      {on && (
-                        <span className="absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-velvet text-white">
-                          <CheckIcon aria-hidden="true" size={14} weight="bold" />
-                        </span>
-                      )}
-                    </span>
-                    <span className="text-[13px] font-semibold leading-tight">{f.name}</span>
-                    <span className="text-[12px] text-slate">{f.code}</span>
-                  </label>
-                )
-              })}
-            </div>
-          </fieldset>
+        <p className="-mt-2 text-[15px] text-slate">Tap a fabric to see it close up.</p>
+        {collections.map((c, ci) => (
+          <section key={c.slug} aria-labelledby={`${id}-${c.slug}`} className="flex flex-col gap-3">
+            <h3 id={`${id}-${c.slug}`} className="font-display text-xl">
+              {c.name}
+            </h3>
+            <ul className={FABRIC_GRID}>
+              {c.fabrics.map((f) => (
+                <li key={f.id}>
+                  <FabricTile
+                    fabric={{ ...f, collection: c.name }}
+                    selected={chosen.includes(f.id)}
+                    onOpen={() => setViewing(all.findIndex((x) => x.id === f.id))}
+                    sizes={FABRIC_TILE_SIZES}
+                    defer={ci > 0}
+                  />
+                </li>
+              ))}
+            </ul>
+          </section>
         ))}
       </section>
 
-      <section aria-labelledby={`${id}-send`} className="flex flex-col gap-5 rounded-[var(--radius-card)] bg-stone p-4 lg:p-6">
-        <h2 id={`${id}-send`} className="text-2xl">
+      <section ref={sendRef} aria-labelledby={`${id}-send`} className="flex scroll-mt-4 flex-col gap-5 rounded-[var(--radius-card)] bg-stone p-4 lg:p-6">
+        <h2 id={`${id}-send`} tabIndex={-1} className="text-2xl outline-none">
           2. Where to send them
         </h2>
         {chosen.length > 0 && (
@@ -210,5 +227,68 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
         </p>
       </section>
     </form>
+
+    <FabricViewer fabrics={all} index={viewing} onIndex={setViewing} onClose={() => setViewing(null)}>
+      {(f) =>
+        chosen.includes(f.id) ? (
+          <>
+            <p className="flex items-center justify-center gap-2 text-[15px] font-semibold text-velvet">
+              <CheckCircleIcon aria-hidden="true" size={20} weight="fill" /> In your samples ({chosen.length} of {limit})
+            </p>
+            <Button variant="secondary" block onClick={() => toggle(f.id)}>
+              Remove from my samples
+            </Button>
+          </>
+        ) : full ? (
+          <>
+            <Button block disabled>
+              Choose this for my samples
+            </Button>
+            <p className="text-center text-[14px] text-slate">You’ve chosen {limit}, the most for one set. Remove one to choose this instead.</p>
+          </>
+        ) : (
+          <Button
+            block
+            onClick={() => {
+              toggle(f.id)
+              setViewing(null)
+            }}
+          >
+            Choose this for my samples
+          </Button>
+        )
+      }
+    </FabricViewer>
+
+    {showBar && (
+      <div
+        ref={barRef}
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 px-4 pt-3 shadow-[0_-6px_20px_rgba(58,10,18,.08)] backdrop-blur-sm print:hidden"
+        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}
+      >
+        <div className="mx-auto flex max-w-[1200px] items-center gap-3">
+          {/* The last three chosen, so the bar fits the narrowest phones with all five. */}
+          <span aria-hidden="true" className="flex shrink-0">
+            {chosen.slice(-3).map((fabricId, i) => {
+              const f = all.find((x) => x.id === fabricId)
+              return (
+                f && (
+                  <span key={fabricId} className="pinked relative block size-9 overflow-hidden" style={{ backgroundColor: f.hex ?? '#F5F1EF', marginLeft: i ? -16 : 0 }}>
+                    {f.image && <Image src={f.image} alt="" width={36} height={36} className="size-full object-cover" />}
+                  </span>
+                )
+              )
+            })}
+          </span>
+          <p className="min-w-0 flex-1 text-[15px] font-semibold leading-tight">
+            {chosen.length} of {limit} chosen
+          </p>
+          <Button size="sm" onClick={goToAddress} className="shrink-0">
+            Next: your address
+          </Button>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

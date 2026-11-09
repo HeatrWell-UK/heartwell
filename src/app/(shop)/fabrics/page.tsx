@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
-import { WhenNear } from '@/components/ui/WhenNear'
+import { FabricLibrary } from '@/components/fabrics/FabricLibrary'
 import { ButtonLink } from '@/components/ui/Button'
 import { FEATURES } from '@/config/features'
 import { SAMPLES } from '@/config/samples'
-import { formatPrice } from '@/lib/format'
 import { getFabricLibrary } from '@/lib/catalogue/listing'
 
 export const revalidate = 300
@@ -44,35 +42,9 @@ export default async function FabricsPage() {
           </div>
         </div>
       </header>
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-4 pt-10 lg:px-6 lg:pt-14">
-      {collections.map((c, ci) => (
-        <section key={c.slug} aria-labelledby={`c-${c.slug}`} className="flex flex-col gap-4">
-          <h2 id={`c-${c.slug}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[28px] leading-tight lg:text-[34px]">
-            {c.name}
-            <span className="font-sans text-[15px] font-normal text-slate">
-              {c.fabrics.length} colours{c.surcharge > 0 ? `, +${formatPrice(c.surcharge)}` : ''}
-            </span>
-          </h2>
-          <ul className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
-            {c.fabrics.map((f) => (
-              <li key={f.code} className="flex flex-col items-center gap-1.5 text-center">
-                <span className="pinked relative block aspect-square w-full max-w-24 overflow-hidden" style={{ backgroundColor: f.hex ?? '#F5F1EF' }}>
-                  {f.image &&
-                    (ci === 0 ? (
-                      <Image src={f.image} alt="" width={96} height={96} className="size-full object-cover" />
-                    ) : (
-                      <WhenNear className="absolute inset-0">
-                        <Image src={f.image} alt="" width={96} height={96} className="size-full object-cover" />
-                      </WhenNear>
-                    ))}
-                </span>
-                <span className="text-[14px] font-semibold leading-tight">{f.name}</span>
-                <span className="text-[12px] text-slate">{f.code}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-12 px-4 pt-8 lg:px-6 lg:pt-14">
+        <p className="-mb-6 text-[15px] text-slate">Tap a fabric to see it close up.</p>
+        <FabricLibrary collections={collections} samples={FEATURES.samples} />
       </div>
     </div>
   )

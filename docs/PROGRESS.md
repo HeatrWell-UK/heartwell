@@ -52,6 +52,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 10 November 2026 — Fabrics open large; two to a row on phones
+- **Owner's request:** on the samples page a tap on a fabric opens it large in a window, with an option to choose it as a sample. The same on the product page, with "Build mine in this". Two fabrics to a row on the fabric pages, and everything right for phones.
+- **The window** (`src/components/fabrics/FabricViewer.tsx`): the fabric as large as the screen allows (a bottom sheet on phones, a panel on desktops). A tap on the fabric looks closer at that spot (2.6×, with a sharper copy loaded) and a second tap steps back. Swipe, the arrows or the arrow keys move to the next fabric. Its name, collection and code sit under it, with the page's own buttons below.
+- **Samples page:** two to a row on phones (3, 4 and 6 on wider screens). The window has "Choose this for my samples", and closes once one is chosen. A chosen fabric's window says "In your samples" and offers "Remove from my samples". With 5 chosen, the button is greyed out and says why. Once something is chosen, a bar at the foot of the screen shows the swatches, "2 of 5 chosen" and "Next: your address", which jumps to the form; the list is about 8,000 px long on a phone. The bar fits a 320 px phone with all five chosen.
+- **Fabrics page:** the same two-to-a-row tiles and window, with "Order a sample of this" (opens the samples page with it chosen) and "See the sofas made in it".
+- **Product page:** "Or choose from 70 fabrics" now lists them three to a row with bigger swatches. A tap opens the window over the list, with "Build mine in this" (chooses it, closes both and shows it on the page as before) and "Or order a sample first". Any extra charge for the collection, and "Your choice now", show under the name. The colour circles above it are unchanged, since a tap there already shows that colour in the big photo.
+- **Checks:** types, lint, tests, the WebAssembly build, and the built pages at 320, 375 and 1280 px wide: two to a row, no sideways scrolling, and the window's zoom, swipe, keys, choose, remove, the 5-limit and "Build mine in this" all work. In the hidden browser pane, a dialog's close event (Escape) never fires, even on a plain test dialog. That's the pane, not the site; the close button works.
+
 ### 9 November 2026 — "Need more Photos?" on the product photo
 - **Owner's request:** a button on the product photo that opens WhatsApp with a message asking for more pictures and videos of that product, with its reference code.
 - **The button** sits at the bottom left of the photo (`ProductPurchase.tsx`, through the Gallery's overlay), above the phone's dots and away from the "To pay today" coin. The owner's wording is kept as written, capital P included.
