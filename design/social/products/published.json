@@ -344,5 +344,162 @@
         }
       }
     ]
+  },
+  "adCreatives": {
+    "published": "2026-11-10 14:26–14:33 UTC (UK time), oldest first; the creatives from design/ads (Meta ads campaign Nov26) as ordinary posts. Captions give code HEARTSOFA wherever a picture says \"with this ad\".",
+    "posts": [
+      {
+        "key": "C1",
+        "name": "The collection (8 cards)",
+        "instagram": {
+          "id": "18143976877719784",
+          "url": "https://www.instagram.com/p/DfkHibfoBwI/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748682033933763",
+          "url": "https://www.facebook.com/120278539876430/posts/1748682033933763"
+        }
+      },
+      {
+        "key": "C2",
+        "name": "Ashton",
+        "instagram": {
+          "id": "18143089594616626",
+          "url": "https://www.instagram.com/p/DfkHb2ZEaAI/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748684217266878",
+          "url": "https://www.facebook.com/120278539876430/posts/1748684217266878"
+        }
+      },
+      {
+        "key": "C3",
+        "name": "Lilly",
+        "instagram": {
+          "id": "18119329412037474",
+          "url": "https://www.instagram.com/p/DfkHb28kYzx/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748685280600105",
+          "url": "https://www.facebook.com/120278539876430/posts/1748685280600105"
+        }
+      },
+      {
+        "key": "C4",
+        "name": "Oakland",
+        "instagram": {
+          "id": "17985431921905670",
+          "url": "https://www.instagram.com/p/DfkHb0VEVbn/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748685977266702",
+          "url": "https://www.facebook.com/120278539876430/posts/1748685977266702"
+        }
+      },
+      {
+        "key": "C5",
+        "name": "Your sofa, your way (video)",
+        "instagram": {
+          "id": "18159737641577389",
+          "url": "https://www.instagram.com/reel/DfkHctlAACc/"
+        },
+        "facebook": {
+          "videoId": "969509052497295",
+          "url": "https://www.facebook.com/120278539876430/videos/969509052497295"
+        }
+      },
+      {
+        "key": "R5",
+        "name": "Pick your Rio (7 cards)",
+        "instagram": {
+          "id": "18128143276854225",
+          "url": "https://www.instagram.com/p/DfkHiakoDl-/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748687580599875",
+          "url": "https://www.facebook.com/120278539876430/posts/1748687580599875"
+        }
+      },
+      {
+        "key": "R6",
+        "name": "Rio details",
+        "instagram": {
+          "id": "18118645355096881",
+          "url": "https://www.instagram.com/p/DfkHdMhkU_h/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748688530599780",
+          "url": "https://www.facebook.com/120278539876430/posts/1748688530599780"
+        }
+      },
+      {
+        "key": "R4",
+        "name": "Rio made your way",
+        "instagram": {
+          "id": "18018380408749756",
+          "url": "https://www.instagram.com/p/DfkHeBFETHK/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748689077266392",
+          "url": "https://www.facebook.com/120278539876430/posts/1748689077266392"
+        }
+      },
+      {
+        "key": "R3",
+        "name": "Pay nothing until it’s in your room",
+        "instagram": {
+          "id": "18034183019884462",
+          "url": "https://www.instagram.com/p/DfkHd-woBJQ/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748689507266349",
+          "url": "https://www.facebook.com/120278539876430/posts/1748689507266349"
+        }
+      },
+      {
+        "key": "R2",
+        "name": "Rio corner",
+        "instagram": {
+          "id": "18236100628322696",
+          "url": "https://www.instagram.com/p/DfkHd_roHGf/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748690040599629",
+          "url": "https://www.facebook.com/120278539876430/posts/1748690040599629"
+        }
+      },
+      {
+        "key": "R1",
+        "name": "Rio 3+2",
+        "instagram": {
+          "id": "18102884939386256",
+          "url": "https://www.instagram.com/p/DfkHeAakVUO/"
+        },
+        "facebook": {
+          "id": "120278539876430_1748690543932912",
+          "url": "https://www.facebook.com/120278539876430/posts/1748690543932912"
+        }
+      },
+      {
+        "key": "V1",
+        "name": "Rio Chesterfield (video)",
+        "instagram": {
+          "id": "18113857850240806",
+          "url": "https://www.instagram.com/reel/DfkHi74ks3g/"
+        },
+        "facebook": {
+          "videoId": "3388804274623686",
+          "url": "https://www.facebook.com/120278539876430/videos/3388804274623686"
+        }
+      }
+    ],
+    "instagramStories": {
+      "C2": "18111567992628676",
+      "C3": "18390357193233442",
+      "C4": "17933886630161251",
+      "R6": "18104002499168909",
+      "R4": "18154489513544347",
+      "R3": "18171088468478393"
+    }
   }
 }
