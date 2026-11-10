@@ -52,6 +52,12 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 10 November 2026 — The ad creatives posted on Instagram and Facebook
+- **Owner's request:** post all the ad creatives in `design/ads` on our social media, each where it fits.
+- **Checked first:** every price on them matches the shop today. Some say "£50 off with this ad" or "via this ad", an offer that applies automatically only to ad visits; code **HEARTSOFA** (active, open to anyone) gives the same £50 off the Rio 3+2 and corner, and £20 off the rest. So every caption gives the code where a picture says "with this ad", and none says "this ad".
+- **Posted (14:26–14:33 UK time), oldest first on both:** the collection carousel (C1, 8 cards), Ashton (C2), Lilly (C3), Oakland (C4), the "Your sofa, your way" video (C5: an Instagram Reel shared to the grid, a Facebook video), Pick your Rio carousel (R5, 7 cards), Rio details (R6), Made your way (R4), Pay nothing until it's in your room (R3), Rio corner (R2), Rio 3+2 (R1), the Rio video (V1, Reel and video), so the Rio video is newest. Alt text on every Instagram picture; Facebook links to each range or product with `utm_medium=social` (never `paid_social`, so no ad offer). Stories on Instagram: the 9:16 versions of C2, C3, C4, R6, R4 and R3 (R1 and R2 left out: they say "with this ad" and a Story has no caption for the code; Facebook Stories aren't possible through the connection). Read back: 12 new posts in order, no duplicates, 6 Stories; both Facebook videos play. IDs and links in `design/social/products/published.json` (`adCreatives`).
+- **Cloudinary:** the 33 uploads deleted once everything was live (none left).
+
 ### 10 November 2026 — WhatsApp: taps but no messages, so the hand-off is watched and has a safety net
 - **Owner's report:** lots of traffic, no WhatsApp messages at all; the whole site checked from a customer's side, with talking to us as the main aim.
 - **What the numbers say:**
