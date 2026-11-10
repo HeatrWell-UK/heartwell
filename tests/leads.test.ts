@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
-import { mintReference, morePhotosMessage, platformOf, REFERENCE_ALPHABET, ukDatePart, WA_REFERENCE, whatsAppLaunch, withReference } from '@/lib/whatsapp/handoff'
+import { handoffNote, mintReference, morePhotosMessage, noteReference, platformOf, REFERENCE_ALPHABET, ukDatePart, WA_REFERENCE, whatsAppLaunch, withReference } from '@/lib/whatsapp/handoff'
+import { VISIT_STEPS } from '@/lib/attribution/visit'
 import { cloudinaryVideo } from '@/lib/videos'
-import { basketReminderEmail, contactShopEmail, newsletterConfirmEmail, reviewRequestEmail, sampleCustomerEmail, sampleShopEmail } from '@/lib/email/lead-emails'
+import { basketReminderEmail, callbackShopEmail, contactShopEmail, newsletterConfirmEmail, reviewRequestEmail, sampleCustomerEmail, sampleShopEmail } from '@/lib/email/lead-emails'
 import { buildStatusChecks, jobRunVerdict, type AdminStatusData } from '@/lib/admin/status'
 
 vi.mock('server-only', () => ({}))
@@ -30,6 +31,27 @@ describe('WhatsApp references', () => {
 
   it('puts the reference on its own line at the end', () => {
     expect(withReference('Hi Heartwell', 'HW-WA-261007-ABCDEF')).toBe('Hi Heartwell\n\nRef: HW-WA-261007-ABCDEF')
+  })
+})
+
+describe('watching the hand-off to WhatsApp', () => {
+  it('notes the reference and the kind of browser, nothing personal', () => {
+    expect(handoffNote('HW-WA-261110-ABCDEF', 'ios-in-app')).toBe('HW-WA-261110-ABCDEF ios-in-app')
+    expect(handoffNote('HW-WA-261110-ABCDEF', 'other', true)).toBe('HW-WA-261110-ABCDEF other retry')
+    expect(handoffNote(null, 'android-in-app')).toBe('android-in-app')
+  })
+
+  it('reads the reference back for the admin, and nothing else', () => {
+    expect(noteReference('HW-WA-261110-ABCDEF android-in-app retry')).toBe('HW-WA-261110-ABCDEF')
+    expect(noteReference('android-in-app')).toBeNull()
+    expect(noteReference(null)).toBeNull()
+  })
+
+  it('lets the visit record take the new steps (the database accepts their names)', () => {
+    for (const step of ['whatsapp_opened', 'whatsapp_stuck', 'whatsapp_callback']) {
+      expect(VISIT_STEPS).toContain(step)
+      expect(step).toMatch(/^[a-z][a-z0-9_]{2,40}$/)
+    }
   })
 })
 
@@ -107,6 +129,27 @@ describe('lead emails', () => {
     expect(e.subject).toBe('[TEST] Sample request: 1 from Ann Smith')
     expect(e.html).toContain('Message them on WhatsApp')
     expect(e.text).toContain('1 Leaf St, LS6 2AB')
+  })
+
+  it('asks the shop to WhatsApp a customer who left their number, safely escaped', () => {
+    const e = callbackShopEmail({
+      name: 'Ann',
+      phone: '07700 900123',
+      product: 'Oakland <5> Corner',
+      reference: 'HW-WA-261110-ABCDEF',
+      pageUrl: 'https://example.test/products/oakland',
+      isTest: false,
+      whatsAppToCustomer: 'https://wa.me/447700900123',
+    })
+    expect(e.subject).toBe('Please WhatsApp Ann on 07700 900123 about the Oakland <5> Corner')
+    expect(e.html).toContain('Message them on WhatsApp')
+    expect(e.html).toContain('Oakland &lt;5&gt; Corner')
+    expect(e.html).not.toContain('<5>')
+    expect(e.html).toContain('HW-WA-261110-ABCDEF in Admin')
+    expect(e.text).toContain('Mobile: 07700 900123')
+    const anon = callbackShopEmail({ name: null, phone: '07700 900123', product: null, reference: null, pageUrl: 'https://example.test/', isTest: true, whatsAppToCustomer: null })
+    expect(anon.subject).toBe('[TEST] Please WhatsApp a customer on 07700 900123')
+    expect(anon.html).not.toContain('Admin → New order')
   })
 
   it('labels contact messages by topic and order', () => {

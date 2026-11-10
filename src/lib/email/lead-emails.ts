@@ -60,6 +60,31 @@ export function sampleCustomerEmail(o: { name: string; phone: string; fabrics: S
   return { subject, html: layout(subject, body, `We'll be in touch to arrange your ${o.fabrics.length} samples.`), text }
 }
 
+/** A customer asked us to message them on WhatsApp (the help sheet, 10 November 2026). Sent to the shop only. */
+export function callbackShopEmail(o: {
+  name: string | null
+  phone: string
+  product: string | null
+  reference: string | null
+  pageUrl: string
+  isTest: boolean
+  whatsAppToCustomer: string | null
+}): RenderedEmail {
+  const subject = `${test(o.isTest)}Please WhatsApp ${o.name ?? 'a customer'} on ${o.phone}${o.product ? ` about the ${o.product}` : ''}`
+  const details = [o.name ? `Name: ${o.name}` : null, `Mobile: ${o.phone}`, o.product ? `About: ${o.product}` : null, o.reference ? `WhatsApp reference: ${o.reference}` : null, `Page: ${o.pageUrl}`]
+    .filter(Boolean)
+    .join('\n')
+  const body = [
+    h(`${test(o.isTest)}Please message this customer on WhatsApp`),
+    p(`They left their number on the website and asked us to message them${o.product ? ` about the ${escapeHtml(o.product)}` : ''}. They’re waiting to hear from us, so the sooner the better.`),
+    pre(details),
+    o.whatsAppToCustomer ? button(o.whatsAppToCustomer, 'Message them on WhatsApp', WHATSAPP_GREEN) : '',
+    o.reference ? p(`If they order, enter ${escapeHtml(o.reference)} in Admin → New order so the order is credited to the advert that brought them.`, `color:${C.slate};font-size:15px`) : '',
+  ].join('')
+  const text = [subject, '', details, '', o.whatsAppToCustomer ? `WhatsApp them: ${o.whatsAppToCustomer}` : ''].join('\n')
+  return { subject, html: layout(subject, body, `Mobile ${o.phone}`), text }
+}
+
 export function sampleShopEmail(o: {
   name: string
   email: string

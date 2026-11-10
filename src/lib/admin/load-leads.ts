@@ -1,5 +1,6 @@
 import 'server-only'
 import { createClient } from '@/lib/supabase/server'
+import { noteReference } from '@/lib/whatsapp/handoff'
 
 // Leads for the admin, read with the signed-in admin's session (row level
 // security lets admins read them): sample requests, contact messages,
@@ -101,7 +102,36 @@ export async function loadEnquiries(search: string) {
   if (ref.length >= 4) q = q.ilike('reference', `%${ref}%`)
   const { data, error } = await q
   throwIf('WhatsApp enquiries', error)
-  return data ?? []
+  const rows = data ?? []
+  const outcomes = await handoffOutcomes(db, rows.at(-1)?.created_at ?? null)
+  return rows.map((r) => ({ ...r, outcome: outcomes.get(r.reference) ?? null }))
+}
+
+/**
+ * Whether WhatsApp opened after each tap (noted since 10 November 2026, src/lib/whatsapp/help.ts): "opened" if it
+ * opened at any try, "stuck" if it never did. Null before then, or when the visitor switched our statistics off.
+ */
+async function handoffOutcomes(db: Awaited<ReturnType<typeof createClient>>, since: string | null) {
+  const outcomes = new Map<string, 'opened' | 'stuck'>()
+  if (!since) return outcomes
+  const { data, error } = await db
+    .from('attribution_actions')
+    .select('action_type, metadata')
+    .in('action_type', ['whatsapp_opened', 'whatsapp_stuck'])
+    .gte('created_at', since)
+    .limit(2000)
+  if (error) {
+    console.error('WhatsApp hand-offs not loaded', error.message)
+    return outcomes
+  }
+  for (const a of data ?? []) {
+    const name = a.metadata && typeof a.metadata === 'object' && !Array.isArray(a.metadata) ? a.metadata.name : null
+    const reference = noteReference(typeof name === 'string' ? name : null)
+    if (!reference) continue
+    if (a.action_type === 'whatsapp_opened') outcomes.set(reference, 'opened')
+    else if (!outcomes.has(reference)) outcomes.set(reference, 'stuck')
+  }
+  return outcomes
 }
 
 export async function loadBaskets(all: boolean) {

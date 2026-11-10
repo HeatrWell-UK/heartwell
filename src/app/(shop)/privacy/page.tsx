@@ -31,7 +31,7 @@ export default function PrivacyPage() {
     <ContentPage
       title="Privacy notice"
       intro={<p>We collect only what we need to sell and deliver your furniture and to run the shop well, and we never sell your details.</p>}
-      updated="2026-11-06"
+      updated="2026-11-10"
       contents={CONTENTS}
     >
       <h2 id="who">Who we are</h2>
@@ -60,7 +60,8 @@ export default function PrivacyPage() {
       <h2 id="enquiries">Enquiries, samples, reminders and the newsletter</h2>
       <ul>
         <li>
-          <strong>WhatsApp, phone and email:</strong> we use what you send us to answer you. When you tap a WhatsApp button on our site we add a short
+          <strong>WhatsApp, phone and email:</strong> we use what you send us to answer you. If you leave your mobile number for us to WhatsApp you, it
+          goes to our shop email to do just that, and isn’t kept on the website. When you tap a WhatsApp button on our site we add a short
           reference (like HW-WA-…) to the message and note which page you were on, so we can help you with the right sofa. WhatsApp is run by Meta under its
           own privacy policy.
         </li>

@@ -210,8 +210,10 @@ async function Enquiries({ q }: { q: string }) {
             <li key={e.id} className="flex flex-col gap-1.5 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="font-mono text-sm font-semibold text-zinc-900">{e.reference}</span>
-                <div className="flex gap-1.5">
+                <div className="flex flex-wrap gap-1.5">
                   {e.is_test && <Tag tone="test">Test</Tag>}
+                  {e.outcome === 'opened' && <Tag tone="source">WhatsApp opened</Tag>}
+                  {e.outcome === 'stuck' && <Tag tone="warn">WhatsApp didn’t open</Tag>}
                   {e.order?.reference ? <Tag tone="source">Ordered {e.order.reference}</Tag> : null}
                 </div>
               </div>

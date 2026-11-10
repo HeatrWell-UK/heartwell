@@ -39,6 +39,15 @@ export function morePhotosMessage({ title, option, code, url }: { title: string;
 
 export type Platform = 'ios-in-app' | 'android-in-app' | 'other'
 
+/** A hand-off note (src/lib/whatsapp/help.ts): the reference and the kind of browser, e.g. "HW-WA-261110-K7P2QX ios-in-app". */
+export const handoffNote = (reference: string | null, platform: Platform, retry = false) => [reference, platform, retry ? 'retry' : null].filter(Boolean).join(' ')
+
+/** The reference a hand-off note is about, or null. */
+export function noteReference(note: string | null | undefined): string | null {
+  const first = note?.split(' ')[0] ?? ''
+  return WA_REFERENCE.test(first) ? first : null
+}
+
 const IN_APP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Threads|Barcelona/i
 
 export function platformOf(userAgent: string): Platform {

@@ -157,6 +157,12 @@ export function stepLabel(step: VisitStepRow): string {
       return 'Tapped “Call us”'
     case 'whatsapp':
       return `Tapped WhatsApp${step.title ? ` about ${step.title}` : ''}`
+    case 'whatsapp_opened':
+      return 'WhatsApp opened'
+    case 'whatsapp_stuck':
+      return 'WhatsApp didn’t open (we showed other ways to reach us)'
+    case 'whatsapp_callback':
+      return 'Left their number for us to WhatsApp them'
     case 'basket_reminder':
       return `Asked for a basket reminder by ${step.title || 'email'}`
     case 'samples': {

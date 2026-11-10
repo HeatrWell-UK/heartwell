@@ -52,6 +52,34 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 10 November 2026 — WhatsApp: taps but no messages, so the hand-off is watched and has a safety net
+- **Owner's report:** lots of traffic, no WhatsApp messages at all; the whole site checked from a customer's side, with talking to us as the main aim.
+- **What the numbers say:**
+  - Visits are about 130–200 a day, roughly 80% from Meta ads, and 764 of about 1,080 visits in five days landed straight on a product page.
+  - 22 people tapped a WhatsApp button from 8 to 10 November, each once. 21 of them were in the Facebook or Instagram app; 15 used "Need more Photos?".
+  - So people do want to talk, and the leak is after the tap.
+  - The number itself is fine: WhatsApp's own link page shows the business name "Heartwell Sofa" for 447460669864 (a made-up number shows only digits). Messages sent would reach that WhatsApp Business account.
+- **Customer walk-through (phone, live site):**
+  - WhatsApp is on every page (the floating button).
+  - A product page has six ways in: the photo's "Need more Photos?", the buy bar, "Ask about this sofa", "ask us on WhatsApp" for sizes, "Ask us anything" by the reviews, and the floating button's place taken by the buy bar.
+  - Being easy to find wasn't the problem.
+- **The likely leak:**
+  - Inside the Facebook and Instagram apps the site opened WhatsApp through the app's own link (`whatsapp://` on iPhone, an Android `intent://`).
+  - On iPhone it then jumped to wa.me 1.6 s later if the page was still showing. That jump could cancel an "Open in WhatsApp?" question the app was still asking.
+  - At least one developer report says Instagram's Android browser doesn't open `intent://` links at all.
+- **What changed** (`src/lib/whatsapp/help.ts`, `src/components/whatsapp/WhatsAppHelp.tsx`):
+  - **Each hand-off is watched.** If the page hides soon after the tap, WhatsApp (or a new tab) opened: noted as `whatsapp_opened` straight away. If the page is still on screen 2.5 s later, it didn't: noted as `whatsapp_stuck`. Both are our own visit steps (`/api/visit`), carrying the HW-WA reference and the kind of browser, nothing personal and nothing to Meta.
+  - **Admin → Leads → WhatsApp** marks each tap "WhatsApp opened" or "WhatsApp didn't open", and the visit timeline says the same.
+  - **No automatic second jump.** When WhatsApp doesn't open, a help window offers:
+    - "Open WhatsApp" (the plain wa.me link, tapped by the customer);
+    - our number with Copy (or "press and hold");
+    - "Or call us";
+    - **"Or we'll message you"**: mobile number and an optional name.
+  - **"Or we'll message you"** emails the shop at once ("Please WhatsApp Ann on 07700 900123 about the Oakland…", kind `callback_shop` in `email_log`), with a "Message them on WhatsApp" button and the HW-WA reference for New order. The number isn't stored on the site, and nothing goes to Meta. The customer is told if it didn't go through. The privacy page says so (updated 10 November).
+  - **Product pages** also have "Or leave your number and we'll WhatsApp you" under "Ask about this sofa on WhatsApp", for people who'd rather not start the chat.
+- **Checks:** types, lint, 581 tests, the WebAssembly build. On the built site at phone width, a WhatsApp tap that didn't leave the page opened the help window after 2.5 s with all four ways in. A bad number was refused, and the product page link opened the "we'll message you" form. My one local tap was saved as a test.
+- **Next:** in a day or two, Admin → Leads → WhatsApp shows whether taps open WhatsApp from each app. If iPhone or Android taps from the apps keep showing "didn't open", change how that one opens.
+
 ### 10 November 2026 — Fabrics open large; two to a row on phones
 - **Owner's request:** on the samples page a tap on a fabric opens it large in a window, with an option to choose it as a sample. The same on the product page, with "Build mine in this". Two fabrics to a row on the fabric pages, and everything right for phones.
 - **The window** (`src/components/fabrics/FabricViewer.tsx`): the fabric as large as the screen allows (a bottom sheet on phones, a panel on desktops). A tap on the fabric looks closer at that spot (2.6×, with a sharper copy loaded) and a second tap steps back. Swipe, the arrows or the arrow keys move to the next fabric. Its name, collection and code sit under it, with the page's own buttons below.

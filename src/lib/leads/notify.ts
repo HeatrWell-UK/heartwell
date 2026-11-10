@@ -5,6 +5,7 @@ import { SITE_URL } from '@/config/site'
 import { sendEmail } from '@/lib/email/send'
 import { ukPhoneDigits } from '@/lib/checkout/phone'
 import {
+  callbackShopEmail,
   contactCustomerEmail,
   contactShopEmail,
   newsletterConfirmEmail,
@@ -49,6 +50,17 @@ export async function sendContactEmails(m: { name: string; email: string; phone:
     sendEmail({ kind: 'contact_shop', to: EMAIL.shopTo, cc: EMAIL.shopCopy, replyTo: m.email, ...shop, toCustomer: false }),
     sendEmail({ kind: 'contact_customer', to: m.email, ...customer, toCustomer: true }),
   ])
+}
+
+/** "Please WhatsApp this customer", to the shop. Awaited, so the customer is told if it didn't go. */
+export async function sendCallbackEmail(c: { name: string | null; phone: string; product: string | null; reference: string | null; page: string; isTest: boolean }) {
+  const first = c.name?.trim().split(/\s+/)[0]
+  const email = callbackShopEmail({
+    ...c,
+    pageUrl: `${SITE_URL}${c.page}`,
+    whatsAppToCustomer: whatsAppTo(c.phone, `Hi${first ? ` ${first}` : ''}, it's Heartwell. You asked us to message you${c.product ? ` about the ${c.product}` : ''}. How can we help?`),
+  })
+  return sendEmail({ kind: 'callback_shop', to: EMAIL.shopTo, cc: EMAIL.shopCopy, ...email, toCustomer: false })
 }
 
 export async function sendNewsletterConfirm(email: string, token: string) {

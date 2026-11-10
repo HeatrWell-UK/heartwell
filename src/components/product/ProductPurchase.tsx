@@ -15,6 +15,7 @@ import { track } from '@/lib/tracking/browser'
 import { unitPrice } from '@/lib/catalogue/pricing'
 import { backOptions, optionLabel, productHref, sizeOptions } from '@/lib/product/helpers'
 import { morePhotosMessage } from '@/lib/whatsapp/handoff'
+import { openWhatsAppHelp } from '@/lib/whatsapp/help'
 import type { ProductPageData } from '@/lib/product/types'
 import { Gallery } from './Gallery'
 import { SaveButton } from './SaveButton'
@@ -444,6 +445,14 @@ export function ProductPurchase({
               <WhatsAppGlyph />
               Ask about this {noun} on WhatsApp
             </WhatsAppButton>
+            {/* For anyone who'd rather not start the chat (or whose WhatsApp won't open from the app they're in). */}
+            <button
+              type="button"
+              onClick={() => openWhatsAppHelp({ mode: 'callback', web: null, reference: null, productName: p.title, context: 'product-callback', newTab: false })}
+              className="min-h-11 self-center text-[15px] font-semibold text-velvet underline underline-offset-4"
+            >
+              Or leave your number and we’ll WhatsApp you
+            </button>
             {variant && price < offers.minOrder && (
               <p className="flex items-start gap-2 text-[14px] leading-snug text-slate">
                 <InfoIcon aria-hidden="true" size={18} className="mt-px shrink-0 text-velvet" />

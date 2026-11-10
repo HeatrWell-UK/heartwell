@@ -21,8 +21,12 @@ export function referenceKind(raw: string): ReferenceKind {
   return 'invalid'
 }
 
-/** What the browser notes (/api/visit). */
-export const VISIT_STEPS = ['page_view', 'add_to_basket', 'checkout_start', 'phone_click'] as const
+/**
+ * What the browser notes (/api/visit). The WhatsApp hand-off notes (10 November
+ * 2026) say whether WhatsApp opened after a tap (src/lib/whatsapp/help.ts), and
+ * when a customer left their number for us to message them.
+ */
+export const VISIT_STEPS = ['page_view', 'add_to_basket', 'checkout_start', 'phone_click', 'whatsapp_opened', 'whatsapp_stuck', 'whatsapp_callback'] as const
 export type VisitStep = (typeof VISIT_STEPS)[number]
 
 /**

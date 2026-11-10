@@ -3,12 +3,14 @@
 // Every customer-facing WhatsApp link. The markup is a plain wa.me link (it
 // works before the page's script has loaded); on tap it adds an HW-WA
 // reference to the message, saves the enquiry in the background and opens
-// WhatsApp the most reliable way for the browser the customer is in.
+// WhatsApp the most reliable way for the browser the customer is in. If
+// WhatsApp doesn't open, the help sheet steps in (src/lib/whatsapp/help.ts).
 
 import { useRef, type ReactNode } from 'react'
 import { CONTACT, whatsAppHref } from '@/config/contact'
 import { visitIds } from '@/lib/basket/store'
 import { mintReference, platformOf, whatsAppLaunch, withReference } from '@/lib/whatsapp/handoff'
+import { watchHandoff } from '@/lib/whatsapp/help'
 import { track } from '@/lib/tracking/browser'
 
 /** The last reference, kept on the device for 30 days so a later order can be linked to the chat. */
@@ -36,11 +38,12 @@ export function WhatsAppButton({ message, context, productId, variantId, product
 
   function onClick(event: React.MouseEvent<HTMLAnchorElement>) {
     let text = message
+    let reference: string | null = null
     if (enquiry) {
       // One reference per button and product choice; tapping twice reuses it.
       const key = [context, productId, variantId].join('|')
       if (!prepared.current || prepared.current.key !== key) prepared.current = { key, reference: mintReference(), sent: false }
-      const { reference } = prepared.current
+      reference = prepared.current.reference
       text = withReference(message, reference)
       if (!prepared.current.sent) {
         prepared.current.sent = true
@@ -52,20 +55,17 @@ export function WhatsAppButton({ message, context, productId, variantId, product
 
     const platform = platformOf(navigator.userAgent)
     const launch = whatsAppLaunch(number, text, platform)
+    // Did WhatsApp open? If the page is still on screen a moment later, the help sheet offers other ways in.
+    watchHandoff({ web: whatsAppLaunch(number, text, 'other').url, reference, productName, context, newTab: platform === 'other', platform })
     if (platform === 'other') {
       // Let the link do its normal job, with the reference in it.
       event.currentTarget.href = launch.url
       return
     }
     event.preventDefault()
+    // The app's own link. No automatic second jump to wa.me any more: it could cancel an "Open in WhatsApp?" question the
+    // app's browser was still asking. The help sheet's "Open WhatsApp" is the second try, tapped by the customer.
     window.location.href = launch.url
-    if (launch.fallback) {
-      const fallback = launch.fallback
-      // If WhatsApp opened, the page is hidden by now; if not, show WhatsApp's web page instead.
-      window.setTimeout(() => {
-        if (document.visibilityState === 'visible') window.location.href = fallback
-      }, 1600)
-    }
   }
 
   return (
