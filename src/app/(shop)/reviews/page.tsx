@@ -10,7 +10,7 @@ import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { ukDate } from '@/lib/format'
 
 export const metadata: Metadata = {
-  title: 'Reviews',
+  title: 'Heartwell Sofa reviews',
   description: 'Reviews of Heartwell sofas, only from people who bought from us. Made to order, delivered free to most of mainland Britain and paid for on delivery.',
   alternates: { canonical: '/reviews' },
 }

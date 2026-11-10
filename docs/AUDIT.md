@@ -156,3 +156,49 @@ Everything the audit leaves to the owner, in the order that helps most. Steps fo
 **Still open from before the audit**
 
 10. Prices for the Lilly 2 Seater and the Verona Cuddle Chair (both hidden until priced), UptimeRobot (`docs/MONITORING.md`) and the OrderFlow tidy-up.
+
+---
+
+# Search audit (10 November 2026)
+
+The owner asked for a full SEO audit of the live shop and its code. Nothing here repeats what A1–A4 fixed. Published for the owner as an artifact ("Heartwell Search Audit"); this is the record for later sessions.
+
+## How I checked
+
+- A crawl of all 135 sitemap pages (status, title, description, canonical, robots, headings, structured data, images, internal links), plus redirects, 404s and canonicals for colourway, fabric, filter, page and ad-tag addresses, and how the CDN answers search and AI crawlers.
+- The code behind titles, descriptions, structured data, category answers and the sitemap; product types and update dates in the database (read only).
+- Google UK (signed out) for the key searches and `site:`; Bing for the domain.
+- Not reached: Search Console (signed out in the browser pane) and PageSpeed Insights (it stalls while the pane is hidden). Server response from this PC was 130–450 ms; the 31 October lab scores were 97–99.
+
+## Fixed (search audit, 10 November 2026)
+
+| Page | Found | Fix |
+| --- | --- | --- |
+| Category pages | Price answers (FAQ data) and the header counted footstools, armchairs and single sofas: "fabric sofas start at £149 (the Sims Footstool)", "3+2 sofa sets start at £350 (the Roma Recliner 2 Seater)", Google's snippet "Fabric sofas. 59 pieces, from £149" | `pricedPieces` in `src/content/categories.ts`: sofas only (sets only on 3+2 sets); header "58 sofas, from £349, plus 3 other pieces"; the department's "from" prices the same |
+| All products | Structured data, breadcrumb and meta description used the product's own title without "sofa" | `productSearchName` (`src/lib/product/seo.ts`): "Ashton 5 Seater Corner Sofa, High Back"; photo alt text on tiles and the gallery too |
+| Range pages | Products never linked to their range; 10 of 19 range pages had one internal link | "Every Ashton size, with prices and measurements" under About, when the range has two or more pieces |
+| Sitemap | No `lastmod` except guides; Google still shows 31 October prices | Dates from `products.updated_at`, ranges and categories from their newest product, never before `PRODUCT_PAGES_REVISED` (`src/app/sitemap.ts`; move it on when a deploy changes every product page) |
+| 7 help pages | Titles without their search ("Care guide", "Reviews", "Guides"…) | Retitled (`docs/KEYWORDS.md`) |
+| Guides | No breadcrumb data; three guides linked to no sofas | BreadcrumbList; "Browse sofas" or "Fabric sofas" in three guides' next links |
+
+## Open findings, most important first
+
+1. **High — Google shows old prices and names** (31 October crawl). The sitemap dates help; resubmit the sitemap and request indexing for Ashton, Lilly, Malibu, Bishop and Oakland pieces (needs Search Console).
+2. **High — not in Shopping results.** "corner sofa cash on delivery" is nearly all Shopping listings with delivery and return badges. Check Merchant Center approval and free listings; the made-to-order returns question (owner list below) shows as "no returns".
+3. **High — not in Burnley's map pack** for "sofa shop burnley" (Dante Furniture 137 reviews, Sofa Smart Interiors 73). Google Business Profile category, photos, reviews; a fuller Visit us page.
+4. **Medium — six one-piece range pages** (Harrison, Olympia, Ruby, Shannon, Tango, Windsor) repeat their product page. Recommended: noindex and off the sitemap until a second piece arrives (owner's go).
+5. **Medium — missing pages:** 3 seater sofas, 2 seater sofas, chesterfield sofas (high); quick delivery sofas, velvet sofas, grey corner sofas, a "no credit check" section in the pay on delivery guide (medium). Categories in Admin with their words and questions; a line each in `docs/KEYWORDS.md`.
+6. **Medium — Visit us is thin** (about 360 words, no links to sofas): parking, what's on show, photos, "a short drive from Blackburn, Accrington, Nelson and Colne".
+7. **Medium — AI and Bing reach:** GPTBot and meta-externalagent still get 429; Bing shows only the home page.
+8. **Low — "L-shaped"** missing from the corner sofas title (Admin words). **Low —** electric recliners' heading lacks "recliner"; 50 product titles pass 60 characters once " | Heartwell" is added; 7 descriptions are 161–178 characters; `http://www.` takes two hops; the GitHub repository is still public and ranks on Bing for the domain.
+
+## What only the owner can do (search audit)
+
+1. **Sign in to Google in the Claude browser pane** so the search check can read Search Console, resubmit the sitemap and request indexing. Say **"signed in"**.
+2. **Made-to-order returns** (31 October list, item 8): now also costs Shopping visibility.
+3. **Google Business Profile:** primary category "Sofa store" (plus "Furniture store"), showroom photos, website link to `/visit-us`, review link to every delivered customer.
+4. **Bing Webmaster Tools** (31 October list, item 5). Say **"Bing added"**.
+5. **GPTBot and meta-externalagent** (31 October list, item 6).
+6. **Decide:** which collections to add, noindex for one-piece range pages, "L-shaped" in the corner sofas title. Say **"go"** and which.
+7. **Visit us facts:** parking, which sofas are on show, two or three photos.
+8. **GitHub repository private** (planned at launch): GitHub → HeatrWell-UK/heartwell → Settings → Change visibility; check the next Hostinger deploy still runs.

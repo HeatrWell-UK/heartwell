@@ -204,6 +204,31 @@ describe('answers about a category', () => {
     expect(qs.find((q) => q.id === 'price')?.a).toMatch(/^We have 2 corner sofas\. They start at £479/)
   })
 
+  it('prices sofas as sofas: a footstool or armchair listed with them never sets the "from" price', () => {
+    const products = [
+      listed('sims-footstool', { title: 'Sims Footstool', typeSlug: 'footstool', shape: 'footstool', price: 149 }),
+      listed('verona-armchair', { title: 'Verona Armchair High Back', typeSlug: 'armchair', shape: 'armchair', price: 279 }),
+      listed('verona-2', { title: 'Verona 2 Seater High Back', shape: 'straight', price: 369 }),
+      listed('ashton-5', { title: 'Ashton 5 Seater Corner High Back', price: 699 }),
+    ]
+    const fabric = categoryQuestions('fabric-sofas', { products, delivery: DELIVERY, fabricCount: 70, children: [] })
+    expect(fabric.find((q) => q.id === 'price')?.a).toMatch(/^We have 2 fabric sofas\. They start at £369 \(the Verona 2 Seater High Back\)/)
+    expect(fabric.find((q) => q.id === 'uk')?.a).toMatch(/^2 of our 2 fabric sofas/)
+    // Armchairs and footstools are what that category is about.
+    const chairs = categoryQuestions('armchairs-and-footstools', { products: products.slice(0, 2), delivery: DELIVERY, fabricCount: 70, children: [] })
+    expect(chairs.find((q) => q.id === 'price')?.a).toMatch(/^We have 2 armchairs and footstools\. They start at £149/)
+  })
+
+  it('prices 3+2 sets from the sets, not the 2 and 3 seaters listed with them', () => {
+    const products = [
+      listed('roma-2', { title: 'Roma Recliner 2 Seater Manual Sofa', shape: 'straight', price: 350 }),
+      listed('roma-32', { title: 'Roma Recliner 3+2 Seater Manual Sofa', shape: 'set', price: 599 }),
+      listed('ashton-32', { title: 'Ashton 3+2 Seater High Back', shape: 'set', price: 699 }),
+    ]
+    const qs = categoryQuestions('3-2-sofa-sets', { products, delivery: DELIVERY, fabricCount: 70, children: [] })
+    expect(qs.find((q) => q.id === 'price')?.a).toMatch(/^We have 2 sets\. They start at £599 \(the Roma Recliner 3\+2 Seater Manual Sofa\) and go up to £699/)
+  })
+
   it('has nothing to say about an empty or unknown category', () => {
     expect(categoryQuestions('corner-sofas', { products: [], delivery: DELIVERY, fabricCount: 0, children: [] })).toEqual([])
     expect(categoryQuestions('dining-tables', { products: [listed('x')], delivery: DELIVERY, fabricCount: 0, children: [] })).toEqual([])

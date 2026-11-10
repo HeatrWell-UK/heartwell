@@ -4,7 +4,7 @@ import { CaretRightIcon } from '@phosphor-icons/react/ssr'
 import { GUIDES } from '@/content/guides'
 
 export const metadata: Metadata = {
-  title: 'Guides',
+  title: 'Sofa buying guides',
   description: 'Plain answers before you buy a sofa online: cash on delivery, delivery times, sizes, corner sofas, high or scatter backs, recliners, fabrics and leather-look.',
   alternates: { canonical: '/guides' },
 }

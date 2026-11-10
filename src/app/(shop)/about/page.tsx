@@ -9,7 +9,7 @@ import { POLICIES, PROMISES } from '@/config/promises'
 const ROOM = 'https://res.cloudinary.com/iv3tp2iq/image/upload/v1792009382/Home-Page-Furniture-Background-Image-3.avif'
 
 export const metadata: Metadata = {
-  title: 'About Heartwell',
+  title: 'About Heartwell Sofa',
   description: CONTACT.visitAddress
     ? `Heartwell is an online sofa shop in ${CONTACT.visitAddress.locality}, ${CONTACT.visitAddress.county}: sofas made to order, free delivery to most of mainland Britain, and you pay on delivery.`
     : `${BRAND.shortDescription} Here’s how we work, and why.`,

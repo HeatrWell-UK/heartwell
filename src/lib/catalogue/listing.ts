@@ -8,6 +8,7 @@ import type { ListingProduct } from './listing-types'
 import type { Piece } from './clean'
 import { measurementLayout } from '@/lib/product/measurements'
 import { leadColourway } from './lead'
+import { searchName } from '@/lib/product/naming'
 
 /** Cache tag the admin revalidates when the catalogue changes (Phase 12). */
 export const CATALOGUE_TAG = 'catalogue'
@@ -43,6 +44,26 @@ export const getCategories = unstable_cache(
   ['categories-v2'],
   { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
 )
+
+/** A tile's photo described as people search: "Ashton 5 Seater Corner Sofa, High Back in grey" (src/lib/product/naming.ts). */
+function photoAlt(
+  p: { title: string; axis1_value: string | null; axis2_value: string | null; specifications: unknown },
+  typeName: string,
+  rangeName: string | null,
+  colour: string | null,
+): string {
+  const specs = (p.specifications ?? {}) as Record<string, unknown>
+  const name = searchName({
+    title: p.title,
+    typeName,
+    shape: typeof specs.shape === 'string' ? specs.shape : null,
+    axis1Value: p.axis1_value,
+    axis2Value: p.axis2_value,
+    rangeName,
+    recliner: false,
+  })
+  return colour ? `${name} in ${colour.toLowerCase()}` : name
+}
 
 /** Every live product, as category pages, search and the home page need it. */
 export const getListing = unstable_cache(
@@ -97,12 +118,12 @@ export const getListing = unstable_cache(
         axis2Value: p.axis2_value,
         categoryIds: p.product_categories.map((pc) => pc.category_id),
         image: shown?.image_url ?? null,
-        imageAlt: shown?.colour_name ? `${p.title} in ${shown.colour_name.toLowerCase()}` : p.title,
+        imageAlt: photoAlt(p, type?.name ?? 'Sofa', range?.name ?? null, shown?.colour_name ?? null),
         colours: variants.filter((v) => v.colour_name).map((v) => ({ name: v.colour_name!, hex: v.colour_hex })),
       }
     })
   },
-  ['listing-v5'],
+  ['listing-v6'],
   { revalidate: FIVE_MINUTES, tags: [CATALOGUE_TAG] },
 )
 

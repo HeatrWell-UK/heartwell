@@ -22,7 +22,7 @@ Phase 20, 18 October 2026. Every page Google can index has a search it's written
 | `/sofas/armchairs-and-footstools` | armchair and footstool to match sofa | reclining armchair | same |
 | `/ranges` | sofa ranges | | `src/app/(shop)/ranges/page.tsx` |
 | `/ranges/<range>` | "<range> sofa", "<range> corner sofa", "<range> sofa dimensions" | what colours, high back or scatter back, made to order, delivery, can I see it | `src/app/(shop)/ranges/[slug]/page.tsx`, answers in `src/lib/seo/answers.ts` |
-| `/products/<piece>` | the piece by name, size, "sofa" and cover ("ashton corner sofa", "grey velvet corner sofa", "roma recliner sofa 3+2 dimensions", "orlando electric recliner sofa") | how big, cover and colours, delivery, paying, fit, returns, extras | page title built from the piece's data ("Ashton 5 Seater Corner Sofa, High Back, Grey Plush Velvet": `src/lib/product/naming.ts`, audit A3) unless the product has its own SEO title (Admin); the heading's second line says "5 seater corner sofa, high back"; description (database); answers in `src/lib/seo/answers.ts`. The product's own title (orders, OrderFlow, feeds) is unchanged |
+| `/products/<piece>` | the piece by name, size, "sofa" and cover ("ashton corner sofa", "grey velvet corner sofa", "roma recliner sofa 3+2 dimensions", "orlando electric recliner sofa") | how big, cover and colours, delivery, paying, fit, returns, extras | page title built from the piece's data ("Ashton 5 Seater Corner Sofa, High Back, Grey Plush Velvet": `src/lib/product/naming.ts`, audit A3) unless the product has its own SEO title (Admin); the heading's second line says "5 seater corner sofa, high back"; the structured data, breadcrumb, meta description and photo alt text use the same name without the cover ("Ashton 5 Seater Corner Sofa, High Back": `productSearchName`, search audit 10 November); description (database); answers in `src/lib/seo/answers.ts`; a link to the range page when the range has two or more pieces. The product's own title (orders, OrderFlow, emails) is unchanged |
 | `/fabrics` | sofa fabrics, plush velvet colours | | `src/app/(shop)/fabrics/page.tsx` |
 | `/fabric-samples` | sofa fabric samples | | `src/app/(shop)/fabric-samples/page.tsx` |
 
@@ -51,12 +51,17 @@ Range names are trade names other UK shops use too (Verona, Roma, Orlando, Nova,
 | `/care-guide` | how to clean a velvet sofa, how to clean faux leather sofa | |
 | `/reviews` | heartwell sofa reviews | |
 | `/contact` | heartwell sofa contact | |
+| `/guides` | sofa buying guides | |
+
+Titles say the search since the search audit (10 November 2026): "How to clean a velvet or faux leather sofa", "Heartwell Sofa reviews", "Contact Heartwell Sofa: WhatsApp, phone and email", "About Heartwell Sofa", "Sofa buying guides", "Sofa fabric samples: see our fabrics at home", "Sofa ranges: every size, colour and price" (each page's `metadata`).
+
+Category questions price the sofas the page is about (`pricedPieces` in `src/content/categories.ts`): fabric, leather-look and recliner answers leave out armchairs and footstools, and the 3+2 answer counts only the sets, so no answer says "fabric sofas from £149" because a footstool is listed there.
 
 Not indexed on purpose: basket, saved, checkout, search, order and confirm links, track my order, the style guide, filtered and sorted category pages.
 
 ## Ideas for later (each would be a new page)
 
-- **Collections** for searches the categories don't cover: "chesterfield corner sofa" (Rio Chesterfield, Windsor), "grey corner sofa", "corner sofas under £500", "high back corner sofa". Each needs a category in Admin → Catalogue → Structure and its words.
+- **Collections** for searches the categories don't cover: "chesterfield corner sofa" (Rio Chesterfield, Windsor), "grey corner sofa", "corner sofas under £500", "high back corner sofa". Each needs a category in Admin → Catalogue → Structure and its words. The search audit (10 November 2026, `docs/AUDIT.md`) puts **3 seater and 2 seater sofas** and **chesterfield sofas** first, then quick delivery, velvet and grey corner sofas, and a "no credit check" section in the pay on delivery guide; all wait for the owner's go.
 - **Places** only where it's true: the Burnley showroom page already covers Burnley and Lancashire; a page per town would be thin and Google treats it as spam.
 - **TikTok** in the footer and Organization data once the profile opens.
 
@@ -77,8 +82,16 @@ Not indexed on purpose: basket, saved, checkout, search, order and confirm links
 - **Bing:** two guides indexed (was nothing); no Bing Webmaster Tools yet (owner).
 - **Public Google:** "heartwell sofa" shows the Care guide (2nd) and Contact (4th) but other shops' "Hartwell" sofas around them; product pages appear with prices once indexed (Verona 3 Seater £399, Lily 3 Seater £449).
 
+## Search audit (10 November 2026, 25 days after launch)
+
+- **Search Console** wasn't reachable (signed out in the browser pane), so no new click or indexing figures.
+- **Google, signed out:** `site:` lists the categories, several ranges and product pages, but with snippets from the 31 October crawl: Ashton U-shape £1,149 (now £1,099), Malibu corner £749 (now £649), "Sims U-Shape" (now Lilly), "Fabric sofas. 59 pieces, from £149". The sitemap now gives every product, range and category page a real change date (`src/app/sitemap.ts`), so Google has a reason to come back.
+- **"corner sofa cash on delivery"** is nearly all Shopping listings (The Online Sofa Shop, UKFurniture, Furniture Hub UK), with delivery and return badges. **"pay on delivery sofas"**: the guide wasn't on page one (it averaged 9.8 on 31 October); Stepin Furniture ("Pay at your door") is the closest rival. Google suggests "pay monthly sofas no credit check" and "quick delivery sofas" beside it.
+- **"sofa shop burnley"**: a map pack of Dante Furniture (137 reviews), Sofa Smart Interiors (73) and Burnley Bed & Sofa Centre (11); Heartwell isn't on page one. Google Business Profile and reviews decide it.
+- **Bing:** the home page shows for "heartwellsofa.co.uk", with the public GitHub profile second.
+
 ## Next
 
-1. **Search Console → Performance** again around 10 November: whether the products are indexed now that the crawl errors are gone, and how the retitled guides do. Pages with impressions but few clicks get a better title; searches that land on the wrong page get their own answer.
+1. **Search Console → Performance** as soon as the owner is signed in to Google in the browser pane (planned for 10 November, not done): resubmit the sitemap, request indexing for the pieces whose prices changed, then whether the products are indexed and how the retitled guides do. Pages with impressions but few clicks get a better title; searches that land on the wrong page get their own answer.
 2. **Bing Webmaster Tools** (owner): sign in with the Microsoft account, choose **Import from Google Search Console**, and the site and sitemap come across. IndexNow already tells Bing about every change.
 3. Re-run the search check (`docs/PROGRESS.md`, 17 October) after any big content change.

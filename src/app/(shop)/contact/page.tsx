@@ -9,7 +9,7 @@ import { ContactForm } from './ContactForm'
 import { TelLink } from '@/components/tracking/TelLink'
 
 export const metadata: Metadata = {
-  title: 'Contact us',
+  title: 'Contact Heartwell Sofa: WhatsApp, phone and email',
   description: 'Ask Heartwell about sofas, fabrics, delivery or an order: WhatsApp, phone, email or the form.',
   alternates: { canonical: '/contact' },
 }

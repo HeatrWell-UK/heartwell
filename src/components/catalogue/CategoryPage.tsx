@@ -8,7 +8,7 @@ import { formatPrice } from '@/lib/format'
 import Link from 'next/link'
 import { getCategories, getFabricLibrary, getListing, sentenceCase } from '@/lib/catalogue/listing'
 import { QuestionList } from '@/components/content/QuestionList'
-import { categoryGuides, categoryQuestions } from '@/content/categories'
+import { categoryGuides, categoryQuestions, pricedPieces } from '@/content/categories'
 import { getDeliveryInfo } from '@/lib/product/load'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { categoryHref, resolveCategory, subtreeIds, trail } from '@/lib/catalogue/tree'
@@ -70,7 +70,12 @@ export async function CategoryPage({ params }: CategoryRouteProps) {
     .map((c) => ({ name: sentenceCase(c.name), href: categoryHref(tree, c) }))
   const [intro, ...more] = paragraphs(node.description)
   const noun = products.every((p) => p.typeSlug === 'sofa') ? 'sofa' : 'piece'
-  const from = products.length ? Math.min(...products.map((p) => p.price)) : null
+  // The headline counts and prices the sofas the page is about (the sets on 3+2
+  // sets), not a footstool listed with them; the grid still shows everything.
+  const priced = pricedPieces(node.slug, products)
+  const pricedNoun = priced.length < products.length ? (node.slug === '3-2-sofa-sets' ? 'set' : 'sofa') : noun
+  const others = products.length - priced.length
+  const from = priced.length ? Math.min(...priced.map((p) => p.price)) : null
   const title = sentenceCase(node.name)
   const titleInSentence = /^[A-Z]-/.test(title) ? title : title.charAt(0).toLowerCase() + title.slice(1)
   // Answers to what people search for about this kind of sofa (src/content/categories.ts).
@@ -79,7 +84,8 @@ export async function CategoryPage({ params }: CategoryRouteProps) {
     .map((c) => {
       const ids = subtreeIds(tree, c.id)
       const inside = products.filter((p) => p.categoryIds.some((id) => ids.has(id)))
-      return { name: sentenceCase(c.name), href: categoryHref(tree, c), count: inside.length, from: inside.length ? Math.min(...inside.map((p) => p.price)) : 0 }
+      const priced = pricedPieces(c.slug, inside)
+      return { name: sentenceCase(c.name), href: categoryHref(tree, c), count: inside.length, from: priced.length ? Math.min(...priced.map((p) => p.price)) : 0 }
     })
     .filter((c) => c.count > 0)
   const questions = categoryQuestions(node.slug, { products, delivery, fabricCount: fabrics.reduce((n, c) => n + c.fabrics.length, 0), children })
@@ -101,7 +107,8 @@ export async function CategoryPage({ params }: CategoryRouteProps) {
       >
         {from !== null && (
           <p className="text-[16px] text-on-wine lg:text-[17px]">
-            {products.length} {products.length === 1 ? noun : `${noun}s`}, from <span className="font-semibold text-white">{formatPrice(from)}</span>
+            {priced.length} {priced.length === 1 ? pricedNoun : `${pricedNoun}s`}, from <span className="font-semibold text-white">{formatPrice(from)}</span>
+            {others > 0 && `, plus ${others} other ${others === 1 ? 'piece' : 'pieces'}`}
           </p>
         )}
       </VelvetHeader>

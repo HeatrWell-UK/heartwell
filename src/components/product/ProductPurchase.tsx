@@ -33,7 +33,7 @@ import { bestOffer, welcomeOff, type ShopOffers } from '@/lib/offers/welcome'
 import type { Layout } from '@/lib/product/measurements'
 import { Medallion } from '@/components/catalogue/Arcade'
 import { gallerySlides } from '@/lib/product/gallery'
-import { withNoun } from '@/lib/product/naming'
+import { searchName, withNoun } from '@/lib/product/naming'
 import { useTodaysDelivery, type DeliveryDates } from '@/lib/delivery/fresh'
 import { InfoIcon, TruckIcon } from '@phosphor-icons/react'
 
@@ -130,11 +130,13 @@ export function ProductPurchase({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewedId])
 
-  // The photos: this colourway's, the chosen fabric's, the others, the close-ups and the top view (audit A2).
+  // The photos: this colourway's, the chosen fabric's, the others, the close-ups and the top view (audit A2),
+  // described as people search ("Ashton 5 Seater Corner Sofa, High Back in grey").
+  const photoName = searchName({ title: p.title, typeName: p.typeName, shape: p.shape, axis1Value: p.axis1Value, axis2Value: p.axis2Value, rangeName: p.range?.name ?? null, recliner: false })
   const slides = useMemo(
     () =>
       gallerySlides({
-        title: p.title,
+        title: photoName,
         rangeName: p.range?.name ?? p.title,
         variant,
         gallery: p.gallery,
@@ -142,7 +144,7 @@ export function ProductPurchase({
         closeUps: p.closeUps,
         topView,
       }),
-    [p.title, p.range, p.gallery, p.closeUps, variant, fabric, topView],
+    [photoName, p.title, p.range, p.gallery, p.closeUps, variant, fabric, topView],
   )
   // Straight to the fabric's own photo once one is chosen here (not when a link opens on one).
   const [fabricPicked, setFabricPicked] = useState(false)

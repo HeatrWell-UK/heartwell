@@ -7,6 +7,7 @@
 //   offers, tracking and the basket all work in the browser.
 
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { ProductPurchase, type PurchaseProduct, type SizePlans } from '@/components/product/ProductPurchase'
@@ -28,7 +29,7 @@ import { getCategories, getListing, sentenceCase } from '@/lib/catalogue/listing
 import { categoryHref, trail } from '@/lib/catalogue/tree'
 import { pickFabric, pickVariant } from '@/lib/product/helpers'
 import { measurementLayout } from '@/lib/product/measurements'
-import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, productSearchTitle, shareImageUrl } from '@/lib/product/seo'
+import { breadcrumbJsonLd, jsonLdString, productDescription, productJsonLd, productSearchName, productSearchTitle, shareImageUrl } from '@/lib/product/seo'
 import { unitPrice } from '@/lib/catalogue/pricing'
 import type { ProductPageData } from '@/lib/product/types'
 import { tierAmount } from '@/lib/offers/paid'
@@ -119,7 +120,7 @@ export async function ProductPage({ slug, variant: sku, fabric: fabricCode }: Pr
         dangerouslySetInnerHTML={{
           __html: jsonLdString([
             productJsonLd(product, SITE_URL),
-            breadcrumbJsonLd([...crumbs.map((c) => ({ name: c.name, path: c.href })), { name: product.title, path: `/products/${product.slug}` }], SITE_URL),
+            breadcrumbJsonLd([...crumbs.map((c) => ({ name: c.name, path: c.href })), { name: productSearchName(product), path: `/products/${product.slug}` }], SITE_URL),
           ]),
         }}
       />
@@ -145,6 +146,14 @@ export async function ProductPage({ slug, variant: sku, fabric: fabricCode }: Pr
             <div className="flex flex-col gap-4">
               <h2 className="text-[28px] leading-tight lg:text-[36px]">About {name}</h2>
               <ProductDetails product={product} delivery={delivery} />
+              {/* The range page answers "<range> sofa" searches (docs/KEYWORDS.md); without this link most were reached only from /ranges. */}
+              {product.range && product.siblings.length > 1 && (
+                <p className="text-[16px]">
+                  <Link href={`/ranges/${product.range.slug}`} className="font-semibold">
+                    Every {product.range.name} size, with prices and measurements
+                  </Link>
+                </p>
+              )}
             </div>
             {/* The questions people search for, answered from this piece's own details (docs/KEYWORDS.md). */}
             <QuestionList

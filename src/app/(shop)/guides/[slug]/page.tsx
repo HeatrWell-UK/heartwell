@@ -5,7 +5,7 @@ import { ContentPage, Note } from '@/components/content/ContentPage'
 import { BRAND, OPEN_GRAPH_BASE } from '@/config/brand'
 import { SITE_URL } from '@/config/site'
 import { GUIDES, guideBySlug, type GuideBlock } from '@/content/guides'
-import { jsonLdString } from '@/lib/product/seo'
+import { breadcrumbJsonLd, jsonLdString } from '@/lib/product/seo'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -79,7 +79,21 @@ export default async function GuidePage({ params }: Props) {
       crumbs={[{ name: 'Guides', href: '/guides' }]}
       contents={guide.sections.map((s) => ({ id: s.id, label: s.heading }))}
     >
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(article) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdString([
+            article,
+            breadcrumbJsonLd(
+              [
+                { name: 'Guides', path: '/guides' },
+                { name: guide.title, path: `/guides/${guide.slug}` },
+              ],
+              SITE_URL,
+            ),
+          ]),
+        }}
+      />
       {guide.sections.map((s) => (
         <section key={s.id} aria-labelledby={s.id} className="flex flex-col gap-4">
           <h2 id={s.id}>{s.heading}</h2>

@@ -7,7 +7,7 @@ import { getSampleLimit } from '@/lib/product/load'
 import { SamplesForm, type SampleCollection } from './SamplesForm'
 
 export const metadata: Metadata = {
-  title: 'Fabric samples',
+  title: 'Sofa fabric samples: see our fabrics at home',
   description: `See our fabrics at home before you choose: up to 5 samples for ${SAMPLES.fee}, taken off your sofa when you buy.`,
   alternates: { canonical: SAMPLES.href },
 }

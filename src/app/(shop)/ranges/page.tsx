@@ -8,7 +8,7 @@ import { homeRanges } from '@/lib/home/picks'
 export const revalidate = 300
 
 export const metadata: Metadata = {
-  title: 'Shop by range',
+  title: 'Sofa ranges: every size, colour and price',
   description: 'Every Heartwell sofa range, from Ashton to Windsor: the sizes each comes in, its colours and the price it starts from.',
   alternates: { canonical: '/ranges' },
 }

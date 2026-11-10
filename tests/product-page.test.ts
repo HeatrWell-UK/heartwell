@@ -212,4 +212,28 @@ describe('search and sharing', () => {
     expect(many.length).toBeLessThanOrEqual(DESCRIPTION_MAX)
     expect(many).toMatch(/cash or bank transfer on delivery\.$/)
   })
+
+  it('names the piece with "sofa" in its structured data and description, as the title and feeds do', () => {
+    const p = {
+      slug: 'ashton-high-back-5-seater-corner',
+      title: 'Ashton 5 Seater Corner High Back',
+      typeName: 'Sofa',
+      shape: 'corner',
+      axis1Value: '5 Seater Corner',
+      axis2Value: 'High Back',
+      range: { slug: 'ashton', name: 'Ashton', axis1Name: 'Size', axis2Name: 'Back' },
+      category: null,
+      basePrice: 699,
+      madeToOrder: true,
+      variants: [variant('AHB5C-G', 'Grey')],
+      gallery: [],
+      seoDescription: null,
+    } as unknown as ProductPageData
+    const data = productJsonLd(p, 'https://example.test')
+    expect(data.name).toBe('Ashton 5 Seater Corner Sofa, High Back')
+    expect(data.hasVariant[0]?.name).toBe('Ashton 5 Seater Corner Sofa, High Back, Grey')
+    // One colour, already in the page title, gives way first when the description would pass 160 characters.
+    expect(productDescription(p)).toMatch(/^Ashton 5 Seater Corner Sofa, High Back(?: in Grey)?, £699\. Made to order\./)
+    expect(productDescription(p).length).toBeLessThanOrEqual(DESCRIPTION_MAX)
+  })
 })

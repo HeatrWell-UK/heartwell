@@ -7,7 +7,7 @@ import { POLICIES, PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
 import { fromPrice, unitPrice } from '@/lib/catalogue/pricing'
 import { productHref } from './helpers'
-import { searchTitle } from './naming'
+import { searchName, searchTitle, type NamedPiece } from './naming'
 import type { ProductPageData } from './types'
 
 const CLOUDINARY_PLAIN = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(v\d+\/.+)$/
@@ -29,20 +29,32 @@ export function shareImageUrl(src: string | null): string | null {
   return m ? `${m[1]}c_pad,b_rgb:F5F1EF,w_1200,h_630,f_jpg,q_auto/${m[2]}` : src
 }
 
-/** The page's title: the owner's search title when set, else one with "sofa" and the cover (src/lib/product/naming.ts). */
-export function productSearchTitle(p: ProductPageData): string {
-  if (p.seoTitle) return p.seoTitle
-  const recliner = [p.category?.slug, p.category?.parent?.slug].some((s) => s?.includes('recliner'))
-  return searchTitle({
+function namedPiece(p: ProductPageData): NamedPiece {
+  return {
     title: p.title,
     typeName: p.typeName,
     shape: p.shape,
     axis1Value: p.axis1Value,
     axis2Value: p.axis2Value,
     rangeName: p.range?.name ?? null,
-    recliner,
-    variants: p.variants,
-  })
+    recliner: [p.category?.slug, p.category?.parent?.slug].some((s) => s?.includes('recliner')),
+  }
+}
+
+/** The page's title: the owner's search title when set, else one with "sofa" and the cover (src/lib/product/naming.ts). */
+export function productSearchTitle(p: ProductPageData): string {
+  if (p.seoTitle) return p.seoTitle
+  return searchTitle({ ...namedPiece(p), variants: p.variants })
+}
+
+/**
+ * "Ashton 5 Seater Corner Sofa, High Back": the piece's name with the word
+ * people search for, without the cover, for the structured data, the
+ * breadcrumb and the meta description (the feeds use the same name). The
+ * product's own title (orders, OrderFlow, emails) stays as it is.
+ */
+export function productSearchName(p: ProductPageData): string {
+  return p.typeName ? searchName(namedPiece(p)) : p.title
 }
 
 export function productPrice(p: ProductPageData): number {
@@ -54,8 +66,9 @@ export function productDescription(p: ProductPageData): string {
   if (p.seoDescription) return p.seoDescription
   const colours = p.variants.map((v) => v.colourName).filter(Boolean)
   const made = p.madeToOrder ? ' Made to order.' : ''
+  const name = productSearchName(p)
   const text = (colourText: string) =>
-    `${p.title}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.brief}. ${PROMISES.payment.short}: cash or bank transfer on delivery.`
+    `${name}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.brief}. ${PROMISES.payment.short}: cash or bank transfer on delivery.`
   // Google shows about 160 characters, so a long colour list becomes a count
   // rather than cutting off how paying works at the end.
   const options = colours.length > 1
@@ -102,10 +115,11 @@ export function productJsonLd(p: ProductPageData, siteUrl: string) {
   const returns = returnPolicy(p.madeToOrder)
   const images = [...p.variants.map((v) => v.image), ...p.gallery].filter((x): x is string => Boolean(x))
   const description = productDescription(p)
+  const name = productSearchName(p)
   return {
     '@context': 'https://schema.org',
     '@type': 'ProductGroup',
-    name: p.title,
+    name,
     url,
     productGroupID: p.slug,
     description,
@@ -128,7 +142,7 @@ export function productJsonLd(p: ProductPageData, siteUrl: string) {
     variesBy: ['https://schema.org/color'],
     hasVariant: p.variants.map((v) => ({
       '@type': 'Product',
-      name: v.colourName ? `${p.title}, ${v.colourName}` : p.title,
+      name: v.colourName ? `${name}, ${v.colourName}` : name,
       description,
       sku: v.sku,
       ...(v.colourName ? { color: v.colourName } : {}),

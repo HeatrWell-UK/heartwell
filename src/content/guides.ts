@@ -118,6 +118,7 @@ export const GUIDES: Guide[] = [
     next: [
       { href: '/delivery-and-returns', label: 'Delivery and returns' },
       { href: '/faq', label: 'Questions and answers' },
+      { href: '/sofas', label: 'Browse sofas' },
     ],
   },
   {
@@ -352,6 +353,7 @@ export const GUIDES: Guide[] = [
       { href: '/fabrics', label: 'See all fabrics' },
       { href: SAMPLES.href, label: 'Order fabric samples' },
       { href: '/care-guide', label: 'Care guide' },
+      { href: '/sofas/fabric-sofas', label: 'Fabric sofas' },
     ],
   },
   {
@@ -418,6 +420,7 @@ export const GUIDES: Guide[] = [
     next: [
       { href: '/delivery-and-returns', label: 'Delivery and returns' },
       { href: '/guides/getting-ready-for-delivery-day', label: 'Getting ready for delivery day' },
+      { href: '/sofas', label: 'Browse sofas' },
     ],
   },
   {

@@ -5,7 +5,7 @@ import { CARE } from '@/config/care'
 import { POLICIES } from '@/config/promises'
 
 export const metadata: Metadata = {
-  title: 'Care guide',
+  title: 'How to clean a velvet or faux leather sofa',
   description: 'How to keep a fabric, velvet or leather-look sofa looking good: everyday care, spills, sunlight, recliners and what’s normal.',
   alternates: { canonical: '/care-guide' },
 }

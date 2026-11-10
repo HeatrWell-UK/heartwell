@@ -29,6 +29,19 @@ const cheapest = (products: ListingProduct[]) => [...products].sort((a, b) => a.
 const dearest = (products: ListingProduct[]) => [...products].sort((a, b) => b.price - a.price)[0] ?? null
 const rangeNames = (products: ListingProduct[]) => [...new Set(products.map((p) => p.rangeName).filter((n): n is string => Boolean(n)))]
 
+/**
+ * The pieces a category's prices and counts are about: its sofas, so fabric
+ * sofas don't "start at £149" because a footstool is listed with them, and on
+ * 3+2 sets only the sets (the 2 and 3 seaters sold on their own are listed
+ * there too). Armchairs and footstools keep everything; a category with none
+ * of the pieces it's about keeps everything too.
+ */
+export function pricedPieces(slug: string, products: ListingProduct[]): ListingProduct[] {
+  if (slug === 'armchairs-and-footstools') return products
+  const picked = products.filter((p) => p.typeSlug === 'sofa' && (slug !== '3-2-sofa-sets' || p.shape === 'set'))
+  return picked.length ? picked : products
+}
+
 /** "Our corner sofas start at £479 (the Verona 4 Seater Corner) and go up to £1,099." */
 function priceAnswer(noun: string, products: ListingProduct[]): string | null {
   const low = cheapest(products)
@@ -168,7 +181,7 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
           q: 'What is a 3+2 sofa set?',
           a: 'A three-seater and a two-seater sofa in the same design and colour, sold together, so the room looks finished from day one. Both arrive on the same delivery.',
         },
-        { id: 'price', q: 'How much is a 3+2 sofa set?', a: priceAnswer('3+2 sofa sets', f.products) ?? '' },
+        { id: 'price', q: 'How much is a 3+2 sofa set?', a: priceAnswer('sets', pricedPieces('3-2-sofa-sets', f.products)) ?? '' },
         threes.length && twos.length
           ? {
               id: 'size',
@@ -186,7 +199,8 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
 
   'fabric-sofas': {
     questions: (f) => {
-      const ukMade = f.products.filter((p) => p.madeInUk && p.madeToOrder).length
+      const sofas = pricedPieces('fabric-sofas', f.products)
+      const ukMade = sofas.filter((p) => p.madeInUk && p.madeToOrder).length
       return [
         {
           id: 'best',
@@ -201,9 +215,9 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
           link: { href: '/fabrics', label: 'See every fabric' },
         },
         ukMade
-          ? { id: 'uk', q: 'Are your fabric sofas made in the UK?', a: `${ukMade} of our ${f.products.length} fabric sofas are made to order in the UK; each sofa’s page says where it’s made.`, link: MADE }
+          ? { id: 'uk', q: 'Are your fabric sofas made in the UK?', a: `${ukMade} of our ${sofas.length} fabric sofas are made to order in the UK; each sofa’s page says where it’s made.`, link: MADE }
           : null,
-        { id: 'price', q: 'How much is a fabric sofa?', a: priceAnswer('fabric sofas', f.products) ?? '' },
+        { id: 'price', q: 'How much is a fabric sofa?', a: priceAnswer('fabric sofas', sofas) ?? '' },
         deliveryQuestion('a fabric sofa', f),
       ]
     },
@@ -231,7 +245,7 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
         link: LEATHER,
       },
       { id: 'clean', q: 'How do I clean a leather-look sofa?', a: CARE.other.join(' '), link: { href: '/care-guide', label: 'The care guide' } },
-      { id: 'price', q: 'How much is a leather-look sofa?', a: priceAnswer('leather-look sofas', f.products) ?? '' },
+      { id: 'price', q: 'How much is a leather-look sofa?', a: priceAnswer('leather-look sofas', pricedPieces('leather-sofas', f.products)) ?? '' },
       deliveryQuestion('a leather-look sofa', f),
     ],
     guides: [LEATHER, RECLINER, PAYING],
@@ -239,8 +253,10 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
 
   recliners: {
     questions: (f) => {
-      const electric = f.products.filter((p) => /electric/i.test(p.reclining ?? ''))
-      const manual = f.products.filter((p) => /manual/i.test(p.reclining ?? ''))
+      // Sofa against sofa: a manual recliner armchair isn't a cheaper recliner sofa.
+      const sofas = pricedPieces('recliners', f.products)
+      const electric = sofas.filter((p) => /electric/i.test(p.reclining ?? ''))
+      const manual = sofas.filter((p) => /manual/i.test(p.reclining ?? ''))
       const lowE = cheapest(electric)
       const lowM = cheapest(manual)
       return [
@@ -260,7 +276,7 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
           q: 'Do your recliners have USB ports and cup holders?',
           a: 'Our electric recliners do: Hannah, Nova, Orlando, Oxford and Michigan all have USB ports and cup holders built in. Nova and Michigan add storage, and Michigan has wireless charging and Bluetooth speakers too. The manual Roma recliners keep it simple. Each recliner’s page lists exactly what’s included.',
         },
-        { id: 'price', q: 'How much is a recliner sofa?', a: priceAnswer('recliners', f.products) ?? '' },
+        { id: 'price', q: 'How much is a recliner sofa?', a: priceAnswer('recliner sofas', sofas) ?? '' },
         deliveryQuestion('a recliner', f),
         payQuestion('a recliner'),
       ]
@@ -281,7 +297,7 @@ export const CATEGORY_CONTENT: Record<string, CategoryContent> = {
         q: 'Which electric recliners have USB ports?',
         a: 'All of them: Hannah, Nova, Orlando, Oxford and Michigan have USB ports and cup holders built in, and Michigan adds USB-C, wireless charging and Bluetooth speakers. Each sofa’s page lists exactly what’s included.',
       },
-      { id: 'price', q: 'How much is an electric recliner sofa?', a: priceAnswer('electric recliners', f.products) ?? '' },
+      { id: 'price', q: 'How much is an electric recliner sofa?', a: priceAnswer('electric recliners', pricedPieces('electric-recliners', f.products)) ?? '' },
       deliveryQuestion('an electric recliner', f),
       payQuestion('an electric recliner'),
     ],
