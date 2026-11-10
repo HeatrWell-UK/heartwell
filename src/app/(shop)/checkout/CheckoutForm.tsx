@@ -22,7 +22,7 @@ import { areaForPostcode, chargeRange } from '@/lib/delivery/areas'
 import { deliveryDaysText, formatDeliveryDate, isNoDeliveryDay } from '@/lib/delivery/window'
 import type { AreaDelivery } from '@/lib/product/types'
 import { PROMISES } from '@/config/promises'
-import { isUkPhone } from '@/lib/checkout/phone'
+import { formatUkPhone, isUkPhone, phoneProblem } from '@/lib/checkout/phone'
 import type { PlainError } from '@/lib/checkout/order'
 import { PayRows } from '@/components/checkout/PayRows'
 import { refreshBasket } from '../basket/actions'
@@ -199,7 +199,8 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const validate = (): Partial<Record<FieldKey, string>> => {
     const e: Partial<Record<FieldKey, string>> = {}
     if (name.trim().length < 2) e.name = 'Please enter your full name.'
-    if (!isUkPhone(phone)) e.phone = 'Please enter a UK phone number, like 07700 900123.'
+    const phoneIssue = phoneProblem(phone)
+    if (phoneIssue) e.phone = phoneIssue
     if (email.trim() && !EMAIL.test(email.trim())) e.email = 'Please check your email address.'
     if (!canOrderHere) e.postcode = address.outcome.kind === 'quote' ? 'This postcode needs a delivery quote.' : 'Please enter your postcode and press Find address.'
     else if (address.line.trim().length < 5) e.address = 'Please choose or type your address.'
@@ -298,15 +299,27 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           <Field label="Full name" id={`${id}-name`} error={err('name')} errorId={`${id}-name-error`}>
             <TextInput id={`${id}-name`} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!err('name') || undefined} aria-describedby={describedBy('name')} />
           </Field>
-          <Field label="Mobile number" help="We ring to book your delivery day." helpId={`${id}-phone-help`} id={`${id}-phone`} error={err('phone')} errorId={`${id}-phone-error`}>
+          <Field label="Mobile number" help="We ring this number to book your delivery day, so please check it." helpId={`${id}-phone-help`} id={`${id}-phone`} error={err('phone')} errorId={`${id}-phone-error`}>
             <TextInput
               id={`${id}-phone`}
               type="tel"
               inputMode="tel"
               autoComplete="tel"
+              enterKeyHint="next"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              onBlur={() => reminder && saveReminder(true)}
+              onChange={(e) => {
+                setPhone(e.target.value)
+                if (err('phone') && isUkPhone(e.target.value)) setFieldErrors((f) => ({ ...f, phone: undefined }))
+              }}
+              onBlur={() => {
+                // Checked as soon as they leave the field, and shown back spaced out (07700 900123) so a slip is easy to spot.
+                if (phone.trim()) {
+                  const problem = phoneProblem(phone)
+                  setFieldErrors((f) => ({ ...f, phone: problem ?? undefined }))
+                  if (!problem) setPhone(formatUkPhone(phone))
+                }
+                if (reminder) saveReminder(true)
+              }}
               aria-invalid={!!err('phone') || undefined}
               aria-describedby={describedBy('phone', `${id}-phone-help`)}
             />
@@ -509,6 +522,14 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
               Add another piece
             </Link>
           </div>
+        )}
+        {isUkPhone(phone) && (
+          <p className="text-[15px] leading-snug">
+            We’ll ring you on <strong className="font-semibold">{formatUkPhone(phone)}</strong> to book delivery.{' '}
+            <button type="button" onClick={() => document.getElementById(`${id}-phone`)?.focus()} className="font-semibold text-velvet underline underline-offset-4">
+              Not right? Change it
+            </button>
+          </p>
         )}
         <button
           type="submit"

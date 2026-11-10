@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatUkPhone, isUkPhone, ukPhoneDigits } from '@/lib/checkout/phone'
+import { formatUkPhone, isUkPhone, phoneProblem, ukPhoneDigits } from '@/lib/checkout/phone'
 import { explainOrderError, OrderInput, orderPayload, pricingPayload, testReason } from '@/lib/checkout/order'
 import { askToConfirmHref, copyBlock, customerOrderEmail, escapeHtml, shopConfirmedEmail, shopOrderEmail, type OrderEmailData } from '@/lib/email/order-emails'
 
@@ -17,6 +17,15 @@ describe('UK phone numbers', () => {
 
   it('refuses what isn’t a UK number', () => {
     for (const raw of ['', '12345', '+1 212 555 0100', '07700', 'call me']) expect(isUkPhone(raw)).toBe(false)
+  })
+
+  it('refuses a mobile with a digit missing or extra, and says so', () => {
+    expect(isUkPhone('07330 12345')).toBe(false)
+    expect(isUkPhone('077009001234')).toBe(false)
+    expect(phoneProblem('07330 12345')).toBe('UK mobile numbers have 11 digits, starting 07. This one has 10, so a digit is missing. Please check it.')
+    expect(phoneProblem('077009001234')).toBe('UK mobile numbers have 11 digits, starting 07. This one has 12. Please check it.')
+    expect(phoneProblem('')).toContain('Please enter your mobile number')
+    expect(phoneProblem('07700 900123')).toBeNull()
   })
 
   it('formats for display and the order record', () => {
