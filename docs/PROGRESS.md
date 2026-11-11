@@ -52,6 +52,24 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 11 November 2026 — Checkout: the phone number can't be one digit short; easier details
+- **Owner's report:** an order came in with a wrong phone number; make entering details easy and make sure the number is right. Everything else in checkout stays as it is: the owner said no to a phone-only order, and there's no database change.
+- **Why:** HW-100119 (9 November) has a mobile with 10 digits. The old check accepted 9 or 10 digits after the 0, because a few landlines are that short, so a mobile missing a digit got through. That customer gave an email address.
+- **The phone check** (`src/lib/checkout/phone.ts`):
+  - After the 0, a mobile must be 7 and nine more digits (11 in all).
+  - Landlines must be 01 with nine or ten more, or 02/03 with ten.
+  - 08, 09 and other numbers are refused.
+  - The same check covers checkout, samples, contact, "we'll message you" and staff New order.
+  - `phoneProblem` says what's wrong: "UK mobile numbers have 11 digits, starting 07. This one has 10, so a digit is missing."
+- **At checkout:**
+  - The number is checked as soon as the customer leaves the field, and the error clears as soon as it's right.
+  - A good number is spaced out (07700 900123).
+  - Above "Place order": "We'll ring you on 07700 900123 to book delivery. Not right? Change it".
+  - The email field suggests a fix for slips (gmial.com → gmail.com, gmail.co.uk → gmail.com) with "Yes, use that", never for real look-alikes (bt.com, me.com, mac.com) (`src/lib/checkout/email-typos.ts`).
+  - Name fields capitalise words; email has no autocorrect or capitals; the keyboard's Next key moves on.
+- **Checks:** types, lint, 586 tests, the WebAssembly build. On the built checkout at phone width: a 10-digit mobile is refused with that message; corrected, it's spaced out and shown above the button. The email hint corrects ann@gmial.com in one tap. No sideways scrolling.
+- **Noticed:** 8 of the 9 website orders since 7 November are still waiting for the customer to press Confirm.
+
 ### 10 November 2026 — Search audit (SEO): fixes live, findings for the owner
 - **Owner's request:** a full SEO audit of the live shop and its code (`/marketing:seo-audit`). Findings and the owner's list: `docs/AUDIT.md`, "Search audit (10 November 2026)", and the artifact "Heartwell Search Audit". Nothing A1–A4 fixed is repeated.
 - **Checked:** all 135 sitemap pages crawled; redirects, 404s, canonicals for colourway, fabric, filter and ad addresses; crawler access; the code behind titles, structured data, category answers and the sitemap; Google UK and Bing results. **Not reached:** Search Console (signed out in the browser pane) and PageSpeed (stalls while the pane is hidden).
