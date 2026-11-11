@@ -52,6 +52,26 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 11 November 2026 — WhatsApp opens with the plain link from the Facebook app too
+- **Owner's question:** some taps in Admin → Leads → WhatsApp say "WhatsApp didn't open"; can that be fixed for customers?
+- **What the hand-off notes showed** (10 November afternoon to 11 November):
+
+  | Phone and app | Link tried first | Result |
+  | --- | --- | --- |
+  | iPhone, Facebook app | `whatsapp://` | didn't open in 6 of 6 |
+  | Same customer, the help sheet's "Open WhatsApp" (plain wa.me link) | — | opened 7 seconds later |
+  | Samsung, Facebook app | `intent://` | didn't open (1 of 1) |
+  | Android, Chrome | plain wa.me link | opened in 2 of 2 |
+
+- **Fix** (`whatsAppLaunch` in `src/lib/whatsapp/handoff.ts`, `WhatsAppButton`):
+  - Every WhatsApp button now uses the plain wa.me link, followed as an ordinary tap on a link (the same thing that worked from the help sheet).
+  - It opens in the same page inside the Facebook and Instagram apps, and in a new tab in ordinary browsers.
+  - The apps' own `whatsapp://` and `intent://` links are gone.
+  - The watch and the help sheet stay as the safety net.
+  - `docs/PLAN.md`'s WhatsApp line is updated.
+- **Checks:** types, lint, 586 tests, the WebAssembly build. On the built product page with a Facebook iPhone, a Facebook Samsung and a Safari browser identity, the tap leaves the button pointing at wa.me: no new tab in the apps, a new tab in Safari. My local taps were saved as tests.
+- **Next:** Admin → Leads → WhatsApp over the next day or two; taps from the Facebook app should now say "WhatsApp opened". If some still don't, the help sheet catches them.
+
 ### 11 November 2026 — Checkout: the phone number can't be one digit short; easier details
 - **Owner's report:** an order came in with a wrong phone number; make entering details easy and make sure the number is right. Everything else in checkout stays as it is: the owner said no to a phone-only order, and there's no database change.
 - **Why:** HW-100119 (9 November) has a mobile with 10 digits. The old check accepted 9 or 10 digits after the 0, because a few landlines are that short, so a mobile missing a digit got through. That customer gave an email address.

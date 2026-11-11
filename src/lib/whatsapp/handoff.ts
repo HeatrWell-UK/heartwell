@@ -6,11 +6,9 @@
 // opens straight away; the enquiry is saved in the background with the same
 // reference (the database accepts it in the same format it makes itself).
 //
-// Opening WhatsApp: a normal https://wa.me link works in Safari and Chrome,
-// but the Instagram and Facebook in-app browsers often show WhatsApp's web
-// page instead of opening the app. There the app's own link is used:
-// whatsapp:// on iPhone (with wa.me as a fallback if the app isn't
-// installed) and an Android intent with wa.me as its built-in fallback.
+// Opening WhatsApp: the plain https://wa.me link, tapped like any link, in
+// every browser, the Facebook and Instagram apps included (see whatsAppLaunch:
+// their own whatsapp:// and intent:// links were measured failing there).
 
 /** The database's alphabet for codes: no 0/O or 1/I to misread. */
 export const REFERENCE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
@@ -58,18 +56,19 @@ export function platformOf(userAgent: string): Platform {
 }
 
 export interface WhatsAppLaunch {
-  /** Where to go first. */
+  /** The plain wa.me link with the message. */
   url: string
-  /** Where to go if the app didn't open (iPhone only). */
-  fallback: string | null
+  /** A new tab in ordinary browsers; the same page in the Facebook and Instagram apps, where that is what opens WhatsApp. */
+  newTab: boolean
 }
 
+/**
+ * How a tap opens WhatsApp: the plain wa.me link, followed as an ordinary tap
+ * on a link, everywhere (11 November 2026). The hand-off notes showed the app's
+ * own links failing inside the Facebook app: `whatsapp://` on iPhone didn't
+ * open WhatsApp in 6 taps out of 6, nor `intent://` on a Samsung (1 of 1),
+ * while the plain link opened it from Facebook on iPhone and from Chrome.
+ */
 export function whatsAppLaunch(number: string, text: string, platform: Platform): WhatsAppLaunch {
-  const encoded = encodeURIComponent(text)
-  const web = `https://wa.me/${number}?text=${encoded}`
-  if (platform === 'ios-in-app') return { url: `whatsapp://send?phone=${number}&text=${encoded}`, fallback: web }
-  if (platform === 'android-in-app') {
-    return { url: `intent://send?phone=${number}&text=${encoded}#Intent;scheme=whatsapp;S.browser_fallback_url=${encodeURIComponent(web)};end`, fallback: null }
-  }
-  return { url: web, fallback: null }
+  return { url: `https://wa.me/${number}?text=${encodeURIComponent(text)}`, newTab: platform === 'other' }
 }

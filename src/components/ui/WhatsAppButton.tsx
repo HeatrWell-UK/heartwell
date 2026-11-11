@@ -56,16 +56,13 @@ export function WhatsAppButton({ message, context, productId, variantId, product
     const platform = platformOf(navigator.userAgent)
     const launch = whatsAppLaunch(number, text, platform)
     // Did WhatsApp open? If the page is still on screen a moment later, the help sheet offers other ways in.
-    watchHandoff({ web: whatsAppLaunch(number, text, 'other').url, reference, productName, context, newTab: platform === 'other', platform })
-    if (platform === 'other') {
-      // Let the link do its normal job, with the reference in it.
-      event.currentTarget.href = launch.url
-      return
-    }
-    event.preventDefault()
-    // The app's own link. No automatic second jump to wa.me any more: it could cancel an "Open in WhatsApp?" question the
-    // app's browser was still asking. The help sheet's "Open WhatsApp" is the second try, tapped by the customer.
-    window.location.href = launch.url
+    watchHandoff({ web: launch.url, reference, productName, context, newTab: launch.newTab, platform })
+    // The link does its normal job, as a real tap on a real link (what opens WhatsApp from the Facebook app), with the
+    // reference in the message. In the apps' browsers it stays in the same page rather than a new tab.
+    const link = event.currentTarget
+    link.href = launch.url
+    if (launch.newTab) link.target = '_blank'
+    else link.removeAttribute('target')
   }
 
   return (
