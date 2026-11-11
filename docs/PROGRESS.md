@@ -52,6 +52,10 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 12 November 2026 — Meta ads paused
+- **Owner:** "Pause everything the whole campaign right now." Campaign 120255251575220416 set to paused; Meta's live read-back shows it paused and no campaign on the account running. Total spend £234.48 since 5 November.
+- **Still open from 11 November:** Purchase sending is on manual (HW-100124's Purchase is held); the six unconfirmed ad orders need a WhatsApp follow-up.
+
 ### 11 November 2026 — Meta ads after six days: orders come in, but most don't confirm
 - **Owner's worry:** the budget is burning; only a couple of confirmed orders; the rest don't answer calls or say they aren't ready.
 - **Meta, 5 to 11 November:** £217.91 spent (Rio £127.81, collection £90.10); 806 link clicks (about 27p each); 81 basket adds and 40 checkouts started (Meta's count, which waits for cookie consent).
