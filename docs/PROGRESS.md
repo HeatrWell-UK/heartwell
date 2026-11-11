@@ -52,6 +52,13 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 11 November 2026 — Meta ads after six days: orders come in, but most don't confirm
+- **Owner's worry:** the budget is burning; only a couple of confirmed orders; the rest don't answer calls or say they aren't ready.
+- **Meta, 5 to 11 November:** £217.91 spent (Rio £127.81, collection £90.10); 806 link clicks (about 27p each); 81 basket adds and 40 checkouts started (Meta's count, which waits for cookie consent).
+- **Orders from the ads: 12, worth £8,381.** Confirmed: 100113 (£769, WhatsApp, V1), 100118 (£979, Nova recliner 3+2, R3) and 100124 (£499, WhatsApp, Verona, R3). Cancelled: 100117 ("made by mistake") and 100125 (confirmed, then the customer asked to cancel). Not confirmed: 100115, 100116, 100119, 100120, 100122 and 100123 (£4,004). One more cancelled order, 100121 ("wanted a payment plan"), had no ad tags. Every unconfirmed customer but one (100120) got the order email with the confirm link.
+- **What it means:** about £18 of ads per order placed but £73 per confirmed order. All three confirmed sales came from the Rio ad set (R3 "pay nothing upfront" brought 9 of the 12 orders); the collection ad set spent £90 for one unconfirmed order. The weak point is confirmation, not traffic: an order costs the customer nothing, so it's easy to place and easy to ignore. The two website orders that confirmed did so within a minute of ordering; the unconfirmed ones were left for hours or days.
+- **Recommended to the owner:** pause the collection ad set (keeps the Rio ad set's £30 a day); contact every new order on WhatsApp within five minutes, with the confirm link, instead of calling later; chase today's six by WhatsApp; consider a small deposit for website orders (a change to the pay-on-delivery rule, so the owner's call); decide on 19 November whether to carry on.
+
 ### 11 November 2026 — WhatsApp opens with the plain link from the Facebook app too
 - **Owner's question:** some taps in Admin → Leads → WhatsApp say "WhatsApp didn't open"; can that be fixed for customers?
 - **What the hand-off notes showed** (10 November afternoon to 11 November):
