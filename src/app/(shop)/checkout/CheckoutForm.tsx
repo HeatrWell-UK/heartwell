@@ -23,6 +23,7 @@ import { deliveryDaysText, formatDeliveryDate, isNoDeliveryDay } from '@/lib/del
 import type { AreaDelivery } from '@/lib/product/types'
 import { PROMISES } from '@/config/promises'
 import { formatUkPhone, isUkPhone, phoneProblem } from '@/lib/checkout/phone'
+import { emailSuggestion } from '@/lib/checkout/email-typos'
 import type { PlainError } from '@/lib/checkout/order'
 import { PayRows } from '@/components/checkout/PayRows'
 import { refreshBasket } from '../basket/actions'
@@ -56,6 +57,8 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
+  // "Did you mean …@gmail.com?", worked out when they leave the email field.
+  const [emailHint, setEmailHint] = useState<string | null>(null)
   const [address, setAddress] = useState<AddressValue>({ postcode: '', outcome: { kind: 'empty' }, line: '' })
   const [floor, setFloor] = useState(0)
   const [hasLift, setHasLift] = useState(false)
@@ -297,7 +300,17 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         <fieldset className={sectionClass}>
           <Legend n={1}>Your details</Legend>
           <Field label="Full name" id={`${id}-name`} error={err('name')} errorId={`${id}-name-error`}>
-            <TextInput id={`${id}-name`} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!err('name') || undefined} aria-describedby={describedBy('name')} />
+            <TextInput
+              id={`${id}-name`}
+              autoComplete="name"
+              autoCapitalize="words"
+              spellCheck={false}
+              enterKeyHint="next"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              aria-invalid={!!err('name') || undefined}
+              aria-describedby={describedBy('name')}
+            />
           </Field>
           <Field label="Mobile number" help="We ring this number to book your delivery day, so please check it." helpId={`${id}-phone-help`} id={`${id}-phone`} error={err('phone')} errorId={`${id}-phone-error`}>
             <TextInput
@@ -338,12 +351,39 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
               type="email"
               inputMode="email"
               autoComplete="email"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              enterKeyHint="next"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => reminder && saveReminder(true)}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setEmailHint(null)
+              }}
+              onBlur={() => {
+                setEmailHint(emailSuggestion(email))
+                if (reminder) saveReminder(true)
+              }}
               aria-invalid={!!err('email') || undefined}
               aria-describedby={describedBy('email', `${id}-email-help`)}
             />
+            {emailHint && (
+              <p role="status" className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px]">
+                <span>
+                  Did you mean <strong className="font-semibold">{emailHint}</strong>?
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail(emailHint)
+                    setEmailHint(null)
+                  }}
+                  className="min-h-11 font-semibold text-velvet underline underline-offset-4"
+                >
+                  Yes, use that
+                </button>
+              </p>
+            )}
           </Field>
         </fieldset>
 

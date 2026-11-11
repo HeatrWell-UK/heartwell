@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { formatUkPhone, isUkPhone, phoneProblem, ukPhoneDigits } from '@/lib/checkout/phone'
+import { emailSuggestion } from '@/lib/checkout/email-typos'
 import { explainOrderError, OrderInput, orderPayload, pricingPayload, testReason } from '@/lib/checkout/order'
 import { askToConfirmHref, copyBlock, customerOrderEmail, escapeHtml, shopConfirmedEmail, shopOrderEmail, type OrderEmailData } from '@/lib/email/order-emails'
 
@@ -26,6 +27,14 @@ describe('UK phone numbers', () => {
     expect(phoneProblem('077009001234')).toBe('UK mobile numbers have 11 digits, starting 07. This one has 12. Please check it.')
     expect(phoneProblem('')).toContain('Please enter your mobile number')
     expect(phoneProblem('07700 900123')).toBeNull()
+  })
+
+  it('suggests the right email domain for a slip of the finger, never for a real one', () => {
+    expect(emailSuggestion('ann@gmial.com')).toBe('ann@gmail.com')
+    expect(emailSuggestion('Ann@Hotmail.co.ik')).toBe('ann@hotmail.co.uk')
+    expect(emailSuggestion('ann@gmail.co.uk')).toBe('ann@gmail.com')
+    expect(emailSuggestion('ann@yahooo.co.uk')).toBe('ann@yahoo.co.uk')
+    for (const fine of ['ann@gmail.com', 'ann@bt.com', 'ann@mac.com', 'ann@me.com', 'ann@my-company.co.uk', 'ann', '']) expect(emailSuggestion(fine)).toBeNull()
   })
 
   it('formats for display and the order record', () => {
