@@ -9,12 +9,12 @@ import { ButtonLink } from '@/components/ui/Button'
 import { TextArea, TextInput } from '@/components/ui/Field'
 import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/cn'
-import { useBasket, visitIds, rememberPostcode } from '@/lib/basket/store'
+import { useBasket, rememberPostcode, reminderId } from '@/lib/basket/store'
 import { OfferStrip } from '@/components/offer/OfferStrip'
 import { useWelcome, WelcomeNote } from '@/components/offer/WelcomeOffer'
 import { MinimumNote } from '@/components/checkout/MinimumNote'
 import { shortOfMinimum, type ShopOffers } from '@/lib/offers/welcome'
-import { isQaVisit, readConsent, sessionFbclid, touchForOrder, track } from '@/lib/tracking/browser'
+import { isQaVisit, readConsent, sessionFbclid, touchForOrder, track, visitIds } from '@/lib/tracking/browser'
 import { TRACKING } from '@/config/tracking'
 import { useHydrated } from '@/lib/basket/use-hydrated'
 import { deliveryLines, floorName, quoteDelivery, type DeliverySettings } from '@/lib/delivery/pricing'
@@ -151,10 +151,11 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
 
   const leadSent = useRef(false)
   const saveReminder = (opt: boolean) => {
-    const visitor = visitIds()
-    if (!opt || !visitor) return
+    if (!opt) return
+    const reminder = reminderId(true)
+    if (!reminder) return
     void saveBasketReminder({
-      visitor,
+      reminderId: reminder,
       email: EMAIL.test(email.trim()) ? email.trim() : '',
       phone,
       emailOptIn: EMAIL.test(email.trim()),
@@ -244,6 +245,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
       notes,
       expectedTotal: shown.total,
       visitor: visitIds(),
+      reminderId: reminderId(),
       website,
       attribution: { touch: touchForOrder(), fbclid: sessionFbclid()?.fbclid ?? null },
       qa: isQaVisit(),
@@ -340,7 +342,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           <Field
             label="Email"
             optional
-            help="We email your order and the link to confirm it. No email? We’ll WhatsApp you instead."
+            help="If you give us an email address, we’ll send your order details and a backup confirmation link."
             helpId={`${id}-email-help`}
             id={`${id}-email`}
             error={err('email')}
@@ -552,7 +554,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
         </p>
         {madeToOrder && (
           <p className="rounded-[var(--radius-field)] bg-white p-3 text-sm leading-snug">
-            Made-to-order pieces are built for you, so they can’t be returned for a change of mind. Faults are always covered.
+            Standard catalogue orders have a 14-day change-of-mind period, including standard fabric choices.
           </p>
         )}
         {short > 0 && (
@@ -580,7 +582,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           {placing ? 'Placing your order…' : 'Place order: pay nothing today'}
         </button>
         <p className="text-[13px] leading-snug text-slate">
-          We’ll email and WhatsApp you a link to confirm your order, then ring to book the day. By placing your order you agree to our{' '}
+          See <Link href="/delivery-and-returns#returns">returns and transport costs</Link> before ordering. Confirm your order on the next page. We’ll then call to arrange delivery. By placing your order you agree to our{' '}
           <Link href="/terms">terms</Link>.
         </p>
       </section>

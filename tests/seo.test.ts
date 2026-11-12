@@ -33,7 +33,6 @@ describe('structured data for the shop', () => {
       applicableCountry: 'GB',
       returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
       merchantReturnDays: POLICIES.changeOfMindDays,
-      returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
     })
     expect(org.location).toEqual({ '@id': `${SITE}/visit-us#store` })
   })

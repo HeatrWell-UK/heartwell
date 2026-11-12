@@ -18,7 +18,6 @@ export const dynamic = 'force-dynamic'
 
 const Body = z.object({
   visitorId: z.uuid(),
-  arrivalId: z.uuid().optional(),
   search: z.string().max(2000),
 })
 
@@ -37,7 +36,6 @@ export async function POST(request: Request) {
   const { data, error } = await createAdminClient().rpc('issue_paid_offer_entitlement', {
     p_visitor_id: parsed.data.visitorId,
     p_source: source,
-    p_arrival_id: parsed.data.arrivalId,
   })
   if (error || !data) {
     console.error('offer entitlement failed', error?.message)

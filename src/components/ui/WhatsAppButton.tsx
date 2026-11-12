@@ -8,10 +8,9 @@
 
 import { useRef, type ReactNode } from 'react'
 import { CONTACT, whatsAppHref } from '@/config/contact'
-import { visitIds } from '@/lib/basket/store'
 import { mintReference, platformOf, whatsAppLaunch, withReference } from '@/lib/whatsapp/handoff'
 import { watchHandoff } from '@/lib/whatsapp/help'
-import { track } from '@/lib/tracking/browser'
+import { isQaVisit, track, visitIds } from '@/lib/tracking/browser'
 
 /** The last reference, kept on the device for 30 days so a later order can be linked to the chat. */
 const LAST_REFERENCE = 'hw-wa-ref'
@@ -95,7 +94,7 @@ function saveEnquiry(e: { reference: string; context: string; productId?: string
       headers: { 'Content-Type': 'application/json' },
       keepalive: true,
       // The path only: ad click IDs in the address wait for the cookie choice (Phase 14).
-      body: JSON.stringify({ ...e, page: window.location.pathname, visit: visitIds() }),
+      body: JSON.stringify({ ...e, page: window.location.pathname, visit: visitIds(), qa: isQaVisit() }),
     }).catch(() => {})
   } catch {
     // Never let saving the enquiry get in the way of WhatsApp opening.

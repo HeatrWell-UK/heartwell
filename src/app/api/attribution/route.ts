@@ -31,8 +31,7 @@ export async function POST(request: Request) {
   const jar = await cookies()
   if (jar.get(STAFF_COOKIE)?.value === '1') return done()
   const consent = parseConsent(jar.get(CONSENT_COOKIE)?.value)
-  // Our own statistics are on unless the visitor switched them off.
-  if (!consent.statistics) return done()
+  if (!consent.marketing) return done()
   if (!rateLimit(`attribution:${await clientIp()}`, 60, 60_000)) return done()
   const parsed = Body.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return done()

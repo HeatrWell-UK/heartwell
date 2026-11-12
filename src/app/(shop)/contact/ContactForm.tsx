@@ -5,7 +5,7 @@ import { CheckCircleIcon, WarningCircleIcon } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/Button'
 import { Field, Select, TextArea, TextInput } from '@/components/ui/Field'
 import { CONTACT_TOPICS, type ContactTopic } from '@/lib/leads/topics'
-import { visitIds } from '@/lib/basket/store'
+import { visitIds } from '@/lib/tracking/browser'
 import { sendContactMessage, type ContactField } from './actions'
 
 export function ContactForm() {

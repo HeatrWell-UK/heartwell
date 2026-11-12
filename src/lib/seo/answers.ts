@@ -5,7 +5,7 @@
 // answer can't disagree with the page or checkout.
 
 import { CONTACT, visitBookingText, visitHoursText } from '@/config/contact'
-import { POLICIES, PROMISES } from '@/config/promises'
+import { PROMISES } from '@/config/promises'
 import type { FaqItem } from '@/content/faq'
 import type { RangeSummary } from '@/lib/catalogue/listing'
 import type { ListingProduct } from '@/lib/catalogue/listing-types'
@@ -149,10 +149,8 @@ export function fitAnswer(p: Pick<ProductPageData, 'shape' | 'dimensions'>, noun
   return parts.join(' ')
 }
 
-export function returnsAnswer(madeToOrder: boolean): string {
-  return madeToOrder
-    ? `Because it’s made to order for you, the ${POLICIES.changeOfMindDays}-day change-of-mind right doesn’t apply. You can change or cancel it within ${POLICIES.madeToOrderChangeWorkingDays} working days of ordering, before it’s made, and faults are always covered.`
-    : `Yes. You have ${POLICIES.changeOfMindDays} days from delivery to change your mind; you pay for the return, and we refund you within ${POLICIES.refundDays} days of it coming back. Faults are always covered.`
+export function returnsAnswer(): string {
+  return PROMISES.returns.long
 }
 
 /** The questions on a product's page, each answered from its own details. */
@@ -166,7 +164,7 @@ export function productQuestions(p: ProductPageData, facts: AnswerFacts): Answer
     { id: 'delivery', q: 'How long does delivery take, and what does it cost?', a: `${deliveryAnswer(d)} Enter your postcode above to see your own dates.`, link: { href: '/delivery-and-returns', label: 'Delivery and returns' } },
     { id: 'pay', q: 'When do I pay?', a: PAYING_ANSWER, link: { href: '/guides/how-paying-on-delivery-works', label: 'How paying on delivery works' } },
     { id: 'fit', q: `Will the ${noun} fit through my door?`, a: fitAnswer(p, noun) },
-    { id: 'returns', q: 'Can I return it if I change my mind?', a: returnsAnswer(p.madeToOrder) },
+    { id: 'returns', q: 'Can I return it if I change my mind?', a: returnsAnswer() },
     d
       ? {
           id: 'extras',
@@ -290,10 +288,10 @@ export function rangeQuestions(range: RangeSummary, facts: AnswerFacts): Answer[
       id: 'made',
       q: `Is the ${range.name} made to order?`,
       a: allMade
-        ? `Yes, it’s made${madeInUk ? ' in the UK' : ''} in the colour you choose, and still arrives in the usual delivery time. ${returnsAnswer(true)}`
+        ? `Yes, it’s made${madeInUk ? ' in the UK' : ''} in the colour you choose, and still arrives in the usual delivery time. ${returnsAnswer()}`
         : noneMade
-          ? `No, it’s ready-made, in the colours shown. ${returnsAnswer(false)}`
-          : 'Some sizes are made to order and some are ready-made: each size’s page says which, and what that means for returns.',
+          ? `No, it’s ready-made, in the colours shown. ${returnsAnswer()}`
+          : 'Some sizes are made to order and some are ready-made: each size’s page says which.',
       ...(range.madeToOrder ? { link: { href: '/guides/what-made-to-order-means', label: 'What made to order means' } } : {}),
     },
     { id: 'delivery', q: `How long does the ${range.name} take to arrive?`, a: deliveryAnswer(facts.delivery), link: { href: '/delivery-and-returns', label: 'Delivery and returns' } },

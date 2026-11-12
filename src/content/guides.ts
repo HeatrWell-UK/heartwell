@@ -162,7 +162,7 @@ export const GUIDES: Guide[] = [
         heading: 'Changing your mind',
         blocks: [
           {
-            p: `Because it’s made to your choice, the ${POLICIES.changeOfMindDays}-day change-of-mind right doesn’t apply to a made-to-order piece. You can still change or cancel it within ${POLICIES.madeToOrderChangeWorkingDays} working days of ordering, before it goes into production, and faults are always covered, exactly as for everything else.`,
+            p: PROMISES.returns.long,
           },
           { p: 'That’s why we suggest checking the measurements and seeing a sample before you order.' },
         ],

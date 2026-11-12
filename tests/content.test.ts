@@ -6,7 +6,7 @@ import { POLICIES } from '@/config/promises'
 import { LISTED_NAMES, STORAGE_GROUPS } from '@/content/cookies'
 import { allFaqItems, faqGroups } from '@/content/faq'
 import { GUIDES } from '@/content/guides'
-import { organizationJsonLd, returnPolicy } from '@/lib/product/seo'
+import { organizationJsonLd, shopReturnPolicy } from '@/lib/product/seo'
 
 const SRC = join(__dirname, '..', 'src')
 const SHOP = join(SRC, 'app', '(shop)')
@@ -112,9 +112,8 @@ describe('policy pages and links', () => {
 })
 
 describe('structured data', () => {
-  it('describes returns honestly: 14 days for ready-made pieces, none for made to order', () => {
-    expect(returnPolicy(false)).toMatchObject({ returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: POLICIES.changeOfMindDays })
-    expect(returnPolicy(true)).toMatchObject({ returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted' })
+  it('advertises a 14-day return window for standard catalogue orders', () => {
+    expect(shopReturnPolicy('https://example.test')).toMatchObject({ returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow', merchantReturnDays: POLICIES.changeOfMindDays })
   })
 
   it('names the shop, its contact details and (once set) its address', () => {
@@ -126,10 +125,9 @@ describe('structured data', () => {
 })
 
 describe('order confirmation email', () => {
-  it('states the change-of-mind rule, with the made-to-order exemption when it applies', async () => {
+  it('covers standard catalogue and fabric choices in the order email', async () => {
     const { returnsLine } = await import('@/lib/email/order-emails')
-    expect(returnsLine(false)).toBe(`Ready-made pieces can be returned within ${POLICIES.changeOfMindDays} days of delivery if you change your mind. Faults are always covered.`)
-    expect(returnsLine(true)).toMatch(/^Your order includes a made-to-order piece, made for you, so it can’t be returned for a change of mind\./)
+    expect(returnsLine()).toContain('including sofas made in a fabric we offer')
   })
 
   it('says who we are and where, with links to the policies', async () => {

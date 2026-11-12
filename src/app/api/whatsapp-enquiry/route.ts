@@ -3,6 +3,9 @@
 // failure here never reaches the customer.
 
 import { z } from 'zod'
+import { cookies } from 'next/headers'
+import { CONSENT_COOKIE, STAFF_COOKIE, isPrivatePath } from '@/config/tracking'
+import { parseConsent } from '@/lib/tracking/consent'
 import { APP_ENV } from '@/config/env'
 import { clientIp, rateLimit } from '@/lib/http/rate-limit'
 import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/admin'
@@ -17,6 +20,7 @@ const Body = z.object({
   productId: z.uuid().optional(),
   variantId: z.uuid().optional(),
   productName: z.string().max(200).optional(),
+  qa: z.boolean().optional(),
   visit: z.object({ visitorId: z.uuid(), sessionId: z.uuid(), arrivalId: z.uuid() }).nullable().optional(),
 })
 
@@ -28,6 +32,9 @@ export async function POST(request: Request) {
   const parsed = Body.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return done()
   const e = parsed.data
+  const jar = await cookies()
+  if (jar.get(STAFF_COOKIE)?.value === '1' || isPrivatePath(e.page)) return done()
+  const visit = parseConsent(jar.get(CONSENT_COOKIE)?.value).marketing ? e.visit : null
   const { error } = await createAdminClient().rpc('create_whatsapp_enquiry', {
     p_input: {
       reference: e.reference,
@@ -36,9 +43,9 @@ export async function POST(request: Request) {
       product_id: e.productId ?? null,
       variant_id: e.variantId ?? null,
       product_name: e.productName ?? null,
-      attribution: e.visit ? { visitor_id: e.visit.visitorId, session_id: e.visit.sessionId, arrival_id: e.visit.arrivalId } : {},
+      attribution: visit ? { visitor_id: visit.visitorId, session_id: visit.sessionId, arrival_id: visit.arrivalId } : {},
       // Everything outside the live site is a test.
-      is_test: APP_ENV !== 'production',
+      is_test: APP_ENV !== 'production' || e.qa === true,
     },
   })
   if (error) console.error('whatsapp enquiry not saved', e.reference, error.message)

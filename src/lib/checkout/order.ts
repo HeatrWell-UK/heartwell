@@ -51,6 +51,7 @@ export const OrderInput = QuoteInput.extend({
   notes: z.string().trim().max(1000),
   expectedTotal: z.number().nonnegative(),
   visitor: Visitor.nullable(),
+  reminderId: z.uuid().nullish(),
   /** A field people never see; bots fill it in. */
   website: z.string().max(200),
   attribution: Attribution.optional(),
@@ -105,15 +106,15 @@ export interface OrderTracking {
 
 /**
  * The order's attribution and tracking fields. Campaign tags and the landing
- * page are first-party (kept unless statistics were switched off); Meta's
+ * page are first-party (kept only with advertising consent); Meta's
  * identifiers, the IP address and the browser go only with marketing consent.
  */
 export function trackingPayload(o: Pick<OrderInput, 'visitor' | 'attribution'>, t: OrderTracking | undefined, now = new Date()) {
   const marketing = t?.consent.marketing ?? false
-  const touch = t?.consent.statistics === false ? null : (o.attribution?.touch ?? null)
+  const touch = marketing ? (o.attribution?.touch ?? null) : null
   const fbclid = marketing ? (o.attribution?.fbclid ?? null) : null
   const attribution = {
-    ...(o.visitor ? { visitor_id: o.visitor.visitorId, session_id: o.visitor.sessionId, arrival_id: o.visitor.arrivalId } : {}),
+    ...(marketing && o.visitor ? { visitor_id: o.visitor.visitorId, session_id: o.visitor.sessionId, arrival_id: o.visitor.arrivalId } : {}),
     ...(touch
       ? {
           utm_source: touch.source ?? null,

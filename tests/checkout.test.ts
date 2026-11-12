@@ -155,13 +155,13 @@ describe('order emails', () => {
       shop: { email: 'shop@example.test', phoneDisplay: '07460 669864', whatsAppHref: 'https://wa.me/447460669864' },
       now: new Date('2026-10-06T10:00:00Z'),
     })
-    expect(e.subject).toBe('Please confirm your Heartwell order HW-100123')
+    expect(e.subject).toBe('Your Heartwell order HW-100123')
     expect(e.html).toContain(confirmUrl)
     expect(e.html).toContain('Confirm my order')
     expect(e.html).toContain('£1,008')
     expect(e.html).toContain('Ann &lt;b&gt;Smith&lt;/b&gt;'.split(' ')[0])
     expect(e.html).not.toContain('<b>Smith</b>')
-    expect(e.html).toContain('can’t be returned for a change of mind')
+    expect(e.html).toContain('including sofas made in a fabric we offer')
     expect(e.text).toContain(confirmUrl)
     expect(e.text).toContain('To pay on delivery: £1,008')
     expect(e.text).toContain('Tuesday 20 October')

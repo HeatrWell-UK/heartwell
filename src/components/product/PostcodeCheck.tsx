@@ -5,7 +5,6 @@ import { CheckIcon, InfoIcon, WarningCircleIcon } from '@phosphor-icons/react'
 import { WhatsAppOrEmail } from '@/components/ui/WhatsAppButton'
 import { recallPostcode, rememberPostcode } from '@/lib/basket/store'
 import { areaForPostcode } from '@/lib/delivery/areas'
-import { deliveryDaysText } from '@/lib/delivery/window'
 import { formatPrice } from '@/lib/format'
 import { postcodeOutcome, type PostcodeOutcome } from '@/lib/product/helpers'
 import { useTodaysDelivery, type DeliveryDates } from '@/lib/delivery/fresh'
@@ -21,11 +20,11 @@ const noSubscription = () => () => {}
 interface Props {
   /** The dates as the page was built; brought up to today in the browser. */
   delivery: DeliveryDates
-  noDeliveryDays: number[]
+  itemPrice?: number
   className?: string
 }
 
-export function PostcodeCheck({ delivery, noDeliveryDays, className = 'mt-6' }: Props) {
+export function PostcodeCheck({ delivery, itemPrice, className = '' }: Props) {
   const { windowLabel, areas } = useTodaysDelivery(delivery)
   const id = useId()
   // The postcode checked last time on this device, read once storage is available.
@@ -47,7 +46,7 @@ export function PostcodeCheck({ delivery, noDeliveryDays, className = 'mt-6' }: 
   }
 
   return (
-    <section aria-labelledby={`${id}-label`} className={`${className} flex flex-col gap-3 rounded-[var(--radius-card)] bg-stone px-4 py-[18px]`}>
+    <section aria-labelledby={`${id}-label`} className={className + ' flex flex-col gap-2 rounded-[var(--radius-card)] bg-stone px-3.5 py-3'}>
       <form
         className="flex flex-col gap-3"
         onSubmit={(e) => {
@@ -56,13 +55,13 @@ export function PostcodeCheck({ delivery, noDeliveryDays, className = 'mt-6' }: 
         }}
       >
         <label id={`${id}-label`} htmlFor={id} className="text-base font-semibold">
-          Check delivery to your postcode
+          {itemPrice === undefined ? 'Check delivery to your postcode' : 'Check your delivery date and total'}
         </label>
         <div className="flex gap-2">
           <input
             id={id}
             value={value}
-            onChange={(e) => setTyped(e.target.value)}
+            onChange={(e) => { setTyped(e.target.value); setChecked({ kind: 'empty' }) }}
             autoComplete="postal-code"
             autoCapitalize="characters"
             spellCheck={false}
@@ -78,7 +77,7 @@ export function PostcodeCheck({ delivery, noDeliveryDays, className = 'mt-6' }: 
         </div>
       </form>
 
-      <div role="status" aria-live="polite">
+      <div role="status" aria-live="polite" className="empty:hidden">
         {outcome.kind === 'invalid' && (
           <p id={`${id}-error`} className="flex items-start gap-2 text-[15px] font-semibold text-error">
             <WarningCircleIcon aria-hidden="true" size={20} className="mt-0.5 shrink-0" />
@@ -95,7 +94,7 @@ export function PostcodeCheck({ delivery, noDeliveryDays, className = 'mt-6' }: 
             <strong className="font-semibold">
               Delivery to {outcome.area} ({area.name}) is {formatPrice(area.charge)}.
             </strong>{' '}
-            Orders there take {area.minWorkingDays} to {area.maxWorkingDays} working days, so most arrive {area.windowLabel}.
+            Most orders arrive {area.windowLabel}.
           </Result>
         )}
         {outcome.kind === 'depends' && (
@@ -118,11 +117,12 @@ export function PostcodeCheck({ delivery, noDeliveryDays, className = 'mt-6' }: 
             .
           </Result>
         )}
+        {outcome.kind === 'mainland' && itemPrice !== undefined && (
+          <p className="px-1 pt-2 text-[15px] font-semibold">Total with delivery: {formatPrice(itemPrice + (area?.charge ?? 0))}</p>
+        )}
       </div>
-
-      <p className="text-sm leading-snug text-slate">
-        {deliveryDaysText(noDeliveryDays)} Upstairs delivery, assembly and taking your old sofa away can be added at checkout.
-      </p>
+      {outcome.kind === 'empty' && <p className="text-sm text-slate">Free delivery for most postcodes. Usually {windowLabel}.</p>}
+      {outcome.kind === 'mainland' && <p className="text-sm text-slate">Any delivery extras you choose are priced at checkout.</p>}
     </section>
   )
 }

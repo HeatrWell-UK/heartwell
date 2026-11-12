@@ -1,7 +1,9 @@
 'use server'
 
+import { CONSENT_COOKIE } from '@/config/tracking'
+import { parseConsent } from '@/lib/tracking/consent'
 import { after } from 'next/server'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { APP_ENV } from '@/config/env'
 import { clientIp, rateLimit } from '@/lib/http/rate-limit'
@@ -46,6 +48,7 @@ export async function requestSamples(input: unknown): Promise<SampleResult> {
     return { ok: false, message: (field && words[field]) ?? 'Please check your details.', field }
   }
   const r = parsed.data
+  const marketing = parseConsent((await cookies()).get(CONSENT_COOKIE)?.value).marketing
   // A bot filled in the hidden field: say thanks, keep nothing.
   if (r.website) return { ok: true }
   if (!isUkPhone(r.phone)) return { ok: false, message: 'Please give a UK mobile or landline, so we can arrange the £5 with you.', field: 'phone' }
@@ -65,8 +68,8 @@ export async function requestSamples(input: unknown): Promise<SampleResult> {
       postcode: r.postcode,
       shipping_address: r.address,
       material_ids: r.materialIds,
-      visitor_id: r.visit?.visitorId ?? null,
-      session_id: r.visit?.sessionId ?? null,
+      visitor_id: marketing ? (r.visit?.visitorId ?? null) : null,
+      session_id: marketing ? (r.visit?.sessionId ?? null) : null,
       customer_ip: await clientIp(),
       customer_user_agent: h.get('user-agent')?.slice(0, 400) ?? null,
       is_test: isTest,

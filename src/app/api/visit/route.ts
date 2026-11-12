@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   if (!SUPABASE_SECRET_CONFIGURED) return done()
   const jar = await cookies()
   if (jar.get(STAFF_COOKIE)?.value === '1') return done()
-  if (!parseConsent(jar.get(CONSENT_COOKIE)?.value).statistics) return done()
+  if (!parseConsent(jar.get(CONSENT_COOKIE)?.value).marketing) return done()
   if (!rateLimit(`visit:${await clientIp()}`, 120, 60_000)) return done()
   const parsed = Body.safeParse(await request.json().catch(() => null))
   if (!parsed.success || isPrivatePath(parsed.data.path)) return done()

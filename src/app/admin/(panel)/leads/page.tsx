@@ -202,6 +202,7 @@ async function Enquiries({ q }: { q: string }) {
           Find
         </button>
       </form>
+      <p className="text-sm text-zinc-600">These are website taps. Check the WhatsApp Business inbox for messages customers actually sent. The reference in each message matches this list.</p>
       {rows.length === 0 ? (
         <Empty>{q ? 'No enquiry with that reference.' : 'No WhatsApp taps yet.'}</Empty>
       ) : (

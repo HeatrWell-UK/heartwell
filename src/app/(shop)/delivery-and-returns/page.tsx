@@ -25,7 +25,7 @@ const CONTENTS = [
   { id: 'damaged', label: 'If something arrives damaged' },
   { id: 'changes', label: 'Changes and cancellations before delivery' },
   { id: 'returns', label: 'Changing your mind after delivery' },
-  { id: 'made-to-order', label: 'Made-to-order pieces' },
+  { id: 'made-to-order', label: 'Bespoke orders' },
   { id: 'faults', label: 'Faults and the guarantee' },
 ]
 
@@ -36,6 +36,10 @@ export default async function DeliveryAndReturnsPage() {
   const d = settings?.delivery
   const areas = settings?.areas ?? []
   const days = POLICIES.changeOfMindDays
+  const cancellationEmail = 'mailto:' + CONTACT.email + '?' + new URLSearchParams({
+    subject: 'Cancel my Heartwell order',
+    body: 'I wish to cancel my order for:\nOrder reference:\nDate ordered or delivered:\nName:\nAddress:\nDate:',
+  }).toString().replaceAll('+', '%20')
 
   return (
     <ContentPage
@@ -45,7 +49,7 @@ export default async function DeliveryAndReturnsPage() {
           Free delivery to most of mainland Britain, nothing to pay until your furniture is in your room, and plain rules if anything goes wrong.
         </p>
       }
-      updated="2026-10-17"
+      updated="2026-11-13"
       contents={CONTENTS}
       figure={
         <div className="hw-panel flex items-center gap-5 px-5 py-6 sm:gap-8 sm:px-8">
@@ -180,10 +184,10 @@ export default async function DeliveryAndReturnsPage() {
       <h2 id="changes">Changes and cancellations before delivery</h2>
       <ul>
         <li>
-          <strong>Ready-made pieces:</strong> you can change or cancel at any time before delivery. As you haven’t paid anything, there’s nothing to refund.
+          <strong>Standard catalogue orders:</strong> you can cancel before delivery, including orders in a colour or fabric we offer.
         </li>
         <li>
-          <strong>Made-to-order pieces:</strong> tell us within {POLICIES.madeToOrderChangeWorkingDays} working days of ordering, before your piece goes
+          <strong>Bespoke orders:</strong> tell us within {POLICIES.madeToOrderChangeWorkingDays} working days of ordering, before your piece goes
           into production.
         </li>
       </ul>
@@ -191,26 +195,23 @@ export default async function DeliveryAndReturnsPage() {
 
       <h2 id="returns">Changing your mind after delivery</h2>
       <p>
-        For ready-made pieces you have {days} days from the day it’s delivered to cancel, for any reason. That’s your right under the Consumer Contracts
-        Regulations. Tell us by email, WhatsApp or phone that you want to cancel (you don’t have to give a reason), then:
+        For standard catalogue orders you have {days} days from delivery to tell us you want to cancel. This includes sofas made to order in our standard colours, fabrics or sizes. Tell us by email, WhatsApp or phone that you want to cancel. You can use our
+        <a className="ml-1" href={cancellationEmail}>cancellation email template</a> or send your own message.
       </p>
       <ol>
-        <li>Send it back within {days} days of telling us. You arrange and pay for the return, and sofas are large, so ask us first if you’d like a guide to what it might cost.</li>
+        <li>Send it back within {days} days of telling us. Contact us before ordering for the estimated transport cost for your sofa and postcode. You pay the direct return cost if we gave you the required cost information before you ordered. Where we didn’t, we cover the direct return cost.</li>
         <li>Send it back in the condition it reached you, wrapped to protect it. You can look at and try it as you would in a shop; if it comes back worn or damaged we may take the loss in value off your refund.</li>
         <li>
-          We refund what you paid for it by bank transfer within {POLICIES.refundDays} days of getting it back. Delivery extras you chose and we’ve already
-          done (carrying upstairs, assembly, taking furniture away) aren’t refunded.
+          We refund the price and the cost of standard outbound delivery within {POLICIES.refundDays} days of receiving the furniture or your proof of return, whichever comes first. Any deduction or exclusion will follow your statutory rights.
         </li>
       </ol>
 
-      <h2 id="made-to-order">Made-to-order pieces</h2>
+      <h2 id="made-to-order">Bespoke orders</h2>
       <p>
-        A made-to-order piece is made for you, in the fabric, colour and size you chose, so it can’t be sold to anyone else. That’s why the {days}-day
-        change-of-mind right doesn’t apply to it: it’s the standard exemption in the Consumer Contracts Regulations, and we show it on those pieces before
-        you order. If you’re unsure about a fabric, <Link href="/fabric-samples">order samples</Link> first.
+        The change-of-mind right may not apply to furniture made to your own specifications, such as a sofa built to a custom width outside our catalogue.
+        We explain any exception before you agree to a bespoke order. Your rights for faulty goods still apply.
       </p>
-      <p>Faults are different: a made-to-order piece is covered exactly like everything else.</p>
-
+      <p>You can <Link href="/fabric-samples">order fabric samples</Link> before choosing a fabric.</p>
       <h2 id="faults">Faults and the guarantee</h2>
       <p>
         If something is faulty, the Consumer Rights Act protects you: within 30 days of delivery you can reject it for a full refund, and after that we’ll

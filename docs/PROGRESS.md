@@ -52,6 +52,14 @@ Newest entry first. Each entry records what was done, where things stand, anythi
 
 ## Log
 
+### 13 November 2026 — Website corrections after the Meta audit
+
+- Website orders can be confirmed on the receipt using the same customer confirmation as the email link. Checkout describes the receipt step and optional email backup.
+- Product pages group the postcode estimate, sofa price and delivery total. Fabric samples and WhatsApp are linked beside the price.
+- Standard catalogue orders, including standard fabric options, have a 14-day cancellation period. The returns page, terms, product details, email and structured data describe the same policy.
+- Optional visit attribution and Meta conversion sharing now require advertising consent. Google Analytics requires analytics consent. A fresh cookie choice is requested. Offer and basket reminder storage serve their own shop functions.
+- The owner deferred address lookup. Return transport estimates and genuine showroom footage are still to be supplied. Existing review requests run after delivery. The WhatsApp Business inbox is the source for messages received.
+
 ### 12 November 2026 — Meta ads paused
 - **Owner:** "Pause everything the whole campaign right now." Campaign 120255251575220416 set to paused; Meta's live read-back shows it paused and no campaign on the account running. Total spend £234.48 since 5 November.
 - **Still open from 11 November:** Purchase sending is on manual (HW-100124's Purchase is held); the six unconfirmed ad orders need a WhatsApp follow-up.

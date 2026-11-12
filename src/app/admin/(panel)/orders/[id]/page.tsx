@@ -158,7 +158,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         ) : (
           <p className="rounded-lg bg-zinc-50 px-3 py-2.5 text-center text-sm font-semibold text-zinc-600">{status === 'cancelled' ? 'Cancelled: no next step.' : 'All done.'}</p>
         )}
-        {status === 'pending_cod' && <p className="text-xs text-zinc-500">Usually the customer confirms from their email. Mark it confirmed yourself only if they confirmed by phone or WhatsApp.</p>}
+        {status === 'pending_cod' && <p className="text-xs text-zinc-500">Customers can confirm on their order page or from their email. Mark it confirmed yourself only after they confirm by phone or WhatsApp.</p>}
         {tell && !moved && (
           <a href={tell} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-center rounded-lg px-4 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-300">
             {status === 'pending_cod' ? 'Ask them to confirm on WhatsApp' : `WhatsApp ${order.customer_name.split(/\s+/)[0]} about this`}

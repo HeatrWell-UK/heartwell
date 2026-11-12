@@ -92,19 +92,6 @@ export function jsonLdString(data: unknown): string {
 // one "free to GB" claim would be wrong there. Google takes delivery costs from
 // Merchant Center's settings, by postcode (docs/MERCHANT-CENTER.md).
 
-/** Ready-made: 14 days to change your mind, return at the customer's cost. Made to order: exempt. */
-export function returnPolicy(madeToOrder: boolean) {
-  return madeToOrder
-    ? { '@type': 'MerchantReturnPolicy', applicableCountry: 'GB', returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted' }
-    : {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'GB',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: POLICIES.changeOfMindDays,
-        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
-      }
-}
-
 export function productJsonLd(p: ProductPageData, siteUrl: string) {
   const url = `${siteUrl}/products/${p.slug}`
   // Made-to-order pieces are on sale now and arrive in the same delivery window,
@@ -112,7 +99,7 @@ export function productJsonLd(p: ProductPageData, siteUrl: string) {
   // schema.org/MadeToOrder (Rich Results Test, 17 October 2026); the return
   // policy below is what tells it they're made to order.
   const availability = 'https://schema.org/InStock'
-  const returns = returnPolicy(p.madeToOrder)
+  const returns = shopReturnPolicy(siteUrl)
   const images = [...p.variants.map((v) => v.image), ...p.gallery].filter((x): x is string => Boolean(x))
   const description = productDescription(p)
   const name = productSearchName(p)
@@ -178,11 +165,7 @@ const postalAddress = (a: NonNullable<typeof CONTACT.visitAddress>) => ({
   addressCountry: 'GB',
 })
 
-/**
- * The shop's return policy, for Google: ${POLICIES.changeOfMindDays} days on ready-made pieces,
- * the customer paying the return. Each made-to-order product overrides it on
- * its own page (no change-of-mind returns).
- */
+/** Change-of-mind policy for standard catalogue orders. */
 export function shopReturnPolicy(siteUrl: string) {
   return {
     '@type': 'MerchantReturnPolicy',
@@ -190,7 +173,6 @@ export function shopReturnPolicy(siteUrl: string) {
     returnPolicyCountry: 'GB',
     returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
     merchantReturnDays: POLICIES.changeOfMindDays,
-    returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
     refundType: 'https://schema.org/FullRefund',
     merchantReturnLink: `${siteUrl}/delivery-and-returns`,
   }

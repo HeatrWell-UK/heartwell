@@ -3,8 +3,8 @@
 // The shop's tags, loaded only when they're allowed:
 // - Meta Pixel: on the live domain, in test or live mode, after the visitor
 //   accepts marketing cookies, never on private pages or staff devices.
-// - GA4: on the live domain, in Consent Mode (cookieless until accepted).
-// It also notes how each visit began (first-party) and shows the cookie
+// - GA4: on the live domain after analytics consent.
+// It also records advertising attribution after consent and shows the cookie
 // question until it's answered.
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
@@ -12,9 +12,8 @@ import { usePathname } from 'next/navigation'
 import { APP_ENV } from '@/config/env'
 import { isPrivatePath, liveAllowed, TRACKING, type TrackingMode } from '@/config/tracking'
 import { parseConsent } from '@/lib/tracking/consent'
-import { captureQa, captureTouch, consentStore, isQaVisit, isStaffDevice, noteVisit, readConsent, sessionFbclid } from '@/lib/tracking/browser'
+import { captureQa, captureTouch, consentStore, isQaVisit, isStaffDevice, noteVisit, visitIds } from '@/lib/tracking/browser'
 import { redactedLocation } from '@/lib/tracking/redact'
-import { visitIds } from '@/lib/basket/store'
 import { ConsentBanner, ConsentSettings } from './ConsentBanner'
 
 function loadPixel(pixelId: string, externalId: string | null) {
@@ -76,36 +75,29 @@ export function Tracking({ mode }: { mode: TrackingMode }) {
     return () => window.removeEventListener('hw:consent-open', open)
   }, [])
 
-  // How the visit began, and each page it views (our own statistics, unless switched off).
+  // Record arrivals and browsing only after permission for advertising measurement.
   useEffect(() => {
     captureQa()
-    if (isStaffDevice() || isQaVisit() || !readConsent().statistics) return
+    if (isStaffDevice() || isQaVisit() || !consent.marketing || isPrivatePath(pathname)) return
     const visit = visitIds()
     const arrival = captureTouch()
     if (visit && arrival) {
       const { touch, fbclid } = arrival
-      postAttribution({ visit, touch: { ...touch, at: undefined }, ...(readConsent().marketing && fbclid ? { fbclid } : {}) })
+      postAttribution({ visit, touch: { ...touch, at: undefined }, ...(fbclid ? { fbclid } : {}) })
     }
     noteVisit('page_view')
-  }, [pathname])
-
-  // A later "Accept" adds this visit's ad click to its record.
-  useEffect(() => {
-    if (!consent.marketing || !consent.statistics || isStaffDevice() || isQaVisit()) return
-    const click = sessionFbclid()
-    const visit = visitIds()
-    if (click && visit) postAttribution({ visit, touch: {}, fbclid: click.fbclid })
-  }, [consent.marketing, consent.statistics])
+  }, [pathname, consent.marketing])
 
   // Load the tags that are allowed, and keep Google's consent state in step.
   useEffect(() => {
     const state = (window.__hwTracking ??= { pixel: false, gtag: false })
     const allowed = liveAllowed(window.location.hostname, APP_ENV) && mode !== 'dry_run' && !isStaffDevice() && !isQaVisit() && !isPrivatePath(pathname)
-    if (allowed && TRACKING.ga4Id) {
+    if (allowed && TRACKING.ga4Id && consent.analytics) {
       loadGtag(TRACKING.ga4Id)
       state.gtag = true
     }
-    if (window.gtag) {
+    if (TRACKING.ga4Id) Object.assign(window, { ['ga-disable-' + TRACKING.ga4Id]: !allowed || !consent.analytics })
+    if (window.gtag && allowed && consent.analytics) {
       const g = (on: boolean) => (on ? 'granted' : 'denied')
       window.gtag('consent', 'update', { analytics_storage: g(consent.analytics), ad_storage: g(consent.marketing), ad_user_data: g(consent.marketing), ad_personalization: g(consent.marketing) })
     }
@@ -118,13 +110,14 @@ export function Tracking({ mode }: { mode: TrackingMode }) {
     }
   }, [mode, pathname, consent.marketing, consent.analytics])
 
-  // Page views (redacted for GA4; none on private pages).
   useEffect(() => {
-    if (isPrivatePath(pathname)) return
-    const state = window.__hwTracking
-    if (state?.pixel && consent.marketing) window.fbq?.('track', 'PageView')
-    if (state?.gtag) window.gtag?.('event', 'page_view', { page_location: redactedLocation(window.location.href), page_title: document.title })
+    if (!isPrivatePath(pathname) && consent.marketing && window.__hwTracking?.pixel) window.fbq?.('track', 'PageView')
   }, [pathname, consent.marketing])
+
+  useEffect(() => {
+    if (isPrivatePath(pathname) || !consent.analytics || !window.__hwTracking?.gtag) return
+    window.gtag?.('event', 'page_view', { page_location: redactedLocation(window.location.href), page_title: document.title })
+  }, [pathname, consent.analytics])
 
   const askable = APP_ENV !== 'production' || Boolean(TRACKING.metaPixelId || TRACKING.ga4Id)
   // The server draws the banner for everyone, so it's there at first paint; a

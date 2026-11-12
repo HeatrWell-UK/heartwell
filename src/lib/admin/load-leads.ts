@@ -109,7 +109,7 @@ export async function loadEnquiries(search: string) {
 
 /**
  * Whether WhatsApp opened after each tap (noted since 10 November 2026, src/lib/whatsapp/help.ts): "opened" if it
- * opened at any try, "stuck" if it never did. Null before then, or when the visitor switched our statistics off.
+ * opened at any try, "stuck" if it never did. An outcome is available when the visitor allowed advertising measurement.
  */
 async function handoffOutcomes(db: Awaited<ReturnType<typeof createClient>>, since: string | null) {
   const outcomes = new Map<string, 'opened' | 'stuck'>()

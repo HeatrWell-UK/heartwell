@@ -60,7 +60,7 @@ export function faqGroups(facts: FaqFacts | null, extras: { fabricCount: number;
         {
           id: 'change-cancel',
           q: 'Can I change or cancel my order?',
-          a: `Yes. A ready-made piece can be cancelled at any time before it’s delivered, and for ${POLICIES.changeOfMindDays} days after. A made-to-order piece can be changed or cancelled within ${POLICIES.madeToOrderChangeWorkingDays} working days of ordering, before it goes into production. Email or WhatsApp us with your order number.`,
+          a: "Yes. You can cancel a standard catalogue order before delivery, including a sofa made in a standard fabric. Contact us with your order number.",
           link: { href: '/delivery-and-returns#changes', label: 'Changes and cancellations' },
         },
       ],
@@ -114,7 +114,7 @@ export function faqGroups(facts: FaqFacts | null, extras: { fabricCount: number;
         {
           id: 'change-mind',
           q: 'Can I return a sofa if I change my mind?',
-          a: `Ready-made pieces, yes: you have ${POLICIES.changeOfMindDays} days from delivery to tell us, then you arrange and pay for the return. Made-to-order pieces are made for you, so the change-of-mind right doesn’t apply to them. Faulty items are always covered.`,
+          a: PROMISES.returns.long,
           link: { href: '/delivery-and-returns#returns', label: 'Delivery and returns' },
         },
         {

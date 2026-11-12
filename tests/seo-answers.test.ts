@@ -152,7 +152,7 @@ describe('answers about a product', () => {
   it('asks and answers the questions people search for', () => {
     const qs = productQuestions(piece(), { delivery: DELIVERY, fabricCount: 70 })
     expect(qs.map((q) => q.id)).toEqual(['size', 'cover', 'delivery', 'pay', 'fit', 'returns', 'extras'])
-    expect(qs.find((q) => q.id === 'returns')!.a).toContain(`${POLICIES.madeToOrderChangeWorkingDays} working days`)
+    expect(qs.find((q) => q.id === 'returns')!.a).toContain(`${POLICIES.changeOfMindDays} days from delivery`)
     expect(qs.find((q) => q.id === 'extras')!.a).toContain('assembly £30')
     expect(JSON.stringify(qs)).not.toMatch(/undefined|null|NaN/)
   })
@@ -182,7 +182,7 @@ describe('answers about a range', () => {
     expect(a('colours')).toBe('In grey fabric. It’s made to order, so you can also have it in any of our 70 fabrics.')
     expect(a('styles')).toMatch(/fixed back cushions/)
     expect(qs.find((q) => q.id === 'styles')?.q).toBe('What’s the difference between the high back and scattered back Verona?')
-    expect(a('made')).toMatch(/^Yes, it’s made in the UK in the colour you choose, and still arrives in the usual delivery time\. Because it’s made to order for you/)
+    expect(a('made')).toMatch(/^Yes, it’s made in the UK in the colour you choose, and still arrives in the usual delivery time\. You have 14 days from delivery/)
     expect(qs.find((q) => q.id === 'see')?.a).toMatch(/showroom/)
   })
 

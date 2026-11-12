@@ -11,7 +11,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Breadcrumbs } from '@/components/layout/Breadcrumbs'
 import { ProductPurchase, type PurchaseProduct, type SizePlans } from '@/components/product/ProductPurchase'
-import { PostcodeCheck } from '@/components/product/PostcodeCheck'
 import { PromiseRows } from '@/components/product/PromiseRows'
 import { FitPanel } from '@/components/product/FitPanel'
 import { ProductDetails } from '@/components/product/ProductDetails'
@@ -135,8 +134,7 @@ export async function ProductPage({ slug, variant: sku, fabric: fabricCode }: Pr
         crumbs={crumbs.length > 0 ? <Breadcrumbs items={crumbs} onVelvet contained dense /> : null}
         delivery={delivery}
       >
-        <PostcodeCheck delivery={delivery} noDeliveryDays={delivery.noDeliveryDays} />
-        <PromiseRows madeToOrder={product.madeToOrder} />
+        <PromiseRows />
       </ProductPurchase>
 
       <div className="mx-auto flex max-w-[1200px] flex-col gap-12 pt-10 lg:gap-20 lg:px-6 lg:pt-20">

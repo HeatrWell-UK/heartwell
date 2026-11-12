@@ -23,23 +23,22 @@ const sha = (v: string) => createHash('sha256').update(v).digest('hex')
 
 describe('consent', () => {
   it('round-trips through the cookie', () => {
-    const raw = serialiseConsent({ marketing: true, analytics: false, statistics: true }, 1_760_000_000)
-    expect(raw).toBe('1.m1a0s1.1760000000')
-    expect(parseConsent(raw)).toEqual({ marketing: true, analytics: false, statistics: true, at: 1_760_000_000 })
+    const raw = serialiseConsent({ marketing: true, analytics: false }, 1_760_000_000)
+    expect(raw).toBe('2.m1a0.1760000000')
+    expect(parseConsent(raw)).toEqual({ marketing: true, analytics: false, at: 1_760_000_000 })
   })
 
   it('treats anything unknown or old as no choice yet', () => {
     expect(parseConsent(null)).toEqual(NO_CHOICE)
-    expect(parseConsent('0.m1a1s1.1760000000')).toEqual(NO_CHOICE)
+    expect(parseConsent('1.m1a1s1.1760000000')).toEqual(NO_CHOICE)
     expect(parseConsent('rubbish')).toEqual(NO_CHOICE)
-    expect(NO_CHOICE).toMatchObject({ marketing: false, analytics: false, statistics: true })
+    expect(NO_CHOICE).toMatchObject({ marketing: false, analytics: false })
   })
 
-  it('Essential only keeps the shop and our own statistics, with Google and Meta off', () => {
-    expect(serialiseConsent(ESSENTIAL_ONLY, 1_760_000_000)).toBe('1.m0a0s1.1760000000')
-    expect(serialiseConsent(ACCEPT_ALL, 1_760_000_000)).toBe('1.m1a1s1.1760000000')
-    // The same as "Reject all" saved, so nobody who chose that is asked again.
-    expect(parseConsent('1.m0a0s1.1760000000')).toMatchObject(ESSENTIAL_ONLY)
+  it('Essential only disables Google Analytics and ad attribution', () => {
+    expect(serialiseConsent(ESSENTIAL_ONLY, 1_760_000_000)).toBe('2.m0a0.1760000000')
+    expect(serialiseConsent(ACCEPT_ALL, 1_760_000_000)).toBe('2.m1a1.1760000000')
+    expect(parseConsent('2.m0a0.1760000000')).toMatchObject(ESSENTIAL_ONLY)
     expect(NO_CHOICE).toMatchObject(ESSENTIAL_ONLY)
     expect(consentForOrder(parseConsent(serialiseConsent(ESSENTIAL_ONLY)))).toBe('denied')
   })
@@ -48,16 +47,16 @@ describe('consent', () => {
     const names = ['hw-consent', '_fbp', '_fbc', '_ga', '_ga_ABC123', '_gat', 'hw-welcome']
     expect(cookiesToClear(ESSENTIAL_ONLY, names)).toEqual(['_fbp', '_fbc', '_ga', '_ga_ABC123'])
     expect(cookiesToClear(ACCEPT_ALL, names)).toEqual([])
-    expect(cookiesToClear({ marketing: false, analytics: true, statistics: true }, names)).toEqual(['_fbp', '_fbc'])
-    expect(cookiesToClear({ marketing: true, analytics: false, statistics: false }, names)).toEqual(['_ga', '_ga_ABC123'])
+    expect(cookiesToClear({ marketing: false, analytics: true }, names)).toEqual(['_fbp', '_fbc'])
+    expect(cookiesToClear({ marketing: true, analytics: false }, names)).toEqual(['_ga', '_ga_ABC123'])
     expect(cookieDomains('www.heartwellsofa.co.uk')).toEqual(['www.heartwellsofa.co.uk', 'heartwellsofa.co.uk', 'co.uk'])
     expect(cookieDomains('localhost')).toEqual([])
   })
 
   it('records the choice on the order', () => {
     expect(consentForOrder(NO_CHOICE)).toBe('unknown')
-    expect(consentForOrder(parseConsent('1.m1a0s1.1760000000'))).toBe('granted')
-    expect(consentForOrder(parseConsent('1.m0a1s1.1760000000'))).toBe('denied')
+    expect(consentForOrder(parseConsent('2.m1a0.1760000000'))).toBe('granted')
+    expect(consentForOrder(parseConsent('2.m0a1.1760000000'))).toBe('denied')
   })
 
   it('hides the banner before first paint only when parseConsent would find a choice', () => {
@@ -67,10 +66,10 @@ describe('consent', () => {
       new Function('document', consentFlagScript(CONSENT_COOKIE))(doc)
       return doc.documentElement.dataset.consent === 'set'
     }
-    for (const cookie of ['hw-consent=1.m1a0s1.1760000000', 'a=1; hw-consent=1.m0a0s1.1760000000; b=2', `x=y; hw-consent=${serialiseConsent({ marketing: false, analytics: true, statistics: false })}`]) {
+    for (const cookie of ['hw-consent=2.m1a0.1760000000', 'a=1; hw-consent=2.m0a0.1760000000; b=2', `x=y; hw-consent=${serialiseConsent({ marketing: false, analytics: true })}`]) {
       expect(flagged(cookie)).toBe(true)
     }
-    for (const cookie of ['', 'hw-consent=0.m1a1s1.1760000000', 'hw-consent=rubbish', 'not-hw-consent=1.m1a0s1.1760000000', 'hw-consent=1.m1a0s1.1760000000x']) {
+    for (const cookie of ['', 'hw-consent=0.m1a1s1.1760000000', 'hw-consent=rubbish', 'not-hw-consent=2.m1a0.1760000000', 'hw-consent=2.m1a0.1760000000x']) {
       expect(flagged(cookie)).toBe(false)
     }
   })
@@ -212,15 +211,15 @@ describe('conversions from the outbox', () => {
     expect(JSON.stringify(b.payload)).not.toMatch(/order_id|HW-1|confirm-order|track-order/)
   })
 
-  it('leaves the browser’s identifiers out without consent, and for WhatsApp orders', () => {
-    const denied = buildConversion(row({}, order({ tracking_consent: 'denied' })), 'https://example.test', NOW)
-    const chat = buildConversion(row({}, order({ source: 'whatsapp' })), 'https://example.test', NOW)
-    for (const b of [denied, chat]) {
-      if ('skip' in b) throw new Error(b.skip)
-      expect(b.payload.user_data).not.toHaveProperty('client_ip_address')
-      expect(b.payload.user_data).toHaveProperty('ph')
+  it('skips Meta conversions without advertising consent and omits the staff browser for WhatsApp', () => {
+    for (const tracking_consent of ['unknown', 'denied']) {
+      const skipped = buildConversion(row({}, order({ tracking_consent })), 'https://example.test', NOW)
+      expect(skipped).toEqual({ skip: 'advertising measurement consent not recorded' })
     }
-    if (!('skip' in chat)) expect(chat.payload.action_source).toBe('chat')
+    const chat = buildConversion(row({}, order({ source: 'whatsapp' })), 'https://example.test', NOW)
+    if ('skip' in chat) throw new Error(chat.skip)
+    expect(chat.payload).toMatchObject({ action_source: 'chat', user_data: { ph: expect.any(String) } })
+    expect(chat.payload.user_data).not.toHaveProperty('client_ip_address')
   })
 
   it('gives a phone or WhatsApp order the ad click of the visit staff linked, never staff’s own IP or browser', () => {
@@ -245,6 +244,8 @@ describe('conversions from the outbox', () => {
 
   it('builds GA4’s purchase with the event ID as the transaction', () => {
     const b = buildConversion(row({ platform: 'ga4', event_name: 'purchase' }), 'https://example.test', NOW)
+    const withoutId = buildConversion(row({ platform: 'ga4', event_name: 'purchase' }, order({ ga_client_id: null })), 'https://example.test', NOW)
+    expect(withoutId).toEqual({ skip: 'consented Google Analytics identifier not recorded' })
     if ('skip' in b) throw new Error(b.skip)
     expect(b.payload).toMatchObject({ client_id: '1.2', events: [{ name: 'purchase', params: { transaction_id: 'pe-1', value: 799 } }] })
   })
@@ -307,17 +308,17 @@ describe('orders and tracking', () => {
   const at = new Date('2026-10-08T10:00:00Z')
 
   it('keeps Meta’s identifiers, the IP and browser only with marketing consent', () => {
-    const yes = trackingPayload(base, tracking('1.m1a1s1.1760000000'), at)
+    const yes = trackingPayload(base, tracking('2.m1a1.1760000000'), at)
     expect(yes).toMatchObject({ tracking_consent: 'granted', customer_ip: '1.2.3.4', customer_user_agent: 'UA' })
     expect(yes.attribution).toMatchObject({ utm_source: 'facebook', landing_page: '/products/ashton', fbclid: 'IwAR123', meta_fbp: 'fb.1.1.1', meta_fbc: `fb.1.${at.getTime()}.IwAR123`, ga_client_id: '1.2' })
-    const no = trackingPayload(base, tracking('1.m0a0s1.1760000000'), at)
+    const no = trackingPayload(base, tracking('2.m0a0.1760000000'), at)
     expect(no).toMatchObject({ tracking_consent: 'denied', customer_ip: null, customer_user_agent: null })
-    expect(no.attribution).toMatchObject({ utm_source: 'facebook' })
+    expect(no.attribution).toEqual({})
     expect(no.attribution).not.toHaveProperty('fbclid')
     expect(no.attribution).not.toHaveProperty('ga_client_id')
-    const off = trackingPayload(base, tracking('1.m0a0s0.1760000000'), at)
+    const off = trackingPayload(base, tracking('1.m1a1s1.1760000000'), at)
     expect(off.attribution).not.toHaveProperty('utm_source')
-    expect(off.attribution).toHaveProperty('visitor_id')
+    expect(off.attribution).not.toHaveProperty('visitor_id')
   })
 
   it('makes staff-device and QA orders test orders on the live site', () => {

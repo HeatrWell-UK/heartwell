@@ -32,6 +32,8 @@ export const STORAGE_GROUPS: StorageGroup[] = [
       { name: 'hw-consent', kind: 'cookie', purpose: 'Remembers your cookie choices.', lasts: `${CONSENT_MONTHS} months` },
       { name: 'hw-basket-v1', kind: 'local storage', purpose: 'Your basket, so it’s still there if the app or browser closes.', lasts: 'Until you empty it or clear your browser' },
       { name: 'hw-saved-v1', kind: 'local storage', purpose: 'The sofas you saved.', lasts: 'Until you remove them or clear your browser' },
+      { name: 'hw-visitor', kind: 'local storage', purpose: 'Keeps an offer consistent for this browser. Used only for offers.', lasts: 'Until you clear your browser' },
+      { name: 'hw-reminder', kind: 'session storage', purpose: 'Links a basket reminder you request to the current checkout.', lasts: 'Until you close the tab' },
       { name: 'hw-postcode', kind: 'local storage', purpose: 'The postcode you checked, so delivery dates and checkout can use it.', lasts: 'Until you clear your browser' },
       { name: 'hw-wa-ref', kind: 'local storage', purpose: 'Your last WhatsApp enquiry reference, so a second tap doesn’t start a new one.', lasts: 'Until you clear your browser' },
       { name: 'hw-offer', kind: 'cookie', purpose: 'Your offer from one of our adverts, so it applies at checkout.', lasts: 'Until the offer ends (up to a week or so)' },
@@ -42,12 +44,11 @@ export const STORAGE_GROUPS: StorageGroup[] = [
     ],
   },
   {
-    id: 'statistics',
-    title: 'Our own visit statistics',
-    intro:
-      'Which campaigns and pages bring visitors, and which visits lead to orders. Kept by us alone and never used for advertising. Part of Essential only, and on unless you switch them off in Cookie settings; switched off, we stop recording your visits, though the device ID can still link an order or an ad offer to this device.',
+    id: 'attribution',
+    title: 'Our advertising measurement',
+    intro: 'Only if you allow advertising measurement. It records your visit and which campaign brought you, and helps us match a later order to that visit.',
     items: [
-      { name: 'hw-visitor', kind: 'local storage', purpose: 'A random ID for this device, linking your visits, ad offer and orders.', lasts: 'Until you clear your browser' },
+      { name: 'hw-ad-visitor', kind: 'local storage', purpose: 'A random ID that links visits and orders for advertising measurement.', lasts: 'Until you withdraw consent or clear your browser' },
       { name: 'hw-session', kind: 'session storage', purpose: 'A random ID for this visit.', lasts: 'Until you close the tab' },
       { name: 'hw-arrival', kind: 'session storage', purpose: 'A random ID for how this visit began.', lasts: 'Until you close the tab' },
       { name: 'hw-arrival-sent', kind: 'session storage', purpose: 'Notes that this visit has been counted.', lasts: 'Until you close the tab' },
@@ -55,7 +56,7 @@ export const STORAGE_GROUPS: StorageGroup[] = [
       {
         name: 'hw-fbclid',
         kind: 'session storage',
-        purpose: 'The click ID Facebook adds to links. It stays on your device and only reaches our records if you accept marketing cookies.',
+        purpose: 'The click ID Facebook adds to links. Recorded only after advertising consent.',
         lasts: 'Until you close the tab',
       },
     ],

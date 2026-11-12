@@ -5,7 +5,7 @@
 import { formatPrice } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 import { ukPhoneDigits } from '@/lib/checkout/phone'
-import { POLICIES, PROMISES } from '@/config/promises'
+import { PROMISES } from '@/config/promises'
 import { SITE_URL } from '@/config/site'
 import { button, C, emailFooterText, escapeHtml, firstName, h, layout, link, p, type RenderedEmail } from './layout'
 
@@ -57,12 +57,9 @@ export interface ShopContact {
 }
 
 
-/** The change-of-mind rule, as the order confirmation states it (with the made-to-order exemption when it applies). */
-export function returnsLine(hasMadeToOrder: boolean): string {
-  const ready = `Ready-made pieces can be returned within ${POLICIES.changeOfMindDays} days of delivery if you change your mind.`
-  return hasMadeToOrder
-    ? `Your order includes a made-to-order piece, made for you, so it can’t be returned for a change of mind. ${ready} Faults are always covered.`
-    : `${ready} Faults are always covered.`
+/** The policy for standard catalogue orders, including standard fabric options. */
+export function returnsLine(): string {
+  return PROMISES.returns.long
 }
 
 function money(n: number) {
@@ -114,7 +111,7 @@ function itemsText(o: OrderEmailData, withSku: boolean): string {
 
 /** To the customer, straight after ordering: please confirm. */
 export function customerOrderEmail(o: OrderEmailData, opts: { confirmUrl: string; windowLabel: string | null; shop: ShopContact; now?: Date }): RenderedEmail {
-  const subject = `Please confirm your Heartwell order ${o.reference}`
+  const subject = `Your Heartwell order ${o.reference}`
   const date = o.preferredDate ? formatDeliveryDate(o.preferredDate, opts.now) : null
   const contactHtml = [
     opts.shop.phoneDisplay ? `call ${escapeHtml(opts.shop.phoneDisplay)}` : null,
@@ -125,20 +122,20 @@ export function customerOrderEmail(o: OrderEmailData, opts: { confirmUrl: string
     .join(', ')
   const body = [
     h(`Thank you, ${firstName(o.customerName)}`),
-    p(`Your order <strong>${escapeHtml(o.reference)}</strong> is saved. <strong>Please tap the button to confirm it</strong>, so we can book your delivery.`),
+    p(`Your order <strong>${escapeHtml(o.reference)}</strong> is saved. If you still need to confirm, use the button below. We’ll then call to arrange delivery.`),
     button(opts.confirmUrl, 'Confirm my order'),
     p(`Nothing is taken today. You pay the driver in cash or by bank transfer once it’s in your room.`, `color:${C.slate};font-size:15px`),
     itemsTable(o, false),
     p(`<strong>Delivering to</strong><br>${escapeHtml(o.shippingAddress)}<br>${escapeHtml(o.postcode)}`),
     date ? p(`<strong>Your preferred day:</strong> ${escapeHtml(date)}. We’ll ring to agree it.`) : opts.windowLabel ? p(`Most orders arrive ${escapeHtml(opts.windowLabel)}. We’ll ring to book the day with you.`) : '',
-    p(`${returnsLine(o.hasMadeToOrder)} ${link(`${SITE_URL}/delivery-and-returns`, 'Delivery and returns')}`, `font-size:15px;color:${C.slate}`),
-    p(`<strong>What happens next</strong><br>1. Tap “Confirm my order” above.<br>2. We ring or WhatsApp you to book your delivery day.<br>3. Your furniture arrives and you pay the driver.`),
+    p(`${returnsLine()} ${link(`${SITE_URL}/delivery-and-returns`, 'Delivery and returns')}`, `font-size:15px;color:${C.slate}`),
+    p(`<strong>What happens next</strong><br>1. Confirm on your order page or use the link above.<br>2. We ring or WhatsApp you to book your delivery day.<br>3. Your furniture arrives and you pay the driver.`),
     p(`Questions? ${contactHtml}. Your reference is ${escapeHtml(o.reference)}.`, `font-size:15px;color:${C.slate}`),
   ].join('')
   const text = [
     `Thank you, ${firstName(o.customerName)}.`,
     '',
-    `Your order ${o.reference} is saved. Please confirm it so we can book your delivery:`,
+    `Your order ${o.reference} is saved. If you still need to confirm, use the link below. We’ll then call to arrange delivery.`,
     opts.confirmUrl,
     '',
     'Nothing is taken today. You pay the driver in cash or by bank transfer once it is in your room.',
@@ -148,7 +145,7 @@ export function customerOrderEmail(o: OrderEmailData, opts: { confirmUrl: string
     `Delivering to: ${o.shippingAddress}, ${o.postcode}`,
     date ? `Your preferred day: ${date}. We will ring to agree it.` : opts.windowLabel ? `Most orders arrive ${opts.windowLabel}. We will ring to book the day with you.` : '',
     '',
-    returnsLine(o.hasMadeToOrder),
+    returnsLine(),
     '',
     `Questions? Email ${opts.shop.email}${opts.shop.phoneDisplay ? ` or call ${opts.shop.phoneDisplay}` : ''}. Your reference is ${o.reference}.`,
     '',
@@ -156,7 +153,7 @@ export function customerOrderEmail(o: OrderEmailData, opts: { confirmUrl: string
   ]
     .filter((l) => l !== null)
     .join('\n')
-  return { subject, html: layout(subject, body, `Tap to confirm order ${o.reference}. Nothing to pay today.`), text }
+  return { subject, html: layout(subject, body, `Details for order ${o.reference}. Nothing to pay today.`), text }
 }
 
 /** The WhatsApp message the shop sends to ask the customer to confirm. */

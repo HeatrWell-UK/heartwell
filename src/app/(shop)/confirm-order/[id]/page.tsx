@@ -1,44 +1,19 @@
 import type { Metadata } from 'next'
-import { notFound, redirect } from 'next/navigation'
-import { after } from 'next/server'
+import { notFound } from 'next/navigation'
 import { CheckCircleIcon } from '@phosphor-icons/react/ssr'
 import { OrderLines } from '@/components/checkout/OrderLines'
 import { OrderJourney } from '@/components/checkout/OrderJourney'
 import { orderJourney } from '@/lib/checkout/journey'
 import { CONTACT, phoneHref } from '@/config/contact'
 import { orderForCustomer } from '@/lib/checkout/read'
-import { createPublicClient } from '@/lib/supabase/public'
-import { clientIp, rateLimit } from '@/lib/http/rate-limit'
-import { sendOrderConfirmedEmail } from '@/lib/checkout/notify'
 import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
+
+import { ConfirmOrderForm, type ConfirmationQuery } from '@/components/checkout/ConfirmOrderForm'
 
 export const metadata: Metadata = { title: 'Confirm your order', robots: { index: false, follow: false } }
 export const dynamic = 'force-dynamic'
 
-/**
- * The customer's confirm link. Opening it only shows the order; the order is
- * confirmed by pressing the button (a POST), so link previews in WhatsApp or
- * email can never confirm it by accident.
- */
-async function confirm(formData: FormData) {
-  'use server'
-  const id = String(formData.get('id') ?? '')
-  if (!rateLimit(`confirm:${await clientIp()}`, 20, 10 * 60_000)) redirect(`/confirm-order/${id}?busy=1`)
-  const { data, error } = await createPublicClient().rpc('confirm_order', { p_order_id: id })
-  if (error) redirect(`/confirm-order/${id}?failed=1`)
-  if ((data as { just_confirmed?: boolean } | null)?.just_confirmed) {
-    after(async () => {
-      try {
-        await sendOrderConfirmedEmail(id)
-      } catch (e) {
-        console.error('confirmed email failed', id, e)
-      }
-    })
-  }
-  redirect(`/confirm-order/${id}`)
-}
-
-export default async function ConfirmOrderPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ failed?: string; busy?: string }> }) {
+export default async function ConfirmOrderPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<ConfirmationQuery> }) {
   const [order, query] = await Promise.all([params.then((p) => orderForCustomer(p.id)), searchParams])
   if (!order) notFound()
   const tel = phoneHref()
@@ -75,23 +50,8 @@ export default async function ConfirmOrderPage({ params, searchParams }: { param
   return (
     <Shell title={`Confirm your order ${order.reference}`}>
       <p className="text-[17px] leading-relaxed">Please check the details below, then press the button. We’ll ring you to book your delivery day.</p>
-      {query.failed && (
-        <p role="alert" className="rounded-[var(--radius-field)] border-2 border-error p-3 font-semibold text-error">
-          Sorry, that didn’t work. Please press the button again, or ring us.
-        </p>
-      )}
-      {query.busy && (
-        <p role="alert" className="rounded-[var(--radius-field)] border-2 border-error p-3 font-semibold text-error">
-          Please wait a minute and try again.
-        </p>
-      )}
-      <form action={confirm}>
-        <input type="hidden" name="id" value={order.id} />
-        <button type="submit" className="min-h-14 w-full rounded-full bg-velvet-sheen px-6 text-[17px] font-semibold text-white">
-          Confirm my order
-        </button>
-      </form>
       <Summary order={order} />
+      <ConfirmOrderForm id={order.id} query={query} />
       <p className="text-[15px] text-slate">
         Something wrong? Don’t confirm: {tel ? <a href={tel}>ring us on {CONTACT.phoneDisplay}</a> : 'contact us'} or email{' '}
         <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> and we’ll put it right.
@@ -119,7 +79,6 @@ function Summary({ order }: { order: NonNullable<Awaited<ReturnType<typeof order
         <br />
         {order.shippingAddress}, {order.postcode}
       </p>
-      {order.hasMadeToOrder && <p className="text-sm text-slate">Made-to-order pieces are built for you, so they can’t be returned for a change of mind. Faults are always covered.</p>}
     </section>
   )
 }

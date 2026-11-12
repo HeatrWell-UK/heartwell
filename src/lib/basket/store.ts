@@ -128,22 +128,41 @@ export function recallPostcode(): string {
   }
 }
 
-/**
- * IDs for this browser and this visit, so a basket reminder can be matched
- * to the order if the shopper goes on to buy. Phase 14 builds the full
- * attribution ledger on the same IDs. Null when storage isn't available.
- */
-export function visitIds(): { visitorId: string; sessionId: string; arrivalId: string } | null {
+function storedId(store: Storage, key: string) {
+  let value = store.getItem(key)
+  if (!value || !/^[0-9a-f-]{36}$/i.test(value)) {
+    value = newId()
+    store.setItem(key, value)
+  }
+  return value
+}
+
+/** Used to honour an offer already shown to the customer. */
+export function offerVisitorId(): string | null {
   try {
-    const get = (store: Storage, key: string) => {
-      let v = store.getItem(key)
-      if (!v || !/^[0-9a-f-]{36}$/i.test(v)) {
-        v = newId()
-        store.setItem(key, v)
-      }
-      return v
+    return storedId(window.localStorage, 'hw-visitor')
+  } catch {
+    return null
+  }
+}
+
+/** Basket reminders are requested separately from advertising consent. */
+export function reminderId(create = false): string | null {
+  try {
+    return create ? storedId(window.sessionStorage, 'hw-reminder') : window.sessionStorage.getItem('hw-reminder')
+  } catch {
+    return null
+  }
+}
+
+/** Only called by the tracking module after advertising consent. */
+export function storedVisitIds() {
+  try {
+    return {
+      visitorId: storedId(window.localStorage, 'hw-ad-visitor'),
+      sessionId: storedId(window.sessionStorage, 'hw-session'),
+      arrivalId: storedId(window.sessionStorage, 'hw-arrival'),
     }
-    return { visitorId: get(window.localStorage, 'hw-visitor'), sessionId: get(window.sessionStorage, 'hw-session'), arrivalId: get(window.sessionStorage, 'hw-arrival') }
   } catch {
     return null
   }

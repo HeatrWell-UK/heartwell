@@ -1,7 +1,9 @@
 'use server'
 
+import { CONSENT_COOKIE } from '@/config/tracking'
+import { parseConsent } from '@/lib/tracking/consent'
 import { after } from 'next/server'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { APP_ENV } from '@/config/env'
 import { SMTP_CONFIGURED } from '@/config/email'
@@ -68,7 +70,7 @@ export async function sendContactMessage(input: unknown): Promise<ContactResult>
         topic: message.topic,
         order_reference: message.orderReference,
         message: message.message,
-        visitor_id: m.visitorId,
+        visitor_id: parseConsent((await cookies()).get(CONSENT_COOKIE)?.value).marketing ? m.visitorId : null,
         customer_ip: await clientIp(),
         customer_user_agent: h.get('user-agent')?.slice(0, 400) ?? null,
         is_test: isTest,

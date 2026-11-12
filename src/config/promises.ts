@@ -37,9 +37,9 @@ export const PROMISES = {
   },
   returns: {
     label: '14 days to change your mind',
-    sub: 'Ready-made pieces',
-    short: '14 days to change your mind on ready-made pieces',
-    long: 'You have 14 days from delivery to change your mind on ready-made pieces, under the Consumer Contracts Regulations. Made-to-order pieces are built for you, so they are exempt; faults are always covered.',
+    sub: 'Standard catalogue orders',
+    short: '14 days to change your mind on standard catalogue orders',
+    long: 'You have 14 days from delivery to tell us you’ve changed your mind on a standard catalogue order, including sofas made in a fabric we offer. Faults are always covered.',
   },
   madeToOrder: {
     label: 'Made to order',
@@ -55,11 +55,11 @@ export const PROMISES = {
  * Change one here and every page that states it changes with it.
  */
 export const POLICIES = {
-  /** Days from delivery to cancel a ready-made piece for any reason (Consumer Contracts Regulations). */
+  /** Days from delivery to cancel a standard catalogue order for any reason (Consumer Contracts Regulations). */
   changeOfMindDays: 14,
   /** Days to refund once a cancelled piece is back with us. */
   refundDays: 14,
-  /** Working days after ordering to change or cancel a made-to-order piece, before it's made. */
+  /** Working days after ordering to change or cancel a bespoke piece, before production. */
   madeToOrderChangeWorkingDays: 2,
   /** Hours after delivery to tell us about transit damage, with photos. */
   damageReportHours: 24,

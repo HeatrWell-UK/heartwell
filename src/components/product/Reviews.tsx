@@ -22,7 +22,10 @@ export function Reviews({ reviews, stats, name, ask }: { reviews: ReviewView[]; 
             {name} is new to Heartwell. We only publish reviews from people who bought from us, so the first ones will come from our first
             customers.
           </p>
-          <div className="pt-0.5 text-[15px] font-semibold">{ask}</div>
+          <div className="flex flex-wrap gap-x-4 gap-y-2 pt-0.5 text-[15px] font-semibold">
+            {ask}
+            <Link href="/visit-us">Visit our Burnley showroom</Link>
+          </div>
         </div>
       ) : (
         <>

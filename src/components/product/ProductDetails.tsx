@@ -57,7 +57,7 @@ export function ProductDetails({ product: p, delivery }: { product: ProductPageD
             your old sofa away {formatPrice(delivery.removalPerSeat)} a seat.
           </p>
           <p>{PROMISES.payment.long}</p>
-          <p>{p.madeToOrder ? 'Made to order for you, so it can’t be returned for a change of mind. Faults are always covered.' : PROMISES.returns.long}</p>
+          <p>{PROMISES.returns.long}</p>
           <p>{PROMISES.guarantee.long}</p>
           <p>
             <Link href="/delivery-and-returns">All the details on delivery and returns</Link>

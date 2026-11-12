@@ -34,7 +34,7 @@ export default async function TermsPage() {
     <ContentPage
       title="Terms of sale"
       intro={<p>These terms apply when you buy from us as a consumer, online, on WhatsApp or by phone. Please read them before you order.</p>}
-      updated="2026-10-22"
+      updated="2026-11-13"
       contents={CONTENTS}
     >
       <h2 id="us">1. Who we are</h2>
@@ -111,15 +111,13 @@ export default async function TermsPage() {
       <h2 id="cancelling">5. Cancelling and returns</h2>
       <ol>
         <li>
-          <strong>Ready-made pieces:</strong> you can cancel at any time before delivery, and within {days} days of delivery for any reason, under the
-          Consumer Contracts Regulations. Tell us clearly (email, WhatsApp or phone), then return the piece within {days} days of telling us, at your
-          cost and in the condition you received it. We refund what you paid for it within {POLICIES.refundDays} days of receiving it back, less any
-          loss in value from handling it more than you’d need to in a shop. Delivery extras we’ve already carried out aren’t refunded.
+          <strong>Standard catalogue orders:</strong> you can cancel before delivery or within {days} days of delivery, including sofas made to order in
+          our standard options. Tell us by email, WhatsApp or phone and return the item within {days} days of telling us.
+          Our <Link href="/delivery-and-returns#returns">returns policy</Link> explains transport costs and refunds.
         </li>
         <li>
-          <strong>Made-to-order pieces</strong> are made to your choice of fabric, colour or size, so the {days}-day right to cancel doesn’t apply to them
-          (regulation 28 of the Consumer Contracts Regulations). You can change or cancel one within {POLICIES.madeToOrderChangeWorkingDays} working days of
-          ordering, before it goes into production. This doesn’t affect your rights if a piece is faulty.
+          <strong>Bespoke orders:</strong> the change-of-mind right may not apply if the goods are made to your own specifications or clearly
+          personalised. We explain any exception before you agree to the order. Your rights for faulty goods still apply.
         </li>
         <li>
           The full details, and how to tell us, are on <Link href="/delivery-and-returns">Delivery and returns</Link>.

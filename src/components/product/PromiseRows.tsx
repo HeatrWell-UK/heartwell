@@ -1,16 +1,14 @@
-import { ArrowCounterClockwiseIcon, ScissorsIcon, ShieldCheckIcon } from '@phosphor-icons/react/ssr'
+import { ArrowCounterClockwiseIcon, ShieldCheckIcon } from '@phosphor-icons/react/ssr'
 import { PROMISES } from '@/config/promises'
 
 /**
  * Guarantee and returns, in the shop's own words (src/config/promises.ts).
  * Paying on delivery is said in the price block above, so it isn't repeated.
  */
-export function PromiseRows({ madeToOrder }: { madeToOrder: boolean }) {
+export function PromiseRows() {
   const rows = [
     { icon: ShieldCheckIcon, strong: PROMISES.guarantee.label, text: 'on the frame and foam.' },
-    madeToOrder
-      ? { icon: ScissorsIcon, strong: 'Made to order for you,', text: 'so the 14-day change-of-mind return doesn’t apply. Faults are always covered.' }
-      : { icon: ArrowCounterClockwiseIcon, strong: `${PROMISES.returns.label}.`, text: 'Faults are always covered.' },
+    { icon: ArrowCounterClockwiseIcon, strong: `${PROMISES.returns.label}.`, text: 'Faults are always covered.' },
   ]
   return (
     <ul className="flex flex-col pt-5">

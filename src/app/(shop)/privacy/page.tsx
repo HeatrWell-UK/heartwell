@@ -31,7 +31,7 @@ export default function PrivacyPage() {
     <ContentPage
       title="Privacy notice"
       intro={<p>We collect only what we need to sell and deliver your furniture and to run the shop well, and we never sell your details.</p>}
-      updated="2026-11-10"
+      updated="2026-11-13"
       contents={CONTENTS}
     >
       <h2 id="who">Who we are</h2>
@@ -90,45 +90,26 @@ export default function PrivacyPage() {
 
       <h2 id="browsing">When you browse</h2>
       <p>
-        Our own statistics (which pages and campaigns bring visitors, and which visits lead to orders) are on unless you switch them off, as UK law now
-        allows for statistics a shop keeps for itself. Google Analytics and Meta’s Pixel only run if you accept them. You can change your mind at any time in{' '}
-        <CookieSettingsButton className="font-semibold text-velvet underline underline-offset-2" />, and our <Link href="/cookies">cookies page</Link> lists
-        everything we store on your device.
+        We use essential storage for your basket, saved sofas, delivery postcode and any offer we show you. The offer uses a separate browser ID
+        to keep the price available at checkout. You can choose whether to allow Google Analytics and advertising measurement in
+        <CookieSettingsButton className="ml-1 font-semibold text-velvet underline underline-offset-2" />. Our <Link href="/cookies">cookies page</Link> lists what we store.
       </p>
       <p>
-        As part of our own statistics we note the pages you look at and a few things you do (adding to your basket, starting checkout, tapping to call
-        us), against your device’s random ID and the kind of phone or computer and app you’re using (like “iPhone, Instagram app”). When you then ring
-        or message us to order, it lets us find your visit and see which advert brought you. These notes stay with us and are deleted after 90 days.
-      </p>
-      <p>
-        Your basket, saved sofas and the postcode you checked stay on your device; we don’t keep them unless you order or ask for a reminder. Like every
-        website’s, our host’s servers see your connection’s IP address; we use it briefly to stop abuse, and only add it to your records where this notice
-        says so.
+        If you allow advertising measurement, we record the campaign that brought you and actions such as viewing a page, adding to your basket or
+        tapping WhatsApp. We use a random browser ID to link the visit to an order or enquiry. We keep these visit records for up to 90 days.
+        Our host sees your IP address when you connect. We also use it briefly to prevent abuse.
       </p>
 
       <h2 id="advertising">Advertising on Facebook and Instagram</h2>
       <p>
-        We advertise on Facebook and Instagram, and we tell Meta when an advert leads to a confirmed order, so we can see which adverts work and show them
-        to people likely to be interested. When you confirm an order (and again when it’s delivered), we send Meta its value and what was bought, with your
-        email address, phone number, name, postcode, town and your device’s random ID in a scrambled (hashed) form that Meta can only match against people
-        it already knows. We never send order numbers, links to your order or anything unscrambled.
+        With your permission, we send Meta information about visits and conversions so we can measure our ads and show them to interested people.
+        For a confirmed or delivered order this can include the items and value, hashed contact details and postcode, a browser ID, and Meta’s
+        cookie IDs. For a website order it may also include your IP address and browser information. We use Google Analytics to measure visits and
+        orders when you allow analytics.
       </p>
       <p>
-        We also tell Google Analytics the value and pieces of each confirmed order, with no personal details, so our sales figures add up. If you didn’t
-        accept Analytics cookies, it goes with a random one-off ID instead of yours.
-      </p>
-      <p>
-        We do this because it’s in our legitimate interest to know which adverts work; you can object, and we’ll stop. If you accepted marketing cookies,
-        we also include your IP address, browser and Meta’s own cookie IDs, which helps Meta match the order; for a phone or WhatsApp order we’ve matched
-        to your visit, that’s Meta’s cookie IDs from the visit. Test orders and cancelled orders are never sent.
-      </p>
-      <p>
-        If you arrived from one of our adverts, the shop remembers it for up to a week (two small cookies) so your ad offer applies at checkout. That
-        doesn’t depend on your cookie choices, because it’s part of the offer you were shown.
-      </p>
-      <p>
-        Every visitor’s welcome offer works the same way: two small cookies, and a note in our database of your device’s random ID with when the offer
-        started and ends, so it applies at checkout and never starts again. We delete that note a year after the offer ends.
+        You can withdraw permission in Cookie settings or contact us about information we’ve already recorded. We still use the details needed to
+        process your order, including your delivery address and contact details.
       </p>
 
       <h2 id="sharing">Who helps us</h2>

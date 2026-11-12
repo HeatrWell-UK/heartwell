@@ -45,9 +45,9 @@ export function buildConversion(row: OutboxRow, siteUrl: string, now = new Date(
   if (!o) return { skip: 'the order no longer exists' }
   if (o.status === 'cancelled') return { skip: 'order cancelled' }
   const consented = o.tracking_consent === 'granted'
-  const website = o.source === 'website'
 
   if (row.platform === 'meta') {
+    if (!consented) return { skip: 'advertising measurement consent not recorded' }
     const at = row.event_name === 'OrderDelivered' ? o.delivered_at : o.confirmed_at
     if (!at) return { skip: 'no date for this event' }
     const time = new Date(at)
@@ -67,12 +67,10 @@ export function buildConversion(row: OutboxRow, siteUrl: string, now = new Date(
           name: o.customer_name,
           postcode: o.postcode,
           externalId: o.visitor_id,
-          // The browser's identifiers only when the customer accepted marketing cookies (D10).
-          ...(consented && website ? { ip: o.customer_ip, userAgent: o.customer_user_agent, fbp: o.meta_fbp, fbc: o.meta_fbc } : {}),
-          // A WhatsApp or phone order has Meta's IDs only when staff linked it to a
-          // visit that accepted marketing cookies (they're never saved otherwise):
-          // the ad click that brought the customer. Never staff's own IP or browser.
-          ...(!website ? { fbp: o.meta_fbp, fbc: o.meta_fbc } : {}),
+          ip: o.source === 'website' ? o.customer_ip : null,
+          userAgent: o.source === 'website' ? o.customer_user_agent : null,
+          fbp: o.meta_fbp,
+          fbc: o.meta_fbc,
         },
         custom: { value: Number(o.total_amount), contents, numItems: o.items.reduce((n, i) => n + i.quantity, 0) },
       }),
@@ -80,6 +78,7 @@ export function buildConversion(row: OutboxRow, siteUrl: string, now = new Date(
   }
 
   if (row.platform === 'ga4') {
+    if (!o.ga_client_id) return { skip: 'consented Google Analytics identifier not recorded' }
     if (!o.confirmed_at) return { skip: 'not confirmed' }
     return {
       platform: 'ga4',

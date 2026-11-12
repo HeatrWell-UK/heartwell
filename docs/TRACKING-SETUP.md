@@ -8,15 +8,15 @@ When you're ready, say so and we'll go through this together, screen by screen (
 
 | What | How |
 | --- | --- |
-| Cookie question | A bar at the bottom with equal **Essential only** / **Accept all**, and **Choose what to allow**. Essential only (since 7 November 2026, in place of Reject all) is the shop plus our own visit statistics; Google Analytics and the Pixel stay off and their cookies are deleted. "Cookie settings" in the footer reopens it. |
+| Cookie question | A bar at the bottom with equal **Essential only** / **Accept all**, and **Choose what to allow**. Essential only keeps the shop working and leaves optional tracking off. Cookie settings in the footer reopens it. |
 | Meta Pixel | Loads only on heartwellsofa.co.uk with `NEXT_PUBLIC_APP_ENV=production`, after **Accept**, never on order, confirmation, tracking, review or newsletter pages. |
 | Conversions API (server) | A copy of every browser event with the same event ID (Meta counts it once), for visitors who accepted. |
 | Events | PageView, ViewContent (each colour viewed), AddToCart, InitiateCheckout, Contact (WhatsApp or phone tap), Lead (samples, basket reminder), OrderPlaced (custom). |
 | Purchase | From the server only, when the customer **confirms**, once per order, 30 minutes later (Send now / Hold / Don't send in Admin → Tracking). Value = the database's total including delivery extras. OrderDelivered follows on delivery. |
-| Customer details | Hashed email, phone, name, postcode and our visitor ID on server events. IP address, browser and Meta's cookies only for customers who accepted (decision D10). Never order numbers, links or raw postcodes. |
-| GA4 | Consent Mode (no cookies until accepted), addresses redacted; purchases sent from the server so revenue matches the database. |
+| Customer details | Meta conversions require recorded advertising consent. Hashed contact details and visitor IDs may be sent with consent. Private order links and raw postcodes stay in the shop. |
+| GA4 | Loads after analytics consent. Server purchases require the consented Analytics identifier. |
 | Never counts | The site before go-live, test orders, `?qa=1` visits, and devices excluded in Admin → Tracking → This device. |
-| Your own record | Campaign tags (utm_), landing page and referring site on every order, WhatsApp enquiry and lead, for every visitor unless they switch it off. |
+| Your own record | Campaign tags, page and referral details are saved only after advertising consent. Offer and basket reminder IDs are separate. |
 
 ## What you'll create
 

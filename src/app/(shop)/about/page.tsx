@@ -91,7 +91,7 @@ export default function AboutPage() {
           <strong>{PROMISES.guarantee.label}:</strong> {PROMISES.guarantee.long}
         </li>
         <li>
-          <strong>{POLICIES.changeOfMindDays} days to change your mind</strong> on ready-made pieces, and faults always put right. The details are in{' '}
+          <strong>{POLICIES.changeOfMindDays} days to change your mind</strong> on standard catalogue orders, and faults always put right. The details are in{' '}
           <Link href="/delivery-and-returns">Delivery and returns</Link>.
         </li>
       </ul>

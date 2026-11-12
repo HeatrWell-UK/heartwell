@@ -20,7 +20,7 @@ export function sizeLine(p: Pick<ListingProduct, 'axis1Value' | 'axis2Value'>): 
 /**
  * A label only where it tells pieces apart (audit A3): nearly everything is
  * made to order, so that says nothing on a tile (the product page says it).
- * Ready-made pieces are the few that come with 14 days to change your mind.
+ * Ready-made labels describe how the piece is supplied.
  */
 function badgeFor(p: ListingProduct): string | null {
   if (p.reclining === 'Electric') return 'Electric recliner'

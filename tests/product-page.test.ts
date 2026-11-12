@@ -198,7 +198,7 @@ describe('search and sharing', () => {
       ['S-G', '749.00', 'https://schema.org/InStock', data.description],
       ['S-B', '769.00', 'https://schema.org/InStock', data.description],
     ])
-    expect(data.hasVariant[0]?.offers.hasMerchantReturnPolicy.returnPolicyCategory).toBe('https://schema.org/MerchantReturnNotPermitted')
+    expect(data.hasVariant[0]?.offers.hasMerchantReturnPolicy.returnPolicyCategory).toBe('https://schema.org/MerchantReturnFiniteReturnWindow')
     expect(JSON.stringify(data)).not.toMatch(/aggregateRating|ratingValue/)
     expect(jsonLdString({ a: '</script>' })).toBe('{"a":"\\u003c/script>"}')
   })

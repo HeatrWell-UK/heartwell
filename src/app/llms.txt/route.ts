@@ -37,7 +37,7 @@ export async function GET() {
       : []),
     '- Outside UK Mainland (Northern Ireland, islands, Isle of Wight): delivered by arrangement, quoted on WhatsApp.',
     `- Orders count once the customer taps Confirm on the link sent by email and WhatsApp.`,
-    `- Returns: ${POLICIES.changeOfMindDays} days to change your mind on ready-made pieces; made-to-order pieces are exempt; faults always covered.`,
+    `- Returns: ${POLICIES.changeOfMindDays} days to change your mind on standard catalogue orders, including standard fabric options. Faults are always covered.`,
     `- Guarantee: ${PROMISES.guarantee.long}`,
     `- Contact: ${CONTACT.email}${CONTACT.phoneDisplay ? `, phone and WhatsApp ${CONTACT.phoneDisplay}` : ''}.`,
     ...(a ? [`- Visit: ${a.street}, ${a.locality} ${a.postcode}. ${visitHoursText()}. ${visitBookingText()}`] : []),

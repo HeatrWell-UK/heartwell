@@ -177,10 +177,17 @@ export async function placeOrder(input: unknown): Promise<PlaceOrderResult> {
     { ...order, postcode: classification.postcode },
     { appEnv: APP_ENV, mixedAreaEvidence: evidence, tracking, offerToken: offer, welcomeToken: welcome },
   )
-  const { data, error } = await createAdminClient().rpc('place_order', { p_input: payload })
+  const db = createAdminClient()
+  const { data, error } = await db.rpc('place_order', { p_input: payload })
   if (error) return { ok: false, error: explainOrderError(error.message) }
 
   const placed = data as { id: string; reference: string }
+  if (order.reminderId) {
+    const { error: reminderError } = await db.from('basket_reminder_leads')
+      .update({ status: 'converted', converted_order_id: placed.id, email: null, phone: null, basket: [] })
+      .eq('session_id', order.reminderId).eq('is_test', payload.is_test).eq('status', 'active')
+    if (reminderError) console.error('basket reminder update failed', reminderError.message)
+  }
   after(async () => {
     try {
       await sendOrderPlacedEmails(placed.id)
@@ -192,7 +199,7 @@ export async function placeOrder(input: unknown): Promise<PlaceOrderResult> {
 }
 
 const ReminderInput = z.object({
-  visitor: z.object({ visitorId: z.uuid(), sessionId: z.uuid(), arrivalId: z.uuid() }),
+  reminderId: z.uuid(),
   email: z.union([z.literal(''), z.email().max(254)]),
   phone: z.string().max(30),
   emailOptIn: z.boolean(),
@@ -218,9 +225,9 @@ export async function saveBasketReminder(input: unknown): Promise<{ ok: boolean 
     .from('basket_reminder_leads')
     .upsert(
       {
-        visitor_id: r.visitor.visitorId,
-        session_id: r.visitor.sessionId,
-        arrival_id: r.visitor.arrivalId,
+        visitor_id: r.reminderId,
+        session_id: r.reminderId,
+        arrival_id: r.reminderId,
         email: r.email || null,
         phone: phoneOk ? formatUkPhone(r.phone) : null,
         email_opt_in: emailOptIn,

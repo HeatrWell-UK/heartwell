@@ -3,7 +3,7 @@
 // the offer strips subscribe to. Client components only.
 
 import { newEventId, readCookie } from '@/lib/tracking/browser'
-import { visitIds } from '@/lib/basket/store'
+import { offerVisitorId } from '@/lib/basket/store'
 import { classifyPaidLanding, OFFER_UNTIL_COOKIE } from './paid'
 import { WELCOME_UNTIL_COOKIE } from './welcome'
 
@@ -31,17 +31,21 @@ export const offerChanged = () => window.dispatchEvent(new Event(CHANGED))
  */
 export async function claimOfferFromAd(): Promise<void> {
   const search = window.location.search
-  if (!classifyPaidLanding(search) || session('get') === search) return
+  const source = classifyPaidLanding(search)
+  if (!source || session('get') === source) return
+  const offerSearch = source === 'google_ads'
+    ? 'utm_source=google&utm_medium=cpc'
+    : 'utm_source=facebook&utm_medium=paid_social' + (source === 'meta_catalog' ? '&utm_campaign=catalogue' : '')
   // Some in-app browsers block storage; the offer still works, keyed to a one-off ID.
-  const visit = visitIds()
+  const visitorId = offerVisitorId()
   try {
     const res = await fetch('/api/offer', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ visitorId: visit?.visitorId ?? newEventId(), arrivalId: visit?.arrivalId, search }),
+      body: JSON.stringify({ visitorId: visitorId ?? newEventId(), search: offerSearch }),
     })
     if (!res.ok) return
-    session('set', search)
+    session('set', source)
     offerChanged()
   } catch {
     // No offer this time; the code still works at checkout.
@@ -79,12 +83,12 @@ export function claimWelcome(): Promise<void> {
   if (readCookie(WELCOME_UNTIL_COOKIE) || welcomeAsked) return Promise.resolve()
   welcomeAsking ??= (async () => {
     // Some in-app browsers block storage; the offer is then keyed to a one-off ID and this browser's cookie.
-    const visit = visitIds()
+    const visitorId = offerVisitorId()
     try {
       await fetch('/api/welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ visitorId: visit?.visitorId ?? newEventId() }),
+        body: JSON.stringify({ visitorId: visitorId ?? newEventId() }),
       })
     } catch {
       // No offer shown this time; nothing promised that checkout wouldn't honour.

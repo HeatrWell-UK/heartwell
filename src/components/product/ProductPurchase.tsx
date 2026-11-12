@@ -34,8 +34,9 @@ import type { Layout } from '@/lib/product/measurements'
 import { Medallion } from '@/components/catalogue/Arcade'
 import { gallerySlides } from '@/lib/product/gallery'
 import { searchName, withNoun } from '@/lib/product/naming'
-import { useTodaysDelivery, type DeliveryDates } from '@/lib/delivery/fresh'
-import { InfoIcon, TruckIcon } from '@phosphor-icons/react'
+import type { DeliveryDates } from '@/lib/delivery/fresh'
+import { PostcodeCheck } from './PostcodeCheck'
+import { InfoIcon } from '@phosphor-icons/react'
 
 export type PurchaseProduct = Pick<
   ProductPageData,
@@ -95,7 +96,6 @@ export function ProductPurchase({
   offers: ShopOffers
   children: ReactNode
 }) {
-  const deliveryWindow = useTodaysDelivery(delivery).windowLabel
   const basket = useBasket()
   const [variantId, setVariantId] = useState(initialVariantId)
   const [fabric, setFabric] = useState<ChosenFabric | null>(initialFabric)
@@ -256,14 +256,6 @@ export function ProductPurchase({
                 )}
               </p>
             </div>
-            {/* Delivery, with this week's real dates: what people from ads ask first. */}
-            <p className="flex items-start gap-2.5 text-[15px] leading-snug">
-              <TruckIcon aria-hidden="true" size={22} className="shrink-0 text-velvet" />
-              <span className="flex flex-col">
-                <span className="font-semibold text-velvet">Free delivery for most postcodes</span>
-                {deliveryWindow && <span className="text-slate">Usually with you {deliveryWindow}</span>}
-              </span>
-            </p>
             {showWelcome && <WelcomePanel state={welcome} amount={welcomeAmount} hours={offers.welcome.hours} noun={noun} />}
             {/* What's paid when: the shop's whole promise, in two lines. */}
             <dl className="flex flex-col rounded-[14px] border border-line px-3.5 text-[15px]">
@@ -273,7 +265,7 @@ export function ProductPurchase({
               </div>
               {/* One term with two descriptions (the amount and how it's paid), so the list stays valid for screen readers. */}
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-2.5">
-                <dt>To pay on delivery</dt>
+                <dt>Item price on delivery</dt>
                 <dd className="font-display text-[20px] leading-none">{formatPrice(price - offerOff)}</dd>
                 <dd className="basis-full text-[13px] leading-snug text-slate">
                   Cash or bank transfer to the driver, once it&rsquo;s in your room
@@ -281,6 +273,13 @@ export function ProductPurchase({
                 </dd>
               </div>
             </dl>
+            {variant && <PostcodeCheck delivery={delivery} itemPrice={price - offerOff} />}
+            {variant && <div className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-semibold">
+              {p.madeToOrder && fabricCount > 0 && <Link href="/fabric-samples">Order fabric samples</Link>}
+              <WhatsAppButton message={waMessage} context="product-summary" productId={p.id} variantId={variant.id} productName={p.title}>
+                Ask about this {noun}
+              </WhatsAppButton>
+            </div>}
             {!showWelcome && <OfferStrip amount={Math.min(adAmount, price)} noun={noun} code={offers.code} />}
           </div>
 
@@ -471,7 +470,7 @@ export function ProductPurchase({
       <WhatsAppTopic message={waMessage} context="sticky-product" productId={p.id} variantId={variant?.id} productName={p.title} />
       {variant && (
         <StickyBuyBar
-          price={price}
+          price={price - offerOff}
           onAdd={addToBasket}
           watch={addRef}
           name={heading.name}

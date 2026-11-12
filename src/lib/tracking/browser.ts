@@ -7,7 +7,7 @@
 // devices or QA visits, and the Pixel and the server copy wait for consent.
 
 import { CONSENT_COOKIE, isPrivatePath, STAFF_COOKIE } from '@/config/tracking'
-import { visitIds } from '@/lib/basket/store'
+import { storedVisitIds } from '@/lib/basket/store'
 import { visitStepFor, type VisitStep } from '@/lib/attribution/visit'
 import { CONSENT_MAX_AGE, cookieDomains, cookiesToClear, parseConsent, serialiseConsent, type Consent, type ConsentChoice } from './consent'
 import { ga4Params, GA4_NAME, META_CUSTOM, pixelParams, type BrowserEventName, type EventData } from './events'
@@ -38,6 +38,10 @@ function writeCookie(name: string, value: string, maxAge: number) {
 
 export const readConsent = (): Consent => parseConsent(readCookie(CONSENT_COOKIE))
 
+export function visitIds() {
+  return readConsent().marketing && !isStaffDevice() && !isQaVisit() ? storedVisitIds() : null
+}
+
 /** Deletes a cookie wherever it may have been set: host-only and on each parent domain. */
 function deleteCookie(name: string) {
   for (const domain of ['', ...cookieDomains(window.location.hostname).map((d) => `; Domain=.${d}`)]) {
@@ -53,6 +57,15 @@ export function saveConsent(c: ConsentChoice) {
     for (const name of cookiesToClear(c, names)) deleteCookie(name)
   } catch {
     // Never let tidying up stop the choice being saved.
+  }
+  if (!c.marketing) {
+    try {
+      window.localStorage.removeItem('hw-ad-visitor')
+      window.localStorage.removeItem(TOUCH_KEY)
+      for (const key of ['hw-session', 'hw-arrival', FBCLID_KEY, ARRIVAL_SENT]) window.sessionStorage.removeItem(key)
+    } catch {
+      // The server still checks consent before recording anything.
+    }
   }
   window.dispatchEvent(new Event('hw:consent'))
 }
@@ -146,6 +159,7 @@ function readTouches(): { first?: Touch; last?: Touch } {
  * nothing new happened.
  */
 export function captureTouch(): { touch: Touch; fbclid?: string } | null {
+  if (!readConsent().marketing) return null
   try {
     const url = new URL(window.location.href)
     const tags = tagsFrom(url.search)
@@ -175,6 +189,7 @@ export function captureTouch(): { touch: Touch; fbclid?: string } | null {
 
 /** The ad click ID from this visit, if any (sent only with marketing consent). */
 export function sessionFbclid(): { fbclid: string; at: number } | null {
+  if (!readConsent().marketing) return null
   try {
     return JSON.parse(window.sessionStorage.getItem(FBCLID_KEY) ?? 'null') as { fbclid: string; at: number } | null
   } catch {
@@ -184,6 +199,7 @@ export function sessionFbclid(): { fbclid: string; at: number } | null {
 
 /** What an order records about how the customer found us: the latest campaign, or the first. */
 export function touchForOrder(): Touch | null {
+  if (!readConsent().marketing) return null
   const { first, last } = readTouches()
   return last && hasTags(last) ? last : (first ?? last ?? null)
 }
@@ -207,11 +223,10 @@ export function newEventId(): string {
  * Notes a step of this visit (a page, a basket add, starting checkout,
  * tapping Call) in our own statistics, so staff can match a phone or WhatsApp
  * order to it. Never for staff devices, QA visits or private pages, and not
- * when the visitor switched our statistics off.
+ * without permission for advertising measurement.
  */
 export function noteVisit(type: VisitStep, extra: { name?: string; value?: number } = {}) {
   if (typeof window === 'undefined' || isStaffDevice() || isQaVisit() || isPrivatePath(window.location.pathname)) return
-  if (!readConsent().statistics) return
   const visit = visitIds()
   if (!visit) return
   try {
@@ -236,7 +251,7 @@ export function track(name: BrowserEventName, data: EventData = {}): string {
   const loaded = window.__hwTracking
   try {
     if (loaded?.pixel && consent.marketing && window.fbq) window.fbq(META_CUSTOM.has(name) ? 'trackCustom' : 'track', name, pixelParams(data), { eventID: eventId })
-    if (loaded?.gtag && window.gtag) window.gtag('event', GA4_NAME[name], ga4Params(data))
+    if (consent.analytics && loaded?.gtag && window.gtag) window.gtag('event', GA4_NAME[name], ga4Params(data))
   } catch {
     // A tag failing must never break the page.
   }
