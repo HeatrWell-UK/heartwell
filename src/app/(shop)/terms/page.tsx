@@ -50,10 +50,10 @@ export default async function TermsPage() {
 
       <h2 id="ordering">2. Ordering and confirming</h2>
       <ol>
-        <li>When you place an order, we send you a link by email and WhatsApp showing what you ordered and the total.</li>
+        <li>When you place an order, your order page and email show what you ordered and the total, and ask you to message us on WhatsApp for confirmation.</li>
         <li>
-          Your order is accepted, and our contract with you begins, when you tap <strong>Confirm</strong> on that link (or confirm with us on WhatsApp or
-          by phone) and we then book it in. Until then nothing is owed on either side.
+          Your order is accepted, and our contract with you begins, when you <strong>confirm</strong> it with us (on WhatsApp, by phone or by email) after
+          checking the details we send back, and we then book it in. Until then nothing is owed on either side.
         </li>
         <li>
           We may decline an order before we book it in, for example if a price on the site is obviously wrong, a piece is no longer available, or we can’t

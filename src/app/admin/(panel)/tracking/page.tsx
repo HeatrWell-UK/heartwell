@@ -105,7 +105,7 @@ export default async function TrackingPage() {
       </div>
 
       <Card title="Settings">
-        <TrackingSettingsForm initial={{ mode, purchaseMode: settings.purchase_mode as 'automatic' | 'manual', holdMinutes: settings.purchase_hold_minutes }} />
+        <TrackingSettingsForm initial={{ mode }} />
       </Card>
 
       <Card title="This device">
@@ -122,7 +122,7 @@ export default async function TrackingPage() {
           </p>
         </div>
         {outbox.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-zinc-300 bg-white p-6 text-center text-[15px] text-zinc-500">Nothing yet. A Purchase appears here when a customer confirms an order.</p>
+          <p className="rounded-xl border border-dashed border-zinc-300 bg-white p-6 text-center text-[15px] text-zinc-500">Nothing yet. A Purchase appears here when an order is confirmed, and waits until you press Send now.</p>
         ) : (
           <ul className="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
             {outbox.map((r) => {

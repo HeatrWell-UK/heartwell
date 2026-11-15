@@ -210,7 +210,7 @@ describe('search and sharing', () => {
     const many = productDescription(p(['Grey', 'Black', 'Navy Blue', 'Beige', 'Silver']))
     expect(many).toMatch(/^Sims 5 Seater Corner High Back in 5 colours, £749\./)
     expect(many.length).toBeLessThanOrEqual(DESCRIPTION_MAX)
-    expect(many).toMatch(/cash or bank transfer on delivery\.$/)
+    expect(many).toMatch(/Pay in full on delivery, in cash or by bank transfer\.$/)
   })
 
   it('names the piece with "sofa" in its structured data and description, as the title and feeds do', () => {

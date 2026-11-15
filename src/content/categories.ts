@@ -47,7 +47,7 @@ function priceAnswer(noun: string, products: ListingProduct[]): string | null {
   const low = cheapest(products)
   const high = dearest(products)
   if (!low || !high) return null
-  return `We have ${products.length} ${noun}. They start at ${formatPrice(low.price)} (the ${low.title})${high.price > low.price ? ` and go up to ${formatPrice(high.price)}` : ''}, with free delivery to most of mainland Britain and nothing to pay until it arrives.`
+  return `We have ${products.length} ${noun}. They start at ${formatPrice(low.price)} (the ${low.title})${high.price > low.price ? ` and go up to ${formatPrice(high.price)}` : ''}, with free delivery to most of mainland Britain, and you pay in full on delivery, in cash or by bank transfer.`
 }
 
 const deliveryQuestion = (noun: string, f: CategoryFacts): Answer => ({

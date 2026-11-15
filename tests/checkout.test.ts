@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { formatUkPhone, isUkPhone, phoneProblem, ukPhoneDigits } from '@/lib/checkout/phone'
 import { emailSuggestion } from '@/lib/checkout/email-typos'
 import { explainOrderError, OrderInput, orderPayload, pricingPayload, testReason } from '@/lib/checkout/order'
-import { askToConfirmHref, copyBlock, customerOrderEmail, escapeHtml, shopConfirmedEmail, shopOrderEmail, type OrderEmailData } from '@/lib/email/order-emails'
+import { askToConfirmHref, confirmRequestMessage, copyBlock, customerOrderEmail, escapeHtml, shopOrderEmail, type OrderEmailData } from '@/lib/email/order-emails'
+import { askForConfirmationMessage } from '@/lib/checkout/confirmation'
 
 const V = '11111111-1111-4111-8111-111111111111'
 const M = '22222222-2222-4222-8222-222222222222'
@@ -145,25 +146,31 @@ const emailOrder: OrderEmailData = {
   deliveryTotal: 30,
   totalAmount: 1008,
 }
-const confirmUrl = `https://example.test/confirm-order/${emailOrder.id}`
+// The customer's "ask for confirmation" link, as the order page and the email open WhatsApp with it.
+const askHref = `https://wa.me/447460669864?text=${encodeURIComponent(askForConfirmationMessage(emailOrder.reference))}`
 
 describe('order emails', () => {
-  it('asks the customer to confirm, with the link, totals and no unescaped input', () => {
+  it('sends the customer to WhatsApp for confirmation, with totals, in-full wording and no unescaped input', () => {
     const e = customerOrderEmail(emailOrder, {
-      confirmUrl,
+      askHref,
       windowLabel: 'Tue 6 – Thu 8 October',
       shop: { email: 'shop@example.test', phoneDisplay: '07460 669864', whatsAppHref: 'https://wa.me/447460669864' },
       now: new Date('2026-10-06T10:00:00Z'),
     })
     expect(e.subject).toBe('Your Heartwell order HW-100123')
-    expect(e.html).toContain(confirmUrl)
-    expect(e.html).toContain('Confirm my order')
+    expect(e.html).toContain(escapeHtml(askHref))
+    expect(e.html).toContain('Ask for confirmation on WhatsApp')
+    expect(e.html).not.toContain('Confirm my order')
+    expect(e.html).not.toContain('£0')
+    expect(e.html).toContain('No finance or instalments')
     expect(e.html).toContain('£1,008')
     expect(e.html).toContain('Ann &lt;b&gt;Smith&lt;/b&gt;'.split(' ')[0])
     expect(e.html).not.toContain('<b>Smith</b>')
     expect(e.html).toContain('including sofas made in a fabric we offer')
-    expect(e.text).toContain(confirmUrl)
-    expect(e.text).toContain('To pay on delivery: £1,008')
+    expect(e.text).toContain(askHref)
+    expect(e.text).toContain('reply Confirm')
+    expect(e.text).toContain('To pay on delivery, in full: £1,008')
+    expect(e.text).not.toContain('£0')
     expect(e.text).toContain('Tuesday 20 October')
     expect(e.text).toContain('Delivery: Free')
   })
@@ -171,19 +178,31 @@ describe('order emails', () => {
   it('shows a charged delivery area’s price as the delivery line', () => {
     const e = customerOrderEmail(
       { ...emailOrder, delivery: { label: 'Delivery to Devon', amount: 40 }, deliveryTotal: 70, totalAmount: 1048 },
-      { confirmUrl, windowLabel: null, shop: { email: 'shop@example.test', phoneDisplay: null, whatsAppHref: null }, now: new Date('2026-10-06T10:00:00Z') },
+      { askHref: null, windowLabel: null, shop: { email: 'shop@example.test', phoneDisplay: null, whatsAppHref: null }, now: new Date('2026-10-06T10:00:00Z') },
     )
     expect(e.text).toContain('Delivery to Devon: £40')
     expect(e.html).toContain('Delivery to Devon')
-    expect(e.text).toContain('To pay on delivery: £1,048')
+    expect(e.text).toContain('To pay on delivery, in full: £1,048')
+    expect(e.html).not.toContain('wa.me')
   })
 
-  it('gives the shop the customer, a WhatsApp ask-to-confirm link, SKUs in the list and the copy block', () => {
-    const e = shopOrderEmail({ ...emailOrder, isTest: true }, { confirmUrl, adminUrl: 'https://example.test/admin' })
+  it('writes the owner’s ask-for-confirmation message with the order number', () => {
+    expect(askForConfirmationMessage('HW-100123')).toBe('Hello Heartwell, I have placed an order (HW-100123). Can you share my details so I can confirm the order?')
+  })
+
+  it('gives the shop the customer, a WhatsApp link that sends their details and asks for CONFIRM, SKUs in the list and the copy block', () => {
+    const e = shopOrderEmail({ ...emailOrder, isTest: true }, { adminUrl: 'https://example.test/admin' })
     expect(e.subject).toBe('[TEST] New order HW-100123: £1,008, waiting for the customer to confirm')
-    const ask = askToConfirmHref(emailOrder, confirmUrl)!
+    const ask = askToConfirmHref(emailOrder)!
     expect(ask.startsWith('https://wa.me/447700900123?text=')).toBe(true)
-    expect(decodeURIComponent(ask)).toContain(confirmUrl)
+    const message = decodeURIComponent(ask.slice('https://wa.me/447700900123?text='.length))
+    expect(message).toBe(confirmRequestMessage(emailOrder))
+    expect(message).toContain('Hi Ann, thank you for your Heartwell order HW-100123')
+    expect(message).toContain('Delivery address: 1 Leaf Street, Headingley, LS6 2AB')
+    expect(message).toContain('Preferred day: Tuesday 20 October')
+    expect(message).toContain('To pay on delivery, in full: £1,008')
+    expect(message).toContain('reply CONFIRM')
+    expect(message).not.toContain('confirm-order')
     expect(e.html).toContain(escapeHtml(ask))
     const block = copyBlock(emailOrder)
     expect(e.html).toContain('SC-1')
@@ -195,11 +214,6 @@ describe('order emails', () => {
     expect(e.html).toContain('Side gate &amp; bins')
   })
 
-  it('tells the shop when the customer confirms', () => {
-    const e = shopConfirmedEmail(emailOrder, { adminUrl: 'https://example.test/admin' })
-    expect(e.subject).toBe('HW-100123 confirmed by the customer: £1,008')
-    expect(e.text).toContain('Ring 07700 900123')
-  })
 })
 
 describe('address tidying', () => {

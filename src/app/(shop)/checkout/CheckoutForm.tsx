@@ -579,11 +579,11 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           className="flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-velvet-sheen px-6 text-[17px] font-semibold text-white disabled:bg-none disabled:bg-line-soft disabled:text-slate"
         >
           <LockSimpleIcon aria-hidden="true" size={20} />
-          {placing ? 'Placing your order…' : 'Place order: pay nothing today'}
+          {placing ? 'Placing your order…' : 'Place order: pay on delivery'}
         </button>
         <p className="text-[13px] leading-snug text-slate">
-          See <Link href="/delivery-and-returns#returns">returns and transport costs</Link> before ordering. Confirm your order on the next page. We’ll then call to arrange delivery. By placing your order you agree to our{' '}
-          <Link href="/terms">terms</Link>.
+          See <Link href="/delivery-and-returns#returns">returns and transport costs</Link> before ordering. On the next page, ask us for confirmation on WhatsApp: we send back
+          your details, you reply to confirm, and we ring to arrange delivery. By placing your order you agree to our <Link href="/terms">terms</Link>.
         </p>
       </section>
     </form>

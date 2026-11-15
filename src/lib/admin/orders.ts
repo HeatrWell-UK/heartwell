@@ -105,12 +105,19 @@ export interface StatusMessageOrder {
   cancellationReason?: string | null
 }
 
-/** The WhatsApp message staff send the customer for each status. */
-export function statusMessage(o: StatusMessageOrder, status: OrderStatus, links: { confirmUrl: string; trackUrl: string }): string {
+/**
+ * The WhatsApp message staff send the customer for each status. For an order
+ * waiting to be confirmed, the page passes confirmRequestMessage (the details
+ * and "reply CONFIRM", src/lib/email/order-emails.ts) as `confirmRequest`.
+ */
+export function statusMessage(o: StatusMessageOrder, status: OrderStatus, links: { trackUrl: string; confirmRequest?: string }): string {
   const hi = `Hi ${firstName(o.customerName)}`
   switch (status) {
     case 'pending_cod':
-      return `${hi}, thank you for your Heartwell order ${o.reference}. Please tap here to confirm it, and we'll book your delivery: ${links.confirmUrl}`
+      return (
+        links.confirmRequest ??
+        `${hi}, thank you for your Heartwell order ${o.reference}. If everything in it is right, please reply CONFIRM and we'll ring you to book your delivery day. If anything needs changing, just tell us here.`
+      )
     case 'confirmed':
       return `${hi}, thank you for confirming your Heartwell order ${o.reference}. Which days suit you for delivery?`
     case 'processing':

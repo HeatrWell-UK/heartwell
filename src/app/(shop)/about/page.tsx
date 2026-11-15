@@ -44,7 +44,7 @@ export default function AboutPage() {
           An online sofa shop{a ? ` based in ${a.locality}, ${a.county}` : ''}, selling to homes across mainland Britain.
         </li>
         <li>Corner sofas, U-shaped sofas, 3+2 sets, recliners, armchairs and footstools, in ranges such as Verona, Ashton and Sims.</li>
-        <li>You pay on delivery, in cash or by bank transfer, once the sofa is in your room: no deposit, no card details, no finance.</li>
+        <li>You pay the full price on delivery, in cash or by bank transfer, once the sofa is in your room: no deposit, no card details, no finance or instalments.</li>
         <li>
           {PROMISES.delivery.long} {PROMISES.delivery.timingLong}
         </li>
@@ -63,14 +63,15 @@ export default function AboutPage() {
       <h2 id="why">Why you pay on delivery</h2>
       <p>
         Buying a sofa online from a name you haven’t heard of is a leap. So we take the risk instead of you: nothing is paid when you order, and you pay
-        the driver in cash or by bank transfer only once your sofa is in your room and you’ve had a good look at it. No card details, no deposit.
+        the driver the full price, in cash or by bank transfer, only once your sofa is in your room and you’ve had a good look at it. No card details, no
+        deposit, and no finance or instalments: one payment, on the day.
       </p>
 
       <h2 id="how">How it works</h2>
       <ol className="hw-steps">
         <li>Choose your sofa online or on WhatsApp. It takes a couple of minutes, and there’s no account to set up.</li>
-        <li>Tap Confirm on the link we send you, and we ring or WhatsApp to book your delivery day.</li>
-        <li>We bring it to your room, free to most of mainland Britain. You check it, then you pay.</li>
+        <li>Ask us for confirmation on WhatsApp. We send back the details we have, you check them and reply to confirm, and we ring to book your delivery day.</li>
+        <li>We bring it to your room, free to most of mainland Britain. You check it, then you pay the driver in full.</li>
       </ol>
 
       <h2 id="made-to-order">Made for you</h2>

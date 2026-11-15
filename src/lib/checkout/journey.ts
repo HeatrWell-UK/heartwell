@@ -17,10 +17,10 @@ export interface JourneyStep {
 
 const STEPS: { key: JourneyStep['key']; label: string; hint: string }[] = [
   { key: 'placed', label: 'Order placed', hint: '' },
-  { key: 'confirmed', label: 'Confirmed by you', hint: 'Tap Confirm my order on the order page or use the link in your order email.' },
+  { key: 'confirmed', label: 'Confirmed by you', hint: 'Tap Ask for confirmation: we send your details back on WhatsApp, and you reply to confirm.' },
   { key: 'processing', label: 'Being prepared', hint: 'We ring you to book your delivery day.' },
   { key: 'shipped', label: 'On its way', hint: 'We let you know the day it leaves.' },
-  { key: 'delivered', label: 'Delivered', hint: 'Look it over, then pay the driver in cash or by bank transfer.' },
+  { key: 'delivered', label: 'Delivered', hint: 'Look it over, then pay the driver in full, in cash or by bank transfer.' },
 ]
 
 /** How far each status has got: the index of the last step it has reached. */

@@ -46,7 +46,7 @@ export default async function DeliveryAndReturnsPage() {
       title="Delivery and returns"
       intro={
         <p>
-          Free delivery to most of mainland Britain, nothing to pay until your furniture is in your room, and plain rules if anything goes wrong.
+          Free delivery to most of mainland Britain, the full price paid to the driver once your furniture is in your room, and plain rules if anything goes wrong.
         </p>
       }
       updated="2026-11-13"

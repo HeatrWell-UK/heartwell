@@ -6,7 +6,7 @@ const states = (status: string) => orderJourney(status)?.map((s) => s.state)
 describe('an order’s journey', () => {
   it('shows what’s done, the one step that’s next and what happens there', () => {
     expect(states('pending_cod')).toEqual(['done', 'current', 'upcoming', 'upcoming', 'upcoming'])
-    expect(orderJourney('pending_cod')![1]!.hint).toMatch(/Confirm my order/)
+    expect(orderJourney('pending_cod')![1]!.hint).toMatch(/Ask for confirmation/)
     expect(states('confirmed')).toEqual(['done', 'done', 'current', 'upcoming', 'upcoming'])
     expect(orderJourney('confirmed')![2]!.hint).toMatch(/book your delivery day/)
     expect(states('shipped')).toEqual(['done', 'done', 'done', 'done', 'current'])

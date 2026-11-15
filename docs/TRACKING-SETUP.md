@@ -12,7 +12,7 @@ When you're ready, say so and we'll go through this together, screen by screen (
 | Meta Pixel | Loads only on heartwellsofa.co.uk with `NEXT_PUBLIC_APP_ENV=production`, after **Accept**, never on order, confirmation, tracking, review or newsletter pages. |
 | Conversions API (server) | A copy of every browser event with the same event ID (Meta counts it once), for visitors who accepted. |
 | Events | PageView, ViewContent (each colour viewed), AddToCart, InitiateCheckout, Contact (WhatsApp or phone tap), Lead (samples, basket reminder), OrderPlaced (custom). |
-| Purchase | From the server only, when the customer **confirms**, once per order, 30 minutes later (Send now / Hold / Don't send in Admin → Tracking). Value = the database's total including delivery extras. OrderDelivered follows on delivery. |
+| Purchase | From the server only, once per order, queued when the order is marked **confirmed** and sent **only when staff press Send** (the order page's "Send Purchase to Meta", or Send now in Admin → Tracking; owner, 15 November 2026). Value = the database's total including delivery extras. OrderDelivered follows on delivery. |
 | Customer details | Meta conversions require recorded advertising consent. Hashed contact details and visitor IDs may be sent with consent. Private order links and raw postcodes stay in the shop. |
 | GA4 | Loads after analytics consent. Server purchases require the consented Analytics identifier. |
 | Never counts | The site before go-live, test orders, `?qa=1` visits, and devices excluded in Admin → Tracking → This device. |

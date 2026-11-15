@@ -18,14 +18,14 @@ Heartwell (heartwellsofa.co.uk) is a new online furniture brand for UK Mainland 
 - The Heartwell repo (HeatrWell-UK/heartwell) is **public until launch**: never commit secrets, customer data or anything from `reference/`. Keys go in the host's environment variables only.
 
 ## Business rules (do not change without the owner)
-- Cash or bank transfer on delivery. An order counts only once the customer confirms it (POST button on `/confirm-order/[id]`).
+- Cash or bank transfer on delivery, **in full**: no deposit, no finance, no instalments, and the site never says "£0" or "pay nothing" (owner, 15 November 2026: customers read it as a payment plan). An order counts only once the customer confirms it **in conversation**: the order page and email open WhatsApp with "Hello Heartwell, I have placed an order (HW-…). Can you share my details so I can confirm the order?", staff send the details back (`confirmRequestMessage`), the customer replies CONFIRM and staff mark it confirmed in the admin. There is no customer confirm button (removed 15 November 2026).
 - Lifecycle: `pending_cod` → `confirmed` → `processing` → `shipped` → `delivered` | `cancelled`. Timestamps are stamped once.
 - Money authority is the database (`place_order` etc.). The browser sends identities and quantities, never prices.
 - Delivery prices, the date window and offer tiers live in the `shop_settings` table. Promises live in `src/config/promises.ts`; contact details in `src/config/contact.ts`; the domain (`NEXT_PUBLIC_SITE_URL`) and customer email (`SUPPORT_EMAIL`) are one setting each.
 - Non-mainland postcodes go to a WhatsApp quote, never the online checkout.
 
 ## Tracking rules
-- Meta Purchase: server-side only, on confirmation, exactly once (via `conversion_outbox`), never for test or cancelled orders.
+- Meta Purchase: server-side only, exactly once (via `conversion_outbox`), never for test or cancelled orders, and **only when staff press Send** (the order page or Admin → Tracking; owner, 15 November 2026). Nothing is sent automatically; `purchase_mode` stays `manual`.
 - Browser and server copies of every event share one event ID.
 - Tracking runs only on a production host **and** with `APP_ENV=production`. The pre-launch site, test orders, QA links and excluded staff devices never count.
 - Customers' personal details (unhashed), order IDs, confirm/track links and postcodes in URLs never go to Meta or Google.

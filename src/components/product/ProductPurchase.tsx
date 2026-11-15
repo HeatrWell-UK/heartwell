@@ -196,7 +196,7 @@ export function ProductPurchase({
         {/*
           The photos on a velvet stage, in their lit alcove: a band across phones, a panel beside the buy box on desktops.
           On phones it's kept tight (audit A1), so the name and price are on the first screen under it, and the
-          "To pay today £0" coin stands on the photo's floor.
+          "Pay on delivery" coin stands on the photo's floor.
         */}
         <div className="lg:sticky lg:top-6 lg:self-start">
           <div className="hw-velvet hw-gold-edge overflow-hidden px-4 pb-5 lg:rounded-[var(--radius-panel)] lg:border-b-0 lg:px-8 lg:pb-9">
@@ -211,7 +211,7 @@ export function ProductPurchase({
                 overlay={
                   <>
                     <SaveButton slug={p.slug} sku={variant?.sku ?? null} noun={noun} className="right-1 top-1 size-11" />
-                    {variant && <Medallion label="To pay today" value="£0" small />}
+                    {variant && <Medallion label="In full" value="Pay on delivery" small />}
                     {/* Above the phone's dots, on the side away from the coin. */}
                     <WhatsAppButton
                       message={morePhotosMessage({ title: p.title, option, code: variant?.sku ?? null, url: pageUrl })}
@@ -257,19 +257,19 @@ export function ProductPurchase({
               </p>
             </div>
             {showWelcome && <WelcomePanel state={welcome} amount={welcomeAmount} hours={offers.welcome.hours} noun={noun} />}
-            {/* What's paid when: the shop's whole promise, in two lines. */}
+            {/*
+              How it's paid: the full price, to the driver, in one payment. (A "To pay today £0" row stood above this until
+              15 November 2026; the owner found customers read it as the first step of a payment plan.)
+            */}
             <dl className="flex flex-col rounded-[14px] border border-line px-3.5 text-[15px]">
-              <div className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2.5">
-                <dt>To pay today</dt>
-                <dd className="font-display text-[20px] leading-none text-velvet">£0</dd>
-              </div>
               {/* One term with two descriptions (the amount and how it's paid), so the list stays valid for screen readers. */}
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-2.5">
-                <dt>Item price on delivery</dt>
+                <dt className="font-semibold">Pay on delivery, in full</dt>
                 <dd className="font-display text-[20px] leading-none">{formatPrice(price - offerOff)}</dd>
                 <dd className="basis-full text-[13px] leading-snug text-slate">
-                  Cash or bank transfer to the driver, once it&rsquo;s in your room
-                  {offerOff > 0 ? `, with your ${formatPrice(offerOff)} ${offer.kind === 'welcome' ? 'welcome offer' : 'offer'} taken off` : ''}.
+                  One payment to the driver, in cash or by bank transfer, once it&rsquo;s in your room
+                  {offerOff > 0 ? `, with your ${formatPrice(offerOff)} ${offer.kind === 'welcome' ? 'welcome offer' : 'offer'} taken off` : ''}. No deposit, no card, no
+                  finance.
                 </dd>
               </div>
             </dl>

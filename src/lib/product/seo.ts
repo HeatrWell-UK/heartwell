@@ -68,7 +68,7 @@ export function productDescription(p: ProductPageData): string {
   const made = p.madeToOrder ? ' Made to order.' : ''
   const name = productSearchName(p)
   const text = (colourText: string) =>
-    `${name}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.brief}. ${PROMISES.payment.short}: cash or bank transfer on delivery.`
+    `${name}${colourText}, ${formatPrice(productPrice(p))}.${made} ${PROMISES.delivery.brief}. ${PROMISES.payment.short}.`
   // Google shows about 160 characters, so a long colour list becomes a count
   // rather than cutting off how paying works at the end.
   const options = colours.length > 1

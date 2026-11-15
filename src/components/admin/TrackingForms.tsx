@@ -6,7 +6,7 @@ import { saveTrackingSettings } from '@/app/admin/(panel)/tracking/actions'
 import { isStaffDevice, setStaffDevice } from '@/lib/tracking/browser'
 import type { TrackingMode } from '@/config/tracking'
 import { cn } from '@/lib/cn'
-import { OutcomeNote, primaryButton, secondaryButton, TextField, type Outcome } from './Fields'
+import { OutcomeNote, primaryButton, secondaryButton, type Outcome } from './Fields'
 
 const MODES: { value: TrackingMode; title: string; body: string }[] = [
   { value: 'dry_run', title: 'Dry run', body: 'Every event is built and shown below, and nothing is sent anywhere. Safe at any time.' },
@@ -14,11 +14,9 @@ const MODES: { value: TrackingMode; title: string; body: string }[] = [
   { value: 'live', title: 'Live', body: 'Real events from the live site. Test orders, QA links and staff devices still never count.' },
 ]
 
-export function TrackingSettingsForm({ initial }: { initial: { mode: TrackingMode; purchaseMode: 'automatic' | 'manual'; holdMinutes: number } }) {
+export function TrackingSettingsForm({ initial }: { initial: { mode: TrackingMode } }) {
   const router = useRouter()
   const [mode, setMode] = useState(initial.mode)
-  const [purchaseMode, setPurchaseMode] = useState(initial.purchaseMode)
-  const [hold, setHold] = useState(String(initial.holdMinutes))
   const [saving, setSaving] = useState(false)
   const [outcome, setOutcome] = useState<Outcome>(null)
 
@@ -29,7 +27,7 @@ export function TrackingSettingsForm({ initial }: { initial: { mode: TrackingMod
         e.preventDefault()
         if (mode === 'live' && initial.mode !== 'live' && !window.confirm('Switch to Live? Real events will reach Meta and Google from the live site.')) return
         setSaving(true)
-        const r = await saveTrackingSettings({ mode, purchaseMode, holdMinutes: Number(hold) || 0 }).catch(() => ({ ok: false as const, message: 'Couldn’t reach the server. Try again.' }))
+        const r = await saveTrackingSettings({ mode }).catch(() => ({ ok: false as const, message: 'Couldn’t reach the server. Try again.' }))
         setSaving(false)
         setOutcome(r)
         if (r.ok) router.refresh()
@@ -47,26 +45,10 @@ export function TrackingSettingsForm({ initial }: { initial: { mode: TrackingMod
           </label>
         ))}
       </fieldset>
-      <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 text-sm font-semibold text-zinc-800">Purchase to Meta and GA4</legend>
-        {(
-          [
-            ['automatic', 'Automatic', 'Sent on its own after the hold below, giving time to mark a mistaken order as a test or cancel it. Recommended.'],
-            ['manual', 'Manual', 'Each confirmed order waits until you press Send now below.'],
-          ] as const
-        ).map(([value, title, body]) => (
-          <label key={value} className={cn('flex cursor-pointer items-start gap-3 rounded-lg p-3 ring-1', purchaseMode === value ? 'bg-zinc-50 ring-zinc-900' : 'ring-zinc-200')}>
-            <input type="radio" name="purchase" value={value} checked={purchaseMode === value} onChange={() => setPurchaseMode(value)} className="mt-1 size-4 accent-zinc-900" />
-            <span className="flex flex-col">
-              <span className="font-semibold text-zinc-900">{title}</span>
-              <span className="text-sm text-zinc-600">{body}</span>
-            </span>
-          </label>
-        ))}
-      </fieldset>
-      {purchaseMode === 'automatic' && (
-        <TextField label="Hold before sending" suffix="minutes" value={hold} inputMode="numeric" className="max-w-56" onChange={(v) => setHold(v.replace(/\D/g, '').slice(0, 4))} hint="30 is a good balance." />
-      )}
+      <p className="rounded-lg bg-zinc-50 p-3 text-sm text-zinc-700 ring-1 ring-zinc-200">
+        <strong className="text-zinc-900">Purchases go to Meta and GA4 only when you press a button.</strong> A confirmed order’s Purchase waits in the queue below and on
+        its order page until you press Send now (owner, 15 November 2026). Nothing is sent on its own.
+      </p>
       <OutcomeNote outcome={outcome} />
       <button type="submit" disabled={saving} className={cn(primaryButton, 'self-start')}>
         {saving ? 'Saving…' : 'Save tracking settings'}

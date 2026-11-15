@@ -36,7 +36,7 @@ export async function GET() {
       ? [`- Delivery charges: ${delivery.areas.map((d) => `${d.name} ${formatPrice(d.charge)}`).join(', ')}; these areas take ${PROMISES.delivery.chargedTiming}. Free everywhere else on the mainland.`]
       : []),
     '- Outside UK Mainland (Northern Ireland, islands, Isle of Wight): delivered by arrangement, quoted on WhatsApp.',
-    `- Orders count once the customer taps Confirm on the link sent by email and WhatsApp.`,
+    `- Orders count once the customer confirms them on WhatsApp (or by phone or email) after checking the details Heartwell sends back. No finance, instalments or deposits: the full price is paid to the driver on delivery.`,
     `- Returns: ${POLICIES.changeOfMindDays} days to change your mind on standard catalogue orders, including standard fabric options. Faults are always covered.`,
     `- Guarantee: ${PROMISES.guarantee.long}`,
     `- Contact: ${CONTACT.email}${CONTACT.phoneDisplay ? `, phone and WhatsApp ${CONTACT.phoneDisplay}` : ''}.`,

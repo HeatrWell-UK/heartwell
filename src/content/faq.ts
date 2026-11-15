@@ -44,12 +44,17 @@ export function faqGroups(facts: FaqFacts | null, extras: { fabricCount: number;
         {
           id: 'how-pay',
           q: 'How do I pay?',
-          a: 'You pay the driver when your furniture arrives, in cash or by bank transfer. Nothing is taken when you order, and we never ask for card details.',
+          a: 'You pay the driver the full price when your furniture arrives, in one payment, in cash or by bank transfer. Nothing is taken when you order, and we never ask for card details.',
+        },
+        {
+          id: 'finance',
+          q: 'Do you offer finance, a payment plan or a deposit?',
+          a: 'No. We don’t offer finance, pay-monthly plans or instalments, and we don’t take deposits. The whole price is paid to the driver on the day your furniture is delivered.',
         },
         {
           id: 'confirm',
-          q: 'Why do you ask me to confirm my order?',
-          a: 'Because nothing is paid upfront, we send you a link by email and WhatsApp after you order. Tap Confirm on it and your order goes ahead: we book your delivery and, for made-to-order pieces, start making it. Until you confirm, nothing happens and you owe nothing.',
+          q: 'How do I confirm my order?',
+          a: 'After you order, tap Ask for confirmation on your order page (it’s in your order email too). It opens WhatsApp with your order number; we reply with the details we have, you check them and reply Confirm, and we ring to book your delivery. Until you confirm, nothing happens and you owe nothing.',
         },
         {
           id: 'order-by-phone',

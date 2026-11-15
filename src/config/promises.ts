@@ -23,11 +23,13 @@ export const PROMISES = {
     chargedAreas: 'Devon, Cornwall and the north of Scotland',
     chargedTiming: '5 to 7 working days',
   },
+  // Owner, 15 November 2026: say "in full" and "no finance" everywhere. "To pay
+  // today £0" read to some customers as the first step of a payment plan.
   payment: {
     label: 'Pay on delivery',
-    sub: 'Cash or transfer',
-    short: 'Pay nothing until it arrives',
-    long: 'Pay the driver in cash or by bank transfer once your furniture is in your room. Nothing to pay upfront.',
+    sub: 'In full, cash or transfer',
+    short: 'Pay in full on delivery, in cash or by bank transfer',
+    long: 'You pay the driver the full price in cash or by bank transfer once your furniture is in your room. No deposit, no card, and no finance or instalments.',
   },
   guarantee: {
     label: '1-year guarantee',
@@ -70,7 +72,7 @@ export const POLICIES = {
 } as const
 
 /** The one sentence in the bar at the top of every page. */
-export const ANNOUNCEMENT = 'Free delivery to most postcodes. Pay nothing until it arrives.'
+export const ANNOUNCEMENT = 'Free delivery to most postcodes. Pay in full on delivery, cash or bank transfer.'
 /** The same on phones, short enough for one line (audit A1). */
 export const ANNOUNCEMENT_SHORT = 'Free delivery to most postcodes · Pay on delivery'
 

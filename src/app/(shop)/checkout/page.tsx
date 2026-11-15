@@ -22,7 +22,7 @@ export default async function CheckoutPage() {
       <header className="flex flex-col gap-2">
         <h1 className="text-[34px] leading-[1.08] lg:text-[52px]">Checkout</h1>
         <p className="text-[16px] leading-relaxed text-slate lg:text-[17px]">
-          No card and nothing to pay today. You pay the driver once it&rsquo;s in your room.
+          No card and no deposit. You pay the driver the full price, in cash or by bank transfer, once it&rsquo;s in your room.
         </p>
       </header>
       <CheckoutForm

@@ -23,9 +23,9 @@ import { MinimumNote } from '@/components/checkout/MinimumNote'
 import { refreshBasket } from './actions'
 
 const NEXT = [
-  'Place your order. No card, no account and nothing to pay.',
-  'Confirm it with one tap, and we ring to book your delivery day.',
-  'Pay the driver once it’s in your room.',
+  'Place your order. No card, no deposit and no account.',
+  'Ask for confirmation on WhatsApp: we send back your details, you reply to confirm, and we ring to book your delivery day.',
+  'Pay the driver in full, in cash or by bank transfer, once it’s in your room. No finance.',
 ]
 
 export function BasketView({ offers }: { offers: ShopOffers }) {
@@ -63,7 +63,7 @@ export function BasketView({ offers }: { offers: ShopOffers }) {
           <BasketIcon size={28} />
         </span>
         <p className="max-w-[32rem] text-[17px] leading-relaxed text-slate">
-          Your basket is empty. Whatever you add stays here on this phone, and there&rsquo;s nothing to pay until it&rsquo;s delivered.
+          Your basket is empty. Whatever you add stays here on this phone. You pay in full on delivery, in cash or by bank transfer.
         </p>
         <ButtonLink href="/sofas">Shop sofas</ButtonLink>
       </div>

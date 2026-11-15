@@ -4,13 +4,13 @@ import { EMAIL } from '@/config/email'
 import { SITE_URL } from '@/config/site'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendEmail } from '@/lib/email/send'
-import { customerOrderEmail, customerStatusEmail, EMAILED_STATUSES, shopConfirmedEmail, shopOrderEmail, type EmailedStatus, type OrderEmailData } from '@/lib/email/order-emails'
+import { customerOrderEmail, customerStatusEmail, EMAILED_STATUSES, shopOrderEmail, type EmailedStatus, type OrderEmailData } from '@/lib/email/order-emails'
+import { askForConfirmationMessage } from '@/lib/checkout/confirmation'
 import { fabricLabel } from '@/lib/product/helpers'
 import { floorName } from '@/lib/delivery/pricing'
 import { getDeliveryInfo } from '@/lib/product/load'
 import { areaForPostcode, orderDeliveryLine } from '@/lib/delivery/areas'
 
-export const confirmUrl = (id: string) => `${SITE_URL}/confirm-order/${id}`
 const adminUrl = () => `${SITE_URL}/admin`
 
 /** An order as the emails need it, read with the server's key. */
@@ -82,23 +82,15 @@ export async function sendOrderPlacedEmails(id: string): Promise<void> {
     .catch(() => null)
   const jobs: Promise<unknown>[] = [
     (async () => {
-      const shop = shopOrderEmail(order, { confirmUrl: confirmUrl(id), adminUrl: adminUrl() })
+      const shop = shopOrderEmail(order, { adminUrl: adminUrl() })
       await sendEmail({ kind: 'order_shop', to: EMAIL.shopTo, cc: EMAIL.shopCopy, ...shop, orderId: id, toCustomer: false })
     })(),
   ]
   if (order.customerEmail) {
-    const email = customerOrderEmail(order, { confirmUrl: confirmUrl(id), windowLabel, shop: shopContact() })
+    const email = customerOrderEmail(order, { askHref: whatsAppHref(askForConfirmationMessage(order.reference)), windowLabel, shop: shopContact() })
     jobs.push(sendEmail({ kind: 'order_customer', to: order.customerEmail, ...email, orderId: id, toCustomer: true }))
   }
   await Promise.all(jobs)
-}
-
-/** After the customer taps Confirm: tell the shop. */
-export async function sendOrderConfirmedEmail(id: string): Promise<void> {
-  const order = await loadOrderForEmail(id)
-  if (!order) return
-  const email = shopConfirmedEmail(order, { adminUrl: adminUrl() })
-  await sendEmail({ kind: 'order_confirmed_shop', to: EMAIL.shopTo, cc: EMAIL.shopCopy, ...email, orderId: id, toCustomer: false })
 }
 
 /** After staff move an order on: tell the customer (when they gave an email and the status is one we email about). */

@@ -8,35 +8,37 @@ const alsoTrue = [
 ]
 
 /**
- * How paying works, as what you pay and when: £0 today, £0 when you confirm,
- * and only then, in your room, the driver. The last step carries this week's
- * real delivery dates. A true sequence on a gold thread (down on phones,
- * across on desktops) that draws itself as the steps scroll by (globals.css,
+ * How paying works, as what happens when: no card when you order, no deposit
+ * when you confirm, and the full price to the driver in your room. (Until 15
+ * November 2026 the first two steps said "£0", which some customers read as
+ * the first step of a payment plan.) The last step carries this week's real
+ * delivery dates. A true sequence on a gold thread (down on phones, across on
+ * desktops) that draws itself as the steps scroll by (globals.css,
  * .hw-thread-draw).
  */
 export function HowPayingWorks({ windowLabel }: { windowLabel: string | null }) {
   const steps = [
-    { when: 'Today', pay: '£0', paid: 'to pay when you order', title: 'Order in two minutes', body: 'Choose your sofa and fabric. No card, no deposit and no account.' },
+    { when: 'Today', pay: 'No card', paid: 'nothing is taken when you order', title: 'Order in two minutes', body: 'Choose your sofa and fabric. No card, no deposit and no account.' },
     {
       when: 'Straight after',
-      pay: '£0',
-      paid: 'to pay when you confirm',
-      title: 'Confirm with one tap',
-      body: 'We send your order by WhatsApp and email. Tap Confirm and we ring you to book the delivery day.',
+      pay: 'No deposit',
+      paid: 'nothing is taken when you confirm',
+      title: 'Confirm on WhatsApp',
+      body: 'Tap Ask for confirmation: we send back the details we have, you check them and reply to confirm, and we ring to book the delivery day.',
     },
     {
       when: windowLabel ? `Usually ${windowLabel}` : `Usually in ${PROMISES.delivery.timingShort}`,
-      pay: 'On delivery',
-      paid: 'to the driver, in cash or by bank transfer',
+      pay: 'Full price',
+      paid: 'to the driver, in one payment, cash or bank transfer',
       title: 'It’s in your room',
-      body: 'Look it over before you pay. If anything’s wrong, show the driver and we’ll put it right.',
+      body: 'Look it over before you pay. If anything’s wrong, show the driver and we’ll put it right. No finance, no instalments.',
     },
   ]
 
   return (
     <section aria-labelledby="paying" className="mx-auto max-w-[1200px] px-4 pt-14 lg:px-6 lg:pt-24">
       <h2 id="paying" className="max-w-[18ch] text-[32px] leading-[1.1] lg:max-w-none lg:text-[46px]">
-        Nothing to pay until it&rsquo;s in your room
+        You pay once, in full, when it&rsquo;s in your room
       </h2>
 
       <ol className="mt-9 grid lg:mt-14 lg:grid-cols-3">
@@ -55,7 +57,7 @@ export function HowPayingWorks({ windowLabel }: { windowLabel: string | null }) 
                 <span className="sr-only">Step {i + 1}, </span>
                 {s.when}
               </span>
-              <span className="mt-2 font-display text-[44px] leading-none text-velvet lg:mt-3 lg:text-[60px]">{s.pay}</span>
+              <span className="mt-2 font-display text-[36px] leading-none text-velvet lg:mt-3 lg:text-[48px]">{s.pay}</span>
               <span className="mt-1.5 text-[14px] text-slate">{s.paid}</span>
               <span className="mt-3.5 text-[18px] font-semibold leading-snug lg:mt-5 lg:text-[19px]">{s.title}</span>
               <span className="mt-1 max-w-[34ch] text-[15px] leading-relaxed text-slate lg:text-base">{s.body}</span>

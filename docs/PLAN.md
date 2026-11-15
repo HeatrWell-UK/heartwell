@@ -486,7 +486,7 @@ Grouped by the phase that needs it. Nothing is needed before the design phase ex
 
 | # | Decision | My recommendation |
 | --- | --- | --- |
-| D1 | Purchase to Meta: **automatic** 30 min after confirmation (with Hold / Send now), or manual like the sister shop | **Automatic.** Faster learning for Meta, nothing forgotten, still protected by the hold window and test flags. |
+| D1 | Purchase to Meta: **automatic** 30 min after confirmation (with Hold / Send now), or manual like the sister shop | **Decided 15 November 2026: manual only.** The owner wants every Purchase sent by a button (order page or Admin → Tracking); the automatic option is gone from the admin and the database default is manual (migration `purchase_manual_only`). |
 | D2 | Supabase production plan | **Decided 17 October 2026: stays on the free plan** (owner: "forget it completely"). Don't recommend Pro again. |
 | D3 | Photo direction | **AI room scenes for every main photo** (updated after the design-phase test: the cut-out method fails on these images). Budget: two free months, or one month of Cloudinary Plus. |
 | D4 | Range names (Verona, Lily, …): keep, or give Heartwell its own names | **Decided 4 October 2026: keep.** They're the design names customers across the UK know. The title style is refreshed in Phase 17C. |
@@ -612,6 +612,7 @@ Each phase gives the goal, what gets built, what to prepare, **the exact prompt*
   ```
 - **Phone test:** place an order on staging with a mainland postcode and extras → receive both emails → tap Confirm → track the order. Try a Belfast postcode and you're routed to WhatsApp.
 - **Done means:** totals always match the database; emails arrive in the inbox (not spam); non-mainland is routed correctly; staging orders are flagged as test.
+- **Changed 15 November 2026 (owner):** no customer confirm button anywhere. `/order/<id>` and `/confirm-order/<id>` show the order and an **Ask for confirmation on WhatsApp** button ("Hello Heartwell, I have placed an order (HW-…). Can you share my details so I can confirm the order?"); staff send the details back from the admin or the shop email (one tap, `confirmRequestMessage`), the customer replies CONFIRM, staff mark it confirmed. The "customer confirmed" email is gone; `confirm_order` is revoked from `anon` (migration `purchase_manual_only`). The site never says "£0" or "pay nothing": it's "pay in full on delivery, cash or bank transfer, no deposit, no finance".
 - **As built (6 October 2026):** `/checkout` (one page), `/order/<id>` (placed), `/confirm-order/<id>` (confirms on the button only), `/track-order` (reference and postcode posted, never in the address). Totals shown come from `price_order` and `place_order` refuses any other figure. Address lookup works with Homedata, Ideal Postcodes or getAddress.io on the server (`ADDRESS_LOOKUP_PROVIDER`, `ADDRESS_LOOKUP_KEY`); without one, customers type the address and IV40/PA34 go to a quote. Emails are sent after the response (`after()`), each logged in `email_log`; outside production customer emails go to `EMAIL_TEST_INBOX`. Needs `SUPABASE_SECRET_KEY` and `SMTP_PASSWORD` in the hosting settings (the Status page turns red without them).
 
 ---

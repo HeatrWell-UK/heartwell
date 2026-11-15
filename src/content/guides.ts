@@ -403,7 +403,7 @@ export const GUIDES: Guide[] = [
         heading: 'Can I get a sofa next day?',
         blocks: [
           {
-            p: 'Not from us: two working days is the soonest we deliver. In return, it’s brought into the room you choose, and there’s nothing to pay until it’s there.',
+            p: 'Not from us: two working days is the soonest we deliver. In return, it’s brought into the room you choose, and you pay the driver in full only once it’s there.',
           },
         ],
       },

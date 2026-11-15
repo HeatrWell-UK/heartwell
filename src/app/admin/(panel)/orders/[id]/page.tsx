@@ -12,7 +12,8 @@ import type { FoundVisit } from '@/lib/admin/visits'
 import { getOrder, lineOption, orderPickers } from '@/lib/admin/load-orders'
 import { ALLOWED_MOVES, dualTime, isStatus, NEXT_STEP, stageAheadOfStatus, STATUS_LABEL, statusMessage, whatsAppTo, type OrderStatus } from '@/lib/admin/orders'
 import { toEmailData } from '@/lib/admin/order-view'
-import { copyBlock } from '@/lib/email/order-emails'
+import { confirmRequestMessage, copyBlock } from '@/lib/email/order-emails'
+import { outboxAction } from '../../tracking/actions'
 import { formatPrice } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 import { floorName } from '@/lib/delivery/pricing'
@@ -64,19 +65,22 @@ export default async function OrderPage({ params, searchParams }: Props) {
   // The website visit behind the order, and whether Meta has its Purchase yet.
   const [visitResult, purchaseResult] = await Promise.all([
     order.arrival_id ? db.rpc('find_visits', { p_input: { arrival_id: order.arrival_id, include_tests: true } }) : null,
-    db.from('conversion_outbox').select('status').eq('order_id', order.id).eq('platform', 'meta').eq('event_name', 'Purchase').maybeSingle(),
+    db.from('conversion_outbox').select('id, status').eq('order_id', order.id).eq('platform', 'meta').eq('event_name', 'Purchase').maybeSingle(),
   ])
   const linkedVisit = ((visitResult?.data as { visits?: FoundVisit[] } | null)?.visits ?? [])[0] ?? null
   const manualOrder = order.source === 'whatsapp' || order.source === 'phone'
-  const purchaseGone = purchaseResult.data?.status === 'sent' || purchaseResult.data?.status === 'sending'
+  const purchase = purchaseResult.data
+  const purchaseGone = purchase?.status === 'sent' || purchase?.status === 'sending'
+  // Purchases go to Meta only by hand (owner, 15 November 2026): a button here and on the Tracking page.
+  const purchaseWaiting = purchase && ['pending', 'held', 'failed'].includes(purchase.status)
 
   const status = (isStatus(order.status) ? order.status : 'pending_cod') as OrderStatus
   const next = NEXT_STEP[status]
-  const links = { confirmUrl: `${SITE_URL}/confirm-order/${order.id}`, trackUrl: `${SITE_URL}/track-order` }
+  const view = toEmailData(order)
+  const links = { trackUrl: `${SITE_URL}/track-order`, confirmRequest: confirmRequestMessage(view) }
   const msgOrder = { reference: order.reference ?? '', customerName: order.customer_name, customerPhone: order.customer_phone, totalAmount: order.total_amount - order.deposit_paid, cancellationReason: order.cancellation_reason }
   const tell = whatsAppTo(order.customer_phone, statusMessage(msgOrder, status, links))
   const ahead = stageAheadOfStatus({ status: order.status, confirmedAt: order.confirmed_at, processingAt: order.processing_at, shippedAt: order.shipped_at, deliveredAt: order.delivered_at })
-  const view = toEmailData(order)
   const moved = sp.moved && isStatus(sp.moved) ? sp.moved : null
   const pushes = ((pushLog.data ?? []) as unknown as (PushRow & { pushed_at: string; manual: boolean })[])
 
@@ -158,12 +162,29 @@ export default async function OrderPage({ params, searchParams }: Props) {
         ) : (
           <p className="rounded-lg bg-zinc-50 px-3 py-2.5 text-center text-sm font-semibold text-zinc-600">{status === 'cancelled' ? 'Cancelled: no next step.' : 'All done.'}</p>
         )}
-        {status === 'pending_cod' && <p className="text-xs text-zinc-500">Customers can confirm on their order page or from their email. Mark it confirmed yourself only after they confirm by phone or WhatsApp.</p>}
+        {status === 'pending_cod' && (
+          <p className="text-xs text-zinc-500">
+            The customer was asked to message us on WhatsApp for confirmation. Send them their details (the button below), and mark the order confirmed once
+            they reply CONFIRM, by WhatsApp or on the phone.
+          </p>
+        )}
         {tell && !moved && (
           <a href={tell} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-center rounded-lg px-4 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-300">
-            {status === 'pending_cod' ? 'Ask them to confirm on WhatsApp' : `WhatsApp ${order.customer_name.split(/\s+/)[0]} about this`}
+            {status === 'pending_cod' ? 'Send them their details on WhatsApp' : `WhatsApp ${order.customer_name.split(/\s+/)[0]} about this`}
           </a>
         )}
+        {purchaseWaiting && !order.is_test && (
+          <div className="flex flex-col gap-2 border-t border-zinc-100 pt-3">
+            <p className="text-sm text-zinc-700">
+              <strong>Meta Purchase: {purchase.status === 'failed' ? 'failed, not sent' : 'waiting for you'}.</strong> Nothing goes to Meta until you press this.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <ActButton act={outboxAction.bind(null, purchase.id, 'send_now')} label="Send Purchase to Meta" tone="primary" confirm={`Send ${order.reference}'s Purchase (${formatPrice(order.total_amount)}) to Meta now?`} />
+              <ActButton act={outboxAction.bind(null, purchase.id, 'skip')} label="Don’t send" tone="danger" confirm="Skip this Purchase? Meta will never get it." />
+            </div>
+          </div>
+        )}
+        {purchaseGone && <p className="text-xs text-zinc-500">Meta has this order’s Purchase.</p>}
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">

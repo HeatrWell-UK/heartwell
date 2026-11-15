@@ -12,7 +12,7 @@ import { HeroOffer } from './HeroOffer'
  * photos all stand the furniture in one room with a velvet alcove and a gold
  * rim, so the hero lines those alcoves up on a velvet wall: in the middle the
  * owner's room photo (Cloudinary, heartwell/Product Images/Elements) with the
- * "to pay today" medallion and the button on its floor; either side, the first
+ * "pay on delivery" medallion and the button on its floor; either side, the first
  * ranges, each named on a plate. As the page opens the alcoves light up one
  * after another (globals.css, "Motion").
  *
@@ -33,8 +33,9 @@ export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[];
         <h1 id="hero-title" className="hw-gallery-title text-[clamp(2.2rem,9.8vw,4rem)] leading-[1.04] lg:text-[min(4.6vw,4.5rem)]">
           <span className="text-gold-lit block">Choose it today.</span> <span className="text-gold-lit block">Pay when it&rsquo;s home.</span>
         </h1>
-        <p className="max-w-[30ch] text-[15px] leading-snug text-on-wine sm:max-w-none sm:text-[17px] lg:text-[18px]">
-          Sofas delivered free to most of mainland Britain, usually in {PROMISES.delivery.timingShort}.
+        <p className="max-w-[34ch] text-[15px] leading-snug text-on-wine sm:max-w-none sm:text-[17px] lg:text-[18px]">
+          Free delivery to most of mainland Britain, usually in {PROMISES.delivery.timingShort}. You pay the full price to the driver, in cash or by bank
+          transfer: no deposit, no finance.
         </p>
       </div>
 
@@ -44,7 +45,7 @@ export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[];
         sideLabel="Some of our ranges"
         className="mt-6 sm:mt-8 lg:mt-7"
       >
-        <Medallion label="To pay today" value="£0" />
+        <Medallion label="Cash or transfer" value="Pay on delivery" />
         <AlcoveFloor>
           <ButtonLink href="/sofas" className="px-9 shadow-[0_10px_24px_-10px_rgb(40_8_14/0.8)]">
             Shop sofas
@@ -67,8 +68,8 @@ export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[];
               <HandCoinsIcon aria-hidden="true" size={17} className="shrink-0 text-gold-pale" />
               On delivery
             </dt>
-            <dd className="text-[17px] font-semibold leading-snug lg:text-[19px]">Pay the driver</dd>
-            <dd className="text-[13px] leading-snug text-on-wine-muted lg:text-[14px]">In cash or by bank transfer</dd>
+            <dd className="text-[17px] font-semibold leading-snug lg:text-[19px]">Pay the driver in full</dd>
+            <dd className="text-[13px] leading-snug text-on-wine-muted lg:text-[14px]">Cash or bank transfer. No finance.</dd>
           </div>
           <HeroOffer welcome={welcome} />
         </dl>

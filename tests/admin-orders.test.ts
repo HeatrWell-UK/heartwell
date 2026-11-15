@@ -46,11 +46,14 @@ describe('times', () => {
 
 describe('WhatsApp messages', () => {
   const o = { reference: 'HW-100200', customerName: 'Ann Smith', customerPhone: '07700 900123', totalAmount: 749, cancellationReason: 'customer asked' }
-  const links = { confirmUrl: 'https://example.test/confirm-order/x', trackUrl: 'https://example.test/track-order' }
+  const links = { trackUrl: 'https://example.test/track-order' }
 
   it('writes one for every status, by first name', () => {
     for (const s of STATUSES) expect(statusMessage(o, s, links)).toMatch(/^Hi Ann,/)
-    expect(statusMessage(o, 'pending_cod', links)).toContain(links.confirmUrl)
+    expect(statusMessage(o, 'pending_cod', links)).toContain('reply CONFIRM')
+    expect(statusMessage(o, 'pending_cod', links)).not.toContain('http')
+    // The order page passes the full details message for an order waiting to be confirmed.
+    expect(statusMessage(o, 'pending_cod', { ...links, confirmRequest: 'Hi Ann, here are your details…' })).toBe('Hi Ann, here are your details…')
     expect(statusMessage(o, 'shipped', links)).toContain('£749')
     expect(statusMessage(o, 'shipped', links)).toContain(links.trackUrl)
     expect(statusMessage(o, 'cancelled', links)).toContain('customer asked')
@@ -227,11 +230,12 @@ describe('a deposit paid before delivery', () => {
     const shipped = customerStatusEmail(toEmailData(withDeposit), 'shipped', { trackUrl: 'https://example.test/track-order', shop })
     expect(shipped.text).toContain('Please have £669 ready')
     expect(shipped.text).toContain('Deposit paid: -£100')
-    expect(shipped.text).toContain('To pay on delivery: £669')
+    expect(shipped.text).toContain('To pay on delivery, in full: £669')
     const confirmed = customerStatusEmail(toEmailData(withDeposit), 'confirmed', { trackUrl: '', shop })
-    expect(confirmed.text).toContain('Nothing more to pay until it’s in your room: £669')
+    expect(confirmed.text).toContain('The rest, £669, is paid to the driver')
     const none = customerStatusEmail(toEmailData(row), 'confirmed', { trackUrl: '', shop })
-    expect(none.text).toContain('Nothing to pay until it’s in your room: £799')
-    expect(none.text).toContain('To pay today: £0')
+    expect(none.text).toContain('The full price, £799, is paid to the driver')
+    expect(none.text).toContain('To pay on delivery, in full: £799')
+    expect(none.text).not.toContain('£0')
   })
 })
