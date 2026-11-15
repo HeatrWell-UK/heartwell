@@ -882,6 +882,96 @@ Not wanted (owner): a registered company or legal details on the site, Meta Busi
 
 ---
 
+### Phase 22 — Black Friday to New Year: the shop dressed as a Christmas sale (owner, 16 November 2026)
+
+The owner's brief: Black Friday week starts on 17 November, then Christmas, then New Year; make the whole website a Christmas sale. Written on 16 November 2026 as five parts, one prompt each, in date order. Everything stays inside the rules that already hold: pay in full on delivery (never "£0"), confirmation in conversation, real reductions only (a was-price is a price really charged for 28 days), real dates only (no invented countdowns), red velvet and gold (no green, pink or orange), the £399 minimum, and Purchases to Meta by button.
+
+**The calendar (2026–27)**
+
+| Dates | What the shop says | Switch |
+| --- | --- | --- |
+| Tue 17 – Thu 26 November | **Black Friday week**: sale prices live, "Black Friday prices, pay in full on delivery" | event `black_friday` on |
+| Fri 27 November – Mon 30 November | **Black Friday to Cyber Monday**: same prices, the band names the last day (Monday) | same event, end date Mon 30 Nov |
+| Tue 1 – Thu 17 December | **Christmas delivery**: "Order by Thursday 17 December for delivery before Christmas" (stock pieces); made-to-order pieces show their own, earlier cut-off | event `christmas` on |
+| Fri 18 – Thu 24 December | **Last days**: stock pieces say "Delivery after Christmas, from <date>"; made-to-order pieces say "Made in January" | the cut-off has passed; the site works it out itself |
+| Fri 25 – Mon 28 December | Closed for delivery (the owner confirms the days); orders still taken | `closed_dates` |
+| Tue 29 December – Sun 31 January | **January sale**: new prices or the same, the band says "January sale" | event `january` on |
+
+Two dates the owner must confirm before anything is shown: **the last delivery day before Christmas** (the calendar above assumes Wednesday 23 December, with 4 working days back from it giving Thursday 17 December as the stock cut-off) and **the made-to-order lead time** (Lily and any other made-in-the-UK pieces; nothing on the site states it today).
+
+**22A — Sale foundations (before Tuesday 17 November)**
+
+- **Goal:** the shop can run a named sale with real dates, and knows which days it can't deliver, with nothing hard-coded.
+- **Builds:**
+  - Migration `shop_event`: `shop_settings.event_key` (`none`, `black_friday`, `christmas`, `january`), `event_name`, `event_starts_on`, `event_ends_on`, `event_line` (the one sentence the band shows), `closed_dates date[]` (days with no delivery, on top of `no_delivery_days`), `made_to_order_lead_days`. Admin → Settings → "Sale and Christmas" edits them. The date window, checkout's date picker, "Order today, at your door" and `place_order` all skip `closed_dates`.
+  - **Christmas cut-off, worked out, never typed:** `christmasCutoff()` = the last delivery day before 25 December minus the delivery working days (the area's own for charged areas), skipping Mondays and closed dates; made-to-order pieces subtract `made_to_order_lead_days`. One function, tested, used by the product page, the category header, the basket, checkout and the emails.
+  - **`/sale`** (indexable, a line in `docs/KEYWORDS.md`: "sofa sale", "black friday sofa deals uk", "christmas sofa sale"): every piece with a real was-price, biggest saving first, the same tiles as a category, the band's dates, and the paying rules in one line. Empty state when nothing is on a deal (the page is never a lie).
+  - **Feeds:** `g:sale_price` and `g:sale_price_effective_date` in the Google feed and `sale_price` in the Meta feed when a piece has a was-price, so Google Shopping and Meta catalogue ads show the strike-through.
+  - **The band:** the announcement bar becomes the event line while an event is on ("Black Friday prices until Monday 30 November. Pay in full on delivery."), otherwise today's line. One row on phones.
+- **Prices (owner's list):** the sale is **real price cuts on the catalogue**, entered in Admin → Catalogue (price and was-price) or by a price-list migration like `owner_price_list`. The 28-day rule decides what can show a strike-through: prices unchanged since 23 October may show a was-price **from Friday 20 November**; the pieces repriced on 5 November (Bishop, Lilly, Oakland) not until **Thursday 3 December**. Until then a cut piece shows its new price without "was". The `product_price_log` check in the editor enforces this.
+- **Prompt:**
+  ```
+  Phase 22A — Sale foundations. Read CLAUDE.md, docs/PLAN.md (Phase 22) and docs/PROGRESS.md, then build 22A. Last delivery day before Christmas: <date>. Closed delivery days: <dates>. Made-to-order lead time: <days>. Black Friday prices: <list of piece, new price> (or "same prices, welcome offer only").
+  ```
+- **Done means:** the event dates and closed days come from Settings; the cut-off is right for a mainland postcode, a Devon postcode and a made-to-order piece; `/sale` lists only real deals; both feeds validate with sale prices.
+
+**22B — The festive dress (17–20 November; CSS only, no new photos needed)**
+
+- **Goal:** the whole site reads as a Christmas sale at a glance, in Heartwell's own velvet and gold, without a single green sprig or fake snow.
+- **Builds (docs/DESIGN.md gets a "Festive edition" section):**
+  - **Home hero:** a gold light-string along the top of the alcoves (the lamps already "light up" one by one; the string is the same glow, dotted), a wine-and-gold ribbon across the medallion's alcove reading the event's name, and the headline swapped by the event: Black Friday "Black Friday prices. Pay when it's home."; Christmas "Home before Christmas. Pay when it's home."; January "January sale. Pay when it's home." The three facts under the floor become: the Christmas cut-off (real), pay in full, the welcome offer.
+  - **Tiles and product pages:** the existing "20% off" pill in gold-pale is the sale mark; a second small line under the delivery dates: "In time for Christmas" or "Order by Thu 17 Dec for Christmas" or, after the cut-off, "Delivery from Tue 29 Dec". Made-to-order pieces say "Made in January" after their own cut-off.
+  - **Category and range pages:** the header's answer line adds the cut-off while the Christmas event is on (built from `christmasCutoff()`, never typed).
+  - **Basket and checkout:** one row under "Your order": the delivery dates offered, and "before Christmas" or "after Christmas" in words. The checkout's date picker greys the closed days.
+  - **Emails:** the header strip gets the gold ribbon and the event name; the order email states whether the dates are before Christmas.
+  - **Social template:** a fourth style, **festive** (gold ribbon, deep wine, white Gloock), in `design/social/products/styles.mjs`, used for sale carousels only.
+  - **Open Graph image** for `/sale` and the home page during the event.
+- **Prompt:**
+  ```
+  Phase 22B — Festive dress. Read CLAUDE.md, docs/PLAN.md (Phase 22), docs/DESIGN.md and docs/PROGRESS.md, then build 22B for the event in Settings.
+  ```
+- **Done means:** Lighthouse mobile accessibility 100 and performance within 3 points of today; everything reverts to the ordinary shop when `event_key` is `none`.
+
+**22C — Black Friday ads and posts (20–26 November; ads only on the owner's go)**
+
+- **Goal:** the traffic for the week, selling the sale on the terms that bring serious buyers.
+- **Builds:** sale carousels for the ranges with the biggest cuts (festive style, prices and was-prices on the slides, "pay in full on delivery, no finance" on the last slide); a 15-second cut of the Rio video with a sale end-card; ad copy that says **"Pay in full on delivery. No finance, no deposit."** in the first line (the "pay nothing upfront" line brought the unserious orders in November); the Meta catalogue sale prices (22A) switched on in the catalogue ad set; a daily budget and the end date set by the owner; `docs/META-ADS.md` gets a "Black Friday" section with the numbers to watch (orders placed, confirmed, cost per confirmed order).
+- **Prompt:**
+  ```
+  Phase 22C — Black Friday ads and posts. Read CLAUDE.md, docs/PLAN.md (Phase 22), docs/META-ADS.md and docs/PROGRESS.md, then build 22C. Budget: £<n> a day from <date> to 30 November. Ranges to lead with: <list>. Create the campaign paused; I will switch it on.
+  ```
+
+**22D — The Christmas run-in (1–17 December)**
+
+- **Goal:** every visitor knows, without asking, whether their sofa can be home for Christmas, and the shop isn't flooded with orders it can't deliver.
+- **Builds:** a **real** "days left to order for Christmas" line on the home hero and product pages (it counts to the computed cut-off, so it's allowed); an **"In time for Christmas"** filter on category pages (stock pieces, mainland postcodes) and a plain note on made-to-order pieces once their cut-off has passed; Visit us, Contact and the footer show the festive opening days (from `closed_dates`); the WhatsApp page message and the order email mention delivery after Christmas once the cut-off has passed; the admin orders list gets a "needs delivery before Christmas" tile (confirmed, preferred date before 25 December) so nothing is missed; the Monday digest counts them.
+- **Prompt:**
+  ```
+  Phase 22D — Christmas run-in. Read CLAUDE.md, docs/PLAN.md (Phase 22) and docs/PROGRESS.md, then build 22D.
+  ```
+
+**22E — Boxing Day to the January sale (switch on 29 December; build in the week of 14 December)**
+
+- **Goal:** the shop turns itself from Christmas to January without a deploy.
+- **Builds:** the event switch handles `january` (band, hero line, `/sale`); on 24 December the Christmas lines stop by themselves (the cut-off has passed and `event_ends_on` has arrived); the January prices entered in advance with `event_starts_on` so they appear on the day; the review-ask emails for December deliveries go out in early January; a "what the season did" entry in `docs/PROGRESS.md` (orders placed, confirmed, cancelled, per ad set) to plan next year from.
+- **Prompt:**
+  ```
+  Phase 22E — January sale. Read CLAUDE.md, docs/PLAN.md (Phase 22) and docs/PROGRESS.md, then build 22E. January prices: <list or "same">. Sale ends: <date>.
+  ```
+
+**Decisions for the owner (Phase 22)**
+
+| # | Decision | My recommendation |
+| --- | --- | --- |
+| S1 | How deep the Black Friday cuts are, and on which pieces | Real cuts on the 15–20 pieces that sell (Rio, Verona, Ashton, Nova recliners), 10–15%, rather than a blanket percentage; the rest keep the welcome offer. Was-prices show from 20 November for most pieces. |
+| S2 | Raise the welcome offer for the event? | Yes, £20 → £30 for Black Friday week only (a setting), back to £20 on 1 December. |
+| S3 | Last delivery day before Christmas and the closed days | Wednesday 23 December; closed 24–28 December; deliveries again Tuesday 29 December. |
+| S4 | Made-to-order lead time | Needed before 22A can show a cut-off; if it's over three weeks, made-to-order pieces are already past Christmas by 17 November and should say "Made in January" from the start. |
+| S5 | Ads budget and the day they restart | Restart on Friday 20 November with the sale creative, £30–40 a day, end Monday 30 November; decide the Christmas run on 1 December from confirmed orders, not placed ones. |
+| S6 | A January sale at all | Yes, but modest: the pieces that didn't move in December, and the welcome offer back at £20. |
+
+---
+
 ### Later phases (after launch, one prompt each, in suggested order)
 
 | # | Phase | What it adds |
