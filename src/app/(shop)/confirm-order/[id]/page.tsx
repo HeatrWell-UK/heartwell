@@ -3,26 +3,32 @@ import { notFound } from 'next/navigation'
 import { CheckCircleIcon } from '@phosphor-icons/react/ssr'
 import { OrderLines } from '@/components/checkout/OrderLines'
 import { OrderJourney } from '@/components/checkout/OrderJourney'
+import { ConfirmOrderForm, type ConfirmationQuery } from '@/components/checkout/ConfirmOrderForm'
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton'
+import { WhatsAppGlyph } from '@/components/ui/WhatsAppGlyph'
+import { buttonClasses } from '@/components/ui/Button'
 import { orderJourney } from '@/lib/checkout/journey'
 import { CONTACT, phoneHref } from '@/config/contact'
 import { orderForCustomer } from '@/lib/checkout/read'
-import { askForConfirmationMessage } from '@/lib/checkout/confirmation'
+import { formatDeliveryDate } from '@/lib/delivery/window'
 import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
-import { AskForConfirmation } from '@/components/checkout/AskForConfirmation'
 
-export const metadata: Metadata = { title: 'Confirm your order', robots: { index: false, follow: false } }
+export const metadata: Metadata = { title: 'Your order', robots: { index: false, follow: false } }
 export const dynamic = 'force-dynamic'
 
 /**
- * The link in the order email (and in emails sent before 15 November 2026,
- * when this page had a Confirm button). Now it shows the order and sends the
- * customer to WhatsApp to confirm in conversation, like the order page.
+ * The order's own page, reached from the link in the shop's WhatsApp message
+ * and the order email (owner, 15 November 2026): every detail, where the
+ * order is up to, and, while it waits, the Confirm button. The screen straight
+ * after checkout (/order/<id>) has no button: it sends people to WhatsApp to
+ * ask for this link, so they read their details before confirming.
  */
-export default async function ConfirmOrderPage({ params }: { params: Promise<{ id: string }> }) {
-  const order = await params.then((p) => orderForCustomer(p.id))
+export default async function ConfirmOrderPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<ConfirmationQuery> }) {
+  const [order, query] = await Promise.all([params.then((p) => orderForCustomer(p.id)), searchParams])
   if (!order) notFound()
   const tel = phoneHref()
   const journey = orderJourney(order.status)
+  const pending = order.status === 'pending_cod'
 
   if (order.status === 'cancelled') {
     return (
@@ -32,39 +38,58 @@ export default async function ConfirmOrderPage({ params }: { params: Promise<{ i
           If that’s not what you expected, please {tel ? <a href={tel}>ring us on {CONTACT.phoneDisplay}</a> : 'contact us'} or email{' '}
           <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
         </p>
-      </Shell>
-    )
-  }
-
-  if (order.status !== 'pending_cod') {
-    return (
-      <Shell title="Your order is confirmed">
-        <p className="flex items-start gap-3 text-[17px] leading-relaxed">
-          <CheckCircleIcon aria-hidden="true" size={28} weight="fill" className="shrink-0 text-velvet" />
-          <span>
-            Thank you. Order <strong className="font-semibold">{order.reference}</strong> is confirmed. We’ll ring you to book your delivery day. You pay the
-            driver the full amount, in cash or by bank transfer, once it’s in your room.
-          </span>
-        </p>
-        {journey && <OrderJourney steps={journey} />}
         <Summary order={order} />
       </Shell>
     )
   }
 
   return (
-    <Shell title={`Confirm your order ${order.reference}`}>
-      <WhatsAppTopic message={askForConfirmationMessage(order.reference)} context="sticky-order" enquiry={false} />
-      <p className="text-[17px] leading-relaxed">
-        Your order is saved but not yet confirmed. Ask us for confirmation on WhatsApp: we send back the details we have, you check them and reply to
-        confirm, and we ring to book your delivery day.
-      </p>
-      <AskForConfirmation reference={order.reference} />
+    <Shell title={pending ? `Check and confirm order ${order.reference}` : `Order ${order.reference}`}>
+      <WhatsAppTopic message={`Hi Heartwell, I have a question about my order ${order.reference}.`} context="sticky-order" enquiry={false} />
+      {pending ? (
+        <p className="text-[17px] leading-relaxed">
+          Please read every detail below. If it’s all right, press the button and we’ll ring you to book your delivery day. You pay the driver the full
+          amount, in cash or by bank transfer, once it’s in your room.
+        </p>
+      ) : (
+        <p className="flex items-start gap-3 text-[17px] leading-relaxed">
+          <CheckCircleIcon aria-hidden="true" size={28} weight="fill" className="shrink-0 text-velvet" />
+          <span>
+            {order.status === 'confirmed' && 'Thank you. Your order is confirmed. We’ll ring you to book your delivery day.'}
+            {order.status === 'processing' && 'Your order is being prepared. We’ll be in touch about your delivery day.'}
+            {order.status === 'shipped' && 'Your order is on its way. The driver will ring before arriving.'}
+            {order.status === 'delivered' && 'Delivered. Thank you for choosing Heartwell.'}
+            {' '}You pay the driver the full amount, in cash or by bank transfer, once it’s in your room.
+          </span>
+        </p>
+      )}
+
       <Summary order={order} />
+
+      {pending && <ConfirmOrderForm id={order.id} query={query} />}
+
+      {journey && (
+        <section aria-labelledby="journey" className="flex flex-col gap-4">
+          <h2 id="journey" className="text-[24px] leading-tight lg:text-[28px]">
+            Where your order is
+          </h2>
+          <OrderJourney steps={journey} />
+        </section>
+      )}
+
       <p className="text-[15px] text-slate">
-        Something wrong? Tell us on WhatsApp, {tel ? <a href={tel}>ring us on {CONTACT.phoneDisplay}</a> : 'contact us'} or email{' '}
-        <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>, and we’ll put it right before anything is confirmed.
+        {pending ? 'Something wrong? Don’t confirm: tell us and we’ll put it right first.' : 'Questions about your order?'}{' '}
+        {tel ? <a href={tel}>Ring us on {CONTACT.phoneDisplay}</a> : 'Contact us'} or email <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
       </p>
+      <WhatsAppButton
+        message={pending ? `Hi Heartwell, something in my order ${order.reference} needs changing before I confirm it.` : `Hi Heartwell, I have a question about my order ${order.reference}.`}
+        context="confirm-page"
+        enquiry={false}
+        className={buttonClasses({ variant: 'secondary', block: true })}
+      >
+        <WhatsAppGlyph />
+        {pending ? 'Something needs changing' : `Message us about ${order.reference}`}
+      </WhatsAppButton>
     </Shell>
   )
 }
@@ -78,15 +103,35 @@ function Shell({ title, children }: { title: string; children: React.ReactNode }
   )
 }
 
+/** Every detail the customer gave, so they can check it before pressing Confirm. */
 function Summary({ order }: { order: NonNullable<Awaited<ReturnType<typeof orderForCustomer>>> }) {
   return (
     <section aria-label="Your order" className="flex flex-col gap-4 rounded-[var(--radius-card)] border border-line p-5 lg:p-6">
       <OrderLines order={order} />
-      <p className="text-[15px]">
-        <span className="font-semibold">{order.customerName}</span>
-        <br />
-        {order.shippingAddress}, {order.postcode}
-      </p>
+      <dl className="flex flex-col gap-2 text-[15px] leading-relaxed">
+        <div>
+          <dt className="font-semibold">Name</dt>
+          <dd>{order.customerName}</dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Delivery address</dt>
+          <dd>
+            {order.shippingAddress}, {order.postcode}
+          </dd>
+        </div>
+        {order.customerEmail && (
+          <div>
+            <dt className="font-semibold">Email</dt>
+            <dd>{order.customerEmail}</dd>
+          </div>
+        )}
+        {order.preferredDate && (
+          <div>
+            <dt className="font-semibold">Preferred delivery day</dt>
+            <dd>{formatDeliveryDate(order.preferredDate)}. We&rsquo;ll ring to agree it.</dd>
+          </div>
+        )}
+      </dl>
     </section>
   )
 }

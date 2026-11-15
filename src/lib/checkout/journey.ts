@@ -17,7 +17,7 @@ export interface JourneyStep {
 
 const STEPS: { key: JourneyStep['key']; label: string; hint: string }[] = [
   { key: 'placed', label: 'Order placed', hint: '' },
-  { key: 'confirmed', label: 'Confirmed by you', hint: 'Tap Ask for confirmation: we send your details back on WhatsApp, and you reply to confirm.' },
+  { key: 'confirmed', label: 'Confirmed by you', hint: 'Tap Ask for confirmation: we send your details back on WhatsApp with a link to check them and press Confirm.' },
   { key: 'processing', label: 'Being prepared', hint: 'We ring you to book your delivery day.' },
   { key: 'shipped', label: 'On its way', hint: 'We let you know the day it leaves.' },
   { key: 'delivered', label: 'Delivered', hint: 'Look it over, then pay the driver in full, in cash or by bank transfer.' },

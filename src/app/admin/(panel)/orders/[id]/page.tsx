@@ -77,7 +77,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const status = (isStatus(order.status) ? order.status : 'pending_cod') as OrderStatus
   const next = NEXT_STEP[status]
   const view = toEmailData(order)
-  const links = { trackUrl: `${SITE_URL}/track-order`, confirmRequest: confirmRequestMessage(view) }
+  const links = { trackUrl: `${SITE_URL}/track-order`, confirmRequest: confirmRequestMessage(view, `${SITE_URL}/confirm-order/${order.id}`) }
   const msgOrder = { reference: order.reference ?? '', customerName: order.customer_name, customerPhone: order.customer_phone, totalAmount: order.total_amount - order.deposit_paid, cancellationReason: order.cancellation_reason }
   const tell = whatsAppTo(order.customer_phone, statusMessage(msgOrder, status, links))
   const ahead = stageAheadOfStatus({ status: order.status, confirmedAt: order.confirmed_at, processingAt: order.processing_at, shippedAt: order.shipped_at, deliveredAt: order.delivered_at })
@@ -164,8 +164,8 @@ export default async function OrderPage({ params, searchParams }: Props) {
         )}
         {status === 'pending_cod' && (
           <p className="text-xs text-zinc-500">
-            The customer was asked to message us on WhatsApp for confirmation. Send them their details (the button below), and mark the order confirmed once
-            they reply CONFIRM, by WhatsApp or on the phone.
+            The customer was asked to message us on WhatsApp for confirmation. Send them their details (the button below): the message carries their confirm
+            link, so they can press Confirm themselves. If they reply CONFIRM or confirm on the phone instead, mark it confirmed here.
           </p>
         )}
         {tell && !moved && (

@@ -112,11 +112,12 @@ function itemsText(o: OrderEmailData, withSku: boolean): string {
 
 /**
  * The shop's WhatsApp reply when a customer asks for confirmation (owner, 15
- * November 2026): the details we hold, then "reply CONFIRM". The same text
- * is behind the shop email's button and the admin order page's button, so the
- * customer gets one wording however staff send it.
+ * November 2026): the details we hold, the link to the confirm page (every
+ * detail, the Confirm button and the order's current status), or "reply
+ * CONFIRM". The same text is behind the shop email's button and the admin
+ * order page's button, so the customer gets one wording however staff send it.
  */
-export function confirmRequestMessage(o: OrderEmailData): string {
+export function confirmRequestMessage(o: OrderEmailData, confirmUrl: string): string {
   const items = o.items.map((i) => `- ${i.quantity > 1 ? `${i.quantity} x ` : ''}${i.title}${i.option ? `, ${i.option}` : ''}`)
   const date = o.preferredDate ? formatDeliveryDate(o.preferredDate) : null
   return [
@@ -130,12 +131,18 @@ export function confirmRequestMessage(o: OrderEmailData): string {
     ...(date ? [`Preferred day: ${date}`] : []),
     `To pay on delivery, in full: ${money(toCollect(o))} (cash or bank transfer to the driver; no deposit, no finance)`,
     '',
-    `If everything is right, please reply CONFIRM and we'll ring you to book your delivery day. If anything needs changing, just tell us here.`,
+    `Please check everything here and press Confirm (this link always shows where your order is up to): ${confirmUrl}`,
+    '',
+    `Or simply reply CONFIRM. Either way we'll ring you to book your delivery day. If anything needs changing, just tell us here.`,
   ].join('\n')
 }
 
-/** To the customer, straight after ordering: ask us for confirmation on WhatsApp (askHref opens it with the owner's message). */
-export function customerOrderEmail(o: OrderEmailData, opts: { askHref: string | null; windowLabel: string | null; shop: ShopContact; now?: Date }): RenderedEmail {
+/**
+ * To the customer, straight after ordering: ask us for confirmation on
+ * WhatsApp (askHref opens it with the owner's message), with a plain link to
+ * the order's own page (every detail, its current status, and Confirm).
+ */
+export function customerOrderEmail(o: OrderEmailData, opts: { askHref: string | null; confirmUrl: string; windowLabel: string | null; shop: ShopContact; now?: Date }): RenderedEmail {
   const subject = `Your Heartwell order ${o.reference}`
   const date = o.preferredDate ? formatDeliveryDate(o.preferredDate, opts.now) : null
   const contactHtml = [
@@ -152,7 +159,7 @@ export function customerOrderEmail(o: OrderEmailData, opts: { askHref: string | 
     ),
     opts.askHref ? button(opts.askHref, 'Ask for confirmation on WhatsApp', '#1F8F4A') : '',
     p(
-      `No WhatsApp? Reply to this email with the word Confirm${opts.shop.phoneDisplay ? `, or ring ${escapeHtml(opts.shop.phoneDisplay)}` : ''}.`,
+      `${link(opts.confirmUrl, 'View your order')} at any time to see every detail and where it’s up to. No WhatsApp? Reply to this email with the word Confirm${opts.shop.phoneDisplay ? `, or ring ${escapeHtml(opts.shop.phoneDisplay)}` : ''}.`,
       `color:${C.slate};font-size:15px`,
     ),
     p(`No deposit and no card. You pay the driver the full amount in cash or by bank transfer once it’s in your room. No finance or instalments.`, `color:${C.slate};font-size:15px`),
@@ -170,6 +177,7 @@ export function customerOrderEmail(o: OrderEmailData, opts: { askHref: string | 
     '',
     `Your order ${o.reference} is saved but not yet confirmed. Ask us for confirmation on WhatsApp: we send back the details we have, you check them and reply Confirm, and we ring to book your delivery day.`,
     ...(opts.askHref ? [opts.askHref] : []),
+    `View your order at any time (every detail and where it is up to): ${opts.confirmUrl}`,
     `No WhatsApp? Reply to this email with the word Confirm${opts.shop.phoneDisplay ? `, or ring ${opts.shop.phoneDisplay}` : ''}.`,
     '',
     'No deposit and no card. You pay the driver the full amount in cash or by bank transfer once it is in your room. No finance or instalments.',
@@ -190,11 +198,11 @@ export function customerOrderEmail(o: OrderEmailData, opts: { askHref: string | 
   return { subject, html: layout(subject, body, `Details for order ${o.reference}. Please confirm on WhatsApp.`), text }
 }
 
-/** The shop's WhatsApp link to the customer with their details and "reply CONFIRM". */
-export function askToConfirmHref(o: OrderEmailData): string | null {
+/** The shop's WhatsApp link to the customer with their details, the confirm link and "reply CONFIRM". */
+export function askToConfirmHref(o: OrderEmailData, confirmUrl: string): string | null {
   const digits = ukPhoneDigits(o.customerPhone)
   if (!digits) return null
-  return `https://wa.me/${digits}?text=${encodeURIComponent(confirmRequestMessage(o))}`
+  return `https://wa.me/${digits}?text=${encodeURIComponent(confirmRequestMessage(o, confirmUrl))}`
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -258,16 +266,16 @@ export function copyBlock(o: OrderEmailData): string {
 }
 
 /** To the shop, straight after an order is placed. */
-export function shopOrderEmail(o: OrderEmailData, opts: { adminUrl: string }): RenderedEmail {
+export function shopOrderEmail(o: OrderEmailData, opts: { confirmUrl: string; adminUrl: string }): RenderedEmail {
   const test = o.isTest ? '[TEST] ' : ''
   const subject = `${test}New order ${o.reference}: ${money(o.totalAmount)}, waiting for the customer to confirm`
-  const ask = askToConfirmHref(o)
+  const ask = askToConfirmHref(o, opts.confirmUrl)
   const block = copyBlock(o)
   const body = [
     h(`${test}New order ${o.reference}`),
     p(`<strong>${escapeHtml(o.customerName)}</strong><br>${escapeHtml(o.customerPhone)}${o.customerEmail ? `<br>${escapeHtml(o.customerEmail)}` : ''}<br>${escapeHtml(o.shippingAddress)}, ${escapeHtml(o.postcode)}`),
     p(
-      `The customer was asked to message us on WhatsApp for confirmation${o.customerEmail ? ' (on the order page and by email)' : ' (on the order page; no email given)'}. If they haven’t, send them their details with the button below. The order counts once they reply CONFIRM and you mark it confirmed in the admin.`,
+      `The customer was asked to message us on WhatsApp for confirmation${o.customerEmail ? ' (on the order page and by email)' : ' (on the order page; no email given)'}. Send them their details with the button below: the message carries their confirm link. The order counts once they press Confirm on it, or reply CONFIRM and you mark it confirmed in the admin.`,
       `color:${C.slate};font-size:15px`,
     ),
     ask ? button(ask, 'Send them their details on WhatsApp', '#1F8F4A') : '',
@@ -280,6 +288,20 @@ export function shopOrderEmail(o: OrderEmailData, opts: { adminUrl: string }): R
   ].join('')
   const text = [`${test}New order ${o.reference}`, '', ask ? `Send them their details on WhatsApp: ${ask}` : '', '', block, '', `Admin: ${opts.adminUrl}`].join('\n')
   return { subject, html: layout(subject, body, `${o.customerName}, ${money(o.totalAmount)}`), text }
+}
+
+/** To the shop, when the customer presses Confirm on their link. */
+export function shopConfirmedEmail(o: OrderEmailData, opts: { adminUrl: string }): RenderedEmail {
+  const test = o.isTest ? '[TEST] ' : ''
+  const subject = `${test}${o.reference} confirmed by the customer: ${money(o.totalAmount)}`
+  const body = [
+    h(`${test}${o.reference} is confirmed`),
+    p(`<strong>${escapeHtml(o.customerName)}</strong> confirmed their order. Ring them on <strong>${escapeHtml(o.customerPhone)}</strong> to book the delivery day.`),
+    itemsTable(o, true),
+    p(`<a href="${escapeHtml(opts.adminUrl)}" style="color:${C.velvet}">Open the admin</a>`, 'font-size:15px'),
+  ].join('')
+  const text = [`${test}${o.reference} confirmed by ${o.customerName}.`, `Ring ${o.customerPhone} to book the delivery day.`, '', itemsText(o, true), '', `Admin: ${opts.adminUrl}`].join('\n')
+  return { subject, html: layout(subject, body, `${o.customerName} confirmed ${o.reference}`), text }
 }
 
 export type EmailedStatus = 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
