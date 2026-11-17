@@ -18,7 +18,7 @@ export function OrderStatusBadge({ status, className }: { status: string; classN
   )
 }
 
-export function Tag({ children, tone = 'plain' }: { children: React.ReactNode; tone?: 'plain' | 'test' | 'warn' | 'source' }) {
+export function Tag({ children, tone = 'plain' }: { children: React.ReactNode; tone?: 'plain' | 'test' | 'warn' | 'source' | 'hold' }) {
   return (
     <span
       className={cn(
@@ -27,6 +27,7 @@ export function Tag({ children, tone = 'plain' }: { children: React.ReactNode; t
         tone === 'test' && 'bg-violet-50 text-violet-800 ring-violet-200',
         tone === 'warn' && 'bg-amber-50 text-amber-900 ring-amber-200',
         tone === 'source' && 'bg-zinc-800 text-white ring-zinc-800',
+        tone === 'hold' && 'bg-sky-50 text-sky-900 ring-sky-300',
       )}
     >
       {children}

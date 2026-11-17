@@ -30,10 +30,12 @@ Never put the key in a file, a message or the hosting settings: Vault only. The 
 | --- | --- |
 | `pending_cod` | Placed online, waiting for the customer to tap Confirm (not a firm order yet) |
 | `confirmed` | Confirmed by the customer (or by staff for a phone or WhatsApp order) |
-| `processing` | Being prepared, or being made for a made-to-order piece |
-| `shipped` | Out for delivery |
+| `processing` | No longer used (since 17 November 2026) |
+| `shipped` | No longer used (since 17 November 2026) |
 | `delivered` | Delivered and paid |
 | `cancelled` | Cancelled |
+
+Since 17 November 2026 the shop uses only `pending_cod` → `confirmed` → `delivered` (or `cancelled`). An order staff put **on hold** (customer can't be reached, or asked to wait) is sent as `pending_cod` again, even if it was `confirmed` before: don't deliver it until it comes back as `confirmed`.
 
 **Sample order** (a real order from the site, placed before launch; no customer fields exist in the payload):
 

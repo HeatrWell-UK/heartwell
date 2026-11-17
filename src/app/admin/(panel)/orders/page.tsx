@@ -25,7 +25,8 @@ export default async function OrdersPage({ searchParams }: Props) {
     if (p > 1) params.set('page', String(p))
     return `/admin/orders?${params.toString()}`
   }
-  const countFor = (f: FilterKey) => (f === 'attention' ? overview.attention : f === 'all' ? overview.all : f === 'test' ? overview.test : (overview.counts[f] ?? 0))
+  const countFor = (f: FilterKey) =>
+    f === 'attention' ? overview.attention : f === 'all' ? overview.all : f === 'test' ? overview.test : f === 'hold' ? overview.held : (overview.counts[f] ?? 0)
 
   return (
     <div className="flex flex-col gap-5">
@@ -45,10 +46,10 @@ export default async function OrdersPage({ searchParams }: Props) {
       {sp.deleted && <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900 ring-1 ring-emerald-200">Test order {sp.deleted} deleted.</p>}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Tile href={href('attention')} label="Needs attention" value={String(overview.attention)} note="Waiting, confirmed or processing" dark />
+        <Tile href={href('attention')} label="Needs attention" value={String(overview.attention)} note="Waiting or confirmed" dark />
         <Tile href={href('attention')} label="To collect" value={formatPrice(overview.openValue)} note="On open orders" />
-        <Tile href={href('processing')} label="Processing" value={String(overview.counts.processing ?? 0)} note="Being prepared" />
-        <Tile href={href('shipped')} label="On its way" value={String(overview.counts.shipped ?? 0)} note={`${overview.withPreferredDate} open with a preferred day`} />
+        <Tile href={href('confirmed')} label="To deliver" value={String(overview.counts.confirmed ?? 0)} note={`Confirmed · ${overview.confirmedWithDate} with a preferred day`} />
+        <Tile href={href('hold')} label="On hold" value={String(overview.held)} note="Can’t reach them, or asked to wait" />
       </div>
 
       <form action="/admin/orders" className="flex gap-2" role="search">
@@ -103,7 +104,7 @@ export default async function OrdersPage({ searchParams }: Props) {
         <div className="flex flex-col items-center gap-2 rounded-xl bg-white py-12 text-center ring-1 ring-zinc-200">
           <TrayIcon aria-hidden="true" size={40} className="text-zinc-300" />
           <p className="font-semibold">{filter === 'attention' && !q ? 'Nothing needs your attention' : 'No orders here'}</p>
-          <p className="text-sm text-zinc-500">{filter === 'attention' && !q ? 'Every order is on its way or done.' : 'Try another filter or search.'}</p>
+          <p className="text-sm text-zinc-500">{filter === 'attention' && !q ? 'Every order is delivered or cancelled.' : 'Try another filter or search.'}</p>
         </div>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -118,6 +119,7 @@ export default async function OrdersPage({ searchParams }: Props) {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-sm font-semibold">{o.reference}</span>
                     <OrderStatusBadge status={o.status} />
+                    {o.held_at && <Tag tone="hold">Hold</Tag>}
                     {o.source !== 'website' && <Tag tone="source">{SOURCE_LABEL[o.source] ?? o.source}</Tag>}
                     {o.has_made_to_order && <Tag tone="warn">Made to order</Tag>}
                     {o.is_test && <Tag tone="test">Test</Tag>}
@@ -134,6 +136,7 @@ export default async function OrdersPage({ searchParams }: Props) {
                     {placed && ` · placed ${placed.uk} UK · ${placed.pk} PK`}
                     {o.preferred_delivery_date && ` · wants ${o.preferred_delivery_date}`}
                   </p>
+                  {o.hold_reason && <p className="text-xs font-semibold text-sky-900">On hold: {o.hold_reason}</p>}
                 </Link>
                 {wa && (
                   <a href={wa} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-center border-t border-zinc-100 text-sm font-semibold text-emerald-700">

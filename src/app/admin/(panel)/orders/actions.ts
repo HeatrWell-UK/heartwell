@@ -6,7 +6,7 @@ import { after } from 'next/server'
 import { z } from 'zod'
 import { adminGuard } from '@/lib/auth/admin'
 import { createClient } from '@/lib/supabase/server'
-import { isStatus } from '@/lib/admin/orders'
+import { holdReason, isStatus } from '@/lib/admin/orders'
 import { sendStatusEmail } from '@/lib/checkout/notify'
 import { isUkPhone, formatUkPhone } from '@/lib/checkout/phone'
 import { SMTP_CONFIGURED } from '@/config/email'
@@ -41,6 +41,23 @@ export async function changeStatus(form: FormData) {
   })
   revalidatePath('/admin/orders')
   redirect(back(id, { moved: status }))
+}
+
+/**
+ * Put an order on hold (can't reach them, or they asked to wait) or release it.
+ * A confirmed order goes back to Waiting; nothing is emailed: staff tell them on WhatsApp.
+ */
+export async function setHold(form: FormData) {
+  const id = field(form, 'id')
+  const hold = field(form, 'hold') === 'true'
+  if (!UUID.test(id)) redirect('/admin/orders')
+  if (await adminGuard()) redirect('/login')
+  const reason = hold ? holdReason(field(form, 'reason'), field(form, 'note')) : null
+  if (hold && !reason) redirect(back(id, { error: 'HOLD_REASON_NEEDED' }))
+  const { error } = await (await createClient()).rpc('set_order_hold', { p_order_id: id, p_hold: hold, p_reason: reason ?? undefined })
+  if (error) redirect(back(id, { error: codeOf(error.message) }))
+  revalidatePath('/admin/orders')
+  redirect(back(id, { done: hold ? 'held' : 'released' }))
 }
 
 export async function setTestFlag(form: FormData) {

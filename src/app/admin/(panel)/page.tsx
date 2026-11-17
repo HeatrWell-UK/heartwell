@@ -35,7 +35,7 @@ export default async function AdminHomePage() {
 
   const tiles = [
     { label: 'Needs attention', value: String(overview.attention), href: '/admin/orders?filter=attention' },
-    { label: 'Waiting to confirm', value: String(overview.counts.pending_cod ?? 0), href: '/admin/orders?filter=pending_cod' },
+    { label: overview.held ? `Waiting (${overview.held} on hold)` : 'Waiting', value: String(overview.counts.pending_cod ?? 0), href: '/admin/orders?filter=pending_cod' },
     { label: 'To collect', value: formatPrice(overview.openValue), href: '/admin/orders?filter=attention' },
     { label: 'Products on sale', value: String(data?.catalogue.active_products ?? 0), href: '/admin/catalogue' },
   ]

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ALLOWED_MOVES, dualTime, NEXT_STEP, searchFilter, stageAheadOfStatus, statusMessage, STATUSES, whatsAppTo } from '@/lib/admin/orders'
+import { ALLOWED_MOVES, canHold, dualTime, HOLD_REASONS, holdMessage, holdReason, NEXT_STEP, searchFilter, stageAheadOfStatus, statusMessage, STATUSES, whatsAppTo } from '@/lib/admin/orders'
 import { toEmailData, type OrderRowForView } from '@/lib/admin/order-view'
 import { addressLine, copyBlock, customerStatusEmail, shortDay, toCollect } from '@/lib/email/order-emails'
 
@@ -7,7 +7,9 @@ import { addressLine, copyBlock, customerStatusEmail, shortDay, toCollect } from
 function databaseAllows(from: string, to: string): boolean {
   if (from === to) return true
   if (from === 'pending_cod') return ['confirmed', 'cancelled'].includes(to)
-  if (['confirmed', 'processing', 'shipped', 'delivered'].includes(from)) return ['confirmed', 'processing', 'shipped', 'delivered', 'cancelled'].includes(to)
+  if (from === 'confirmed') return ['delivered', 'cancelled'].includes(to)
+  if (from === 'delivered') return ['confirmed', 'cancelled'].includes(to)
+  if (['processing', 'shipped'].includes(from)) return ['confirmed', 'delivered', 'cancelled'].includes(to)
   return false
 }
 
@@ -32,6 +34,39 @@ describe('status moves', () => {
     expect(stageAheadOfStatus({ ...base, status: 'confirmed' })).toEqual({ status: 'processing', at: '2026-10-02T10:00:00Z' })
     expect(stageAheadOfStatus({ ...base, status: 'processing' })).toBeNull()
     expect(stageAheadOfStatus({ ...base, status: 'cancelled' })).toBeNull()
+  })
+
+  it('goes Waiting → Confirmed → Delivered, and never into the old stages', () => {
+    expect(NEXT_STEP.pending_cod?.status).toBe('confirmed')
+    expect(NEXT_STEP.confirmed?.status).toBe('delivered')
+    for (const from of STATUSES) expect(ALLOWED_MOVES[from].some((to) => to === 'processing' || to === 'shipped')).toBe(false)
+  })
+})
+
+describe('hold', () => {
+  it('is for open orders only', () => {
+    expect(canHold('pending_cod')).toBe(true)
+    expect(canHold('confirmed')).toBe(true)
+    for (const s of ['delivered', 'cancelled', 'processing', 'shipped']) expect(canHold(s)).toBe(false)
+  })
+
+  it('saves a listed reason, a note, or both, and nothing made up', () => {
+    expect(holdReason(HOLD_REASONS[0], '')).toBe(HOLD_REASONS[0])
+    expect(holdReason(HOLD_REASONS[1], ' after payday ')).toBe(`${HOLD_REASONS[1]}: after payday`)
+    expect(holdReason('<script>', 'rang twice')).toBe('rang twice')
+    expect(holdReason('', '  ')).toBeNull()
+  })
+
+  it('doesn’t warn about a waiting order that was confirmed before (it was put on hold)', () => {
+    expect(stageAheadOfStatus({ status: 'pending_cod', confirmedAt: '2026-11-17T10:00:00Z', processingAt: null, shippedAt: null, deliveredAt: null })).toBeNull()
+  })
+
+  it('tells the customer nothing is delivered yet, with their confirm link', () => {
+    const msg = holdMessage({ reference: 'HW-100200', customerName: 'Ann Smith' }, 'https://example.test/confirm-order/abc')
+    expect(msg).toMatch(/^Hi Ann,/)
+    expect(msg).toContain('HW-100200')
+    expect(msg).toContain('on hold')
+    expect(msg).toContain('https://example.test/confirm-order/abc')
   })
 })
 

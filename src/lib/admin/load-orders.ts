@@ -11,7 +11,7 @@ import { NEEDS_ATTENTION, searchFilter, type FilterKey } from './orders'
 export const PER_PAGE = 20
 
 const LIST_FIELDS = `id, reference, status, source, is_test, created_at, customer_name, customer_phone, postcode,
-  total_amount, has_made_to_order, preferred_delivery_date, whatsapp_reference,
+  total_amount, has_made_to_order, preferred_delivery_date, whatsapp_reference, held_at, hold_reason,
   order_items(quantity)`
 
 export async function listOrders({ filter, q, page }: { filter: FilterKey; q: string; page: number }) {
@@ -19,6 +19,7 @@ export async function listOrders({ filter, q, page }: { filter: FilterKey; q: st
   let query = supabase.from('orders').select(LIST_FIELDS, { count: 'exact' })
   if (filter === 'attention') query = query.in('status', NEEDS_ATTENTION).eq('is_test', false)
   else if (filter === 'test') query = query.eq('is_test', true)
+  else if (filter === 'hold') query = query.not('held_at', 'is', null)
   else if (filter !== 'all') query = query.eq('status', filter)
   const search = searchFilter(q)
   if (search) query = query.or(search)
@@ -31,7 +32,7 @@ export async function listOrders({ filter, q, page }: { filter: FilterKey; q: st
 /** The workload: counts per status (real orders only) and what's still to collect. */
 export async function orderOverview() {
   const supabase = await createClient()
-  const { data, error } = await supabase.from('orders').select('status, is_test, total_amount, preferred_delivery_date').limit(10000)
+  const { data, error } = await supabase.from('orders').select('status, is_test, total_amount, preferred_delivery_date, held_at').limit(10000)
   if (error) throw new Error(`Orders: ${error.message}`)
   const real = data.filter((o) => !o.is_test)
   const counts: Record<string, number> = {}
@@ -41,9 +42,10 @@ export async function orderOverview() {
     counts,
     all: real.length,
     test: data.length - real.length,
+    held: real.filter((o) => o.held_at).length,
+    confirmedWithDate: real.filter((o) => o.status === 'confirmed' && o.preferred_delivery_date).length,
     attention: NEEDS_ATTENTION.reduce((n, s) => n + (counts[s] ?? 0), 0),
     openValue: open.reduce((n, o) => n + Number(o.total_amount), 0),
-    withPreferredDate: open.filter((o) => o.preferred_delivery_date).length,
   }
 }
 

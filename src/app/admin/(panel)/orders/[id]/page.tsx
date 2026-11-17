@@ -10,7 +10,7 @@ import { LinkVisitForm } from '@/components/admin/LinkVisitForm'
 import { VisitCard } from '@/components/admin/VisitFinder'
 import type { FoundVisit } from '@/lib/admin/visits'
 import { getOrder, lineOption, orderPickers } from '@/lib/admin/load-orders'
-import { ALLOWED_MOVES, dualTime, isStatus, NEXT_STEP, stageAheadOfStatus, STATUS_LABEL, statusMessage, whatsAppTo, type OrderStatus } from '@/lib/admin/orders'
+import { ALLOWED_MOVES, canHold, dualTime, HOLD_REASONS, holdMessage, isStatus, NEXT_STEP, stageAheadOfStatus, STATUS_LABEL, statusMessage, whatsAppTo, type OrderStatus } from '@/lib/admin/orders'
 import { toEmailData } from '@/lib/admin/order-view'
 import { confirmRequestMessage, copyBlock } from '@/lib/email/order-emails'
 import { outboxAction } from '../../tracking/actions'
@@ -18,7 +18,7 @@ import { formatPrice } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 import { floorName } from '@/lib/delivery/pricing'
 import { SITE_URL } from '@/config/site'
-import { addNote, askForReview, changeStatus, deleteTestOrder, setAttribution, setDeposit, setTestFlag } from '../actions'
+import { addNote, askForReview, changeStatus, deleteTestOrder, setAttribution, setDeposit, setHold, setTestFlag } from '../actions'
 import { sendToOrderFlow } from '../../settings/orderflow-actions'
 import { pushVerdict, type PushRow } from '@/lib/admin/orderflow'
 import { createClient } from '@/lib/supabase/server'
@@ -39,6 +39,9 @@ const ERRORS: Record<string, string> = {
   BAD_STATUS_CHANGE: 'That status change isn’t allowed.',
   BAD_DEPOSIT: 'Enter the deposit in pounds, like 100.',
   DEPOSIT_TOO_HIGH: 'The deposit can’t be more than the order’s total.',
+  HOLD_REASON_NEEDED: 'Pick why it’s on hold, or write a note.',
+  HOLD_NOT_OPEN: 'Only a waiting or confirmed order can be put on hold.',
+  NOT_ON_HOLD: 'This order isn’t on hold.',
 }
 const DONE: Record<string, string> = {
   note: 'Note added.',
@@ -47,6 +50,8 @@ const DONE: Record<string, string> = {
   test_off: 'No longer a test order.',
   created: 'Order saved.',
   deposit: 'Deposit saved. The driver collects the rest.',
+  held: 'On hold, back in Waiting. Nothing is delivered until it’s confirmed again.',
+  released: 'Hold released. It’s still waiting: mark it confirmed when they’re sure.',
 }
 const EVENT_LABEL: Record<string, string> = {
   placed: 'Placed',
@@ -54,6 +59,8 @@ const EVENT_LABEL: Record<string, string> = {
   details_updated: 'Details updated',
   test_flag_changed: 'Test flag changed',
   note: 'Note',
+  held: 'Put on hold',
+  hold_released: 'Hold released',
 }
 
 export default async function OrderPage({ params, searchParams }: Props) {
@@ -79,16 +86,16 @@ export default async function OrderPage({ params, searchParams }: Props) {
   const view = toEmailData(order)
   const links = { trackUrl: `${SITE_URL}/track-order`, confirmRequest: confirmRequestMessage(view, `${SITE_URL}/confirm-order/${order.id}`) }
   const msgOrder = { reference: order.reference ?? '', customerName: order.customer_name, customerPhone: order.customer_phone, totalAmount: order.total_amount - order.deposit_paid, cancellationReason: order.cancellation_reason }
-  const tell = whatsAppTo(order.customer_phone, statusMessage(msgOrder, status, links))
-  const ahead = stageAheadOfStatus({ status: order.status, confirmedAt: order.confirmed_at, processingAt: order.processing_at, shippedAt: order.shipped_at, deliveredAt: order.delivered_at })
   const moved = sp.moved && isStatus(sp.moved) ? sp.moved : null
+  const held = Boolean(order.held_at)
+  const tell = whatsAppTo(order.customer_phone, held ? holdMessage(msgOrder, `${SITE_URL}/confirm-order/${order.id}`) : statusMessage(msgOrder, status, links))
+  const ahead = stageAheadOfStatus({ status: order.status, confirmedAt: order.confirmed_at, processingAt: order.processing_at, shippedAt: order.shipped_at, deliveredAt: order.delivered_at })
   const pushes = ((pushLog.data ?? []) as unknown as (PushRow & { pushed_at: string; manual: boolean })[])
 
   const timeline: [string, string | null][] = [
     ['Placed', order.created_at],
     [`Confirmed${order.confirmed_by ? ` by ${order.confirmed_by === 'customer' ? 'the customer' : 'staff'}` : ''}`, order.confirmed_at],
-    ['Processing', order.processing_at],
-    ['On its way', order.shipped_at],
+    [`On hold${order.hold_reason ? `: ${order.hold_reason}` : ''}`, order.held_at],
     ['Delivered', order.delivered_at],
     [`Cancelled${order.cancellation_reason ? `: ${order.cancellation_reason}` : ''}`, order.cancelled_at],
   ]
@@ -105,6 +112,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
           <h1 className="font-mono text-2xl font-bold">{order.reference}</h1>
           <OrderStatusBadge status={order.status} />
           {order.source !== 'website' && <Tag tone="source">{SOURCE_LABEL[order.source] ?? order.source}</Tag>}
+          {held && <Tag tone="hold">Hold</Tag>}
           {order.has_made_to_order && <Tag tone="warn">Made to order: ring to confirm</Tag>}
           {order.is_test && <Tag tone="test">Test{order.test_reason ? `: ${order.test_reason}` : ''}</Tag>}
         </div>
@@ -126,7 +134,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         <div className="flex flex-col gap-2 rounded-lg bg-emerald-50 px-4 py-3 ring-1 ring-emerald-200">
           <p className="text-sm font-semibold text-emerald-900">
             Marked {STATUS_LABEL[moved].toLowerCase()}.{' '}
-            {['confirmed', 'shipped', 'delivered', 'cancelled'].includes(moved)
+            {['confirmed', 'delivered', 'cancelled'].includes(moved)
               ? order.customer_email
                 ? 'The customer has been emailed.'
                 : 'No email on this order, so let them know on WhatsApp.'
@@ -151,6 +159,23 @@ export default async function OrderPage({ params, searchParams }: Props) {
       )}
 
       <section aria-label="Next step" className={`${card} flex flex-col gap-2`}>
+        {held && (
+          <div className="flex flex-col gap-2 rounded-lg bg-sky-50 px-3 py-2.5 text-sm text-sky-950 ring-1 ring-sky-200">
+            <p>
+              <strong>On hold</strong>
+              {order.hold_reason ? `: ${order.hold_reason}` : ''}
+              {dualTime(order.held_at) ? ` (since ${dualTime(order.held_at)!.uk} UK)` : ''}. It stays in Waiting and nothing is delivered. When they’re sure, mark it
+              confirmed (that ends the hold), or they can press Confirm on their link.
+            </p>
+            <form action={setHold}>
+              <input type="hidden" name="id" value={order.id} />
+              <input type="hidden" name="hold" value="false" />
+              <button type="submit" className="min-h-11 rounded-lg bg-white px-4 text-sm font-semibold text-sky-900 ring-1 ring-sky-300">
+                Release hold
+              </button>
+            </form>
+          </div>
+        )}
         {next ? (
           <form action={changeStatus}>
             <input type="hidden" name="id" value={order.id} />
@@ -162,7 +187,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         ) : (
           <p className="rounded-lg bg-zinc-50 px-3 py-2.5 text-center text-sm font-semibold text-zinc-600">{status === 'cancelled' ? 'Cancelled: no next step.' : 'All done.'}</p>
         )}
-        {status === 'pending_cod' && (
+        {status === 'pending_cod' && !held && (
           <p className="text-xs text-zinc-500">
             The customer was asked to message us on WhatsApp for confirmation. Send them their details (the button below): the message carries their confirm
             link, so they can press Confirm themselves. If they reply CONFIRM or confirm on the phone instead, mark it confirmed here.
@@ -170,10 +195,10 @@ export default async function OrderPage({ params, searchParams }: Props) {
         )}
         {tell && !moved && (
           <a href={tell} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-center rounded-lg px-4 text-sm font-semibold text-emerald-800 ring-1 ring-emerald-300">
-            {status === 'pending_cod' ? 'Send them their details on WhatsApp' : `WhatsApp ${order.customer_name.split(/\s+/)[0]} about this`}
+            {held ? 'Tell them it’s on hold, on WhatsApp' : status === 'pending_cod' ? 'Send them their details on WhatsApp' : `WhatsApp ${order.customer_name.split(/\s+/)[0]} about this`}
           </a>
         )}
-        {purchaseWaiting && !order.is_test && (
+        {purchaseWaiting && !order.is_test && !held && (
           <div className="flex flex-col gap-2 border-t border-zinc-100 pt-3">
             <p className="text-sm text-zinc-700">
               <strong>Meta Purchase: {purchase.status === 'failed' ? 'failed, not sent' : 'waiting for you'}.</strong> Nothing goes to Meta until you press this.
@@ -184,7 +209,37 @@ export default async function OrderPage({ params, searchParams }: Props) {
             </div>
           </div>
         )}
+        {purchaseWaiting && !order.is_test && held && <p className="text-xs text-zinc-500">The Meta Purchase waits until it’s confirmed again.</p>}
         {purchaseGone && <p className="text-xs text-zinc-500">Meta has this order’s Purchase.</p>}
+        {canHold(status) && !held && (
+          <details className="border-t border-zinc-100 pt-3">
+            <summary className="cursor-pointer text-sm font-semibold text-zinc-700">Put on hold</summary>
+            <form action={setHold} className="mt-3 flex flex-col gap-2">
+              <input type="hidden" name="id" value={order.id} />
+              <input type="hidden" name="hold" value="true" />
+              <p className="text-xs text-zinc-500">
+                For a customer you can’t reach, or who asked to wait until they’re sure.
+                {status === 'confirmed' ? ' It goes back to Waiting, marked Hold (OrderFlow sees it as waiting too), until it’s confirmed again.' : ' It stays in Waiting, marked Hold.'}
+              </p>
+              <fieldset className="flex flex-col">
+                <legend className="sr-only">Why it’s on hold</legend>
+                {HOLD_REASONS.map((r, i) => (
+                  <label key={r} className="flex min-h-11 items-center gap-2 text-sm">
+                    <input type="radio" name="reason" value={r} defaultChecked={i === 0} className="size-5" />
+                    {r}
+                  </label>
+                ))}
+              </fieldset>
+              <label htmlFor="hold-note" className="sr-only">
+                Note
+              </label>
+              <input id="hold-note" name="note" maxLength={200} placeholder="Note (optional): when to try again…" className="min-h-11 rounded-lg border border-zinc-300 px-3 text-[16px]" />
+              <button type="submit" className="min-h-11 rounded-lg bg-sky-800 px-4 text-sm font-semibold text-white">
+                Put on hold
+              </button>
+            </form>
+          </details>
+        )}
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">

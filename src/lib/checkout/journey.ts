@@ -1,12 +1,13 @@
-// An order's journey as the customer sees it: the five steps from placing it
-// to delivery, which are done, which one is next and what happens there.
+// An order's journey as the customer sees it: placed, confirmed, delivered
+// (the shop's three stages since 17 November 2026), which are done, which one
+// is next and what happens there.
 // Worked out from the order's status (and its dates, where the page has them).
 // A pure function, so it's tested.
 
 export type JourneyState = 'done' | 'current' | 'upcoming'
 
 export interface JourneyStep {
-  key: 'placed' | 'confirmed' | 'processing' | 'shipped' | 'delivered'
+  key: 'placed' | 'confirmed' | 'delivered'
   label: string
   state: JourneyState
   /** When it happened (ISO), if the page knows. */
@@ -18,13 +19,11 @@ export interface JourneyStep {
 const STEPS: { key: JourneyStep['key']; label: string; hint: string }[] = [
   { key: 'placed', label: 'Order placed', hint: '' },
   { key: 'confirmed', label: 'Confirmed by you', hint: 'Tap Ask for confirmation: we send your details back on WhatsApp with a link to check them and press Confirm.' },
-  { key: 'processing', label: 'Being prepared', hint: 'We ring you to book your delivery day.' },
-  { key: 'shipped', label: 'On its way', hint: 'We let you know the day it leaves.' },
-  { key: 'delivered', label: 'Delivered', hint: 'Look it over, then pay the driver in full, in cash or by bank transfer.' },
+  { key: 'delivered', label: 'Delivered', hint: 'We ring you to book your delivery day. Look it over, then pay the driver in full, in cash or by bank transfer.' },
 ]
 
-/** How far each status has got: the index of the last step it has reached. */
-const REACHED: Record<string, number> = { pending_cod: 0, confirmed: 1, processing: 2, shipped: 3, delivered: 4 }
+/** How far each status has got: the index of the last step it has reached (the old processing and shipped stages count as confirmed). */
+const REACHED: Record<string, number> = { pending_cod: 0, confirmed: 1, processing: 1, shipped: 1, delivered: 2 }
 
 export interface JourneyTimes {
   createdAt?: string | null
@@ -41,8 +40,6 @@ export function orderJourney(status: string, times: JourneyTimes = {}): JourneyS
   const at: Record<JourneyStep['key'], string | null> = {
     placed: times.createdAt ?? null,
     confirmed: times.confirmedAt ?? null,
-    processing: times.processingAt ?? null,
-    shipped: times.shippedAt ?? null,
     delivered: times.deliveredAt ?? null,
   }
   return STEPS.map((s, i) => {

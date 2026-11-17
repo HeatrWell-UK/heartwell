@@ -8,34 +8,49 @@ export const STATUSES = ['pending_cod', 'confirmed', 'processing', 'shipped', 'd
 export type OrderStatus = (typeof STATUSES)[number]
 
 export const STATUS_LABEL: Record<OrderStatus, string> = {
-  pending_cod: 'Waiting to confirm',
+  pending_cod: 'Waiting',
   confirmed: 'Confirmed',
-  processing: 'Processing',
-  shipped: 'On its way',
+  // Old stages (owner, 17 November 2026: Waiting, Confirmed, Delivered only). No order ever used them.
+  processing: 'Processing (old)',
+  shipped: 'On its way (old)',
   delivered: 'Delivered',
   cancelled: 'Cancelled',
 }
 
-/** The one button that moves an order on. Corrections and cancelling sit behind a fold. */
+/** The one button that moves an order on: Waiting → Confirmed → Delivered. Corrections, hold and cancelling sit behind a fold. */
 export const NEXT_STEP: Partial<Record<OrderStatus, { status: OrderStatus; label: string }>> = {
   pending_cod: { status: 'confirmed', label: 'Mark confirmed' },
-  confirmed: { status: 'processing', label: 'Start processing' },
-  processing: { status: 'shipped', label: 'Mark on its way' },
+  confirmed: { status: 'delivered', label: 'Mark delivered' },
+  processing: { status: 'delivered', label: 'Mark delivered' },
   shipped: { status: 'delivered', label: 'Mark delivered' },
 }
 
 /**
  * Where each status may move, exactly as public.order_status_allowed decides:
- * a waiting order is confirmed or cancelled; after that any stage can be
- * corrected; a cancelled order is final.
+ * Waiting is confirmed or cancelled; Confirmed is delivered or cancelled;
+ * Delivered can be put back to Confirmed; cancelled is final. A confirmed
+ * order goes back to Waiting only by putting it on hold (canHold).
  */
 export const ALLOWED_MOVES: Record<OrderStatus, OrderStatus[]> = {
   pending_cod: ['confirmed', 'cancelled'],
-  confirmed: ['processing', 'shipped', 'delivered', 'cancelled'],
-  processing: ['confirmed', 'shipped', 'delivered', 'cancelled'],
-  shipped: ['confirmed', 'processing', 'delivered', 'cancelled'],
-  delivered: ['confirmed', 'processing', 'shipped', 'cancelled'],
+  confirmed: ['delivered', 'cancelled'],
+  processing: ['confirmed', 'delivered', 'cancelled'],
+  shipped: ['confirmed', 'delivered', 'cancelled'],
+  delivered: ['confirmed', 'cancelled'],
   cancelled: [],
+}
+
+/** Only an open order can be put on hold: a waiting one stays Waiting, a confirmed one goes back to Waiting. */
+export const canHold = (status: string) => status === 'pending_cod' || status === 'confirmed'
+
+/** The reasons staff pick from when holding an order (owner: can't reach them, or they asked to wait). */
+export const HOLD_REASONS = ['Can’t reach the customer', 'Customer asked to wait until they’re sure'] as const
+
+/** The reason saved with a hold: a listed reason, a note, or both. */
+export function holdReason(choice: string, note: string): string | null {
+  const picked = (HOLD_REASONS as readonly string[]).includes(choice) ? choice : ''
+  const extra = note.trim().slice(0, 200)
+  return (picked && extra ? `${picked}: ${extra}` : picked || extra) || null
 }
 
 const RANK: Partial<Record<OrderStatus, number>> = { pending_cod: 0, confirmed: 1, processing: 2, shipped: 3, delivered: 4 }
@@ -50,10 +65,11 @@ export interface Stamps {
 
 /**
  * A later stage recorded than the current status shows (a correction moved it
- * back). Timestamps are stamped once, so this is worth a look.
+ * back). Timestamps are stamped once, so this is worth a look. A waiting order
+ * that was confirmed before was put on hold, which is intended: no warning.
  */
 export function stageAheadOfStatus(o: Stamps): { status: OrderStatus; at: string } | null {
-  if (!isStatus(o.status) || o.status === 'cancelled') return null
+  if (!isStatus(o.status) || o.status === 'cancelled' || o.status === 'pending_cod') return null
   const stages: [OrderStatus, string | null][] = [
     ['confirmed', o.confirmedAt],
     ['processing', o.processingAt],
@@ -67,19 +83,19 @@ export function stageAheadOfStatus(o: Stamps): { status: OrderStatus; at: string
 
 export const isStatus = (s: string): s is OrderStatus => (STATUSES as readonly string[]).includes(s)
 
-/** Orders still waiting on someone: the default view. */
-export const NEEDS_ATTENTION: OrderStatus[] = ['pending_cod', 'confirmed', 'processing']
+/** Orders still waiting on someone (Waiting, on hold or not, and Confirmed): the default view. */
+export const NEEDS_ATTENTION: OrderStatus[] = ['pending_cod', 'confirmed']
 
+/** The admin's tabs (owner, 17 November 2026): Waiting, Confirmed, Delivered, Hold, Cancelled and Test. */
 export const FILTERS = [
   { key: 'attention', label: 'Needs attention' },
-  { key: 'all', label: 'All' },
   { key: 'pending_cod', label: 'Waiting' },
   { key: 'confirmed', label: 'Confirmed' },
-  { key: 'processing', label: 'Processing' },
-  { key: 'shipped', label: 'On its way' },
   { key: 'delivered', label: 'Delivered' },
+  { key: 'hold', label: 'Hold' },
   { key: 'cancelled', label: 'Cancelled' },
   { key: 'test', label: 'Test' },
+  { key: 'all', label: 'All' },
 ] as const
 export type FilterKey = (typeof FILTERS)[number]['key']
 export const isFilter = (s: string | undefined): s is FilterKey => FILTERS.some((f) => f.key === s)
@@ -129,6 +145,14 @@ export function statusMessage(o: StatusMessageOrder, status: OrderStatus, links:
     case 'cancelled':
       return `${hi}, your Heartwell order ${o.reference} has been cancelled${o.cancellationReason ? ` (${o.cancellationReason})` : ''}. If that's not what you expected, please reply here.`
   }
+}
+
+/**
+ * The WhatsApp message for an order put on hold: nothing is delivered until
+ * they're ready, and their confirm link is there for when they are.
+ */
+export function holdMessage(o: Pick<StatusMessageOrder, 'reference' | 'customerName'>, confirmUrl: string): string {
+  return `Hi ${firstName(o.customerName)}, we've put your Heartwell order ${o.reference} on hold for now, so nothing will be delivered until you're ready. When you are, check your details and press Confirm here: ${confirmUrl} (or just reply here). If you'd rather cancel, tell us here too.`
 }
 
 export function whatsAppTo(phone: string, message?: string): string | null {

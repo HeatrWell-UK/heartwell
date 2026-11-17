@@ -1010,6 +1010,8 @@ export type Database = {
           gbraid: string | null
           gclid: string | null
           has_made_to_order: boolean
+          held_at: string | null
+          hold_reason: string | null
           id: string
           is_test: boolean
           items_subtotal: number
@@ -1082,6 +1084,8 @@ export type Database = {
           gbraid?: string | null
           gclid?: string | null
           has_made_to_order?: boolean
+          held_at?: string | null
+          hold_reason?: string | null
           id?: string
           is_test?: boolean
           items_subtotal?: number
@@ -1154,6 +1158,8 @@ export type Database = {
           gbraid?: string | null
           gclid?: string | null
           has_made_to_order?: boolean
+          held_at?: string | null
+          hold_reason?: string | null
           id?: string
           is_test?: boolean
           items_subtotal?: number
@@ -2165,6 +2171,10 @@ export type Database = {
       set_order_attribution: {
         Args: { p_note?: string; p_order_id: string; p_source: string }
         Returns: undefined
+      }
+      set_order_hold: {
+        Args: { p_hold: boolean; p_order_id: string; p_reason?: string }
+        Returns: Json
       }
       set_order_status: {
         Args: { p_order_id: string; p_reason?: string; p_status: string }
