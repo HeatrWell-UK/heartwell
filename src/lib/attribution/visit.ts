@@ -26,7 +26,7 @@ export function referenceKind(raw: string): ReferenceKind {
  * 2026) say whether WhatsApp opened after a tap (src/lib/whatsapp/help.ts), and
  * when a customer left their number for us to message them.
  */
-export const VISIT_STEPS = ['page_view', 'add_to_basket', 'checkout_start', 'phone_click', 'whatsapp_opened', 'whatsapp_stuck', 'whatsapp_callback'] as const
+export const VISIT_STEPS = ['page_view', 'add_to_basket', 'checkout_start', 'phone_click', 'whatsapp_opened', 'whatsapp_stuck', 'whatsapp_callback', 'delivery_check'] as const
 export type VisitStep = (typeof VISIT_STEPS)[number]
 
 /**
@@ -34,8 +34,10 @@ export type VisitStep = (typeof VISIT_STEPS)[number]
  * noted on every page; WhatsApp taps, basket reminders, samples and orders
  * already have their own records, so they aren't noted twice.
  */
-export function visitStepFor(name: BrowserEventName, data: EventData = {}): { type: VisitStep; name?: string; value?: number } | null {
-  if (name === 'AddToCart') return { type: 'add_to_basket', ...(data.contentName ? { name: data.contentName } : {}), ...(data.value !== undefined ? { value: data.value } : {}) }
+export function visitStepFor(name: BrowserEventName, data: EventData = {}): { type: VisitStep; name?: string; value?: number; variantId?: string } | null {
+  // Run 2: the variant goes with a basket add, so product funnels don't depend on page addresses.
+  const variantId = data.contents?.[0]?.id ?? data.contentIds?.[0]
+  if (name === 'AddToCart') return { type: 'add_to_basket', ...(data.contentName ? { name: data.contentName } : {}), ...(data.value !== undefined ? { value: data.value } : {}), ...(variantId ? { variantId } : {}) }
   if (name === 'InitiateCheckout') return { type: 'checkout_start', ...(data.value !== undefined ? { value: data.value } : {}) }
   if (name === 'Contact' && data.contentName === 'Phone call') return { type: 'phone_click' }
   return null

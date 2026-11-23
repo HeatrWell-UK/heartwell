@@ -4,6 +4,7 @@
 // countdown is true. Also the minimum order. Pure: shared by the browser, the
 // server and tests.
 
+import type { ChristmasFacts } from '@/lib/delivery/christmas'
 import type { EventSettings } from './event'
 import type { TierAmounts } from './paid'
 
@@ -36,6 +37,8 @@ export interface ShopOffers {
   minOrder: number
   /** The Christmas and New Year sofa event (£ off each made-to-order sofa, with its dates). */
   event: EventSettings
+  /** The owner's Christmas delivery facts (null fields: not verified, so no promise). */
+  christmas: ChristmasFacts
 }
 
 /** What the welcome offer takes off: the amount for each piece, never more than the pieces cost. As the database works it out. */

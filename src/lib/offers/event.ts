@@ -32,6 +32,15 @@ export function londonDate(at: Date): { year: number; month: number; day: number
   return { year: get('year'), month: get('month'), day: get('day') }
 }
 
+/** Has the event's start passed (true after it ends, too)? */
+export const eventStarted = (s: EventSettings, at: Date = new Date()) => at.getTime() >= Date.parse(s.startsAt)
+
+/** Today's date in the UK, YYYY-MM-DD. */
+export function todayIsoLondon(at: Date = new Date()): string {
+  const d = londonDate(at)
+  return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`
+}
+
 /** True while the event is on at this instant. */
 export function eventLive(s: EventSettings, at: Date = new Date()): boolean {
   if (!s.enabled || !(s.mtoAmount > 0)) return false

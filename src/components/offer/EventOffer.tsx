@@ -11,7 +11,8 @@ import { useSyncExternalStore } from 'react'
 import { HeartIcon } from '@phosphor-icons/react'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
-import { eventCopy, eventLastDay, eventPhase, type EventCopy, type EventPhase, type EventSettings } from '@/lib/offers/event'
+import { christmasDelivery, type ChristmasFacts } from '@/lib/delivery/christmas'
+import { eventCopy, eventLastDay, eventPhase, todayIsoLondon, type EventCopy, type EventPhase, type EventSettings } from '@/lib/offers/event'
 
 // One shared minute tick, so every component re-checks the phase together.
 const listeners = new Set<() => void>()
@@ -92,5 +93,31 @@ export function EventBand({ settings, fallback, fallbackShort }: { settings: Eve
       <span className="sm:hidden">{state ? state.copy.bandShort : fallbackShort}</span>
       <span className="hidden sm:inline">{state ? state.copy.band : fallback}</span>
     </>
+  )
+}
+
+/**
+ * Product pages, Christmas part of the event only: Christmas delivery, said
+ * honestly. With the owner's facts set (Admin → Settings), the real order-by
+ * date for most mainland postcodes; without them, no date at all and a real
+ * check on WhatsApp instead. Never "guaranteed".
+ */
+export function ChristmasDeliveryNote({ state, facts, madeToOrder, children }: { state: EventState | null; facts: ChristmasFacts; madeToOrder: boolean; children?: React.ReactNode }) {
+  const todayIso = todayIsoLondon()
+  const said = christmasDelivery(facts, { christmasPhase: state?.phase === 'christmas', madeToOrder, todayIso })
+  if (said.kind === 'hidden') return null
+  const dateText = (d: string) => new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${d}T12:00:00Z`))
+  return (
+    <div role="note" className="flex flex-col gap-1 rounded-[14px] border border-line px-3.5 py-2.5 text-[14px] leading-snug">
+      <strong className="font-semibold text-ink">Need it before Christmas?</strong>
+      <span className="text-slate">
+        {said.kind === 'ask' &&
+          `We only promise a Christmas delivery once we’ve checked your postcode and ${madeToOrder ? 'the making time for your fabric' : 'stock'} with you. Message us before you order and we’ll tell you honestly.`}
+        {said.kind === 'order_by' &&
+          `Order by ${dateText(said.date)} for delivery before Christmas to most mainland postcodes. Devon, Cornwall and Scotland’s charged areas take longer: ask us. We confirm your day by phone.`}
+        {said.kind === 'too_late' && `Orders placed now are delivered after Christmas. We’ll agree the day with you by phone.`}
+      </span>
+      {said.kind !== 'too_late' && children}
+    </div>
   )
 }

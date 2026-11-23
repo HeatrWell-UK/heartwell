@@ -8,6 +8,7 @@ import { areaForPostcode } from '@/lib/delivery/areas'
 import { formatPrice } from '@/lib/format'
 import { postcodeOutcome, type PostcodeOutcome } from '@/lib/product/helpers'
 import { useTodaysDelivery, type DeliveryDates } from '@/lib/delivery/fresh'
+import { noteVisit } from '@/lib/tracking/browser'
 
 /**
  * "Check delivery to your postcode": answered instantly on the phone (the same
@@ -39,6 +40,8 @@ export function PostcodeCheck({ delivery, itemPrice, className = '' }: Props) {
   const check = () => {
     const result = postcodeOutcome(value)
     setChecked(result)
+    // Our own statistics (Run 2): the result and the outward code only (e.g. "EX1"), never the full postcode.
+    if (result.kind !== 'empty') noteVisit('delivery_check', { name: result.kind === 'invalid' ? 'invalid' : `${result.kind} ${result.area}`.slice(0, 40) })
     if (result.kind !== 'empty' && result.kind !== 'invalid') {
       setTyped(result.postcode)
       rememberPostcode(result.postcode)

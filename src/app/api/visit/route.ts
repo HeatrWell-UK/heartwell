@@ -22,6 +22,8 @@ const Body = z.object({
   path: z.string().startsWith('/').max(300).regex(/^[^?#]*$/),
   name: z.string().trim().max(120).optional(),
   value: z.number().min(0).max(100000).optional(),
+  // A product variant's ID (basket adds), never anything the customer typed.
+  variantId: z.uuid().optional(),
 })
 
 const done = () => new Response(null, { status: 204 })
@@ -34,9 +36,12 @@ export async function POST(request: Request) {
   if (!rateLimit(`visit:${await clientIp()}`, 120, 60_000)) return done()
   const parsed = Body.safeParse(await request.json().catch(() => null))
   if (!parsed.success || isPrivatePath(parsed.data.path)) return done()
-  const { visit, type, path, name, value } = parsed.data
+  const { visit, type, path, name, value, variantId } = parsed.data
   const metadata = { ...(name ? { name } : {}), ...(value !== undefined ? { value: Math.round(value * 100) / 100 } : {}) }
-  const { error } = await createAdminClient()
+  const db = createAdminClient()
+  // The variant's product, so funnels can count by product (Run 2).
+  const productId = variantId ? ((await db.from('product_variants').select('product_id').eq('id', variantId).maybeSingle()).data?.product_id ?? null) : null
+  const { error } = await db
     .from('attribution_actions')
     .insert({
       visitor_id: visit.visitorId,
@@ -45,6 +50,8 @@ export async function POST(request: Request) {
       action_type: type,
       page_url: path,
       metadata: Object.keys(metadata).length ? metadata : null,
+      variant_id: productId ? variantId : null,
+      product_id: productId,
       is_test: APP_ENV !== 'production',
     })
   if (error) console.error('visit step not saved', type, error.message)

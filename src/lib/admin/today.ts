@@ -61,6 +61,11 @@ export function ago(ms: number): string {
   return `${d} ${d === 1 ? 'day' : 'days'}`
 }
 
+/** How far back Today looks (60 days of orders is plenty for open work). */
+export function todaySince(now: Date = new Date()): string {
+  return new Date(now.getTime() - 60 * DAY).toISOString()
+}
+
 export function todayTasks(orders: TodayOrder[], purchases: TodayPurchase[], now: Date = new Date()): TodayTask[] {
   const held = new Map(purchases.map((p) => [p.orderId, p.status]))
   const tasks: TodayTask[] = []

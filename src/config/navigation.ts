@@ -32,6 +32,8 @@ export const HELP_LINKS: NavLink[] = [
 
 /** Browse links shown under the shop links. */
 export const BROWSE_LINKS: NavLink[] = [
+  // Run 2: the Christmas and New Year sofa event (1 Dec 2026 – 31 Jan 2027). Remove after February.
+  { label: 'Christmas and New Year sofa event', href: '/sale' },
   { label: 'Shop by range', href: '/ranges' },
   { label: 'Our fabrics', href: '/fabrics' },
 ]

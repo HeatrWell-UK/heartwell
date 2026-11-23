@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { CaretRightIcon } from '@phosphor-icons/react/ssr'
 import { OrderStatusBadge, Tag } from '@/components/admin/OrderBits'
 import { createClient } from '@/lib/supabase/server'
-import { TASK_ORDER, TASK_TITLE, todayTasks, type TodayOrder, type TodayTask } from '@/lib/admin/today'
+import { TASK_ORDER, TASK_TITLE, todaySince, todayTasks, type TodayOrder, type TodayTask } from '@/lib/admin/today'
 import { purchaseWindowText } from '@/lib/tracking/purchase-window'
 import { formatPrice } from '@/lib/format'
 
@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function TodayPage() {
   const db = await createClient()
-  const since = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString()
+  const since = todaySince()
   const [orders, purchases] = await Promise.all([
     db
       .from('orders')

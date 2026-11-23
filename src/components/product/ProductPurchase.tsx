@@ -24,7 +24,7 @@ import { AddedSheet, type AddedItem } from './AddedSheet'
 import { StickyBuyBar } from './StickyBuyBar'
 import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
 import { useWelcome, WelcomePanel } from '@/components/offer/WelcomeOffer'
-import { EventPanel, useEvent } from '@/components/offer/EventOffer'
+import { ChristmasDeliveryNote, EventPanel, useEvent } from '@/components/offer/EventOffer'
 import { orderOffer } from '@/lib/offers/event'
 import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 import { ScalePlan } from '@/components/catalogue/ScalePlan'
@@ -289,6 +289,19 @@ export function ProductPurchase({
               </div>
             </dl>
             {variant && <PostcodeCheck delivery={delivery} itemPrice={price - offerOff} />}
+            {variant && (
+              <ChristmasDeliveryNote state={event} facts={offers.christmas} madeToOrder={p.madeToOrder}>
+                <WhatsAppButton
+                  message={`Hello Heartwell, can the ${p.title} be delivered before Christmas to my postcode?`}
+                  context="christmas-delivery"
+                  productId={p.id}
+                  variantId={variant.id}
+                  productName={p.title}
+                >
+                  Check Christmas delivery on WhatsApp
+                </WhatsAppButton>
+              </ChristmasDeliveryNote>
+            )}
             {variant && <div className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-semibold">
               {p.madeToOrder && fabricCount > 0 && <Link href="/fabric-samples">Order fabric samples</Link>}
               <WhatsAppButton message={waMessage} context="product-summary" productId={p.id} variantId={variant.id} productName={p.title}>

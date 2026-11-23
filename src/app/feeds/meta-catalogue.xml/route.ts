@@ -7,6 +7,13 @@ import { after } from 'next/server'
 import { SITE_URL } from '@/config/site'
 import { buildFeed, feedAgent, metaFeedXml } from '@/lib/catalogue/feed'
 import { getFeedProducts, recordFeedFetch } from '@/lib/catalogue/feed-load'
+import { getOfferSettings } from '@/lib/offers/server'
+
+/** The Christmas and New Year event for the feed, when it's switched on (dates limit it). */
+async function feedSale() {
+  const { event } = await getOfferSettings()
+  return event.enabled && event.mtoAmount > 0 ? { amount: event.mtoAmount, startsAt: event.startsAt, endsAt: event.endsAt } : null
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +21,7 @@ export async function GET(request: Request) {
   let xml: string
   let count: number
   try {
-    const { items } = buildFeed(await getFeedProducts(), SITE_URL)
+    const { items } = buildFeed(await getFeedProducts(), SITE_URL, await feedSale())
     xml = metaFeedXml(items, SITE_URL)
     count = items.length
   } catch (e) {

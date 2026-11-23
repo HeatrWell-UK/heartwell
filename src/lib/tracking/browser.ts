@@ -225,7 +225,7 @@ export function newEventId(): string {
  * order to it. Never for staff devices, QA visits or private pages, and not
  * without permission for advertising measurement.
  */
-export function noteVisit(type: VisitStep, extra: { name?: string; value?: number } = {}) {
+export function noteVisit(type: VisitStep, extra: { name?: string; value?: number; variantId?: string } = {}) {
   if (typeof window === 'undefined' || isStaffDevice() || isQaVisit() || isPrivatePath(window.location.pathname)) return
   const visit = visitIds()
   if (!visit) return
@@ -246,7 +246,7 @@ export function track(name: BrowserEventName, data: EventData = {}): string {
   const eventId = newEventId()
   if (typeof window === 'undefined' || isStaffDevice() || isQaVisit() || isPrivatePath(window.location.pathname)) return eventId
   const step = visitStepFor(name, data)
-  if (step) noteVisit(step.type, { name: step.name, value: step.value })
+  if (step) noteVisit(step.type, { name: step.name, value: step.value, variantId: step.variantId })
   const consent = readConsent()
   const loaded = window.__hwTracking
   try {

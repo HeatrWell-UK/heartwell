@@ -93,6 +93,19 @@ export interface FeedItem {
   highlights: string[]
   /** "Colour: Grey. Cover: Plush Velvet. Size: …": added to Google's description only. */
   details: string
+  /**
+   * The Christmas and New Year event's price (Run 2): today's price less £50,
+   * for eligible made-to-order pieces, with the event's dates so Google and
+   * Meta show it only while it's on. Never a raised or invented price.
+   */
+  sale: { price: number; effective: string } | null
+}
+
+/** The event as the feeds need it: £ off each eligible made-to-order piece, between two instants. */
+export interface FeedSale {
+  amount: number
+  startsAt: string
+  endsAt: string
 }
 
 export type LeftOutReason = 'no-photo' | 'no-price'
@@ -205,7 +218,8 @@ export function itemDetails(p: FeedProductRow, v: FeedVariantRow): string {
 }
 
 /** Feed items for every colourway that can be shown, and what was left out. */
-export function buildFeed(products: FeedProductRow[], siteUrl: string): { items: FeedItem[]; leftOut: LeftOut[] } {
+export function buildFeed(products: FeedProductRow[], siteUrl: string, sale: FeedSale | null = null): { items: FeedItem[]; leftOut: LeftOut[] } {
+  const effective = sale ? `${new Date(sale.startsAt).toISOString().slice(0, 16)}+00:00/${new Date(sale.endsAt).toISOString().slice(0, 16)}+00:00` : ''
   const items: FeedItem[] = []
   const leftOut: LeftOut[] = []
   const bySlug = new Map(products.map((p) => [p.slug, p]))
@@ -256,6 +270,10 @@ export function buildFeed(products: FeedProductRow[], siteUrl: string): { items:
         dimensions: footprint(p.size),
         highlights: p.highlights.slice(0, HIGHLIGHTS_MAX).map((h) => clip(h, HIGHLIGHT_MAX)),
         details: itemDetails(p, v),
+        sale:
+          sale && sale.amount > 0 && p.madeToOrder && p.offerTier !== 'EXCLUDED' && price > sale.amount
+            ? { price: Math.round((price - sale.amount) * 100) / 100, effective }
+            : null,
       })
     }
     // Meta groups colourways by item_group_id; a product with one item in the feed has no group.
@@ -332,6 +350,8 @@ export function metaFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('availability', 'in stock'),
         tag('condition', 'new'),
         tag('price', money(i.price)),
+        i.sale ? tag('sale_price', money(i.sale.price)) : '',
+        i.sale ? tag('sale_price_effective_date', i.sale.effective) : '',
         tag('link', catalogueLink(i.link)),
         tag('image_link', i.imageLink),
         ...i.additionalImageLinks.map((src) => tag('additional_image_link', src)),
@@ -373,6 +393,8 @@ export function googleFeedXml(items: FeedItem[], siteUrl: string): string {
         tag('availability', 'in_stock'),
         tag('condition', 'new'),
         tag('price', money(i.price)),
+        i.sale ? tag('sale_price', money(i.sale.price)) : '',
+        i.sale ? tag('sale_price_effective_date', i.sale.effective) : '',
         tag('link', i.link),
         tag('image_link', i.imageLink),
         ...i.additionalImageLinks.map((src) => tag('additional_image_link', src)),

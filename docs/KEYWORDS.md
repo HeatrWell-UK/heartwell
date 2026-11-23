@@ -11,6 +11,7 @@ Phase 20, 18 October 2026. Every page Google can index has a search it's written
 | Page | Written for | Also answers | Where the words live |
 | --- | --- | --- | --- |
 | `/` | heartwell sofa, cash on delivery sofas, sofas delivered in days | pay on delivery furniture, sofa free delivery uk | `src/app/layout.tsx` (title), `META_DESCRIPTION` |
+| `/sale` | christmas sofa sale, sofa sale uk, made to order sofa offer | january sofa sale, boxing day sofa deals | `src/app/(shop)/sale/page.tsx` (title, description), heading by season in `src/components/offer/SaleHeading.tsx` |
 | `/sofas` | sofas delivered in days, pay cash on delivery | sofa quick delivery uk, how much is a sofa | database `categories` (migration `category_search_words`), questions in `src/content/categories.ts` |
 | `/sofas/corner-sofas` | corner sofa fast delivery uk, corner sofa cash on delivery | corner sofas under 500, left or right hand corner sofa, will a corner sofa fit through my door | same |
 | `/sofas/u-shaped-sofas` | u shaped sofa uk | how much space does a u shaped sofa need, u shaped sofa cheap | same |

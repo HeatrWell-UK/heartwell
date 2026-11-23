@@ -331,3 +331,23 @@ describe('status: the catalogue feed', () => {
     expect(buildStatusChecks(ctx, data, null).some((c) => c.key === 'catalogue_feed')).toBe(false)
   })
 })
+
+describe('the Christmas and New Year event in the feeds (Run 2)', () => {
+  const sale = { amount: 50, startsAt: '2026-12-01T00:00:00Z', endsAt: '2027-02-01T00:00:00Z' }
+
+  it('made-to-order pieces carry today’s price less £50, limited to the event’s dates', () => {
+    const [item] = buildFeed([product({ madeToOrder: true, offerTier: 'STANDARD' })], SITE, sale).items
+    expect(item!.sale).toEqual({ price: item!.price - 50, effective: '2026-12-01T00:00+00:00/2027-02-01T00:00+00:00' })
+    const xml = googleFeedXml([item!], SITE) + metaFeedXml([item!], SITE)
+    expect(xml).toContain('<g:sale_price_effective_date>2026-12-01T00:00+00:00/2027-02-01T00:00+00:00</g:sale_price_effective_date>')
+    expect(xml).not.toMatch(/50\s*%/)
+  })
+
+  it('imported, excluded, or no event: no sale price, and the list price never changes', () => {
+    const imported = buildFeed([product({ madeToOrder: false, offerTier: 'HIGH' })], SITE, sale).items[0]!
+    const excluded = buildFeed([product({ madeToOrder: true, offerTier: 'EXCLUDED' })], SITE, sale).items[0]!
+    const none = buildFeed([product({ madeToOrder: true, offerTier: 'STANDARD' })], SITE).items[0]!
+    expect([imported.sale, excluded.sale, none.sale]).toEqual([null, null, null])
+    expect(none.price).toBe(buildFeed([product({ madeToOrder: true, offerTier: 'STANDARD' })], SITE, sale).items[0]!.price)
+  })
+})
