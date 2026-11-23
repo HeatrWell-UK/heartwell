@@ -7,6 +7,7 @@ import { createPublicClient } from '@/lib/supabase/public'
 import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/admin'
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { SETTINGS_TAG } from '@/lib/product/load'
+import { NO_EVENT, type EventSettings } from './event'
 import type { TierAmounts } from './paid'
 import type { ShopOffers, WelcomeSettings } from './welcome'
 
@@ -21,6 +22,8 @@ export interface OfferSettings {
   welcome: WelcomeSettings
   /** The least a website order's pieces can come to, before offers and delivery. */
   minOrder: number
+  /** The Christmas and New Year sofa event (migration seasonal_event). */
+  event: EventSettings
 }
 
 const NONE: OfferSettings = {
@@ -30,6 +33,7 @@ const NONE: OfferSettings = {
   code: null,
   welcome: { enabled: false, amount: 0, hours: 48 },
   minOrder: 0,
+  event: NO_EVENT,
 }
 
 export const getOfferSettings = unstable_cache(
@@ -37,13 +41,14 @@ export const getOfferSettings = unstable_cache(
     if (!SUPABASE_CONFIGURED) return NONE
     const { data, error } = await createPublicClient()
       .from('shop_settings')
-      .select('paid_offer_enabled, paid_offer_days, offer_tier_high, offer_tier_mid, offer_tier_standard, welcome_offer_enabled, welcome_offer_amount, welcome_offer_hours, min_order_value')
+      .select('paid_offer_enabled, paid_offer_days, offer_tier_high, offer_tier_mid, offer_tier_standard, welcome_offer_enabled, welcome_offer_amount, welcome_offer_hours, min_order_value, event_enabled, event_name, event_starts_at, event_ends_at, event_mto_amount')
       .single()
     if (error || !data) return NONE
     // Offer codes are admin-only in the database, so the newest live one is read with the server key.
+    // The event's dated aliases (CHRISTMAS, NEWYEAR) aren't the ad visitor's code: the event needs none.
     let code: string | null = null
     if (SUPABASE_SECRET_CONFIGURED) {
-      const codes = await createAdminClient().from('offer_codes').select('code').eq('is_active', true).order('created_at', { ascending: false }).limit(1)
+      const codes = await createAdminClient().from('offer_codes').select('code').eq('is_active', true).eq('is_event_alias', false).order('created_at', { ascending: false }).limit(1)
       code = codes.data?.[0]?.code ?? null
     }
     const welcomeAmount = Number(data.welcome_offer_amount)
@@ -54,11 +59,18 @@ export const getOfferSettings = unstable_cache(
       code,
       welcome: { enabled: data.welcome_offer_enabled && welcomeAmount > 0, amount: welcomeAmount, hours: data.welcome_offer_hours },
       minOrder: Number(data.min_order_value),
+      event: {
+        enabled: data.event_enabled === true,
+        name: data.event_name ?? '',
+        startsAt: data.event_starts_at,
+        endsAt: data.event_ends_at,
+        mtoAmount: Number(data.event_mto_amount),
+      },
     }
   },
-  ['offer-settings-v2'],
+  ['offer-settings-v3'],
   { revalidate: 300, tags: [SETTINGS_TAG] },
 )
 
 /** Only what the shop's pages need in the browser. */
-export const shopOffers = (s: OfferSettings): ShopOffers => ({ amounts: s.amounts, code: s.code, welcome: s.welcome, minOrder: s.minOrder })
+export const shopOffers = (s: OfferSettings): ShopOffers => ({ amounts: s.amounts, code: s.code, welcome: s.welcome, minOrder: s.minOrder, event: s.event })

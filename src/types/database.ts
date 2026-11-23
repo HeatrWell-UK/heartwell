@@ -408,6 +408,8 @@ export type Database = {
       }
       conversion_outbox: {
         Row: {
+          note: string | null
+          noted_at: string | null
           attempts: number
           created_at: string
           error: Json | null
@@ -426,6 +428,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          note?: string | null
+          noted_at?: string | null
           attempts?: number
           created_at?: string
           error?: Json | null
@@ -444,6 +448,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          note?: string | null
+          noted_at?: string | null
           attempts?: number
           created_at?: string
           error?: Json | null
@@ -762,6 +768,9 @@ export type Database = {
       }
       offer_codes: {
         Row: {
+          is_event_alias: boolean
+          valid_from: string | null
+          valid_until: string | null
           code: string
           created_at: string
           is_active: boolean
@@ -769,6 +778,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          is_event_alias?: boolean
+          valid_from?: string | null
+          valid_until?: string | null
           code: string
           created_at?: string
           is_active?: boolean
@@ -776,6 +788,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          is_event_alias?: boolean
+          valid_from?: string | null
+          valid_until?: string | null
           code?: string
           created_at?: string
           is_active?: boolean
@@ -981,6 +996,8 @@ export type Database = {
       }
       orders: {
         Row: {
+          staff_verified_at: string | null
+          staff_verified_by: string | null
           arrival_id: string | null
           cancellation_reason: string | null
           cancelled_at: string | null
@@ -1055,6 +1072,8 @@ export type Database = {
           whatsapp_reference: string | null
         }
         Insert: {
+          staff_verified_at?: string | null
+          staff_verified_by?: string | null
           arrival_id?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
@@ -1129,6 +1148,8 @@ export type Database = {
           whatsapp_reference?: string | null
         }
         Update: {
+          staff_verified_at?: string | null
+          staff_verified_by?: string | null
           arrival_id?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
@@ -1700,6 +1721,14 @@ export type Database = {
       }
       shop_settings: {
         Row: {
+          christmas_closed_dates: string[]
+          christmas_last_delivery_date: string | null
+          event_enabled: boolean
+          event_ends_at: string
+          event_mto_amount: number
+          event_name: string
+          event_starts_at: string
+          made_to_order_lead_days: number | null
           assembly_fee: number
           delivery_max_working_days: number
           delivery_min_working_days: number
@@ -1732,6 +1761,14 @@ export type Database = {
           welcome_offer_hours: number
         }
         Insert: {
+          christmas_closed_dates?: string[]
+          christmas_last_delivery_date?: string | null
+          event_enabled?: boolean
+          event_ends_at?: string
+          event_mto_amount?: number
+          event_name?: string
+          event_starts_at?: string
+          made_to_order_lead_days?: number | null
           assembly_fee?: number
           delivery_max_working_days?: number
           delivery_min_working_days?: number
@@ -1764,6 +1801,14 @@ export type Database = {
           welcome_offer_hours?: number
         }
         Update: {
+          christmas_closed_dates?: string[]
+          christmas_last_delivery_date?: string | null
+          event_enabled?: boolean
+          event_ends_at?: string
+          event_mto_amount?: number
+          event_name?: string
+          event_starts_at?: string
+          made_to_order_lead_days?: number | null
           assembly_fee?: number
           delivery_max_working_days?: number
           delivery_min_working_days?: number
@@ -2171,6 +2216,14 @@ export type Database = {
       set_order_attribution: {
         Args: { p_note?: string; p_order_id: string; p_source: string }
         Returns: undefined
+      }
+      verify_order: {
+        Args: { p_note?: string; p_order_id: string }
+        Returns: Json
+      }
+      event_phase: {
+        Args: { p_at?: string }
+        Returns: string
       }
       set_order_hold: {
         Args: { p_hold: boolean; p_order_id: string; p_reason?: string }

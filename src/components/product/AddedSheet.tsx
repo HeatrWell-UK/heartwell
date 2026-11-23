@@ -46,7 +46,7 @@ export function AddedSheet({ item, offers, onClose }: { item: AddedItem | null; 
             )}
             {offer.amount > 0 && (
               <div className="flex justify-between">
-                <dt>{offer.kind === 'welcome' ? 'Welcome offer' : 'Your offer'}</dt>
+                <dt>{offer.kind === 'event' && offer.event ? offer.event.copy.title : offer.kind === 'welcome' ? 'Welcome offer' : 'Your offer'}</dt>
                 <dd>−{formatPrice(offer.amount)}</dd>
               </div>
             )}

@@ -17,6 +17,7 @@ import { productHref } from '@/lib/product/helpers'
 import type { ShopOffers } from '@/lib/offers/welcome'
 import { OfferStrip } from '@/components/offer/OfferStrip'
 import { WelcomeNote } from '@/components/offer/WelcomeOffer'
+import { EventNote } from '@/components/offer/EventOffer'
 import { useBasketOffer } from '@/components/offer/useBasketOffer'
 import { PayRows } from '@/components/checkout/PayRows'
 import { MinimumNote } from '@/components/checkout/MinimumNote'
@@ -144,7 +145,9 @@ export function BasketView({ offers }: { offers: ShopOffers }) {
           <h2 id="summary" className="text-[26px] leading-tight">
             Summary
           </h2>
-          {offer.kind === 'ad' ? (
+          {offer.event ? (
+            <EventNote state={offer.event} units={offer.kind === 'event' ? offer.eventUnits : 0} />
+          ) : offer.kind === 'ad' ? (
             <OfferStrip amount={offer.amount} code={offers.code} />
           ) : (
             <WelcomeNote state={offer.welcome} amount={offers.welcome.amount} hours={offers.welcome.hours} />
@@ -156,11 +159,28 @@ export function BasketView({ offers }: { offers: ShopOffers }) {
               </dt>
               <dd>{formatPrice(basket.subtotal)}</dd>
             </div>
-            {offer.amount > 0 && (
-              <div className="flex justify-between">
-                <dt>{offer.kind === 'welcome' ? `Welcome offer (${basket.count} × ${formatPrice(offers.welcome.amount)})` : 'Your offer'}</dt>
-                <dd>−{formatPrice(offer.amount)}</dd>
-              </div>
+            {offer.kind === 'event' && offer.event ? (
+              <>
+                <div className="flex justify-between">
+                  <dt>
+                    {offer.event.copy.title} ({offer.eventUnits} × {formatPrice(offer.event.amount)})
+                  </dt>
+                  <dd>−{formatPrice(offer.eventAmount)}</dd>
+                </div>
+                {offer.restAmount > 0 && (
+                  <div className="flex justify-between">
+                    <dt>{offer.restKind === 'welcome' ? 'Welcome offer on your other pieces' : 'Your offer on your other pieces'}</dt>
+                    <dd>−{formatPrice(offer.restAmount)}</dd>
+                  </div>
+                )}
+              </>
+            ) : (
+              offer.amount > 0 && (
+                <div className="flex justify-between">
+                  <dt>{offer.kind === 'welcome' ? `Welcome offer (${basket.count} × ${formatPrice(offers.welcome.amount)})` : 'Your offer'}</dt>
+                  <dd>−{formatPrice(offer.amount)}</dd>
+                </div>
+              )
             )}
             <div className="flex justify-between">
               <dt>Delivery</dt>

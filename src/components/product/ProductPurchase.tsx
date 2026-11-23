@@ -24,12 +24,14 @@ import { AddedSheet, type AddedItem } from './AddedSheet'
 import { StickyBuyBar } from './StickyBuyBar'
 import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
 import { useWelcome, WelcomePanel } from '@/components/offer/WelcomeOffer'
+import { EventPanel, useEvent } from '@/components/offer/EventOffer'
+import { orderOffer } from '@/lib/offers/event'
 import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 import { ScalePlan } from '@/components/catalogue/ScalePlan'
 import { planFrame, sizeLabel } from '@/lib/catalogue/range-sizes'
 import { dealFor, dealLabel } from '@/lib/catalogue/deal'
 import { homeSwatches } from '@/lib/home/picks'
-import { bestOffer, welcomeOff, type ShopOffers } from '@/lib/offers/welcome'
+import { welcomeOff, type ShopOffers } from '@/lib/offers/welcome'
 import type { Layout } from '@/lib/product/measurements'
 import { Medallion } from '@/components/catalogue/Arcade'
 import { gallerySlides } from '@/lib/product/gallery'
@@ -158,14 +160,26 @@ export function ProductPurchase({
   // A was-price, with the same colourway or fabric difference as today's price.
   const deal = dealFor(price, p.wasPrice === null ? null : unitPrice(p.wasPrice, variant?.priceAdjustment ?? 0, fabric?.collection.surcharge ?? 0))
 
-  // One offer comes off what's paid on delivery, while it's live: the welcome
-  // offer or an ad visitor's, whichever takes more off (as the database decides).
+  // One offer comes off what's paid on delivery, while it's live: during the
+  // Christmas and New Year event £50 off a made-to-order sofa; otherwise the
+  // welcome offer or an ad visitor's, whichever takes more off (as the
+  // database decides, calculate_order_offer).
   const welcome = useWelcome(offers.welcome.enabled)
+  const event = useEvent(offers.event)
   const adEnds = useOfferEnds()
   const adOff = adEnds ? Math.min(adAmount, price) : 0
   const welcomeAmount = welcomeOff(1, price, offers.welcome.amount)
-  const showWelcome = welcome.kind !== 'none' && welcomeAmount > adOff
-  const offer = bestOffer(welcome.kind === 'live' ? welcomeAmount : 0, adOff)
+  const outcome = orderOffer([{ madeToOrder: p.madeToOrder, tier: p.offerTier ?? null, unitPrice: price, quantity: 1 }], {
+    event: event !== null,
+    eventAmount: offers.event.mtoAmount,
+    ad: adEnds !== null,
+    amounts: offers.amounts,
+    welcome: welcome.kind === 'live',
+    welcomeAmount: offers.welcome.amount,
+  })
+  const showEvent = event !== null && outcome.kind === 'event'
+  const showWelcome = !showEvent && welcome.kind !== 'none' && welcomeAmount > adOff
+  const offer = { kind: outcome.kind, amount: outcome.amount }
   const offerOff = offer.amount
 
   // "5 seater corner sofa, high back": the size with the word people search for (audit A3).
@@ -256,6 +270,7 @@ export function ProductPurchase({
                 )}
               </p>
             </div>
+            {showEvent && event && <EventPanel state={event} amount={offerOff} noun={noun} />}
             {showWelcome && <WelcomePanel state={welcome} amount={welcomeAmount} hours={offers.welcome.hours} noun={noun} />}
             {/*
               How it's paid: the full price, to the driver, in one payment. (A "To pay today £0" row stood above this until
@@ -268,7 +283,7 @@ export function ProductPurchase({
                 <dd className="font-display text-[20px] leading-none">{formatPrice(price - offerOff)}</dd>
                 <dd className="basis-full text-[13px] leading-snug text-slate">
                   One payment to the driver, in cash or by bank transfer, once it&rsquo;s in your room
-                  {offerOff > 0 ? `, with your ${formatPrice(offerOff)} ${offer.kind === 'welcome' ? 'welcome offer' : 'offer'} taken off` : ''}. No deposit, no card, no
+                  {offerOff > 0 ? `, with ${offer.kind === 'event' && event ? `the ${event.copy.title}'s ${formatPrice(offerOff)}` : `your ${formatPrice(offerOff)} ${offer.kind === 'welcome' ? 'welcome offer' : 'offer'}`} taken off` : ''}. No deposit, no card, no
                   finance.
                 </dd>
               </div>
@@ -280,7 +295,7 @@ export function ProductPurchase({
                 Ask about this {noun}
               </WhatsAppButton>
             </div>}
-            {!showWelcome && <OfferStrip amount={Math.min(adAmount, price)} noun={noun} code={offers.code} />}
+            {!showWelcome && !showEvent && <OfferStrip amount={Math.min(adAmount, price)} noun={noun} code={offers.code} />}
           </div>
 
           {(p.madeToOrder || p.madeInUk) && (

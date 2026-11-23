@@ -20,7 +20,7 @@ export async function ShopShell({ children }: { children: ReactNode }) {
   const shop: NavSection[] = nav.length ? nav : [{ title: 'Shop sofas', links: SHOP_LINKS }]
   return (
     <div id="page" className="flex flex-1 flex-col">
-      <AnnouncementBar />
+      <AnnouncementBar event={offers.event} />
       <Header shop={shop} />
       <main id="main" className="flex-1">
         {children}

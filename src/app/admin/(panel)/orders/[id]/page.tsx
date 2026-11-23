@@ -307,6 +307,8 @@ export default async function OrderPage({ params, searchParams }: Props) {
                 label={
                   order.offer_source === 'welcome'
                     ? 'Welcome offer'
+                    : order.offer_source === 'event'
+                      ? `Christmas–New Year event${order.promotion_code ? ` (${order.promotion_code})` : ''}${order.discount_tier ? `, other pieces ${order.discount_tier}` : ''}`
                     : `Offer${order.promotion_code ? ` ${order.promotion_code}` : ''}${order.discount_tier ? ` (${order.discount_tier})` : ''}`
                 }
                 value={`−${formatPrice(order.discount_amount)}`}

@@ -12,6 +12,7 @@ import { cn } from '@/lib/cn'
 import { useBasket, rememberPostcode, reminderId } from '@/lib/basket/store'
 import { OfferStrip } from '@/components/offer/OfferStrip'
 import { useWelcome, WelcomeNote } from '@/components/offer/WelcomeOffer'
+import { EventNote, useEvent } from '@/components/offer/EventOffer'
 import { MinimumNote } from '@/components/checkout/MinimumNote'
 import { shortOfMinimum, type ShopOffers } from '@/lib/offers/welcome'
 import { isQaVisit, readConsent, sessionFbclid, touchForOrder, track, visitIds } from '@/lib/tracking/browser'
@@ -139,9 +140,13 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   // The database's own minimum once it has priced the basket; the page's figures until then.
   const minimum = shown ? shown.minimumOrder : offers.minOrder
   const short = shortOfMinimum(shown ? shown.itemsSubtotal : subtotal, minimum)
-  const welcomeApplies = shown ? shown.offerSource === 'welcome' : welcome.kind !== 'none'
+  const event = useEvent(offers.event)
+  const eventApplies = shown?.offerSource === 'event'
+  const welcomeApplies = !event && (shown ? shown.offerSource === 'welcome' : welcome.kind !== 'none')
   const offerLabel =
-    shown?.offerSource === 'welcome'
+    eventApplies && event
+      ? `${event.copy.title} (${shown?.eventUnits ?? 0} × ${formatPrice(event.amount)})${shown && shown.restAmount > 0 ? ` and ${formatPrice(shown.restAmount)} on your other pieces` : ''}`
+      : shown?.offerSource === 'welcome'
       ? 'Welcome offer'
       : shown?.promotionCode
         ? `Offer (${shown.promotionCode})`
@@ -471,6 +476,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           <Field label="Delivery notes" optional help="Parking, steps, a tight turn on the stairs: anything that helps the drivers." helpId={`${id}-notes-help`} id={`${id}-notes`}>
             <TextArea id={`${id}-notes`} value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} aria-describedby={`${id}-notes-help`} />
           </Field>
+          {event && <EventNote state={event} units={eventApplies ? (shown?.eventUnits ?? 0) : 0} />}
           {welcomeApplies && <WelcomeNote state={welcome} amount={offers.welcome.amount} hours={offers.welcome.hours} applied />}
           {shown?.offerSource === 'paid_entitlement' && shown.discountAmount > 0 && code === '' ? (
             <OfferStrip amount={shown.discountAmount} atCheckout />
@@ -489,7 +495,11 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
               {code && shown && (
                 <p role="status" className={cn('pt-2 text-[15px]', shown.codeValid ? 'text-ink' : 'font-semibold text-error')}>
                   {!shown.codeValid
-                    ? `We don’t recognise ${code}. Please check it.`
+                    ? `We don’t recognise ${code}${event ? '' : ', or it isn’t on at the moment'}. Please check it.`
+                    : shown.codeIsEventAlias
+                      ? `${code} recognised: the ${event?.copy.title ?? 'sofa event'} is already taken off, ${formatPrice(shown.discountAmount)} in all. One offer per piece.`
+                    : eventApplies && shown.restSource !== 'manual_code'
+                      ? `${code} is valid, but the ${event?.copy.title ?? 'sofa event'} takes more off, so we’ve kept that. One offer per piece.`
                     : shown.codeAmount === 0
                       ? `${code} is valid, but doesn’t apply to the pieces in your basket.`
                       : shown.offerSource === 'welcome'

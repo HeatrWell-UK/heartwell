@@ -90,9 +90,10 @@ ${line('To pay on delivery, in full', money(toCollect(o)), true)}
 ${line(`<span style="color:${C.slate};font-size:13px">One payment to the driver, in cash or by bank transfer. No deposit, no finance.</span>`, '')}</table>`
 }
 
-/** "Welcome offer", "Offer (HEARTSOFA)" or "Offer". */
+/** "Welcome offer", "Christmas and New Year sofa event", "Offer (HEARTSOFA)" or "Offer". */
 export function offerName(o: Pick<OrderEmailData, 'offerSource' | 'promotionCode'>): string {
   if (o.offerSource === 'welcome') return 'Welcome offer'
+  if (o.offerSource === 'event') return 'Christmas and New Year sofa event (£50 off each made-to-order sofa)'
   return `Offer${o.promotionCode ? ` (${o.promotionCode})` : ''}`
 }
 

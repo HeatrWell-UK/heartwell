@@ -4,6 +4,7 @@
 // countdown is true. Also the minimum order. Pure: shared by the browser, the
 // server and tests.
 
+import type { EventSettings } from './event'
 import type { TierAmounts } from './paid'
 
 /** httpOnly: the welcome offer's token, which checkout sends to the database. */
@@ -33,6 +34,8 @@ export interface ShopOffers {
   welcome: WelcomeSettings
   /** The least a website order's pieces can come to, before offers and delivery. */
   minOrder: number
+  /** The Christmas and New Year sofa event (£ off each made-to-order sofa, with its dates). */
+  event: EventSettings
 }
 
 /** What the welcome offer takes off: the amount for each piece, never more than the pieces cost. As the database works it out. */

@@ -32,7 +32,14 @@ export interface CheckoutQuote {
   /** The ad-visitor offer is live (it, a code or the welcome offer applies, whichever takes the most off). */
   adOffer: boolean
   /** Which offer the discount is: an offer code, the ad offer or the welcome offer. */
-  offerSource: 'manual_code' | 'paid_entitlement' | 'welcome' | null
+  offerSource: 'manual_code' | 'paid_entitlement' | 'welcome' | 'event' | null
+  /** The Christmas and New Year event's part: £ off made-to-order sofas, how many, and what the other pieces got (from which offer). */
+  eventAmount: number
+  eventUnits: number
+  restAmount: number
+  restSource: 'manual_code' | 'paid_entitlement' | 'welcome' | null
+  /** The code typed is CHRISTMAS/NEWYEAR inside its dates: the event, nothing extra. */
+  codeIsEventAlias: boolean
   /** The welcome offer is live, and what it would take off. */
   welcome: boolean
   welcomeAmount: number
@@ -90,7 +97,12 @@ export async function quoteCheckout(input: unknown): Promise<{ ok: true; quote: 
       codeValid: r.code_valid === true,
       promotionCode: (r.promotion_code as string | null) ?? null,
       adOffer: r.entitlement_valid === true,
-      offerSource: source === 'manual_code' || source === 'paid_entitlement' || source === 'welcome' ? source : null,
+      offerSource: source === 'manual_code' || source === 'paid_entitlement' || source === 'welcome' || source === 'event' ? source : null,
+      eventAmount: num(r.event_amount),
+      eventUnits: num(r.event_units),
+      restAmount: num(r.rest_amount),
+      restSource: r.rest_source === 'manual_code' || r.rest_source === 'paid_entitlement' || r.rest_source === 'welcome' ? r.rest_source : null,
+      codeIsEventAlias: r.code_is_event_alias === true,
       welcome: r.welcome_valid === true,
       welcomeAmount: num(r.welcome_amount),
       codeAmount: num(r.code_amount),
