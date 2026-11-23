@@ -408,8 +408,6 @@ export type Database = {
       }
       conversion_outbox: {
         Row: {
-          note: string | null
-          noted_at: string | null
           attempts: number
           created_at: string
           error: Json | null
@@ -418,6 +416,8 @@ export type Database = {
           id: string
           last_attempt_at: string | null
           lease_until: string | null
+          note: string | null
+          noted_at: string | null
           order_id: string
           platform: string
           response: Json | null
@@ -428,8 +428,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          note?: string | null
-          noted_at?: string | null
           attempts?: number
           created_at?: string
           error?: Json | null
@@ -438,6 +436,8 @@ export type Database = {
           id?: string
           last_attempt_at?: string | null
           lease_until?: string | null
+          note?: string | null
+          noted_at?: string | null
           order_id: string
           platform: string
           response?: Json | null
@@ -448,8 +448,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          note?: string | null
-          noted_at?: string | null
           attempts?: number
           created_at?: string
           error?: Json | null
@@ -458,6 +456,8 @@ export type Database = {
           id?: string
           last_attempt_at?: string | null
           lease_until?: string | null
+          note?: string | null
+          noted_at?: string | null
           order_id?: string
           platform?: string
           response?: Json | null
@@ -768,34 +768,34 @@ export type Database = {
       }
       offer_codes: {
         Row: {
-          is_event_alias: boolean
-          valid_from: string | null
-          valid_until: string | null
           code: string
           created_at: string
           is_active: boolean
+          is_event_alias: boolean
           label: string | null
           updated_at: string
+          valid_from: string | null
+          valid_until: string | null
         }
         Insert: {
-          is_event_alias?: boolean
-          valid_from?: string | null
-          valid_until?: string | null
           code: string
           created_at?: string
           is_active?: boolean
+          is_event_alias?: boolean
           label?: string | null
           updated_at?: string
-        }
-        Update: {
-          is_event_alias?: boolean
           valid_from?: string | null
           valid_until?: string | null
+        }
+        Update: {
           code?: string
           created_at?: string
           is_active?: boolean
+          is_event_alias?: boolean
           label?: string | null
           updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: []
       }
@@ -996,8 +996,6 @@ export type Database = {
       }
       orders: {
         Row: {
-          staff_verified_at: string | null
-          staff_verified_by: string | null
           arrival_id: string | null
           cancellation_reason: string | null
           cancelled_at: string | null
@@ -1010,12 +1008,12 @@ export type Database = {
           customer_phone: string
           customer_user_agent: string | null
           delivered_at: string | null
-          deposit_paid: number
           delivery_area: string | null
           delivery_floor: number
           delivery_has_lift: boolean
           delivery_total: number
           delivery_zone: string
+          deposit_paid: number
           discount_amount: number
           discount_tier: string | null
           fbclid: string | null
@@ -1055,6 +1053,8 @@ export type Database = {
           shipping_address: string
           source: string
           special_instructions: string | null
+          staff_verified_at: string | null
+          staff_verified_by: string | null
           status: string
           test_reason: string | null
           total_amount: number
@@ -1072,8 +1072,6 @@ export type Database = {
           whatsapp_reference: string | null
         }
         Insert: {
-          staff_verified_at?: string | null
-          staff_verified_by?: string | null
           arrival_id?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
@@ -1086,12 +1084,12 @@ export type Database = {
           customer_phone: string
           customer_user_agent?: string | null
           delivered_at?: string | null
-          deposit_paid?: number
           delivery_area?: string | null
           delivery_floor?: number
           delivery_has_lift?: boolean
           delivery_total?: number
           delivery_zone?: string
+          deposit_paid?: number
           discount_amount?: number
           discount_tier?: string | null
           fbclid?: string | null
@@ -1131,6 +1129,8 @@ export type Database = {
           shipping_address: string
           source?: string
           special_instructions?: string | null
+          staff_verified_at?: string | null
+          staff_verified_by?: string | null
           status?: string
           test_reason?: string | null
           total_amount: number
@@ -1148,8 +1148,6 @@ export type Database = {
           whatsapp_reference?: string | null
         }
         Update: {
-          staff_verified_at?: string | null
-          staff_verified_by?: string | null
           arrival_id?: string | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
@@ -1162,12 +1160,12 @@ export type Database = {
           customer_phone?: string
           customer_user_agent?: string | null
           delivered_at?: string | null
-          deposit_paid?: number
           delivery_area?: string | null
           delivery_floor?: number
           delivery_has_lift?: boolean
           delivery_total?: number
           delivery_zone?: string
+          deposit_paid?: number
           discount_amount?: number
           discount_tier?: string | null
           fbclid?: string | null
@@ -1207,6 +1205,8 @@ export type Database = {
           shipping_address?: string
           source?: string
           special_instructions?: string | null
+          staff_verified_at?: string | null
+          staff_verified_by?: string | null
           status?: string
           test_reason?: string | null
           total_amount?: number
@@ -1721,18 +1721,18 @@ export type Database = {
       }
       shop_settings: {
         Row: {
+          assembly_fee: number
           christmas_closed_dates: string[]
           christmas_last_delivery_date: string | null
+          delivery_max_working_days: number
+          delivery_min_working_days: number
           event_enabled: boolean
           event_ends_at: string
           event_mto_amount: number
           event_name: string
           event_starts_at: string
-          made_to_order_lead_days: number | null
-          assembly_fee: number
-          delivery_max_working_days: number
-          delivery_min_working_days: number
           id: boolean
+          made_to_order_lead_days: number | null
           max_floor: number
           min_order_value: number
           no_delivery_days: number[]
@@ -1761,18 +1761,18 @@ export type Database = {
           welcome_offer_hours: number
         }
         Insert: {
+          assembly_fee?: number
           christmas_closed_dates?: string[]
           christmas_last_delivery_date?: string | null
+          delivery_max_working_days?: number
+          delivery_min_working_days?: number
           event_enabled?: boolean
           event_ends_at?: string
           event_mto_amount?: number
           event_name?: string
           event_starts_at?: string
-          made_to_order_lead_days?: number | null
-          assembly_fee?: number
-          delivery_max_working_days?: number
-          delivery_min_working_days?: number
           id?: boolean
+          made_to_order_lead_days?: number | null
           max_floor?: number
           min_order_value?: number
           no_delivery_days?: number[]
@@ -1801,18 +1801,18 @@ export type Database = {
           welcome_offer_hours?: number
         }
         Update: {
+          assembly_fee?: number
           christmas_closed_dates?: string[]
           christmas_last_delivery_date?: string | null
+          delivery_max_working_days?: number
+          delivery_min_working_days?: number
           event_enabled?: boolean
           event_ends_at?: string
           event_mto_amount?: number
           event_name?: string
           event_starts_at?: string
-          made_to_order_lead_days?: number | null
-          assembly_fee?: number
-          delivery_max_working_days?: number
-          delivery_min_working_days?: number
           id?: boolean
+          made_to_order_lead_days?: number | null
           max_floor?: number
           min_order_value?: number
           no_delivery_days?: number[]
@@ -2116,6 +2116,7 @@ export type Database = {
       delete_test_order: { Args: { p_order_id: string }; Returns: Json }
       delivery_area: { Args: { p_postcode: string }; Returns: Json }
       digest_data: { Args: { p_ticket: string }; Returns: Json }
+      event_phase: { Args: { p_at?: string }; Returns: string }
       find_visits: { Args: { p_input: Json }; Returns: Json }
       health_ping: { Args: never; Returns: Json }
       health_report: {
@@ -2142,6 +2143,10 @@ export type Database = {
           p_status: string
           p_ticket: string
         }
+        Returns: Json
+      }
+      link_order_visit: {
+        Args: { p_order_id: string; p_reference: string }
         Returns: Json
       }
       newsletter_confirm: { Args: { p_token: string }; Returns: Json }
@@ -2180,7 +2185,6 @@ export type Database = {
         Args: { p_from: string; p_to: string }
         Returns: boolean
       }
-      link_order_visit: { Args: { p_order_id: string; p_reference: string }; Returns: Json }
       place_manual_order: { Args: { p_input: Json }; Returns: Json }
       place_order: { Args: { p_input: Json }; Returns: Json }
       postcode_from_text: { Args: { p_text: string }; Returns: string }
@@ -2212,18 +2216,13 @@ export type Database = {
         Returns: Json
       }
       run_daily_cleanup: { Args: never; Returns: Json }
-      set_order_deposit: { Args: { p_amount: number; p_order_id: string }; Returns: Json }
       set_order_attribution: {
         Args: { p_note?: string; p_order_id: string; p_source: string }
         Returns: undefined
       }
-      verify_order: {
-        Args: { p_note?: string; p_order_id: string }
+      set_order_deposit: {
+        Args: { p_amount: number; p_order_id: string }
         Returns: Json
-      }
-      event_phase: {
-        Args: { p_at?: string }
-        Returns: string
       }
       set_order_hold: {
         Args: { p_hold: boolean; p_order_id: string; p_reason?: string }
@@ -2255,6 +2254,10 @@ export type Database = {
       try_uuid: { Args: { p_text: string }; Returns: string }
       update_order_details: {
         Args: { p_input: Json; p_order_id: string }
+        Returns: Json
+      }
+      verify_order: {
+        Args: { p_note?: string; p_order_id: string }
         Returns: Json
       }
     }

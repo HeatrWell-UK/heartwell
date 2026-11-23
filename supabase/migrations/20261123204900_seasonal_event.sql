@@ -94,6 +94,7 @@ $$;
 
 -- House rule: new public functions start revoked; the server calls it with its key.
 revoke execute on function public.event_phase(timestamptz) from public, anon, authenticated;
+grant execute on function public.event_phase(timestamptz) to service_role;
 
 -- 5. The offer: one per unit, the best plan for the customer ------------------------
 
