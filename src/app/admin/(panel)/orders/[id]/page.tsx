@@ -13,7 +13,8 @@ import { getOrder, lineOption, orderPickers } from '@/lib/admin/load-orders'
 import { ALLOWED_MOVES, canHold, dualTime, HOLD_REASONS, holdMessage, isStatus, NEXT_STEP, stageAheadOfStatus, STATUS_LABEL, statusMessage, whatsAppTo, type OrderStatus } from '@/lib/admin/orders'
 import { toEmailData } from '@/lib/admin/order-view'
 import { confirmRequestMessage, copyBlock } from '@/lib/email/order-emails'
-import { outboxAction } from '../../tracking/actions'
+import { outboxAction, verifyOrder } from '../../tracking/actions'
+import { purchaseWindow, purchaseWindowText, OUTBOX_NOTE } from '@/lib/tracking/purchase-window'
 import { formatPrice } from '@/lib/format'
 import { formatDeliveryDate } from '@/lib/delivery/window'
 import { floorName } from '@/lib/delivery/pricing'
@@ -61,6 +62,7 @@ const EVENT_LABEL: Record<string, string> = {
   note: 'Note',
   held: 'Put on hold',
   hold_released: 'Hold released',
+  verified: 'Verified by staff',
 }
 
 export default async function OrderPage({ params, searchParams }: Props) {
@@ -72,7 +74,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   // The website visit behind the order, and whether Meta has its Purchase yet.
   const [visitResult, purchaseResult] = await Promise.all([
     order.arrival_id ? db.rpc('find_visits', { p_input: { arrival_id: order.arrival_id, include_tests: true } }) : null,
-    db.from('conversion_outbox').select('id, status').eq('order_id', order.id).eq('platform', 'meta').eq('event_name', 'Purchase').maybeSingle(),
+    db.from('conversion_outbox').select('id, status, note').eq('order_id', order.id).eq('platform', 'meta').eq('event_name', 'Purchase').maybeSingle(),
   ])
   const linkedVisit = ((visitResult?.data as { visits?: FoundVisit[] } | null)?.visits ?? [])[0] ?? null
   const manualOrder = order.source === 'whatsapp' || order.source === 'phone'
@@ -198,10 +200,25 @@ export default async function OrderPage({ params, searchParams }: Props) {
             {held ? 'Tell them it’s on hold, on WhatsApp' : status === 'pending_cod' ? 'Send them their details on WhatsApp' : `WhatsApp ${order.customer_name.split(/\s+/)[0]} about this`}
           </a>
         )}
-        {purchaseWaiting && !order.is_test && !held && (
+        {!order.is_test && !held && !order.staff_verified_at && (status === 'confirmed' || status === 'delivered') && (
+          <div className="flex flex-col gap-2 border-t border-zinc-100 pt-3">
+            <p className="text-sm text-zinc-700">
+              <strong>Not verified yet.</strong> {order.confirmed_by === 'customer' ? 'The customer confirmed this themselves. ' : ''}Once you’ve spoken to them
+              and the details are right, verify it: only verified orders can go to Meta as a Purchase.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <ActButton act={verifyOrder.bind(null, order.id)} label="Verify: I’ve spoken to the customer" tone="primary" confirm={`Verify ${order.reference}? You’ve spoken to the customer and the details are right.`} />
+            </div>
+          </div>
+        )}
+        {purchaseWaiting && !order.is_test && !held && order.staff_verified_at && (
           <div className="flex flex-col gap-2 border-t border-zinc-100 pt-3">
             <p className="text-sm text-zinc-700">
               <strong>Meta Purchase: {purchase.status === 'failed' ? 'failed, not sent' : 'waiting for you'}.</strong> Nothing goes to Meta until you press this.
+              {(() => {
+                const w = purchaseWindow(order.confirmed_at)
+                return w ? <span className={w.urgent || w.expired ? ' font-semibold text-amber-800' : ''}> {purchaseWindowText(w)}.</span> : null
+              })()}
             </p>
             <div className="flex flex-wrap gap-2">
               <ActButton act={outboxAction.bind(null, purchase.id, 'send_now')} label="Send Purchase to Meta" tone="primary" confirm={`Send ${order.reference}'s Purchase (${formatPrice(order.total_amount)}) to Meta now?`} />
@@ -211,6 +228,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         )}
         {purchaseWaiting && !order.is_test && held && <p className="text-xs text-zinc-500">The Meta Purchase waits until it’s confirmed again.</p>}
         {purchaseGone && <p className="text-xs text-zinc-500">Meta has this order’s Purchase.</p>}
+        {purchase?.note && OUTBOX_NOTE[purchase.note] && <p className="text-xs font-semibold text-amber-800">{OUTBOX_NOTE[purchase.note]}</p>}
         {canHold(status) && !held && (
           <details className="border-t border-zinc-100 pt-3">
             <summary className="cursor-pointer text-sm font-semibold text-zinc-700">Put on hold</summary>

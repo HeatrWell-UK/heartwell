@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { purchaseWindow, purchaseWindowText, OUTBOX_NOTE } from '@/lib/tracking/purchase-window'
 import Link from 'next/link'
 import { CheckCircleIcon, WarningIcon, XCircleIcon } from '@phosphor-icons/react/ssr'
 import { ActButton } from '@/components/admin/ActButton'
@@ -153,6 +154,17 @@ export default async function TrackingPage() {
                     {r.skip_reason && ` · ${r.skip_reason}`}
                     {said && ` · ${said}`}
                   </p>
+                  {r.note && OUTBOX_NOTE[r.note] && <p className="text-xs font-semibold text-amber-800">{OUTBOX_NOTE[r.note]}</p>}
+                  {waiting && r.event_name.toLowerCase() === 'purchase' && r.order && (() => {
+                    const w = purchaseWindow(r.order.confirmed_at)
+                    const verified = Boolean(r.order.staff_verified_at)
+                    return (
+                      <p className={`text-xs ${!verified || w?.urgent || w?.expired ? 'font-semibold text-amber-800' : 'text-zinc-600'}`}>
+                        {verified ? 'Verified by staff' : 'Not verified yet: open the order and press Verify once you’ve spoken to the customer'}
+                        {w ? ` · ${purchaseWindowText(w)}` : ''}
+                      </p>
+                    )
+                  })()}
                   {waiting && (
                     <div className="flex flex-wrap gap-2 pt-1">
                       <ActButton act={outboxAction.bind(null, r.id, 'send_now')} label="Send now" tone="primary" />

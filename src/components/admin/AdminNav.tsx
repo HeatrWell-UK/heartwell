@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   ChartLineUpIcon,
+  ListChecksIcon,
   ChatCircleTextIcon,
   CouchIcon,
   DotsThreeOutlineIcon,
@@ -27,10 +28,11 @@ import { cn } from '@/lib/cn'
 // Phones get five tabs; the rest (and Sign out) live on the More page.
 const NAV: { href: string; label: string; icon: Icon; phone?: false; desktop?: false }[] = [
   { href: '/admin', label: 'Home', icon: HouseIcon },
+  { href: '/admin/today', label: 'Today', icon: ListChecksIcon },
   { href: '/admin/orders', label: 'Orders', icon: ReceiptIcon },
   { href: '/admin/leads', label: 'Leads', icon: ChatCircleTextIcon },
   { href: '/admin/reviews', label: 'Reviews', icon: StarIcon, phone: false },
-  { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon },
+  { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon, phone: false },
   { href: '/admin/videos', label: 'Videos', icon: VideoCameraIcon, phone: false },
   { href: '/admin/tracking', label: 'Tracking', icon: ChartLineUpIcon, phone: false },
   { href: '/admin/ad-links', label: 'Ad links', icon: LinkSimpleIcon, phone: false },
@@ -40,7 +42,7 @@ const NAV: { href: string; label: string; icon: Icon; phone?: false; desktop?: f
 ]
 
 /** The sections the More tab stands for on phones. */
-const MORE_PAGES = ['/admin/more', '/admin/reviews', '/admin/videos', '/admin/tracking', '/admin/ad-links', '/admin/settings', '/admin/status']
+const MORE_PAGES = ['/admin/more', '/admin/catalogue', '/admin/reviews', '/admin/videos', '/admin/tracking', '/admin/ad-links', '/admin/settings', '/admin/status']
 
 function isActive(pathname: string, href: string) {
   if (href === '/admin') return pathname === href

@@ -11,7 +11,7 @@ export async function loadTracking() {
     db.from('shop_settings').select('tracking_mode, purchase_mode, purchase_hold_minutes').single(),
     db
       .from('conversion_outbox')
-      .select('id, platform, event_name, status, send_after, attempts, sent_at, skip_reason, response, error, created_at, order:orders(id, reference, status, is_test, total_amount)')
+      .select('id, platform, event_name, status, send_after, attempts, sent_at, skip_reason, note, response, error, created_at, order:orders(id, reference, status, is_test, total_amount, confirmed_at, staff_verified_at, held_at)')
       .order('created_at', { ascending: false })
       .limit(60),
     db.from('conversion_outbox').select('status').limit(5000),

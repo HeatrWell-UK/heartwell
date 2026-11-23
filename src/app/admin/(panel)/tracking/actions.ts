@@ -31,8 +31,25 @@ export async function saveTrackingSettings(input: unknown): Promise<TrackingResu
 
 const WORDS: Record<string, string> = {
   NOT_WAITING: 'That one has already been sent or closed.',
+  NOT_VERIFIED: 'Verify the order first (on its order page): only orders staff have checked with the customer go to Meta.',
+  VERIFY_NOT_CONFIRMED: 'Only a confirmed order that isn’t on hold can be verified.',
   NOT_FOUND: 'That one has gone.',
   NOT_AUTHORISED: 'Please sign in again.',
+}
+
+/**
+ * Staff have spoken to the customer and the details are right: the order
+ * becomes a genuine sale, and its Purchase is queued (held for Send).
+ */
+export async function verifyOrder(id: string): Promise<TrackingResult> {
+  if (!z.uuid().safeParse(id).success) return { ok: false, message: 'Unknown order.' }
+  if (await adminGuard()) return SIGN_IN
+  const { error } = await (await createClient()).rpc('verify_order', { p_order_id: id })
+  if (error) return { ok: false, message: WORDS[error.message.match(/^([A-Z_]+)/)?.[1] ?? ''] ?? `Couldn’t do that: ${error.message}` }
+  revalidatePath('/admin/tracking')
+  revalidatePath('/admin/today')
+  revalidatePath('/admin/orders/[id]', 'page')
+  return { ok: true, message: 'Verified. Its Purchase is waiting for Send.' }
 }
 
 export async function outboxAction(id: string, action: 'send_now' | 'hold' | 'skip'): Promise<TrackingResult> {
