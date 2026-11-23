@@ -82,9 +82,10 @@ set search_path = ''
 as $$
   select case
     when not s.event_enabled or p_at < s.event_starts_at or p_at >= s.event_ends_at then null
-    when (p_at at time zone 'Europe/London')::date
-         < make_date(extract(year from (p_at at time zone 'Europe/London'))::int, 12, 25)
-         and extract(month from (p_at at time zone 'Europe/London')) = 12 then 'christmas'
+    -- November counts as the Christmas run-up (if the event is ever started early).
+    when extract(month from (p_at at time zone 'Europe/London')) = 11 then 'christmas'
+    when extract(month from (p_at at time zone 'Europe/London')) = 12
+         and extract(day from (p_at at time zone 'Europe/London')) < 25 then 'christmas'
     when extract(month from (p_at at time zone 'Europe/London')) = 12 then 'year_end'
     else 'new_year'
   end

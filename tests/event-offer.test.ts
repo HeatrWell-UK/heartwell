@@ -29,6 +29,10 @@ describe('event calendar (UK time, injected clock)', () => {
     expect(eventPhase(EVENT, at(iso))).toBe(phase)
   })
 
+  it('an event started early in November reads as Christmas, not New Year', () => {
+    expect(eventPhase({ ...EVENT, startsAt: '2026-11-20T00:00:00Z' }, at('2026-11-24T12:00:00Z'))).toBe('christmas')
+  })
+
   it('is off when disabled or the amount is zero', () => {
     expect(eventLive({ ...EVENT, enabled: false }, at('2026-12-10T12:00:00Z'))).toBe(false)
     expect(eventLive({ ...EVENT, mtoAmount: 0 }, at('2026-12-10T12:00:00Z'))).toBe(false)

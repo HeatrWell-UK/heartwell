@@ -47,10 +47,12 @@ export default async function SalePage() {
         </div>
       </header>
       <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 pt-8 lg:px-6">
-        <p className="text-[15px] text-slate">
-          Prices shown are today’s prices. While the event is on, £{Math.round(offers.event.mtoAmount)} comes off each of these sofas in your basket, one offer per
-          piece. Recliners and other imported pieces keep their own offers.
-        </p>
+        {offers.event.enabled && offers.event.mtoAmount > 0 && (
+          <p className="text-[15px] text-slate">
+            Prices shown are today’s prices. While the event is on, £{Math.round(offers.event.mtoAmount)} comes off each of these sofas in your basket, one offer per
+            piece. Recliners and other imported pieces keep their own offers.
+          </p>
+        )}
         {eligible.length > 0 ? <ProductGrid products={eligible} eagerCount={4} /> : <p>No made-to-order sofas are on sale just now.</p>}
       </div>
     </div>

@@ -52,7 +52,9 @@ export function eventLive(s: EventSettings, at: Date = new Date()): boolean {
 export function eventPhase(s: EventSettings, at: Date = new Date()): EventPhase | null {
   if (!eventLive(s, at)) return null
   const d = londonDate(at)
-  if (d.month === 12) return d.day < 25 ? 'christmas' : 'year_end'
+  // November counts as the Christmas run-up (if the owner ever starts the event early).
+  if (d.month === 11 || (d.month === 12 && d.day < 25)) return 'christmas'
+  if (d.month === 12) return 'year_end'
   return 'new_year'
 }
 
