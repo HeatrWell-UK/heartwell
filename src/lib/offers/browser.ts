@@ -17,6 +17,8 @@ export const offerStore = {
   },
   /** The end date (ISO) while an offer is live; '' otherwise. A string, so React can compare snapshots. */
   getSnapshot(): string {
+    // A seasonal window's cookies (Run 3) are not an ad offer: never show them as one.
+    if (readCookie(OFFER_GENERATION_COOKIE)) return ''
     const raw = readCookie(OFFER_UNTIL_COOKIE)
     return raw && new Date(raw).getTime() > Date.now() ? raw : ''
   },
@@ -62,6 +64,8 @@ export function claimSeason(generation: string): Promise<void> {
     } catch {
       // No window shown this time; nothing is promised that checkout wouldn't honour.
     }
+    // No window yet (shop busy, season not started): ask again on the next page.
+    if (readCookie(OFFER_GENERATION_COOKIE) !== generation) seasonAsking = null
   })()
   return seasonAsking
 }

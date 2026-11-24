@@ -13,8 +13,6 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { clientIp, rateLimit } from '@/lib/http/rate-limit'
 import { OFFER_COOKIE, OFFER_GENERATION_COOKIE, OFFER_UNTIL_COOKIE, offerToken, SEASON_COOKIE_DAYS } from '@/lib/offers/paid'
-import { eventLive } from '@/lib/offers/event'
-import { getOfferSettings } from '@/lib/offers/server'
 import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
@@ -28,7 +26,8 @@ export async function POST(request: Request) {
   if (!rateLimit(`season:${await clientIp()}`, 30, 60_000)) return none()
   const parsed = Body.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return none()
-  if (!eventLive((await getOfferSettings()).event)) return none()
+  // No check of the cached settings here: issue_seasonal_offer itself returns nothing outside the season,
+  // so a page cached a few minutes before the season starts (or ends) can't block or extend it.
 
   const jar = await cookies()
   const { data, error } = await createAdminClient().rpc('issue_seasonal_offer', {
