@@ -22,6 +22,7 @@ import { useBasket } from '@/lib/basket/store'
 import { useHydrated } from '@/lib/basket/use-hydrated'
 import { pageTopic } from '@/lib/whatsapp/page-message'
 import { usePageTopic } from './WhatsAppTopic'
+import { SantaHat } from '@/components/season/SantaHat'
 
 /** Pages where a chat button would only get in the way. */
 const HIDDEN = new Set(['/login'])
@@ -57,6 +58,7 @@ export function FloatingWhatsApp() {
         </span>
         <span className="sr-only lg:not-sr-only lg:text-[15px] lg:font-semibold">Ask us on WhatsApp</span>
       </WhatsAppButton>
+      <SantaHat className="-top-4 left-1 w-[30px] -rotate-[20deg]" />
     </div>
   )
 }

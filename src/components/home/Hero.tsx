@@ -5,6 +5,9 @@ import { PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
 import type { RangeSummary } from '@/lib/catalogue/listing'
 import type { WelcomeSettings } from '@/lib/offers/welcome'
+import type { EventSettings } from '@/lib/offers/event'
+import { SeasonDecor } from '@/components/season/SeasonDecor'
+import { SeasonHeroPrice } from '@/components/season/SeasonHeroPrice'
 import { HeroOffer } from './HeroOffer'
 
 /**
@@ -26,10 +29,11 @@ const ROOM_ALT = 'A grey sofa with cream cushions in a red velvet alcove, in a p
 // The photo is square and cropped to the 5:6 arch (object-fit: cover), so it's shown a little wider than its alcove.
 const ROOM_SIZES = '(min-width: 1680px) 454px, (min-width: 1024px) 27vw, (min-width: 640px) 44vw, 92vw'
 
-export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[]; windowLabel: string | null; welcome: WelcomeSettings }) {
+export function Hero({ ranges, windowLabel, welcome, event }: { ranges: RangeSummary[]; windowLabel: string | null; welcome: WelcomeSettings; event: EventSettings }) {
   return (
     <section aria-labelledby="hero-title" className="hw-gallery hw-velvet text-white">
-      <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-2.5 px-4 pt-7 text-center sm:pt-10 lg:gap-3 lg:pt-9">
+      <SeasonDecor settings={event} />
+      <div className="relative z-10 mx-auto flex max-w-[1200px] flex-col items-center gap-2.5 px-4 pt-7 text-center sm:pt-10 lg:gap-3 lg:pt-9">
         <h1 id="hero-title" className="hw-gallery-title text-[clamp(2.2rem,9.8vw,4rem)] leading-[1.04] lg:text-[min(4.6vw,4.5rem)]">
           <span className="text-gold-lit block">Choose it today.</span> <span className="text-gold-lit block">Pay when it&rsquo;s home.</span>
         </h1>
@@ -37,6 +41,7 @@ export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[];
           Free delivery to most of mainland Britain, usually in {PROMISES.delivery.timingShort}. You pay the full price to the driver, in cash or by bank
           transfer: no deposit, no finance.
         </p>
+        <SeasonHeroPrice settings={event} />
       </div>
 
       <Arcade
@@ -71,7 +76,7 @@ export function Hero({ ranges, windowLabel, welcome }: { ranges: RangeSummary[];
             <dd className="text-[17px] font-semibold leading-snug lg:text-[19px]">Pay the driver in full</dd>
             <dd className="text-[13px] leading-snug text-on-wine-muted lg:text-[14px]">Cash or bank transfer. No finance.</dd>
           </div>
-          <HeroOffer welcome={welcome} />
+          <HeroOffer welcome={welcome} event={event} />
         </dl>
       </div>
     </section>

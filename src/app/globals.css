@@ -627,3 +627,32 @@ html[data-consent='set'] [data-consent-banner] { display: none; }
     .hw-prose h2 { font-size: 34px; }
   }
 }
+
+/*
+ * The Christmas and New Year season (Run 3): warm bulbs that glow softly and
+ * six-armed snow that drifts down the hero. Decorative only; with reduced
+ * motion the bulbs stay lit and the snow isn't drawn at all.
+ */
+@layer components {
+  .hw-bulb { box-shadow: 0 0 6px 2px rgb(255 210 122 / 0.55); }
+  svg .hw-bulb { filter: drop-shadow(0 0 3px rgb(255 210 122 / 0.8)); }
+  .hw-flake { will-change: transform; }
+  @media (prefers-reduced-motion: no-preference) {
+    .hw-bulb { animation: hw-twinkle 2.4s ease-in-out infinite alternate; }
+    .hw-flake { animation: hw-snow 14s linear infinite; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hw-flake { display: none; }
+  }
+}
+
+@keyframes hw-twinkle {
+  from { opacity: 1; }
+  to { opacity: 0.45; }
+}
+
+@keyframes hw-snow {
+  from { transform: translate3d(0, -2rem, 0) rotate(0deg); }
+  50% { transform: translate3d(14px, 50vh, 0) rotate(120deg); }
+  to { transform: translate3d(-8px, 105vh, 0) rotate(240deg); }
+}

@@ -93,7 +93,7 @@ ${line(`<span style="color:${C.slate};font-size:13px">One payment to the driver,
 /** "Welcome offer", "Christmas and New Year sofa event", "Offer (HEARTSOFA)" or "Offer". */
 export function offerName(o: Pick<OrderEmailData, 'offerSource' | 'promotionCode'>): string {
   if (o.offerSource === 'welcome') return 'Welcome offer'
-  if (o.offerSource === 'event') return 'Christmas and New Year sofa event (£50 off each made-to-order sofa)'
+  if (o.offerSource === 'event') return 'Christmas and New Year sofa event (£50 off each sofa and chair)'
   return `Offer${o.promotionCode ? ` (${o.promotionCode})` : ''}`
 }
 

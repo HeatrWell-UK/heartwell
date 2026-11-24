@@ -35,7 +35,7 @@ export interface ShopOffers {
   welcome: WelcomeSettings
   /** The least a website order's pieces can come to, before offers and delivery. */
   minOrder: number
-  /** The Christmas and New Year sofa event (£ off each made-to-order sofa, with its dates). */
+  /** The Christmas and New Year sofa event (£ off each sofa and chair, with its dates). */
   event: EventSettings
   /** The owner's Christmas delivery facts (null fields: not verified, so no promise). */
   christmas: ChristmasFacts

@@ -5,6 +5,8 @@ import { PROMISES } from '@/config/promises'
 import { formatPrice } from '@/lib/format'
 import { timeLeftText, type WelcomeSettings } from '@/lib/offers/welcome'
 import { useWelcome } from '@/components/offer/WelcomeOffer'
+import { useEvent } from '@/components/offer/EventOffer'
+import { windowLeftText, type EventSettings } from '@/lib/offers/event'
 
 const FRAME = 'col-span-2 flex flex-col gap-1 border-t border-white/15 pt-4 sm:col-span-1 sm:border-l sm:border-t-0 sm:pl-8 sm:pt-0'
 
@@ -14,9 +16,23 @@ const FRAME = 'col-span-2 flex flex-col gap-1 border-t border-white/15 pt-4 sm:c
  * the shop has it off, the guarantee. The same height either way, so the page
  * doesn't move when the offer arrives.
  */
-export function HeroOffer({ welcome }: { welcome: WelcomeSettings }) {
+export function HeroOffer({ welcome, event }: { welcome: WelcomeSettings; event?: EventSettings }) {
   const state = useWelcome(welcome.enabled)
-  if (state.kind === 'none') {
+  const season = useEvent(event)
+  // Run 3: in the season, this visitor's 14-day window (it replaces the welcome offer).
+  if (season && season.window.kind === 'live') {
+    return (
+      <div className={FRAME}>
+        <dt className="flex items-center gap-1.5 text-[13px] leading-snug text-on-wine-muted lg:text-[14px]">
+          <HeartIcon aria-hidden="true" size={17} weight="fill" className="shrink-0 text-gold-pale" />
+          Your {season.copy.title.replace(' sofa event', '')} offer
+        </dt>
+        <dd className="text-[17px] font-semibold leading-snug lg:text-[19px]">{formatPrice(season.amount)} off each sofa and chair</dd>
+        <dd className="text-[13px] leading-snug text-on-wine-muted tabular-nums lg:text-[14px]">{windowLeftText(season.window.ends)} left</dd>
+      </div>
+    )
+  }
+  if (state.kind === 'none' || season) {
     return (
       <div className={FRAME}>
         <dt className="flex items-center gap-1.5 text-[13px] leading-snug text-on-wine-muted lg:text-[14px]">

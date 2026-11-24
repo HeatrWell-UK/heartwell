@@ -74,7 +74,7 @@ export function Footer({ shop }: { shop: NavSection[] }) {
             {/* Shape categories and the department link; fabric and leather are in the menu. */}
             <FooterColumn
               title="Shop"
-              links={[...(shop[0]?.links ?? []).filter((l) => !/fabric|leather/.test(l.href)), BROWSE_LINKS[0]!]}
+              links={[...(shop[0]?.links ?? []).filter((l) => !/fabric|leather/.test(l.href)), ...BROWSE_LINKS.filter((l) => l.href === '/christmas' || l.href === '/new-year')]}
             />
             <FooterColumn title="Help" links={HELP_LINKS} />
             <FooterColumn title="Heartwell" links={ABOUT_LINKS} />

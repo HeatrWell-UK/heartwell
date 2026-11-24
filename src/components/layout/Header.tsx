@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react/ssr'
 import { LogoLockup } from '@/components/brand/Logo'
+import { SantaHat } from '@/components/season/SantaHat'
 import { MenuDrawer } from './MenuDrawer'
 import { BasketLink } from './BasketLink'
 import { NavLink } from './NavLink'
@@ -17,14 +18,15 @@ const iconButton = 'flex size-11 items-center justify-center rounded-full text-i
  */
 export function Header({ shop }: { shop: NavSection[] }) {
   const links = shop[0]?.links ?? []
-  const ranges = BROWSE_LINKS[0]!
+  const ranges = BROWSE_LINKS.find((l) => l.href === '/ranges')!
   const categories = links.slice(0, -1)
   const all = links.at(-1)
   return (
     <header className="border-b border-line-soft bg-white">
       <div className="mx-auto flex h-[60px] max-w-[1200px] items-center justify-between px-2 lg:h-[68px] lg:px-6">
         <MenuDrawer shop={shop} />
-        <Link href="/" aria-label="Heartwell home" className="rounded-md">
+        <Link href="/" aria-label="Heartwell home" className="relative rounded-md">
+          <SantaHat className="-left-2.5 -top-3 w-[26px] -rotate-[18deg] lg:-top-3.5" />
           <LogoLockup />
         </Link>
         <div className="flex items-center">

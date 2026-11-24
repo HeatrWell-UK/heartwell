@@ -79,6 +79,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { url: url('/fabrics'), changeFrequency: 'monthly', priority: 0.5 },
     { url: url('/sale'), changeFrequency: 'daily', priority: 0.8 },
+    { url: url('/christmas'), changeFrequency: 'daily', priority: 0.8 },
+    { url: url('/new-year'), changeFrequency: 'daily', priority: 0.7 },
     { url: url('/fabric-samples'), changeFrequency: 'monthly', priority: 0.5 },
     { url: url('/reviews'), changeFrequency: 'weekly', priority: 0.5 },
     { url: url('/contact'), changeFrequency: 'yearly', priority: 0.4 },

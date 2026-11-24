@@ -41,7 +41,7 @@ export default async function HomePage() {
   return (
     <div className="pb-16 lg:pb-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString([organizationJsonLd(SITE_URL), websiteJsonLd(SITE_URL)]) }} />
-      <Hero ranges={homeRanges(ranges, 4)} windowLabel={windowLabel} welcome={offers.welcome} />
+      <Hero ranges={homeRanges(ranges, 4)} windowLabel={windowLabel} welcome={offers.welcome} event={offers.event} />
       <HowPayingWorks windowLabel={windowLabel} />
       {sofas && <ShopByShape tree={tree} department={sofas} listing={listing} />}
       <OurRanges ranges={homeRanges(ranges, 9)} total={ranges.length} />
