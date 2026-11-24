@@ -11,7 +11,8 @@ import { classifyDeliveryPostcode, resolveDeliveryPostcode } from '@/lib/deliver
 import { explainOrderError, OrderInput, orderPayload, pricingPayload, QuoteInput, testReason, type OrderTracking, type PlainError } from '@/lib/checkout/order'
 import { CONSENT_COOKIE, STAFF_COOKIE } from '@/config/tracking'
 import { parseConsent } from '@/lib/tracking/consent'
-import { ga4ClientIdFromCookie } from '@/lib/tracking/ga4-event'
+import { ga4ClientIdFromCookie, ga4SessionIdFromCookie, ga4StreamCookie } from '@/lib/tracking/ga4-event'
+import { TRACKING } from '@/config/tracking'
 import { sendOrderPlacedEmails } from '@/lib/checkout/notify'
 import { isUkPhone, formatUkPhone } from '@/lib/checkout/phone'
 import { OFFER_COOKIE, OFFER_UNTIL_COOKIE, offerToken } from '@/lib/offers/paid'
@@ -180,6 +181,7 @@ export async function placeOrder(input: unknown): Promise<PlaceOrderResult> {
     fbp: jar.get('_fbp')?.value ?? null,
     fbc: jar.get('_fbc')?.value ?? null,
     gaClientId: ga4ClientIdFromCookie(jar.get('_ga')?.value),
+    gaSessionId: ga4SessionIdFromCookie(jar.get(ga4StreamCookie(TRACKING.ga4Id) ?? '')?.value),
     ip: await clientIp(),
     userAgent: (await headers()).get('user-agent')?.slice(0, 400) ?? null,
   }
@@ -194,6 +196,11 @@ export async function placeOrder(input: unknown): Promise<PlaceOrderResult> {
   if (error) return { ok: false, error: explainOrderError(error.message) }
 
   const placed = data as { id: string; reference: string }
+  // GA4's session ID (Run 4), with analytics consent and the client ID it belongs to only.
+  if (tracking.consent.analytics && tracking.gaClientId && tracking.gaSessionId) {
+    const { error: gaError } = await db.from('orders').update({ ga_session_id: tracking.gaSessionId }).eq('id', placed.id)
+    if (gaError) console.error('ga session id not saved', gaError.message)
+  }
   if (order.reminderId) {
     const { error: reminderError } = await db.from('basket_reminder_leads')
       .update({ status: 'converted', converted_order_id: placed.id, email: null, phone: null, basket: [] })

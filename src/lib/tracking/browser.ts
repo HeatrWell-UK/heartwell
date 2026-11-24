@@ -117,6 +117,12 @@ export interface Touch {
   campaign?: string
   content?: string
   term?: string
+  /** Meta's numeric IDs and placement from the ad's URL parameters (Run 4). */
+  utmId?: string
+  campaignId?: string
+  adsetId?: string
+  adId?: string
+  placement?: string
   landing?: string
   referrer?: string
   at: number
@@ -140,10 +146,26 @@ export function tagsFrom(search: string): Omit<Touch, 'at' | 'landing' | 'referr
       .filter(Boolean)
       .at(-1)
       ?.slice(0, 200) || undefined
-  return { source: get('utm_source'), medium: get('utm_medium'), campaign: get('utm_campaign'), content: get('utm_content'), term: get('utm_term') }
+  const digits = (k: string) => {
+    const v = get(k)
+    return v && /^[0-9]{1,25}$/.test(v) ? v : undefined
+  }
+  const placement = get('placement')
+  return {
+    source: get('utm_source'),
+    medium: get('utm_medium'),
+    campaign: get('utm_campaign'),
+    content: get('utm_content'),
+    term: get('utm_term'),
+    utmId: digits('utm_id'),
+    campaignId: digits('meta_campaign_id') ?? digits('utm_id'),
+    adsetId: digits('meta_adset_id') ?? digits('adset_id'),
+    adId: digits('meta_ad_id') ?? digits('ad_id'),
+    placement: placement && /^[A-Za-z0-9_.-]{1,60}$/.test(placement) ? placement : undefined,
+  }
 }
 
-const hasTags = (t: Partial<Touch>) => Boolean(t.source || t.medium || t.campaign || t.content || t.term)
+const hasTags = (t: Partial<Touch>) => Boolean(t.source || t.medium || t.campaign || t.content || t.term || t.campaignId || t.adId)
 
 function readTouches(): { first?: Touch; last?: Touch } {
   try {

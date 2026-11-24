@@ -26,6 +26,7 @@ export interface OutboxOrder {
   meta_fbc: string | null
   visitor_id: string | null
   ga_client_id: string | null
+  ga_session_id?: string | null
   items: { variant_id: string | null; quantity: number; unit_price: number; title: string; option: string | null }[]
 }
 
@@ -86,6 +87,7 @@ export function buildConversion(row: OutboxRow, siteUrl: string, now = new Date(
         {
           eventId: row.event_id,
           clientId: o.ga_client_id,
+          sessionId: o.ga_session_id ?? null,
           consented,
           time: new Date(o.confirmed_at),
           value: Number(o.total_amount),

@@ -68,7 +68,7 @@ export function journey(event: JourneyEvent, fields: JourneyFields = {}, opts: {
   if (typeof window === 'undefined') return
   try {
     const path = window.location.pathname
-    if (isStaffDevice() || isQaVisit() || isPrivatePath(path) || !readConsent().analytics) return
+    if (isStaffDevice() || isPrivatePath(path) || !readConsent().analytics) return
     const session = sessionId()
     if (!session) return
     const ad = visitIds()
@@ -84,6 +84,7 @@ export function journey(event: JourneyEvent, fields: JourneyFields = {}, opts: {
       sequence: page.sequence,
       elapsedMs: page.started ? Math.min(Date.now() - page.started, 86_400_000) : 0,
       ...Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined && v !== '')),
+      ...(isQaVisit() ? { qa: true } : {}),
     })
     if (event !== 'page_exit') page.last = event
     if (opts.beacon && typeof navigator.sendBeacon === 'function') {

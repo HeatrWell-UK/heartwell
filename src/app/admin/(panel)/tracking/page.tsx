@@ -57,7 +57,7 @@ export default async function TrackingPage() {
       <header className="flex flex-col gap-2">
         <h1 className="font-display text-2xl font-bold tracking-tight lg:text-4xl">Tracking</h1>
         <p className="text-[15px] text-zinc-600">
-          Meta (Pixel and Conversions API) and Google Analytics 4. Purchases go from the server once a customer confirms, exactly once. Personal details are only ever sent hashed, and never order numbers or private links.
+          Meta (Pixel and Conversions API) and Google Analytics 4. Purchases go from the server only after staff verify the order (a customer’s own Confirm isn’t enough), with consent, within Meta’s 7 days, exactly once. The full ledger is on Meta signals. Personal details are only ever sent hashed, and never order numbers or private links.
         </p>
       </header>
 

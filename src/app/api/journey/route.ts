@@ -2,8 +2,8 @@
 // the taxonomy (src/lib/journey/taxonomy.ts), with the visitor's ANALYTICS
 // consent. Never sent to Meta or Google. Every field is checked against the
 // allowlist and anything else is dropped; the browser's event ID makes a resend
-// harmless (unique in the database). Staff devices, QA visits and private
-// pages aren't recorded. Kept 90 days. Always answers 204.
+// harmless (unique in the database). Staff devices and private pages aren't
+// recorded; QA visits (?qa=1) are saved as test rows that reports exclude. Kept 90 days. Always answers 204.
 
 import { cookies } from 'next/headers'
 import { z } from 'zod'
@@ -44,6 +44,8 @@ const Body = z
     elapsedMs: z.number().int().min(0).max(86_400_000).optional(),
     quantity: z.number().int().min(1).max(99).optional(),
     variantId: z.uuid().optional(),
+    // A QA visit (?qa=1): saved as a test row, which every report excludes (Run 4).
+    qa: z.literal(true).optional(),
   })
   .strict()
 
@@ -92,7 +94,7 @@ export async function POST(request: Request) {
     metadata,
     product_id: productId,
     variant_id: productId ? b.variantId : null,
-    is_test: APP_ENV !== 'production',
+    is_test: APP_ENV !== 'production' || b.qa === true,
   })
   // 23505: the same event again (a resend): already saved.
   if (error && error.code !== '23505') console.error('journey event not saved', b.event, error.message)

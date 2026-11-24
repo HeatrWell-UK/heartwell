@@ -24,6 +24,11 @@ export default async function CheckoutPage() {
         <p className="text-[16px] leading-relaxed text-slate lg:text-[17px]">
           No card and no deposit. You pay the driver the full price, in cash or by bank transfer, once it&rsquo;s in your room.
         </p>
+        {/* Run 4: most lost sales were orders never confirmed, so say the next step before they order. */}
+        <p className="text-[15px] leading-snug text-slate">
+          After you order: we send your details on WhatsApp, you reply to confirm, and we ring to book your delivery day. Your order isn&rsquo;t final until you&rsquo;ve
+          confirmed.
+        </p>
       </header>
       <CheckoutForm
         settings={s.delivery}

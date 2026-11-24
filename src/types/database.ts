@@ -138,11 +138,16 @@ export type Database = {
           last_touch_medium: string | null
           last_touch_source: string | null
           last_touch_term: string | null
+          meta_ad_id: string | null
+          meta_adset_id: string | null
+          meta_campaign_id: string | null
           meta_fbc: string | null
           meta_fbp: string | null
+          placement: string | null
           reference: string
           referrer: string | null
           session_id: string
+          utm_id: string | null
           visitor_id: string
           wbraid: string | null
         }
@@ -170,11 +175,16 @@ export type Database = {
           last_touch_medium?: string | null
           last_touch_source?: string | null
           last_touch_term?: string | null
+          meta_ad_id?: string | null
+          meta_adset_id?: string | null
+          meta_campaign_id?: string | null
           meta_fbc?: string | null
           meta_fbp?: string | null
+          placement?: string | null
           reference?: string
           referrer?: string | null
           session_id: string
+          utm_id?: string | null
           visitor_id: string
           wbraid?: string | null
         }
@@ -202,11 +212,16 @@ export type Database = {
           last_touch_medium?: string | null
           last_touch_source?: string | null
           last_touch_term?: string | null
+          meta_ad_id?: string | null
+          meta_adset_id?: string | null
+          meta_campaign_id?: string | null
           meta_fbc?: string | null
           meta_fbp?: string | null
+          placement?: string | null
           reference?: string
           referrer?: string | null
           session_id?: string
+          utm_id?: string | null
           visitor_id?: string
           wbraid?: string | null
         }
@@ -1024,6 +1039,7 @@ export type Database = {
           fee_removal: number
           fee_upstairs: number
           ga_client_id: string | null
+          ga_session_id: string | null
           gbraid: string | null
           gclid: string | null
           has_made_to_order: boolean
@@ -1100,6 +1116,7 @@ export type Database = {
           fee_removal?: number
           fee_upstairs?: number
           ga_client_id?: string | null
+          ga_session_id?: string | null
           gbraid?: string | null
           gclid?: string | null
           has_made_to_order?: boolean
@@ -1176,6 +1193,7 @@ export type Database = {
           fee_removal?: number
           fee_upstairs?: number
           ga_client_id?: string | null
+          ga_session_id?: string | null
           gbraid?: string | null
           gclid?: string | null
           has_made_to_order?: boolean

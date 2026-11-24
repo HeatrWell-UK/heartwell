@@ -18,7 +18,18 @@ export const dynamic = 'force-dynamic'
 const tag = z.string().trim().max(200).optional()
 const Body = z.object({
   visit: z.object({ visitorId: z.uuid(), sessionId: z.uuid(), arrivalId: z.uuid() }),
-  touch: z.object({ source: tag, medium: tag, campaign: tag, content: tag, term: tag, landing: z.string().startsWith('/').max(300).optional(), referrer: z.string().max(200).optional() }),
+  touch: z.object({
+    source: tag,
+    medium: tag,
+    campaign: tag,
+    content: tag,
+    term: tag,
+    utmId: z.string().regex(/^[0-9]{1,25}$/).optional(),
+    campaignId: z.string().regex(/^[0-9]{1,25}$/).optional(),
+    adsetId: z.string().regex(/^[0-9]{1,25}$/).optional(),
+    adId: z.string().regex(/^[0-9]{1,25}$/).optional(),
+    placement: z.string().regex(/^[A-Za-z0-9_.-]{1,60}$/).optional(),
+    landing: z.string().startsWith('/').max(300).optional(), referrer: z.string().max(200).optional() }),
   fbclid: z.string().max(500).optional(),
   productId: z.uuid().optional(),
   variantId: z.uuid().optional(),
@@ -39,6 +50,10 @@ export async function POST(request: Request) {
   const marketing = consent.marketing
   const db = createAdminClient()
   const hasTags = Boolean(touch.source || touch.medium || touch.campaign || touch.content || touch.term)
+  // Meta's IDs and placement (Run 4), only when the ad's link carried them.
+  const adIds = Object.fromEntries(
+    Object.entries({ utm_id: touch.utmId, meta_campaign_id: touch.campaignId, meta_adset_id: touch.adsetId, meta_ad_id: touch.adId, placement: touch.placement }).filter(([, v]) => v),
+  )
   const meta = marketing ? { fbclid: fbclid ?? null, meta_fbp: jar.get('_fbp')?.value ?? null, meta_fbc: jar.get('_fbc')?.value ?? null } : {}
 
   const { data: existing } = await db.from('attribution_sessions').select('id').eq('arrival_id', visit.arrivalId).maybeSingle()
@@ -59,6 +74,7 @@ export async function POST(request: Request) {
       last_touch_term: touch.term ?? null,
       landing_page: touch.landing ?? null,
       referrer: touch.referrer ?? null,
+      ...adIds,
       initial_product_id: productId ?? null,
       initial_variant_id: variantId ?? null,
       // "iPhone, Instagram app": enough for staff to pick the visit; the full browser string isn't kept.
@@ -78,6 +94,7 @@ export async function POST(request: Request) {
               last_touch_campaign: touch.campaign ?? null,
               last_touch_content: touch.content ?? null,
               last_touch_term: touch.term ?? null,
+              ...adIds,
             }
           : {}),
         ...(marketing ? Object.fromEntries(Object.entries(meta).filter(([, v]) => v)) : {}),

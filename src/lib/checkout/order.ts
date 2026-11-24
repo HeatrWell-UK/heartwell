@@ -100,6 +100,8 @@ export interface OrderTracking {
   fbc: string | null
   /** From GA4's _ga cookie, when analytics was accepted. */
   gaClientId: string | null
+  /** GA4's session ID (stream cookie), when analytics was accepted. */
+  gaSessionId?: string | null
   ip: string | null
   userAgent: string | null
 }
