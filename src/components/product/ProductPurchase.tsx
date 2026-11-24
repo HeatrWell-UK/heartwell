@@ -1,5 +1,6 @@
 'use client'
 
+import { journey } from '@/lib/journey/browser'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Badge } from '@/components/ui/Badge'
@@ -201,6 +202,7 @@ export function ProductPurchase({
     })
     setAdded({ title: p.title, option, image, price })
     track('AddToCart', { contents: [{ id: variant.id, quantity: 1, item_price: price }], contentName: p.title, value: price })
+    journey('basket_add', { outcome: 'success', variantId: variant.id, quantity: 1 })
   }
 
   const pageUrl = `${SITE_URL}${productHref(p.slug, variant?.sku, fabric?.fabric.code)}`

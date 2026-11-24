@@ -7,7 +7,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  ChartBarIcon,
   ChartLineUpIcon,
+  FlowArrowIcon,
+  GlobeIcon,
   ListChecksIcon,
   ChatCircleTextIcon,
   CouchIcon,
@@ -31,6 +34,9 @@ const NAV: { href: string; label: string; icon: Icon; phone?: false; desktop?: f
   { href: '/admin/today', label: 'Today', icon: ListChecksIcon },
   { href: '/admin/orders', label: 'Orders', icon: ReceiptIcon },
   { href: '/admin/leads', label: 'Leads', icon: ChatCircleTextIcon },
+  { href: '/admin/website', label: 'Website', icon: GlobeIcon, phone: false },
+  { href: '/admin/journeys', label: 'Journeys', icon: FlowArrowIcon, phone: false },
+  { href: '/admin/business', label: 'Business', icon: ChartBarIcon, phone: false },
   { href: '/admin/reviews', label: 'Reviews', icon: StarIcon, phone: false },
   { href: '/admin/catalogue', label: 'Catalogue', icon: CouchIcon, phone: false },
   { href: '/admin/videos', label: 'Videos', icon: VideoCameraIcon, phone: false },
@@ -42,7 +48,7 @@ const NAV: { href: string; label: string; icon: Icon; phone?: false; desktop?: f
 ]
 
 /** The sections the More tab stands for on phones. */
-const MORE_PAGES = ['/admin/more', '/admin/catalogue', '/admin/reviews', '/admin/videos', '/admin/tracking', '/admin/ad-links', '/admin/settings', '/admin/status']
+const MORE_PAGES = ['/admin/more', '/admin/website', '/admin/journeys', '/admin/business', '/admin/catalogue', '/admin/reviews', '/admin/videos', '/admin/tracking', '/admin/ad-links', '/admin/settings', '/admin/status']
 
 function isActive(pathname: string, href: string) {
   if (href === '/admin') return pathname === href

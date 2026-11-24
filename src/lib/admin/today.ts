@@ -102,3 +102,6 @@ export function todayTasks(orders: TodayOrder[], purchases: TodayPurchase[], now
   }
   return tasks.sort((a, b) => TASK_ORDER.indexOf(a.kind) - TASK_ORDER.indexOf(b.kind) || a.rank - b.rank)
 }
+
+/** Source review (Run 3): orders from the last 30 days. */
+export const sourceReviewSince = (now = new Date()) => new Date(now.getTime() - 30 * DAY).toISOString()

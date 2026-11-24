@@ -40,6 +40,7 @@ export const STORAGE_GROUPS: StorageGroup[] = [
       { name: 'hw-offer-until', kind: 'cookie', purpose: 'When that offer ends, to show it on the page.', lasts: 'As hw-offer' },
       { name: 'hw-offer-gen', kind: 'cookie', purpose: 'Which season your offer belongs to, so you get one offer per season and it is never restarted.', lasts: 'About 4 months' },
       { name: 'hw-offer-sheet', kind: 'local storage', purpose: 'Remembers that you have seen the offer note, so it isn’t shown again on every page.', lasts: 'Until you clear your browser' },
+      { name: 'hw-journey-session', kind: 'session storage', purpose: 'With your permission for statistics: groups the steps of this visit (which pages, which kind of form field) in our own reports. Never what you type, and never sent to Meta or Google.', lasts: 'Until you close the tab' },
       { name: 'hw-bar', kind: 'session storage', purpose: 'Remembers that you closed or paused the seasonal message bar.', lasts: 'Until you close the tab' },
       { name: 'hw-offer-claimed', kind: 'session storage', purpose: 'Stops the shop asking for the same offer twice.', lasts: 'Until you close the tab' },
       { name: 'hw-welcome', kind: 'cookie', purpose: 'Your welcome offer, so it comes off at checkout (and, once it ends, so it stays ended).', lasts: '1 year' },

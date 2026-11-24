@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { CouchIcon, CaretRightIcon, ChartLineUpIcon, GearSixIcon, LinkSimpleIcon, PulseIcon, SignOutIcon, StarIcon, VideoCameraIcon } from '@phosphor-icons/react/ssr'
+import { CaretRightIcon, ChartBarIcon, ChartLineUpIcon, CouchIcon, FlowArrowIcon, GearSixIcon, GlobeIcon, LinkSimpleIcon, PulseIcon, SignOutIcon, StarIcon, VideoCameraIcon } from '@phosphor-icons/react/ssr'
 import { signOut } from '@/app/admin/actions'
 import { createClient } from '@/lib/supabase/server'
 
@@ -11,6 +11,9 @@ export const dynamic = 'force-dynamic'
 export default async function AdminMorePage() {
   const { count } = await (await createClient()).from('reviews').select('id', { count: 'exact', head: true }).eq('is_approved', false)
   const links = [
+    { href: '/admin/website', label: 'Website', note: 'Visits, baskets, WhatsApp and orders', icon: GlobeIcon },
+    { href: '/admin/journeys', label: 'Journeys', note: 'Funnel, fields that fail, where visits stop', icon: FlowArrowIcon },
+    { href: '/admin/business', label: 'Business', note: 'Orders and value by status', icon: ChartBarIcon },
     { href: '/admin/catalogue', label: 'Catalogue', note: 'Products, prices, photos and fabrics', icon: CouchIcon },
     { href: '/admin/reviews', label: 'Reviews', note: count ? `${count} waiting` : 'Nothing waiting', icon: StarIcon },
     { href: '/admin/videos', label: 'Videos', note: 'On product pages', icon: VideoCameraIcon },

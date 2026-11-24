@@ -28,6 +28,8 @@ import { emailSuggestion } from '@/lib/checkout/email-typos'
 import type { PlainError } from '@/lib/checkout/order'
 import { PayRows } from '@/components/checkout/PayRows'
 import { refreshBasket } from '../basket/actions'
+import { journey, toCode } from '@/lib/journey/browser'
+import { fieldCategoryFor } from '@/lib/journey/taxonomy'
 import { placeOrder, quoteCheckout, saveBasketReminder, type CheckoutQuote } from './actions'
 import { AddressStep, type AddressValue } from './AddressStep'
 
@@ -97,6 +99,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   useEffect(() => {
     if (!hydrated || begun.current || basket.lines.length === 0) return
     begun.current = true
+    journey('checkout_step', { step: 'start' })
     track('InitiateCheckout', { contents: basket.lines.map((l) => ({ id: l.variantId, quantity: l.quantity, item_price: l.view.unitPrice })), value: basket.subtotal })
   }, [hydrated, basket.lines, basket.subtotal])
 
@@ -223,7 +226,10 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
     setError(null)
     const e = validate()
     setFieldErrors(e)
+    journey('place_order', { outcome: 'attempted' })
     if (Object.keys(e).length) {
+      // Journeys: which kinds of field failed, never what was typed.
+      for (const k of Object.keys(e)) journey('validation_error', { fieldCategory: fieldCategoryFor(k), errorCode: 'check_failed', section: 'checkout' })
       setError({ code: 'BAD_INPUT', message: 'Please check the highlighted details.' })
       errorRef.current?.focus()
       return
@@ -234,6 +240,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
       return
     }
     if (shown.belowMinimum) {
+      journey('place_order', { outcome: 'failed', errorCode: 'below_minimum' })
       setError({ code: 'BELOW_MINIMUM', field: 'basket', message: `Orders start at ${formatPrice(shown.minimumOrder)}. Please add another piece to your basket.` })
       errorRef.current?.focus()
       return
@@ -257,12 +264,14 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
       qa: isQaVisit(),
     }).catch(() => ({ ok: false as const, error: { code: 'NETWORK', message: 'We couldn’t reach the shop. Please check your connection and try again; your order wasn’t placed.' } as PlainError }))
     if (res.ok) {
+      journey('place_order', { outcome: 'saved' })
       orderPlaced(shown.total)
       basket.clear()
       router.push(`/order/${res.id}`)
       return
     }
     setPlacing(false)
+    journey('place_order', { outcome: 'failed', errorCode: toCode(res.error.code) })
     setError(res.error)
     if (res.error.field) setFieldErrors({ [res.error.field]: res.error.message })
     if (res.error.code === 'PRICE_MISMATCH') setQuote(null)
@@ -289,6 +298,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   return (
     <form
       noValidate
+      data-journey-form="checkout"
       onSubmit={(e) => {
         e.preventDefault()
         void submit()

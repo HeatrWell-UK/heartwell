@@ -7,17 +7,20 @@ import { settingsDraft } from '@/lib/admin/settings-form'
 import { OrderFlowCard, type OrderFlowState } from '@/components/admin/OrderFlowCard'
 import { DeliveryAreasForm } from '@/components/admin/DeliveryAreasForm'
 import { createClient } from '@/lib/supabase/server'
+import { SeasonForm } from '@/components/admin/SeasonForm'
+import type { SeasonStatus } from '@/lib/admin/season-form'
 
 export const metadata: Metadata = { title: 'Settings' }
 export const dynamic = 'force-dynamic'
 
 export default async function SettingsPage() {
   const db = await createClient()
-  const [{ settings, codes, tierCounts }, orderflow, areas, welcomeLive] = await Promise.all([
+  const [{ settings, codes, tierCounts }, orderflow, areas, welcomeLive, season] = await Promise.all([
     loadSettings(),
     db.rpc('admin_orderflow'),
     db.from('delivery_areas').select('slug, name, places, charge, min_working_days, max_working_days, districts').order('sort').order('slug'),
     db.from('welcome_offers').select('visitor_id', { count: 'exact', head: true }).gt('expires_at', new Date().toISOString()),
+    db.rpc('admin_season_status'),
   ])
   if (areas.error) throw new Error(`Delivery areas: ${areas.error.message}`)
   return (
@@ -33,6 +36,7 @@ export default async function SettingsPage() {
       </header>
       <SettingsForm initial={settingsDraft(settings)} tierCounts={tierCounts} />
       <DeliveryAreasForm areas={areas.data.map((a) => ({ ...a, charge: Number(a.charge) }))} noDeliveryDays={settings.no_delivery_days} />
+      {season.data ? <SeasonForm status={season.data as unknown as SeasonStatus} /> : null}
       <WelcomeOfferSwitch
         on={settings.welcome_offer_enabled}
         amount={Number(settings.welcome_offer_amount)}

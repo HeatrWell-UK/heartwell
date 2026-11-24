@@ -1,6 +1,5 @@
 // Generated from the staging database by Supabase (generate_typescript_types).
 // Do not edit by hand: regenerate after every migration.
-
 export type Json =
   | string
   | number
@@ -2085,7 +2084,29 @@ export type Database = {
         Args: { p_note: string; p_order_id: string }
         Returns: undefined
       }
+      admin_business_summary: {
+        Args: { p_from: string; p_to: string }
+        Returns: Json
+      }
       admin_delete_product: { Args: { p_product_id: string }; Returns: Json }
+      admin_journey_daily: {
+        Args: {
+          p_device?: string
+          p_from: string
+          p_source?: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      admin_journey_explorer: {
+        Args: {
+          p_event?: string
+          p_from: string
+          p_limit?: number
+          p_to: string
+        }
+        Returns: Json
+      }
       admin_orderflow: { Args: never; Returns: Json }
       admin_orderflow_collect: { Args: never; Returns: number }
       admin_orderflow_log: { Args: { p_order_id: string }; Returns: Json }
@@ -2099,6 +2120,15 @@ export type Database = {
       admin_save_season: { Args: { p_input: Json }; Returns: Json }
       admin_season_status: { Args: never; Returns: Json }
       admin_status: { Args: never; Returns: Json }
+      admin_website_summary: {
+        Args: {
+          p_device?: string
+          p_from: string
+          p_source?: string
+          p_to: string
+        }
+        Returns: Json
+      }
       calculate_order_offer: {
         Args: {
           p_items: Json

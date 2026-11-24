@@ -1,0 +1,4 @@
+-- Recorded by mistake on 24 November 2026 (Run 3) with no statements: an
+-- empty placeholder applied before the real migration. It changed nothing.
+-- The Journeys migration is 20261124161438_journeys_reports.sql. Kept so the
+-- files match the database's migration history.
