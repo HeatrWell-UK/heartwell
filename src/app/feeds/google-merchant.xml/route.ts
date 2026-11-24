@@ -13,7 +13,10 @@ import { getOfferSettings } from '@/lib/offers/server'
 /** The Christmas and New Year event for the feed, when it's switched on (dates limit it). */
 async function feedSale() {
   const { event } = await getOfferSettings()
-  return event.enabled && event.mtoAmount > 0 ? { amount: event.mtoAmount, startsAt: event.startsAt, endsAt: event.endsAt } : null
+  // Run 3: the season's £50 is a personal 14-day window, not available to everyone at all times,
+  // so it isn't sent as a feed sale_price (Google and Meta treat that as a universal price).
+  void event
+  return null
 }
 
 export const dynamic = 'force-dynamic'

@@ -24,7 +24,7 @@ import { AddedSheet, type AddedItem } from './AddedSheet'
 import { StickyBuyBar } from './StickyBuyBar'
 import { OfferStrip, useOfferEnds } from '@/components/offer/OfferStrip'
 import { useWelcome, WelcomePanel } from '@/components/offer/WelcomeOffer'
-import { ChristmasDeliveryNote, EventPanel, useEvent } from '@/components/offer/EventOffer'
+import { ChristmasDeliveryNote, entitled, EventPanel, useEvent } from '@/components/offer/EventOffer'
 import { orderOffer } from '@/lib/offers/event'
 import { WhatsAppTopic } from '@/components/whatsapp/WhatsAppTopic'
 import { ScalePlan } from '@/components/catalogue/ScalePlan'
@@ -171,14 +171,16 @@ export function ProductPurchase({
   const welcomeAmount = welcomeOff(1, price, offers.welcome.amount)
   const outcome = orderOffer([{ madeToOrder: p.madeToOrder, tier: p.offerTier ?? null, unitPrice: price, quantity: 1 }], {
     event: event !== null,
+    entitled: entitled(event),
     eventAmount: offers.event.mtoAmount,
     ad: adEnds !== null,
     amounts: offers.amounts,
     welcome: welcome.kind === 'live',
     welcomeAmount: offers.welcome.amount,
   })
-  const showEvent = event !== null && outcome.kind === 'event'
-  const showWelcome = !showEvent && welcome.kind !== 'none' && welcomeAmount > adOff
+  // In the season: the panel while this visitor's window is live (or the honest ended note), never the welcome or ad strips.
+  const showEvent = event !== null && (outcome.kind === 'event' || event.window.kind === 'ended')
+  const showWelcome = event === null && welcome.kind !== 'none' && welcomeAmount > adOff
   const offer = { kind: outcome.kind, amount: outcome.amount }
   const offerOff = offer.amount
 
@@ -308,7 +310,7 @@ export function ProductPurchase({
                 Ask about this {noun}
               </WhatsAppButton>
             </div>}
-            {!showWelcome && !showEvent && <OfferStrip amount={Math.min(adAmount, price)} noun={noun} code={offers.code} />}
+            {!showWelcome && event === null && <OfferStrip amount={Math.min(adAmount, price)} noun={noun} code={offers.code} />}
           </div>
 
           {(p.madeToOrder || p.madeInUk) && (

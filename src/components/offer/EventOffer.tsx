@@ -1,26 +1,42 @@
 'use client'
 
-// The Christmas and New Year sofa event on the page (Run 2, owner 24 November
-// 2026). The part of the season (Christmas, Boxing week, New Year) is worked
-// out from the visitor's clock in UK time, so cached pages switch at
-// midnight by themselves and the event ends on 1 February with no deploy.
-// Gold tint and the gold heart, like the other offers; a real end date, no
-// countdown (the event's end is the same for everyone).
+// The Christmas and New Year sofa event on the page. Run 3 (owner, 24 November
+// 2026): one personal 14-day window per visitor (new or returning), capped at
+// the season's end, £50 off each sofa and chair. The part of the season
+// (Christmas, Boxing week, New Year) comes from the visitor's clock in UK
+// time; the window from the shop's cookies (end time and generation). A price
+// with the offer is shown only while this visitor's window is live; after it,
+// an honest "ended" note and the list price.
 
 import { useSyncExternalStore } from 'react'
 import { HeartIcon } from '@phosphor-icons/react'
 import { cn } from '@/lib/cn'
 import { formatPrice } from '@/lib/format'
 import { christmasDelivery, type ChristmasFacts } from '@/lib/delivery/christmas'
-import { eventCopy, eventLastDay, eventPhase, todayIsoLondon, type EventCopy, type EventPhase, type EventSettings } from '@/lib/offers/event'
+import { seasonStore } from '@/lib/offers/browser'
+import {
+  eventCopy,
+  eventLastDay,
+  eventPhase,
+  offerWords,
+  todayIsoLondon,
+  windowLeftText,
+  windowState,
+  type EventCopy,
+  type EventPhase,
+  type EventSettings,
+  type WindowState,
+} from '@/lib/offers/event'
 
-// One shared minute tick, so every component re-checks the phase together.
+// One shared minute tick, so every component re-checks together.
 const listeners = new Set<() => void>()
 let timer: ReturnType<typeof setInterval> | null = null
 function subscribe(cb: () => void) {
   listeners.add(cb)
   if (!timer) timer = setInterval(() => listeners.forEach((l) => l()), 60_000)
+  const off = seasonStore.subscribe(cb)
   return () => {
+    off()
     listeners.delete(cb)
     if (listeners.size === 0 && timer) {
       clearInterval(timer)
@@ -29,27 +45,48 @@ function subscribe(cb: () => void) {
   }
 }
 
+// A minute stamp, so the snapshot changes when the clock moves on (and only then).
+const minute = () => Math.floor(Date.now() / 60_000)
+
 export interface EventState {
   phase: EventPhase
   copy: EventCopy
   amount: number
   lastDay: string
+  /** This visitor's window. */
+  window: WindowState
+  /** Plain words for the offer: "£50 off each sofa and chair". */
+  words: string
 }
 
-/** The event as it stands now for this visitor, or null when it isn't on. */
+/** The season as it stands now for this visitor, or null when it isn't on. */
 export function useEvent(settings: EventSettings | undefined): EventState | null {
-  const phase = useSyncExternalStore(
+  const snap = useSyncExternalStore(
     subscribe,
-    () => (settings ? eventPhase(settings) : null),
-    () => (settings ? eventPhase(settings) : null),
+    () => (settings ? `${eventPhase(settings) ?? ''}#${seasonStore.getSnapshot()}#${minute()}` : ''),
+    () => (settings ? `${eventPhase(settings) ?? ''}##` : ''),
   )
-  if (!settings || !phase) return null
+  if (!settings) return null
+  const [phase, raw] = snap.split('#') as [EventPhase | '', string]
+  if (!phase) return null
+  const [until, gen] = (raw ?? '').split('|')
   const lastDay = eventLastDay(settings)
-  return { phase, copy: eventCopy(phase, settings.mtoAmount, lastDay), amount: settings.mtoAmount, lastDay }
+  return {
+    phase,
+    copy: eventCopy(phase, settings.mtoAmount, lastDay),
+    amount: settings.mtoAmount,
+    lastDay,
+    window: windowState(until, gen, settings.generation),
+    words: offerWords(settings.mtoAmount),
+  }
 }
 
-/** Product pages: the event's saving on this piece, in one row by the price. */
+/** True while this visitor's window is live. */
+export const entitled = (s: EventState | null) => s?.window.kind === 'live'
+
+/** Product pages: the saving on this piece and the visitor's real time left. */
 export function EventPanel({ state, amount, noun, className }: { state: EventState; amount: number; noun: string; className?: string }) {
+  if (state.window.kind !== 'live') return <EventEnded state={state} className={className} />
   return (
     <section
       aria-label={state.copy.title}
@@ -60,32 +97,46 @@ export function EventPanel({ state, amount, noun, className }: { state: EventSta
         <strong className="text-[15px] font-semibold text-ink">
           {formatPrice(amount)} off this {noun}
         </strong>
-        <span className="text-[13px] text-slate">{state.copy.note}</span>
+        <span className="text-[13px] text-slate">
+          {state.copy.note} Ends in {windowLeftText(state.window.ends)}.
+        </span>
       </p>
     </section>
   )
 }
 
-/** Basket and checkout: what the event takes off, in one line. */
+/** The honest state after a window has ended (or before the shop has answered: nothing). */
+export function EventEnded({ state, className }: { state: EventState; className?: string }) {
+  if (state.window.kind !== 'ended') return null
+  return (
+    <p role="note" className={cn('rounded-[14px] border border-line px-3 py-2 text-[13px] leading-snug text-slate', className)}>
+      Your 14-day {state.copy.title.toLowerCase()} offer has ended, so prices here are our normal prices. Questions? Message us on WhatsApp.
+    </p>
+  )
+}
+
+/** Basket and checkout: what the season takes off, in one line. */
 export function EventNote({ state, units, className }: { state: EventState; units: number; className?: string }) {
+  if (state.window.kind === 'ended') return <EventEnded state={state} className={className} />
+  if (state.window.kind !== 'live') return null
   return (
     <div role="note" className={cn('flex gap-3 rounded-[var(--radius-field)] bg-gold-tint px-3.5 py-3 text-[15px] leading-snug', className)}>
       <HeartIcon aria-hidden="true" size={22} weight="fill" className="mt-0.5 shrink-0 text-gold-dark" />
       <span className="flex flex-col gap-0.5">
         <strong className="font-semibold text-ink">
-          {state.copy.title}: {formatPrice(state.amount)} off each made-to-order sofa
+          {state.copy.title}: {state.words}
         </strong>
         <span className="text-slate">
           {units > 0
-            ? `${units} ${units === 1 ? 'sofa qualifies' : 'sofas qualify'}, taken off your total. One offer per piece, no code needed, until ${state.lastDay}.`
-            : `Made-to-order sofas in your basket get it automatically, until ${state.lastDay}.`}
+            ? `${units} ${units === 1 ? 'piece qualifies' : 'pieces qualify'}, taken off your total (code ${state.copy.code} is already applied). One offer per piece; footstools aren’t included. Your offer ends in ${windowLeftText(state.window.ends)}.`
+            : `Sofas and chairs in your basket get it automatically. Your offer ends in ${windowLeftText(state.window.ends)}.`}
         </span>
       </span>
     </div>
   )
 }
 
-/** The announcement bar's words while the event is on (client, so it switches at midnight). */
+/** The announcement bar's words while the season is on (client, so it switches at midnight). */
 export function EventBand({ settings, fallback, fallbackShort }: { settings: EventSettings; fallback: string; fallbackShort: string }) {
   const state = useEvent(settings)
   return (
@@ -97,7 +148,7 @@ export function EventBand({ settings, fallback, fallbackShort }: { settings: Eve
 }
 
 /**
- * Product pages, Christmas part of the event only: Christmas delivery, said
+ * Product pages, Christmas part of the season only: Christmas delivery, said
  * honestly. With the owner's facts set (Admin → Settings), the real order-by
  * date for most mainland postcodes; without them, no date at all and a real
  * check on WhatsApp instead. Never "guaranteed".

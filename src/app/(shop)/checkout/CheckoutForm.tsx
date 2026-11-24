@@ -143,9 +143,10 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const event = useEvent(offers.event)
   const eventApplies = shown?.offerSource === 'event'
   const welcomeApplies = !event && (shown ? shown.offerSource === 'welcome' : welcome.kind !== 'none')
+  // eventApplies comes from the database's own quote (the visitor's live window).
   const offerLabel =
     eventApplies && event
-      ? `${event.copy.title} (${shown?.eventUnits ?? 0} × ${formatPrice(event.amount)})${shown && shown.restAmount > 0 ? ` and ${formatPrice(shown.restAmount)} on your other pieces` : ''}`
+      ? `${event.copy.title} (${shown?.eventUnits ?? 0} × ${formatPrice(event.amount)})`
       : shown?.offerSource === 'welcome'
       ? 'Welcome offer'
       : shown?.promotionCode
@@ -496,10 +497,10 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
                 <p role="status" className={cn('pt-2 text-[15px]', shown.codeValid ? 'text-ink' : 'font-semibold text-error')}>
                   {!shown.codeValid
                     ? `We don’t recognise ${code}${event ? '' : ', or it isn’t on at the moment'}. Please check it.`
-                    : shown.codeIsEventAlias
-                      ? `${code} recognised: the ${event?.copy.title ?? 'sofa event'} is already taken off, ${formatPrice(shown.discountAmount)} in all. One offer per piece.`
-                    : eventApplies && shown.restSource !== 'manual_code'
-                      ? `${code} is valid, but the ${event?.copy.title ?? 'sofa event'} takes more off, so we’ve kept that. One offer per piece.`
+                    : event && eventApplies
+                      ? `${code} recognised: your ${event.copy.title} offer is already taken off, ${formatPrice(shown.discountAmount)} in all. Codes don’t add more: one offer per piece.`
+                    : event
+                      ? `${code} is recognised, but your 14-day offer isn’t live on this browser, so there’s nothing to take off. Message us on WhatsApp if you think that’s wrong.`
                     : shown.codeAmount === 0
                       ? `${code} is valid, but doesn’t apply to the pieces in your basket.`
                       : shown.offerSource === 'welcome'

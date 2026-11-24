@@ -19,6 +19,10 @@ export type OfferTier = 'HIGH' | 'MID' | 'STANDARD' | 'EXCLUDED'
 export const OFFER_COOKIE = 'hw-offer'
 /** Readable by the page: when the offer ends (ISO), so strips can show it. */
 export const OFFER_UNTIL_COOKIE = 'hw-offer-until'
+/** Readable by the page: which season generation the window belongs to (Run 3). */
+export const OFFER_GENERATION_COOKIE = 'hw-offer-gen'
+/** The seasonal window's cookies outlive it, so an ended window stays ended on this browser. */
+export const SEASON_COOKIE_DAYS = 120
 
 /** The tags on every Meta ad and catalogue link (the ad's own name tags are added by Meta). */
 export const META_AD_TAGS = { utm_source: 'facebook', utm_medium: 'paid_social' } as const

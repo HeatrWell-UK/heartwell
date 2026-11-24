@@ -82,7 +82,7 @@ export async function quoteCheckout(input: unknown): Promise<{ ok: true; quote: 
   if (error) return { ok: false, error: explainOrderError(error.message) }
   const r = data as Record<string, unknown>
   // An ad offer that has ended (or was withdrawn) stops showing anywhere.
-  if (token && r.entitlement_valid !== true) {
+  if (token && r.entitlement_valid !== true && r.season_ended !== true) {
     jar.delete(OFFER_COOKIE)
     jar.delete(OFFER_UNTIL_COOKIE)
   }

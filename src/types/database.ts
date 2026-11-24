@@ -803,6 +803,7 @@ export type Database = {
         Row: {
           created_at: string
           expires_at: string
+          generation: string | null
           id: string
           qualifying_arrival_id: string | null
           revoked_at: string | null
@@ -815,6 +816,7 @@ export type Database = {
         Insert: {
           created_at?: string
           expires_at: string
+          generation?: string | null
           id?: string
           qualifying_arrival_id?: string | null
           revoked_at?: string | null
@@ -827,6 +829,7 @@ export type Database = {
         Update: {
           created_at?: string
           expires_at?: string
+          generation?: string | null
           id?: string
           qualifying_arrival_id?: string | null
           revoked_at?: string | null
@@ -1736,9 +1739,11 @@ export type Database = {
           max_floor: number
           min_order_value: number
           no_delivery_days: number[]
+          offer_generation: string
           offer_tier_high: number
           offer_tier_mid: number
           offer_tier_standard: number
+          offer_window_hours: number
           orderflow_enabled: boolean
           orderflow_send_tests: boolean
           paid_offer_days: number
@@ -1776,9 +1781,11 @@ export type Database = {
           max_floor?: number
           min_order_value?: number
           no_delivery_days?: number[]
+          offer_generation?: string
           offer_tier_high?: number
           offer_tier_mid?: number
           offer_tier_standard?: number
+          offer_window_hours?: number
           orderflow_enabled?: boolean
           orderflow_send_tests?: boolean
           paid_offer_days?: number
@@ -1816,9 +1823,11 @@ export type Database = {
           max_floor?: number
           min_order_value?: number
           no_delivery_days?: number[]
+          offer_generation?: string
           offer_tier_high?: number
           offer_tier_mid?: number
           offer_tier_standard?: number
+          offer_window_hours?: number
           orderflow_enabled?: boolean
           orderflow_send_tests?: boolean
           paid_offer_days?: number
@@ -2087,6 +2096,8 @@ export type Database = {
       }
       admin_review_request: { Args: { p_order_id: string }; Returns: Json }
       admin_save_product: { Args: { p: Json }; Returns: Json }
+      admin_save_season: { Args: { p_input: Json }; Returns: Json }
+      admin_season_status: { Args: never; Returns: Json }
       admin_status: { Args: never; Returns: Json }
       calculate_order_offer: {
         Args: {
@@ -2129,6 +2140,10 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       issue_paid_offer_entitlement: {
         Args: { p_arrival_id?: string; p_source: string; p_visitor_id: string }
+        Returns: Json
+      }
+      issue_seasonal_offer: {
+        Args: { p_token?: string; p_visitor_id: string }
         Returns: Json
       }
       issue_welcome_offer: {

@@ -15,6 +15,7 @@ import { clientIp, rateLimit } from '@/lib/http/rate-limit'
 import { offerToken } from '@/lib/offers/paid'
 import { WELCOME_COOKIE, WELCOME_COOKIE_DAYS, WELCOME_UNTIL_COOKIE } from '@/lib/offers/welcome'
 import { getOfferSettings } from '@/lib/offers/server'
+import { eventLive } from '@/lib/offers/event'
 import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
@@ -28,7 +29,9 @@ export async function POST(request: Request) {
   if (!rateLimit(`welcome:${await clientIp()}`, 30, 60_000)) return none()
   const parsed = Body.safeParse(await request.json().catch(() => null))
   if (!parsed.success) return none()
-  if (!(await getOfferSettings()).welcome.enabled) return none()
+  const settings = await getOfferSettings()
+  // Run 3: during the season the seasonal window replaces the welcome offer.
+  if (!settings.welcome.enabled || eventLive(settings.event)) return none()
 
   const jar = await cookies()
   const { data, error } = await createAdminClient().rpc('issue_welcome_offer', {

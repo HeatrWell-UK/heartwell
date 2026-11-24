@@ -167,12 +167,6 @@ export function BasketView({ offers }: { offers: ShopOffers }) {
                   </dt>
                   <dd>−{formatPrice(offer.eventAmount)}</dd>
                 </div>
-                {offer.restAmount > 0 && (
-                  <div className="flex justify-between">
-                    <dt>{offer.restKind === 'welcome' ? 'Welcome offer on your other pieces' : 'Your offer on your other pieces'}</dt>
-                    <dd>−{formatPrice(offer.restAmount)}</dd>
-                  </div>
-                )}
               </>
             ) : (
               offer.amount > 0 && (

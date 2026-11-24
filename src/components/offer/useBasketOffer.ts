@@ -3,7 +3,7 @@
 import { basketSubtotal, type BasketLine } from '@/lib/basket/model'
 import { orderOffer } from '@/lib/offers/event'
 import { shortOfMinimum, type ShopOffers } from '@/lib/offers/welcome'
-import { useEvent } from './EventOffer'
+import { entitled, useEvent } from './EventOffer'
 import { useOfferEnds } from './OfferStrip'
 import { useWelcome } from './WelcomeOffer'
 
@@ -24,6 +24,7 @@ export function useBasketOffer(lines: BasketLine[], offers: ShopOffers) {
     lines.map((l) => ({ madeToOrder: l.view.madeToOrder, tier: l.view.offerTier ?? null, unitPrice: l.view.unitPrice, quantity: l.quantity })),
     {
       event: event !== null,
+      entitled: entitled(event),
       eventAmount: offers.event.mtoAmount,
       ad: adEnds !== null,
       amounts: offers.amounts,

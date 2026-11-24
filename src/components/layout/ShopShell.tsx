@@ -29,7 +29,7 @@ export async function ShopShell({ children }: { children: ReactNode }) {
       <FloatingWhatsApp />
       <WhatsAppHelp />
       <Tracking mode={tracking.mode} />
-      <OfferCapture enabled={offers.adOffer} welcome={offers.welcome.enabled} />
+      <OfferCapture enabled={offers.adOffer} welcome={offers.welcome.enabled} event={offers.event} />
     </div>
   )
 }

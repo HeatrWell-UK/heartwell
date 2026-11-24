@@ -8,7 +8,7 @@ import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/ad
 import { SUPABASE_CONFIGURED } from '@/lib/supabase/config'
 import { SETTINGS_TAG } from '@/lib/product/load'
 import type { ChristmasFacts } from '@/lib/delivery/christmas'
-import { NO_EVENT, type EventSettings } from './event'
+import { eventLive, NO_EVENT, type EventSettings } from './event'
 import type { TierAmounts } from './paid'
 import type { ShopOffers, WelcomeSettings } from './welcome'
 
@@ -46,13 +46,13 @@ export const getOfferSettings = unstable_cache(
     if (!SUPABASE_CONFIGURED) return NONE
     const db = createPublicClient()
     const BASE = 'paid_offer_enabled, paid_offer_days, offer_tier_high, offer_tier_mid, offer_tier_standard, welcome_offer_enabled, welcome_offer_amount, welcome_offer_hours, min_order_value, delivery_max_working_days, no_delivery_days'
-    const EVENT = 'event_enabled, event_name, event_starts_at, event_ends_at, event_mto_amount, christmas_last_delivery_date, christmas_closed_dates, made_to_order_lead_days'
+    const EVENT = 'event_enabled, event_name, event_starts_at, event_ends_at, event_mto_amount, christmas_last_delivery_date, christmas_closed_dates, made_to_order_lead_days, offer_window_hours, offer_generation'
     let { data, error } = await db.from('shop_settings').select(`${BASE}, ${EVENT}`).single()
     if (error) {
       // Before migration seasonal_event is applied the event's columns don't exist:
       // keep every other offer working and show no event (the database applies none either).
       const old = await db.from('shop_settings').select(BASE).single()
-      data = old.data ? ({ ...old.data, event_enabled: false, event_name: '', event_starts_at: NO_EVENT.startsAt, event_ends_at: NO_EVENT.endsAt, event_mto_amount: 0, christmas_last_delivery_date: null, christmas_closed_dates: [], made_to_order_lead_days: null } as typeof data) : null
+      data = old.data ? ({ ...old.data, event_enabled: false, event_name: '', event_starts_at: NO_EVENT.startsAt, event_ends_at: NO_EVENT.endsAt, event_mto_amount: 0, christmas_last_delivery_date: null, christmas_closed_dates: [], made_to_order_lead_days: null, offer_window_hours: 336, offer_generation: '' } as typeof data) : null
       error = old.error
     }
     if (error || !data) return NONE
@@ -80,6 +80,8 @@ export const getOfferSettings = unstable_cache(
         startsAt: data.event_starts_at,
         endsAt: data.event_ends_at,
         mtoAmount: Number(data.event_mto_amount),
+        windowHours: Number(data.offer_window_hours ?? 336),
+        generation: data.offer_generation ?? '',
       },
       christmas: {
         lastDeliveryDate: data.christmas_last_delivery_date ?? null,
@@ -95,4 +97,15 @@ export const getOfferSettings = unstable_cache(
 )
 
 /** Only what the shop's pages need in the browser. */
-export const shopOffers = (s: OfferSettings): ShopOffers => ({ amounts: s.amounts, code: s.code, welcome: s.welcome, minOrder: s.minOrder, event: s.event, christmas: s.christmas })
+/**
+ * Only what the shop's pages need in the browser. While the season is on (Run 3),
+ * the 48-hour welcome offer isn't used: the seasonal window replaces it.
+ */
+export const shopOffers = (s: OfferSettings, now: Date = new Date()): ShopOffers => ({
+  amounts: s.amounts,
+  code: s.code,
+  welcome: eventLive(s.event, now) ? { ...s.welcome, enabled: false } : s.welcome,
+  minOrder: s.minOrder,
+  event: s.event,
+  christmas: s.christmas,
+})

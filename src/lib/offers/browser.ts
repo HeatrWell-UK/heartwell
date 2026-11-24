@@ -4,7 +4,7 @@
 
 import { newEventId, readCookie } from '@/lib/tracking/browser'
 import { offerVisitorId } from '@/lib/basket/store'
-import { classifyPaidLanding, OFFER_UNTIL_COOKIE } from './paid'
+import { classifyPaidLanding, OFFER_GENERATION_COOKIE, OFFER_UNTIL_COOKIE } from './paid'
 import { WELCOME_UNTIL_COOKIE } from './welcome'
 
 const CHANGED = 'hw:offer'
@@ -24,6 +24,47 @@ export const offerStore = {
 }
 
 export const offerChanged = () => window.dispatchEvent(new Event(CHANGED))
+
+// The seasonal window (Run 3) ----------------------------------------------------
+
+/** Raw cookie state: "until|generation", or '' (a string so React can compare snapshots). */
+export const seasonStore = {
+  subscribe(onChange: () => void) {
+    window.addEventListener(CHANGED, onChange)
+    return () => window.removeEventListener(CHANGED, onChange)
+  },
+  getSnapshot(): string {
+    const until = readCookie(OFFER_UNTIL_COOKIE)
+    return until ? `${until}|${readCookie(OFFER_GENERATION_COOKIE) ?? ''}` : ''
+  },
+  getServerSnapshot: () => '',
+}
+
+let seasonAsking: Promise<void> | null = null
+
+/**
+ * During the season: asks the shop for this visitor's window once per page
+ * when the browser has none for this generation. The database grants ONE
+ * fresh window per visitor per generation and never resets it, so asking again
+ * is harmless.
+ */
+export function claimSeason(generation: string): Promise<void> {
+  if (!generation || readCookie(OFFER_GENERATION_COOKIE) === generation) return Promise.resolve()
+  seasonAsking ??= (async () => {
+    const visitorId = offerVisitorId()
+    try {
+      const res = await fetch('/api/season', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitorId: visitorId ?? newEventId() }),
+      })
+      if (res.ok) offerChanged()
+    } catch {
+      // No window shown this time; nothing is promised that checkout wouldn't honour.
+    }
+  })()
+  return seasonAsking
+}
 
 /**
  * When this address came from an ad, asks the server for the offer (once per

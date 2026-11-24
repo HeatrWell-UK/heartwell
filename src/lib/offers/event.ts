@@ -1,11 +1,13 @@
-// The Christmas and New Year sofa event (owner, 24 November 2026, Run 2):
-// 1 December 2026 00:00 to 31 January 2027 23:59:59, UK time, ending by itself
-// on 1 February. £50 off each made-to-order sofa, per sofa, for every visitor,
-// no code needed; list prices untouched, no was-prices. Pieces the shop
-// excludes from offers (tier EXCLUDED) are left out; imported pieces keep
-// their own offers. The database (calculate_order_offer, migration
-// seasonal_event) is the authority; this mirrors it for display. Pure: shared
-// by the browser, the server and tests.
+// The Christmas and New Year sofa event. Run 2 (24 November 2026) set the
+// season; Run 3 (owner's final scope, same day) made it ONE personal 14-day
+// window per visitor, new or returning, capped at the season's end
+// (1 February 2027 00:00 UK time): GBP 50 off EACH sofa and chair, per unit,
+// made to order or imported; only pieces the shop excludes from offers (tier
+// EXCLUDED: the Sims Footstool) are left out. List prices untouched, no
+// was-prices, never a percentage. During the season the welcome and ad offers
+// are not used; afterwards they resume. The database (calculate_order_offer,
+// issue_seasonal_offer, migration season_offer_14_day) is the authority;
+// this mirrors it for display. Pure: shared by the browser, the server and tests.
 
 import type { OfferTier, TierAmounts } from './paid'
 
@@ -16,11 +18,15 @@ export interface EventSettings {
   startsAt: string
   /** ISO instant the event ends (exclusive: 1 Feb 2027 00:00 London). */
   endsAt: string
-  /** Pounds off each made-to-order sofa. */
+  /** Pounds off each eligible sofa or chair. */
   mtoAmount: number
+  /** Hours in each visitor's window (capped at endsAt). */
+  windowHours: number
+  /** Changing it gives everyone one fresh window. */
+  generation: string
 }
 
-export const NO_EVENT: EventSettings = { enabled: false, name: '', startsAt: '1970-01-01T00:00:00Z', endsAt: '1970-01-01T00:00:00Z', mtoAmount: 0 }
+export const NO_EVENT: EventSettings = { enabled: false, name: '', startsAt: '1970-01-01T00:00:00Z', endsAt: '1970-01-01T00:00:00Z', mtoAmount: 0, windowHours: 336, generation: '' }
 
 /** The three parts of the season, by the UK calendar: the copy changes, the offer doesn't. */
 export type EventPhase = 'christmas' | 'year_end' | 'new_year'
@@ -73,43 +79,56 @@ export interface EventCopy {
   bandShort: string
   /** The line under a price. */
   note: string
+  /** The season's code: recognised at checkout, adds nothing on top of the window. */
+  code: 'CHRISTMAS' | 'NEWYEAR'
+  /** Its own page. */
+  href: '/christmas' | '/new-year'
 }
 
+/** What the offer is, in the same words everywhere. */
+export const offerWords = (amount: number) => `£${Math.round(amount)} off each sofa and chair`
+
 /**
- * The words for each part of the season. Always "£50 off each made-to-order
- * sofa" (never "50%", never "save" against an older price), always the real
- * last day, never a Christmas delivery promise (that comes only from the
- * delivery settings, christmas.ts).
+ * The words for each part of the season: always "£50 off each sofa and chair"
+ * (never a percentage, never "save" against an older price), the visitor's own
+ * window (said near the price, from the real end time), never a Christmas
+ * delivery promise (that comes only from the delivery settings, christmas.ts).
  */
 export function eventCopy(phase: EventPhase, amount: number, lastDay: string): EventCopy {
-  const off = `£${Math.round(amount)} off each made-to-order sofa`
+  const off = offerWords(amount)
   switch (phase) {
     case 'christmas':
       return {
         title: 'Christmas sofa event',
-        band: `Christmas sofa event: ${off} until ${lastDay}. Pay in full on delivery.`,
+        band: `Christmas sofa event: ${off} for 14 days from your first visit (season ends ${lastDay}).`,
         bandShort: `Christmas: ${off}`,
-        note: `Christmas sofa event, until ${lastDay}. No code needed.`,
+        note: 'Christmas sofa event: your 14-day offer, taken off automatically.',
+        code: 'CHRISTMAS',
+        href: '/christmas',
       }
     case 'year_end':
       return {
         title: 'Boxing week sofa event',
-        band: `Boxing week and year-end: ${off} until ${lastDay}. Pay in full on delivery.`,
+        band: `Boxing week and year-end: ${off} for 14 days from your first visit (season ends ${lastDay}).`,
         bandShort: `Boxing week: ${off}`,
-        note: `Boxing week and year-end event, until ${lastDay}. No code needed.`,
+        note: 'Boxing week sofa event: your 14-day offer, taken off automatically.',
+        code: 'NEWYEAR',
+        href: '/new-year',
       }
     case 'new_year':
       return {
         title: 'New Year sofa event',
-        band: `New Year sofa event: ${off} until ${lastDay}. Pay in full on delivery.`,
+        band: `New Year sofa event: ${off} for 14 days from your first visit (season ends ${lastDay}).`,
         bandShort: `New Year: ${off}`,
-        note: `New Year sofa event, until ${lastDay}. No code needed.`,
+        note: 'New Year sofa event: your 14-day offer, taken off automatically.',
+        code: 'NEWYEAR',
+        href: '/new-year',
       }
   }
 }
 
-/** A piece counts for the event when it is made to order and not excluded from offers. */
-export const eventEligible = (madeToOrder: boolean, tier: OfferTier | null | undefined) => madeToOrder && tier !== 'EXCLUDED'
+/** A piece counts for the event unless the shop excludes it from offers (Run 3: imported pieces count too). */
+export const eventEligible = (tier: OfferTier | null | undefined) => tier !== 'EXCLUDED'
 
 export interface OfferLine {
   madeToOrder: boolean
@@ -140,42 +159,53 @@ export type OfferChoice = 'event' | 'welcome' | 'ad' | null
 export interface OfferOutcome {
   kind: OfferChoice
   amount: number
-  /** The event's part (made-to-order units). */
+  /** The event's part (eligible units). */
   eventAmount: number
   eventUnits: number
-  /** What the other pieces got alongside the event, and from which offer. */
+  /** Kept for the basket's layout; always 0 since Run 3 (one offer per piece, the season's). */
   restAmount: number
   restKind: 'welcome' | 'ad' | null
 }
 
 /**
  * The one offer an order gets, as the database works it out:
- *   A. without the event: the best tier (ad visit or code) or the welcome offer on every piece;
- *   B. with the event: £amount on each eligible unit, plus the better of tier or welcome on the other pieces.
- * The bigger wins; a tie goes to the event. Never stacked on a unit.
+ *   in the season: amount off each eligible unit while this visitor's window is live, otherwise nothing;
+ *   outside it: the best tier (ad visit or code) or the welcome offer on every piece.
  */
 export function orderOffer(
   lines: OfferLine[],
-  opts: { event: boolean; eventAmount: number; ad: boolean; amounts: TierAmounts; welcome: boolean; welcomeAmount: number },
+  opts: { event: boolean; entitled: boolean; eventAmount: number; ad: boolean; amounts: TierAmounts; welcome: boolean; welcomeAmount: number },
 ): OfferOutcome {
   const none: OfferOutcome = { kind: null, amount: 0, eventAmount: 0, eventUnits: 0, restAmount: 0, restKind: null }
+  if (opts.event) {
+    if (!opts.entitled || !(opts.eventAmount > 0)) return none
+    const eligible = lines.filter((l) => eventEligible(l.tier))
+    const ev = round2(eligible.reduce((s, l) => s + Math.min(l.unitPrice * l.quantity, opts.eventAmount * l.quantity), 0))
+    return ev > 0 ? { ...none, kind: 'event', amount: ev, eventAmount: ev, eventUnits: eligible.reduce((s, l) => s + l.quantity, 0) } : none
+  }
   const adA = opts.ad ? tierOff(lines, opts.amounts) : 0
   const welA = opts.welcome ? welcomeOffFor(lines, opts.welcomeAmount) : 0
-  const planA: OfferOutcome =
-    adA > 0 && adA >= welA ? { ...none, kind: 'ad', amount: adA } : welA > 0 ? { ...none, kind: 'welcome', amount: welA } : none
+  return adA > 0 && adA >= welA ? { ...none, kind: 'ad', amount: adA } : welA > 0 ? { ...none, kind: 'welcome', amount: welA } : none
+}
 
-  if (!opts.event || !(opts.eventAmount > 0)) return planA
-  const eligible = lines.filter((l) => eventEligible(l.madeToOrder, l.tier))
-  const rest = lines.filter((l) => !eventEligible(l.madeToOrder, l.tier))
-  const ev = round2(eligible.reduce((s, l) => s + Math.min(l.unitPrice * l.quantity, opts.eventAmount * l.quantity), 0))
-  if (ev <= 0) return planA
-  const adR = opts.ad ? tierOff(rest, opts.amounts) : 0
-  const welR = opts.welcome ? welcomeOffFor(rest, opts.welcomeAmount) : 0
-  const restKind = adR > 0 && adR >= welR ? 'ad' : welR > 0 ? 'welcome' : null
-  const restAmount = restKind === 'ad' ? adR : restKind === 'welcome' ? welR : 0
-  const planB = round2(ev + restAmount)
-  if (planB >= planA.amount) {
-    return { kind: 'event', amount: planB, eventAmount: ev, eventUnits: eligible.reduce((s, l) => s + l.quantity, 0), restAmount, restKind }
-  }
-  return planA
+/** The visitor's window: live (with its end), ended, or not known yet / none. */
+export type WindowState = { kind: 'live'; ends: Date } | { kind: 'ended'; ended: Date } | { kind: 'none' }
+
+export function windowState(untilIso: string | null | undefined, generationCookie: string | null | undefined, generation: string, now = Date.now()): WindowState {
+  if (!untilIso || !generation || generationCookie !== generation) return { kind: 'none' }
+  const t = Date.parse(untilIso)
+  if (!Number.isFinite(t)) return { kind: 'none' }
+  return t > now ? { kind: 'live', ends: new Date(t) } : { kind: 'ended', ended: new Date(t) }
+}
+
+/** "13 days 4 hours", "5 hours 12 minutes": the real time left, rounded down. */
+export function windowLeftText(ends: Date, now = Date.now()): string {
+  const ms = ends.getTime() - now
+  if (!(ms > 0)) return 'ended'
+  const mins = Math.floor(ms / 60_000)
+  const d = Math.floor(mins / 1440)
+  const h = Math.floor((mins % 1440) / 60)
+  const m = mins % 60
+  const part = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`
+  return d > 0 ? `${part(d, 'day')} ${part(h, 'hour')}` : `${part(h, 'hour')} ${part(m, 'minute')}`
 }

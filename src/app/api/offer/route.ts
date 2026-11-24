@@ -10,7 +10,7 @@
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { clientIp, rateLimit } from '@/lib/http/rate-limit'
-import { classifyPaidLanding, OFFER_COOKIE, OFFER_UNTIL_COOKIE } from '@/lib/offers/paid'
+import { classifyPaidLanding, OFFER_COOKIE, OFFER_GENERATION_COOKIE, OFFER_UNTIL_COOKIE, SEASON_COOKIE_DAYS } from '@/lib/offers/paid'
 import { getOfferSettings } from '@/lib/offers/server'
 import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/admin'
 
@@ -41,11 +41,16 @@ export async function POST(request: Request) {
     console.error('offer entitlement failed', error?.message)
     return none()
   }
-  const offer = data as { token: string; expires_at: string }
+  const offer = data as { token: string; expires_at: string; generation?: string | null }
   const expires = new Date(offer.expires_at)
   const jar = await cookies()
-  const base = { path: '/', expires, sameSite: 'lax' as const, secure: process.env.NODE_ENV === 'production' }
+  const seasonal = Boolean(offer.generation)
+  const base = seasonal
+    ? { path: '/', maxAge: SEASON_COOKIE_DAYS * 86_400, sameSite: 'lax' as const, secure: process.env.NODE_ENV === 'production' }
+    : { path: '/', expires, sameSite: 'lax' as const, secure: process.env.NODE_ENV === 'production' }
   jar.set(OFFER_COOKIE, offer.token, { ...base, httpOnly: true })
   jar.set(OFFER_UNTIL_COOKIE, expires.toISOString(), base)
+  if (seasonal) jar.set(OFFER_GENERATION_COOKIE, offer.generation!, base)
+  else jar.delete(OFFER_GENERATION_COOKIE)
   return Response.json({ offer: { until: expires.toISOString() } })
 }
