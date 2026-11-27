@@ -11,6 +11,7 @@ import { createAdminClient, SUPABASE_SECRET_CONFIGURED } from '@/lib/supabase/ad
 import { formatUkPhone, isUkPhone } from '@/lib/checkout/phone'
 import { testReason } from '@/lib/checkout/order'
 import { sendSampleEmails } from '@/lib/leads/notify'
+import { PAUSED, PAUSED_TEXT } from '@/config/paused'
 
 export type SampleField = 'name' | 'phone' | 'email' | 'postcode' | 'address' | 'fabrics'
 export type SampleResult = { ok: true } | { ok: false; message: string; field?: SampleField }
@@ -34,6 +35,7 @@ const MESSAGES: Record<string, { message: string; field?: SampleField }> = {
 }
 
 export async function requestSamples(input: unknown): Promise<SampleResult> {
+  if (PAUSED.samples) return { ok: false, message: PAUSED_TEXT.samples }
   const parsed = Input.safeParse(input)
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.path[0]

@@ -10,6 +10,7 @@ import { FABRIC_GRID, FABRIC_TILE_SIZES } from '@/components/fabrics/grid'
 import { Button } from '@/components/ui/Button'
 import { Field, TextArea, TextInput } from '@/components/ui/Field'
 import { SAMPLES } from '@/config/samples'
+import { PAUSED, PAUSED_TEXT } from '@/config/paused'
 import { visitIds } from '@/lib/tracking/browser'
 import { track } from '@/lib/tracking/browser'
 import { useBottomCover } from '@/lib/ui/bottom-cover'
@@ -89,6 +90,11 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
       setError({ message: 'Choose at least one fabric.', field: 'fabrics' })
       return
     }
+    if (PAUSED.samples) {
+      setError({ message: PAUSED_TEXT.samples })
+      requestAnimationFrame(() => errorRef.current?.focus())
+      return
+    }
     setSending(true)
     setError(null)
     const ids = visitIds()
@@ -120,6 +126,7 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
             {chosen.length} of {limit} chosen
           </p>
         </div>
+        {PAUSED.samples && chosen.length > 0 && <PausedNote />}
         {fieldError('fabrics') && (
           <p className="flex items-center gap-2 text-[15px] font-semibold text-error">
             <WarningCircleIcon aria-hidden="true" size={20} /> {fieldError('fabrics')}
@@ -222,6 +229,7 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
         <Button type="submit" block disabled={sending}>
           {sending ? 'Sending…' : chosen.length > 0 ? `Request ${chosen.length} ${chosen.length === 1 ? 'sample' : 'samples'}` : 'Request samples'}
         </Button>
+        {PAUSED.samples && chosen.length > 0 && !error && <PausedNote />}
         <p className="text-sm text-slate">
           Nothing to pay now. We’ll ring or WhatsApp you to arrange the {SAMPLES.fee} for the set before we post anything, and we take it off your sofa if you buy.
         </p>
@@ -290,5 +298,20 @@ export function SamplesForm({ collections, limit, initialIds }: { collections: S
       </div>
     )}
     </>
+  )
+}
+
+/** Shown once a fabric is chosen while posting samples is paused (src/config/paused.ts). */
+function PausedNote() {
+  return (
+    <div role="status" className="flex items-start gap-2 rounded-[var(--radius-field)] bg-white p-3 text-[15px] leading-snug ring-1 ring-line">
+      <WarningCircleIcon aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-velvet" />
+      <span>
+        {PAUSED_TEXT.samples}{' '}
+        <Link href="/visit-us" className="font-semibold">
+          Visit our showroom
+        </Link>
+      </span>
+    </div>
   )
 }

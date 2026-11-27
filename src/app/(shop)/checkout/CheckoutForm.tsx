@@ -23,6 +23,7 @@ import { areaForPostcode, chargeRange } from '@/lib/delivery/areas'
 import { deliveryDaysText, formatDeliveryDate, isNoDeliveryDay } from '@/lib/delivery/window'
 import type { AreaDelivery } from '@/lib/product/types'
 import { PROMISES } from '@/config/promises'
+import { PAUSED, PAUSED_TEXT } from '@/config/paused'
 import { formatUkPhone, isUkPhone, phoneProblem } from '@/lib/checkout/phone'
 import { emailSuggestion } from '@/lib/checkout/email-typos'
 import type { PlainError } from '@/lib/checkout/order'
@@ -68,6 +69,8 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   const [assembly, setAssembly] = useState(false)
   const [removal, setRemoval] = useState(false)
   const [removalSeats, setRemovalSeats] = useState(settings.removal_default_seats)
+  // Ticking it while removal is paused shows the apology and adds nothing to the order.
+  const removalOn = removal && !PAUSED.removal
   const [preferredDate, setPreferredDate] = useState('')
   const [notes, setNotes] = useState('')
   const [codeInput, setCodeInput] = useState('')
@@ -104,7 +107,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   }, [hydrated, basket.lines, basket.subtotal])
 
   const items = useMemo(() => basket.lines.map((l) => ({ id: l.id, variantId: l.variantId, materialId: l.materialId, quantity: l.quantity })), [basket.lines])
-  const extras = useMemo(() => ({ floor, hasLift: floor > 0 && hasLift, assembly, removal, removalSeats: removal ? removalSeats : null }), [floor, hasLift, assembly, removal, removalSeats])
+  const extras = useMemo(() => ({ floor, hasLift: floor > 0 && hasLift, assembly, removal: removalOn, removalSeats: removalOn ? removalSeats : null }), [floor, hasLift, assembly, removalOn, removalSeats])
   const canOrderHere = address.outcome.kind === 'mainland' || address.outcome.kind === 'depends'
   // A charged area's price and slower window, once the postcode is known; the database adds the same charge.
   const area = canOrderHere ? areaForPostcode(address.postcode, areas) : null
@@ -130,7 +133,7 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
   }, [hydrated, items.length, quoteInput, quoteKey])
 
   // Instant figures while the database's answer is on its way.
-  const local = quoteDelivery({ floor, hasLift, assembly, removal, removalSeats }, settings)
+  const local = quoteDelivery({ floor, hasLift, assembly, removal: removalOn, removalSeats }, settings)
   const subtotal = basket.subtotal
   const shown = quoteIsCurrent && quote ? quote.value : null
   const total = shown ? shown.total : subtotal + local.total + (area?.charge ?? 0)
@@ -449,7 +452,13 @@ export function CheckoutForm({ settings, windowLabel, earliestDate, latestDate, 
           )}
           <Check id={`${id}-asm`} checked={assembly} onChange={setAssembly} label={`Assemble it in my room (${formatPrice(settings.assembly_fee)})`} />
           <Check id={`${id}-rem`} checked={removal} onChange={setRemoval} label={`Take my old sofa away (${formatPrice(settings.removal_per_seat)} a seat)`} />
-          {removal && (
+          {removal && PAUSED.removal && (
+            <p role="status" className="flex items-start gap-2 rounded-[var(--radius-field)] bg-stone p-3 text-[15px] leading-snug">
+              <WarningCircleIcon aria-hidden="true" size={20} className="mt-0.5 shrink-0 text-velvet" />
+              {PAUSED_TEXT.removal}
+            </p>
+          )}
+          {removalOn && (
             <Field label="How many seats is your old sofa?" id={`${id}-seats`}>
               <select
                 id={`${id}-seats`}
